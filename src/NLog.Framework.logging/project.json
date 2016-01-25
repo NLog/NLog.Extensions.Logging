@@ -1,0 +1,27 @@
+﻿{
+    "version": "1.0.0-*",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/NLog/NLog.Framework.logging"
+    },
+    "compilationOptions": {
+        "warningsAsErrors": true,
+        "keyFile": "NLog.snk"
+    },
+    "_comment": "loglevels has been changed in RC2, so fix to RC1",
+    "dependencies": {
+
+        "Microsoft.Extensions.Logging.Abstractions": "[1.0.0-rc1-final]",
+        "Microsoft.AspNet.Hosting": "[1.0.0-rc1-final]",
+
+        "NLog": "4.0.1"
+    },
+    "frameworks": {
+        "net451": {
+            "frameworkAssemblies": {
+                "System.Xml": "4.0.0.0",
+                "System.Xml.XmlSerializer": "4.0.0.0"
+            }
+        }
+    }
+}
