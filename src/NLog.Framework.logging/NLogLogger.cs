@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace NLog.Framework.Logging
 {
+    /// <summary>
+    /// Wrap NLog's Logger in a Microsoft.Extensions.Logging's interface <see cref="Microsoft.Extensions.Logging.ILogger"/>.
+    /// </summary>
     internal class NLogLogger : Microsoft.Extensions.Logging.ILogger
     {
         private readonly Logger _logger;
@@ -18,24 +21,26 @@ namespace NLog.Framework.Logging
         public void Log(Microsoft.Extensions.Logging.LogLevel logLevel, int eventId, object state, Exception exception, Func<object, Exception, string> formatter)
         {
             var nLogLogLevel = ConvertLogLevel(logLevel);
-            string message;
-            if (formatter != null)
+            if (IsEnabled(nLogLogLevel))
             {
-                message = formatter(state, exception);
-            }
-            else
-            {
-                //todo dit niet? via nlog args?
-                message = Microsoft.Extensions.Logging.LogFormatter.Formatter(state, exception);
-            }
-            if (!string.IsNullOrEmpty(message))
-            {
+                string message;
+                if (formatter != null)
+                {
+                    message = formatter(state, exception);
+                }
+                else
+                {
+                    message = Microsoft.Extensions.Logging.LogFormatter.Formatter(state, exception);
+                }
+                if (!string.IsNullOrEmpty(message))
+                {
 
-
-                var eventInfo = LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
-                eventInfo.Exception = exception;
-                eventInfo.Properties["EventId"] = eventId;
-                _logger.Log(eventInfo);
+                    //message arguments are not needed as it is already checked that the loglevel is enabled.
+                    var eventInfo = LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
+                    eventInfo.Exception = exception;
+                    eventInfo.Properties["EventId"] = eventId;
+                    _logger.Log(eventInfo);
+                }
             }
         }
 
@@ -46,13 +51,22 @@ namespace NLog.Framework.Logging
         /// <returns></returns>
         public bool IsEnabled(Microsoft.Extensions.Logging.LogLevel logLevel)
         {
-            return _logger.IsEnabled(ConvertLogLevel(logLevel));
+            var convertLogLevel = ConvertLogLevel(logLevel);
+            return IsEnabled(convertLogLevel);
         }
 
         /// <summary>
-        /// Convert loglevel to NLog variant
+        /// Is logging enabled for this logger at this <paramref name="logLevel"/>?
         /// </summary>
-        /// <param name="logLevel"></param>
+        private bool IsEnabled(LogLevel logLevel)
+        {
+            return _logger.IsEnabled(logLevel);
+        }
+
+        /// <summary>
+        /// Convert loglevel to NLog variant.
+        /// </summary>
+        /// <param name="logLevel">level to be converted.</param>
         /// <returns></returns>
         private static LogLevel ConvertLogLevel(Microsoft.Extensions.Logging.LogLevel logLevel)
         {
@@ -81,6 +95,7 @@ namespace NLog.Framework.Logging
             }
         }
 
+        
         public IDisposable BeginScopeImpl(object state)
         {
             if (state == null)
