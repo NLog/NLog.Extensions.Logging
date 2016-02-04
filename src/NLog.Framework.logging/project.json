@@ -1,5 +1,11 @@
 ﻿{
     "version": "1.0.0-rc1-final-*",
+    "description": "NLog provider for Microsoft.Framework.Logging",
+    "authors": [ "Microsoft", "Julian Verdurmen" ],
+    "tags": [ "NLog", "Microsoft.Extensions.Logging", "Microsoft.Framework.Logging", "log", "log files" ],
+    "projectUrl": "https://github.com/NLog/NLog.Framework.logging",
+    "licenseUrl": "https://github.com/NLog/NLog.Framework.logging/blob/master/LICENSE",
+    "iconUrl": "http://nlog-project.org/NConfig.png",
     "repository": {
         "type": "git",
         "url": "git://github.com/NLog/NLog.Framework.logging"
