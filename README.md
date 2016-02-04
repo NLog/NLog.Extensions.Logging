@@ -34,4 +34,4 @@ Known issues
 - This work only for "Microsoft.Extensions.Logging" RC1 as there are breaking changes in RC2 (not released yet)
 
 
-Please give feedback!
+Please give feedback [here](https://github.com/NLog/NLog.Framework.logging/issues/8)!
