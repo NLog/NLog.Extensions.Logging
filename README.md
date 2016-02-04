@@ -32,6 +32,7 @@ Known issues
 - `${basedir}` refers to `C:\Users\...\.dnx\runtimes\dnx-clr-win-x86.1.0.0-rc1-update1\bin`
 - auto load of NLog extensions won't work yet.
 - This work only for "Microsoft.Extensions.Logging" RC1 as there are breaking changes in RC2 (not released yet)
+- You need NLog 4.4 (alpha now) for CoreCLR
 
 
 Please give feedback [here](https://github.com/NLog/NLog.Framework.logging/issues/8)!
