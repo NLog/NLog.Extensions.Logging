@@ -1,0 +1,11 @@
+version: 1.0.{build}
+configuration: Release
+before_build:
+- cmd: >-
+    dnvm upgrade
+    dnu restore
+build:
+  project: NLog.Framework.logging.sln
+  verbosity: minimal
+artifacts:
+- path: '**\*.nupkg'
