@@ -3,12 +3,12 @@
     "description": "NLog provider for Microsoft.Framework.Logging",
     "authors": [ "Microsoft", "Julian Verdurmen" ],
     "tags": [ "NLog", "Microsoft.Extensions.Logging", "Microsoft.Framework.Logging", "log", "log files" ],
-    "projectUrl": "https://github.com/NLog/NLog.Framework.logging",
-    "licenseUrl": "https://github.com/NLog/NLog.Framework.logging/blob/master/LICENSE",
+    "projectUrl": "https://github.com/NLog/NLog.Framework.Logging",
+    "licenseUrl": "https://github.com/NLog/NLog.Framework.Logging/blob/master/LICENSE",
     "iconUrl": "http://nlog-project.org/NConfig.png",
     "repository": {
         "type": "git",
-        "url": "git://github.com/NLog/NLog.Framework.logging"
+        "url": "git://github.com/NLog/NLog.Framework.Logging"
     },
     "compilationOptions": {
         "warningsAsErrors": true,
