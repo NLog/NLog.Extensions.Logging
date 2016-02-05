@@ -13,7 +13,7 @@ How to use
 ----
 
 1. Create nlog.config in root of your project file.
-2.  in startup.cs add
+2.  in startup.cs add in `Configure`
 
 ```c#
   public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -23,7 +23,8 @@ How to use
 
       //configure nlog.config in your project root
       env.ConfigureNLog("nlog.config");
-  }
+      
+      ...
 ```  
   
 Known issues
