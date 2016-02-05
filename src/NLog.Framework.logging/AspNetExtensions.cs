@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNet.Hosting;
 using Microsoft.Extensions.PlatformAbstractions;
@@ -23,7 +24,7 @@ namespace NLog.Framework.Logging
         public static ILoggerFactory AddNLog(this ILoggerFactory factory)
         {
             //ignore this
-            LogManager.AddHiddenAssembly(typeof(AspNetExtensions).Assembly);
+            LogManager.AddHiddenAssembly(typeof(AspNetExtensions).GetTypeInfo().Assembly);
 
             var provider = new NLogLoggerProvider();
             factory.AddProvider(provider);
