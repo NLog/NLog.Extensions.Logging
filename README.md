@@ -29,7 +29,7 @@ How to use
   
 Known issues
 ---
-- you need to configure to load nlog.config (see example)
+- You need to configure where the nlog.config is located (see example above)
 - Installing the NuGet packages [NLog.config](https://www.nuget.org/packages/NLog.Config/) / [NLog.schema](https://www.nuget.org/packages/NLog.Schema/) won't add to your project. 
 - `${basedir}` refers to `C:\Users\...\.dnx\runtimes\dnx-clr-win-x86.1.0.0-rc1-update1\bin`
 - auto load of NLog extensions won't work yet.
