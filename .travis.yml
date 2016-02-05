@@ -1,0 +1,12 @@
+language: csharp
+sudo: required
+dist: trusty
+mono:
+  - 4.0.5
+os:
+  - linux
+  - osx
+script:
+  - dnvm install latest
+  - dnu restore
+  - dnu build --configuration release src/NLog.Framework.logging/project.json
