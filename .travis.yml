@@ -1,3 +1,4 @@
 language: csharp
 script:
+  - chmod u+x ./build.sh
   - ./build.sh --configuration Debug 
