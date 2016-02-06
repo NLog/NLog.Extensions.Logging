@@ -26,8 +26,10 @@ namespace NLog.Framework.Logging
             //ignore this
             LogManager.AddHiddenAssembly(typeof(AspNetExtensions).GetTypeInfo().Assembly);
 
-            var provider = new NLogLoggerProvider();
-            factory.AddProvider(provider);
+            using (var provider = new NLogLoggerProvider())
+            {
+                factory.AddProvider(provider);
+            }
             return factory;
         }
 
