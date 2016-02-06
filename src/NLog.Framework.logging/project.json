@@ -1,5 +1,5 @@
 ﻿{
-    "version": "1.0.0-rc1-final-*",
+    "version": "1.0.0-rc1-final-2016-02-06",
     "description": "NLog provider for Microsoft.Framework.Logging",
     "authors": [ "Microsoft", "Julian Verdurmen" ],
     "tags": [ "NLog", "Microsoft.Extensions.Logging", "Microsoft.Framework.Logging", "log", "log files" ],
