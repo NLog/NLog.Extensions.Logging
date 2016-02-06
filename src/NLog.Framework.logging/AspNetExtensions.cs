@@ -26,8 +26,10 @@ namespace NLog.Framework.Logging
             //ignore this
             LogManager.AddHiddenAssembly(typeof(AspNetExtensions).GetTypeInfo().Assembly);
 
-            var provider = new NLogLoggerProvider();
-            factory.AddProvider(provider);
+            using (var provider = new NLogLoggerProvider())
+            {
+                factory.AddProvider(provider);
+            }
             return factory;
         }
 
@@ -38,7 +40,7 @@ namespace NLog.Framework.Logging
         /// <param name="configFileRelativePath">relative path to NLog configuration file.</param>
         public static void ConfigureNLog(this IHostingEnvironment env, string configFileRelativePath)
         {
-            var fileName = Path.Combine(Directory.GetParent(env.WebRootPath).ToString(), configFileRelativePath);
+            var fileName = Path.Combine(Directory.GetParent(env.WebRootPath).FullName, configFileRelativePath);
             ConfigureNLog(fileName);
         }
 
