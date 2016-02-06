@@ -4,7 +4,7 @@ before_build:
 - cmd: >-
     dnvm install latest
     
-    dnu restore
+    dnu restore --quiet
 build:
   project: NLog.Framework.logging.sln
   verbosity: minimal
