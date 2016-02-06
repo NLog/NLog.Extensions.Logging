@@ -7,6 +7,4 @@ os:
   - linux
   - osx
 script:
-  - dnvm install latest
-  - dnu restore
-  - dnu build --configuration release src/NLog.Framework.logging/project.json
+  - ./build.sh --configuration Debug 
