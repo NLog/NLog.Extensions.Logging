@@ -29,7 +29,13 @@
     },
 
     "frameworks": {
-        "dnx451": { },
+        "dnx451": {
+            "dependencies": {
+                "NLog.Web": "4.1.0"
+            },
+            "compilationOptions": {"define": ["net451"]}
+
+        },
         "dnxcore50": { }
     },
 
