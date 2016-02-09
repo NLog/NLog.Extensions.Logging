@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.org/NLog/NLog.Framework.Logging.svg?branch=master)](https://travis-ci.org/NLog/NLog.Framework.Logging)
 [![NuGet Pre Release](https://img.shields.io/nuget/vpre/NLog.Framework.Logging.svg)](https://www.nuget.org/packages/NLog.Framework.Logging)
 
-[NLog](https://github.com/NLog/NLog) provider for [Microsoft.Framework.Logging](https://github.com/aspnet/Logging); DNX and ASP.NET 5.
+[NLog](https://github.com/NLog/NLog) provider for [Microsoft.Extensions.Logging](https://github.com/aspnet/Logging); DNX and ASP.NET 5.
 
 
 Routes ASP.NET 5 log messages to NLog.
@@ -36,7 +36,7 @@ Known issues
 - auto load of NLog extensions won't work yet.
 - This work only for "Microsoft.Extensions.Logging" RC1 as there are breaking changes in RC2 (not released yet)
 - You need NLog 4.4 (alpha now) for CoreCLR
-- The levels of Microsoft.Framework.Logging can be confusing. In  Microsoft.Framework.Logging RC1, `debug` is lowest level and not `verbose`. This has been fixed in Microsoft.Framework.Logging RC2 - which isn't released yet.
+- The levels of Microsoft.Extensions.Logging can be confusing. In  Microsoft.Extensions.Logging RC1, `debug` is lowest level and not `verbose`. This has been fixed in Microsoft.Extensions.Logging RC2 - which isn't released yet.
 
 Overview:
 
