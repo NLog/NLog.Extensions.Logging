@@ -50,7 +50,7 @@ Information	 | Information  | Info
 Verbose	     | Debug        | Debug
 Debug	       | Trace        | Trace
 
-So in RC1, `debug` in Microsoft is `trace` in NLog! This will be fixed in 
+So in RC1, `debug` in Microsoft is `trace` in NLog! 
 
 Please give feedback [here](https://github.com/NLog/NLog.Framework.Logging/issues/8)!
 
