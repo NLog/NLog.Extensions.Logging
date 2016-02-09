@@ -36,7 +36,21 @@ Known issues
 - auto load of NLog extensions won't work yet.
 - This work only for "Microsoft.Extensions.Logging" RC1 as there are breaking changes in RC2 (not released yet)
 - You need NLog 4.4 (alpha now) for CoreCLR
+- The levels of Microsoft.Framework.Logging can be confusing. In  Microsoft.Framework.Logging RC1, `debug` is lowest level and not `verbose`. This has been fixed in Microsoft.Framework.Logging RC2 - which isn't released yet.
 
+Overview:
+
+
+Microsoft RC1 | Microsoft RC2 | NLog
+-------------|--------------|-----------
+Critical	   | Critical     | Fatal
+Error	       | Error        | Error
+Warning	     | Warning      | Warn
+Information	 | Information  | Info
+Verbose	     | Debug        | Debug
+Debug	       | Trace        | Trace
+
+So in RC1, `debug` in Microsoft is `trace` in NLog! This will be fixed in 
 
 Please give feedback [here](https://github.com/NLog/NLog.Framework.Logging/issues/8)!
 
