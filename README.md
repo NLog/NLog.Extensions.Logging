@@ -94,7 +94,7 @@ With
 **Example 2**
 ```xml
     <target xsi:type="File" name="file" fileName="c:\temp\nlog-own-${shortdate}.log"
-              layout="${longdate}|${logger}|${uppercase:${level}}|${message} ${exception}" /> />
+              layout="${longdate}|${logger}|${uppercase:${level}}|${message} ${exception}" />
 ```
 
 ```
