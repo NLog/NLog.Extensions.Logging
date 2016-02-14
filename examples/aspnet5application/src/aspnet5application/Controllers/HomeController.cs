@@ -16,7 +16,7 @@ namespace aspnet5application.Controllers
         public HomeController(ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
         {
             Logger = loggerFactory.CreateLogger(GetType().Namespace);
-            Logger.Log(LogLevel.Information,1, "my own log",  null, null);
+            Logger.LogInformation("created homeController");
         }
         public IActionResult Index()
         {
