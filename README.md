@@ -58,6 +58,13 @@ Please give feedback [here](https://github.com/NLog/NLog.Framework.Logging/issue
 Example output
 ---
 
+With 
+
+```xml
+ <target xsi:type="File" name="file" fileName="c:\temp\nlog-own-${shortdate}.log"
+              layout="${longdate} ${uppercase:${level}} ${message} ${exception}" />
+```
+
 ```
 2016-02-05 00:36:59.6172 DEBUG Hosting starting
 2016-02-05 00:36:59.7027 DEBUG Hosting started
@@ -83,3 +90,95 @@ Example output
 2016-02-05 00:37:25.6917 INFO Request finished in 2,5563ms 200 text/html; charset=utf-8
 2016-02-05 00:37:25.8107 INFO Request finished in 2,5703ms 200 text/html; charset=utf-8
 ```
+
+**Example 2**
+```xml
+    <target xsi:type="File" name="file" fileName="c:\temp\nlog-own-${shortdate}.log"
+              layout="${longdate}|${logger}|${uppercase:${level}}|${message} ${exception}" /> />
+```
+
+```
+2016-02-14 16:27:02.8007|Microsoft.AspNet.Hosting.Internal.HostingEngine|DEBUG|Hosting starting 
+2016-02-14 16:27:02.8507|Microsoft.AspNet.Hosting.Internal.HostingEngine|DEBUG|Hosting started 
+2016-02-14 16:27:03.1037|Microsoft.AspNet.Hosting.Internal.HostingEngine|INFO|Request starting HTTP/1.1 GET http://localhost:56624/   
+2016-02-14 16:27:03.1037|Microsoft.AspNet.Hosting.Internal.HostingEngine|INFO|Request starting HTTP/1.1 DEBUG http://localhost:56624/ text/html  
+2016-02-14 16:27:03.2467|Microsoft.AspNet.StaticFiles.StaticFileMiddleware|DEBUG|DEBUG requests are not supported 
+2016-02-14 16:27:03.2527|Microsoft.AspNet.StaticFiles.StaticFileMiddleware|DEBUG|The request path / does not match a supported file type 
+2016-02-14 16:27:03.8387|Microsoft.AspNet.Routing.Template.TemplateRoute|DEBUG|Request successfully matched the route with name 'default' and template '{controller=Home}/{action=Index}/{id?}'. 
+2016-02-14 16:27:03.8387|Microsoft.AspNet.Routing.Template.TemplateRoute|DEBUG|Request successfully matched the route with name 'default' and template '{controller=Home}/{action=Index}/{id?}'. 
+2016-02-14 16:27:03.9577|Microsoft.AspNet.Mvc.Infrastructure.MvcRouteHandler|DEBUG|Executing action aspnet5application.Controllers.HomeController.Index 
+2016-02-14 16:27:03.9577|Microsoft.AspNet.Mvc.Infrastructure.MvcRouteHandler|DEBUG|Executing action aspnet5application.Controllers.HomeController.Index 
+2016-02-14 16:27:04.0547|aspnet5application.Controllers|INFO|created homeController 
+2016-02-14 16:27:04.0547|aspnet5application.Controllers|INFO|created homeController 
+2016-02-14 16:27:04.0967|Microsoft.AspNet.Mvc.Controllers.ControllerActionInvoker|INFO|Executing action method aspnet5application.Controllers.HomeController.Index with arguments () - ModelState is Valid' 
+2016-02-14 16:27:04.0967|Microsoft.AspNet.Mvc.Controllers.ControllerActionInvoker|INFO|Executing action method aspnet5application.Controllers.HomeController.Index with arguments () - ModelState is Valid' 
+2016-02-14 16:27:04.0967|Microsoft.AspNet.Mvc.Controllers.ControllerActionInvoker|DEBUG|Executed action method aspnet5application.Controllers.HomeController.Index, returned result Microsoft.AspNet.Mvc.ViewResult.' 
+2016-02-14 16:27:04.0967|Microsoft.AspNet.Mvc.Controllers.ControllerActionInvoker|DEBUG|Executed action method aspnet5application.Controllers.HomeController.Index, returned result Microsoft.AspNet.Mvc.ViewResult.' 
+2016-02-14 16:27:05.4417|Microsoft.AspNet.Mvc.ViewFeatures.ViewResultExecutor|DEBUG|The view 'Index' was found. 
+2016-02-14 16:27:05.4417|Microsoft.AspNet.Mvc.ViewFeatures.ViewResultExecutor|DEBUG|The view 'Index' was found. 
+2016-02-14 16:27:05.4417|Microsoft.AspNet.Mvc.ViewFeatures.ViewResultExecutor|INFO|Executing ViewResult, running view at path /Views/Home/Index.cshtml. 
+2016-02-14 16:27:05.4417|Microsoft.AspNet.Mvc.ViewFeatures.ViewResultExecutor|INFO|Executing ViewResult, running view at path /Views/Home/Index.cshtml. 
+2016-02-14 16:27:05.5557|Microsoft.Extensions.DependencyInjection.DataProtectionServices|INFO|User profile is available. Using 'C:\Users\j.verdurmen\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest. 
+2016-02-14 16:27:06.0557|Microsoft.AspNet.Mvc.Infrastructure.MvcRouteHandler|INFO|Executed action aspnet5application.Controllers.HomeController.Index in 0.2094ms 
+2016-02-14 16:27:06.0557|Microsoft.AspNet.Mvc.Infrastructure.MvcRouteHandler|INFO|Executed action aspnet5application.Controllers.HomeController.Index in 0.2094ms 
+2016-02-14 16:27:06.0947|Microsoft.AspNet.Hosting.Internal.HostingEngine|INFO|Request finished in 0,2953ms 200 text/html; charset=utf-8 
+2016-02-14 16:27:06.0947|Microsoft.AspNet.Hosting.Internal.HostingEngine|INFO|Request finished in 0,2953ms 200 text/html; charset=utf-8 
+```
+
+**Example only my logs**
+
+```c#
+    public class HomeController : Controller
+    {
+        protected ILogger Logger { get; }
+
+        public HomeController(ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
+        {
+            Logger = loggerFactory.CreateLogger(GetType().Namespace);
+            Logger.LogInformation("created homeController");
+        }
+```
+
+config:
+
+```xml
+<?xml version="1.0" encoding="utf-8" ?>
+<nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      autoReload="true"
+      internalLogLevel="Warn"
+      internalLogFile="c:\temp\internal.txt">
+
+
+  <!-- define various log targets -->
+  <targets>
+    <!-- write logs to file -->
+    <target xsi:type="File" name="allfile" fileName="c:\temp\nlog-all-${shortdate}.log"
+                 layout="${longdate}|${logger}|${uppercase:${level}}|${message} ${exception}" />
+
+    <target xsi:type="File" name="ownFile" fileName="c:\temp\nlog-own-${shortdate}.log"
+              layout="${longdate}|${logger}|${uppercase:${level}}|${message} ${exception}" />
+
+    <target xsi:type="Null" name="blackhole" />
+  </targets>
+
+  <rules>
+    <!--All logs, including from Microsoft-->
+    <logger name="*" minlevel="Trace" writeTo="allfile" />
+
+    <!--Skip Microsoft logs and so log only own logs-->
+    <logger name="Microsoft.*" minlevel="Trace" writeTo="blackhole" final="true" />
+    <logger name="*" minlevel="Trace" writeTo="ownFile" />
+  </rules>
+</nlog>
+```
+
+"nlog-own-2016-02-14.log" contains:
+
+```
+2016-02-14 16:27:04.0547|aspnet5application.Controllers|INFO|created homeController 
+2016-02-14 16:27:04.0547|aspnet5application.Controllers|INFO|created homeController 
+```
+
+
+
