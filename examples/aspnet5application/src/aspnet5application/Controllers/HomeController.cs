@@ -3,11 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.OptionsModel;
 
 namespace aspnet5application.Controllers
 {
     public class HomeController : Controller
     {
+
+        protected ILogger Logger { get; }
+
+        public HomeController(ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
+        {
+            Logger = loggerFactory.CreateLogger(GetType().Namespace);
+            Logger.Log(LogLevel.Information,1, "my own log",  null, null);
+        }
         public IActionResult Index()
         {
             return View();
@@ -23,7 +33,8 @@ namespace aspnet5application.Controllers
         public IActionResult Contact()
         {
             ViewData["Message"] = "Your contact page.";
-
+            
+            
             return View();
         }
 
