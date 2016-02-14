@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		global.json = global.json
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NLog.Framework.logging", "src\NLog.Framework.logging\NLog.Framework.logging.xproj", "{5BB808CD-F633-47C7-98B0-79B2A9BAE24A}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NLog.Extensions.Logging", "src\NLog.Extensions.Logging\NLog.Extensions.Logging.xproj", "{5BB808CD-F633-47C7-98B0-79B2A9BAE24A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
