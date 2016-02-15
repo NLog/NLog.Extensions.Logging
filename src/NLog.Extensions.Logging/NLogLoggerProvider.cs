@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using NLog;
-
-namespace NLog.Framework.Logging
+﻿namespace NLog.Extensions.Logging
 {
     /// <summary>
     /// Provider logger for NLog.
