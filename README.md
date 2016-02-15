@@ -1,8 +1,8 @@
-# NLog.Framework.Logging
+# NLog.Extensions.Logging
 
 [![Build status](https://ci.appveyor.com/api/projects/status/0nrg8cksp4b6tab1/branch/master?svg=true)](https://ci.appveyor.com/project/nlog/nlog-framework-logging/branch/master)
-[![Build Status](https://travis-ci.org/NLog/NLog.Framework.Logging.svg?branch=master)](https://travis-ci.org/NLog/NLog.Framework.Logging)
-[![NuGet Pre Release](https://img.shields.io/nuget/vpre/NLog.Framework.Logging.svg)](https://www.nuget.org/packages/NLog.Framework.Logging)
+[![Build Status](https://travis-ci.org/NLog/NLog.Extensions.Logging.svg?branch=master)](https://travis-ci.org/NLog/NLog.Extensions.Logging)
+[![NuGet Pre Release](https://img.shields.io/nuget/vpre/NLog.Extensions.Logging.svg)](https://www.nuget.org/packages/NLog.Extensions.Logging)
 
 [NLog](https://github.com/NLog/NLog) provider for [Microsoft.Extensions.Logging](https://github.com/aspnet/Logging); DNX and ASP.NET 5.
 
@@ -52,7 +52,7 @@ Debug	       | Trace        | Trace
 
 So in RC1, `debug` in Microsoft is `trace` in NLog! 
 
-Please give feedback [here](https://github.com/NLog/NLog.Framework.Logging/issues/8)!
+Please give feedback [here](https://github.com/NLog/NLog.Extensions.Logging/issues/8)!
 
 
 Example output

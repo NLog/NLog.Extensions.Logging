@@ -6,7 +6,7 @@ before_build:
     
     dnu restore --quiet
 build:
-  project: NLog.Framework.logging.sln
+  project: NLog.Extensions.Logging.sln
   verbosity: minimal
 artifacts:
 - path: '**\*.nupkg'

@@ -1,14 +1,14 @@
-﻿{
+{
     "version": "1.0.0-rc1-final-2016-02-06",
-    "description": "NLog provider for Microsoft.Framework.Logging",
+    "description": "NLog provider for Microsoft.Extensions.Logging",
     "authors": [ "Microsoft", "Julian Verdurmen" ],
-    "tags": [ "NLog", "Microsoft.Extensions.Logging", "Microsoft.Framework.Logging", "log", "logfiles", "aspnet5" ],
-    "projectUrl": "https://github.com/NLog/NLog.Framework.Logging",
-    "licenseUrl": "https://github.com/NLog/NLog.Framework.Logging/blob/master/LICENSE",
+    "tags": [ "NLog", "Microsoft.Extensions.Logging", "Microsoft.Framework.Logging", "log", "logfiles", "aspnet5", "dnx" ],
+    "projectUrl": "https://github.com/NLog/NLog.Extensions.Logging",
+    "licenseUrl": "https://github.com/NLog/NLog.Extensions.Logging/blob/master/LICENSE",
     "iconUrl": "http://nlog-project.org/NConfig.png",
     "repository": {
         "type": "git",
-        "url": "git://github.com/NLog/NLog.Framework.Logging"
+        "url": "git://github.com/NLog/NLog.Extensions.Logging"
     },
     "compilationOptions": {
         "warningsAsErrors": true,

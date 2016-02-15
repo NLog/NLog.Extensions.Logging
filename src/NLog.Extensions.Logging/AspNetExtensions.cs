@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Reflection;
-using Microsoft.Extensions.Logging;
 using Microsoft.AspNet.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.PlatformAbstractions;
 using NLog.Config;
 
-namespace NLog.Framework.Logging
+namespace NLog.Extensions.Logging
 {
     /// <summary>
     /// Helpers for ASP.NET

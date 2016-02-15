@@ -18,4 +18,4 @@ dnvm install $DNXVERSION -a x64 -r mono -alias default
 dnvm use default
 
 dnu restore
-dnu build --configuration release src/NLog.Framework.logging/project.json
+dnu build --configuration release src/NLog.Extensions.Logging/project.json
