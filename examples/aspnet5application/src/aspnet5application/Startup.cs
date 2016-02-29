@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
+using Microsoft.AspNet.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using NLog.Framework.Logging;
+using NLog.Extensions.Logging;
+using NLog.Web;
 
 namespace aspnet5application
 {
@@ -46,13 +49,20 @@ namespace aspnet5application
             //add NLog to aspnet5
             loggerFactory.AddNLog();
 
+            //add NLog.Web (only needed if NLog.Web.ASPNET5 is needed)
+            app.AddNLogWeb();
+
             //configure nlog.config in your project root
             env.ConfigureNLog("nlog.config");
+          
 
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
             app.UseApplicationInsightsRequestTelemetry();
+
+
+     
 
             if (env.IsDevelopment())
             {
