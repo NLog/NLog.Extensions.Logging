@@ -21,8 +21,7 @@
         "Microsoft.Extensions.Logging.Debug": "1.0.0-rc1-final",
         "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0-rc1-final",
         "NLog.Extensions.Logging": "1.0.0-rc1-final-2016-02-06",
-        "NLog": "4.4.0-alpha1",
-        "NLog.Web.ASPNET5": "4.2.0"
+        "NLog.Web.ASPNET5": "4.2.1"
     },
 
     "commands": {
@@ -31,14 +30,14 @@
 
     "frameworks": {
         "dnx451": {
-          
-            "compilationOptions": {"define": ["net451"]}
+
+            "compilationOptions": { "define": [ "net451" ] }
 
         },
         "dnxcore50": {
-          
 
         }
+      
     },
 
     "exclude": [
