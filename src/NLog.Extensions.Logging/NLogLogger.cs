@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.Logging;
 
 namespace NLog.Extensions.Logging
 {
@@ -15,24 +16,19 @@ namespace NLog.Extensions.Logging
         }
 
         //todo  callsite showing the framework logging classes/methods
-
-        public void Log(Microsoft.Extensions.Logging.LogLevel logLevel, int eventId, object state, Exception exception, Func<object, Exception, string> formatter)
+        public void Log<TState>(Microsoft.Extensions.Logging.LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
             var nLogLogLevel = ConvertLogLevel(logLevel);
             if (IsEnabled(nLogLogLevel))
             {
-                string message;
-                if (formatter != null)
+                if (formatter == null)
                 {
-                    message = formatter(state, exception);
+                    throw new ArgumentNullException(nameof(formatter));
                 }
-                else
-                {
-                    message = Microsoft.Extensions.Logging.LogFormatter.Formatter(state, exception);
-                }
+                var message = formatter(state, exception);
+
                 if (!string.IsNullOrEmpty(message))
                 {
-
                     //message arguments are not needed as it is already checked that the loglevel is enabled.
                     var eventInfo = LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
                     eventInfo.Exception = exception;
@@ -68,15 +64,11 @@ namespace NLog.Extensions.Logging
         /// <returns></returns>
         private static LogLevel ConvertLogLevel(Microsoft.Extensions.Logging.LogLevel logLevel)
         {
-            //note in RC2 verbose = trace
-            //https://github.com/aspnet/Logging/pull/314
             switch (logLevel)
-            {
-                
-                case Microsoft.Extensions.Logging.LogLevel.Debug:
-                    //note in RC1 trace is verbose is lower then Debug
+            {                
+                case Microsoft.Extensions.Logging.LogLevel.Trace:
                     return LogLevel.Trace;
-                case Microsoft.Extensions.Logging.LogLevel.Verbose:
+                case Microsoft.Extensions.Logging.LogLevel.Debug:
                     return LogLevel.Debug;
                 case Microsoft.Extensions.Logging.LogLevel.Information:
                     return LogLevel.Info;
@@ -93,8 +85,8 @@ namespace NLog.Extensions.Logging
             }
         }
 
-        
-        public IDisposable BeginScopeImpl(object state)
+
+        public IDisposable BeginScope<TState>(TState state)
         {
             if (state == null)
             {
