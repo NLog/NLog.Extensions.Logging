@@ -1,12 +1,9 @@
 version: 1.0.{build}
 configuration: Release
-before_build:
-- cmd: >-
-    dnvm install latest
-    
-    dnu restore --quiet
-build:
-  project: NLog.Extensions.Logging.sln
-  verbosity: minimal
+build_script:
+- ps: >-
+    dotnet restore src\NLog.Extensions.Logging
+
+    dotnet pack src\NLog.Extensions.Logging --configuration Release
 artifacts:
-- path: '**\*.nupkg'
+- path: 'src\NLog.Extensions.Logging\bin\release\*.nupkg'
