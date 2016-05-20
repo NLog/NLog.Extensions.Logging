@@ -33,7 +33,7 @@
         },
         "netstandard1.0": {
             "dependencies": {
-                "NLog":  "4.4.0-beta3"
+                "NLog":  "4.4.0-beta5"
             },
             "imports": [
                 "portable-net45+win8",
