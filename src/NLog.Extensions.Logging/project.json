@@ -1,5 +1,5 @@
 {
-    "version": "1.0.0-rc2-final-2016-05-20",
+    "version": "1.0.0-rc2-final-2016-05-21",
     "description": "NLog provider for Microsoft.Extensions.Logging",
     "authors": [ "Microsoft", "Julian Verdurmen" ],
     "packOptions": {
@@ -33,7 +33,7 @@
         },
         "netstandard1.3": {
             "dependencies": {
-                "NLog":  "4.4.0-beta6"
+                "NLog":  "4.4.0-beta8"
             }
         }
     }
