@@ -28,7 +28,7 @@
                 "System.Xml.XmlSerializer": "4.0.0.0"
             },
             "dependencies": {
-                "NLog": "4.0.1"
+                "NLog": "4.3.4"
             }
         },
         "netstandard1.0": {
