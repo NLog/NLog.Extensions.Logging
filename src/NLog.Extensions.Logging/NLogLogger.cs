@@ -93,7 +93,7 @@ namespace NLog.Extensions.Logging
                 throw new ArgumentNullException(nameof(state));
             }
             //TODO not working with async
-            return NestedDiagnosticsContext.Push(state.ToString());
+            return NestedDiagnosticsContext.Push(state);
         }
     }
 }

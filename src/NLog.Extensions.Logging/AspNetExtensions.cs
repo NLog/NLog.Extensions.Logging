@@ -2,19 +2,18 @@
 using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.PlatformAbstractions;
 using NLog.Config;
 
 namespace NLog.Extensions.Logging
 {
     /// <summary>
-    /// Helpers for ASP.NET
+    /// Helpers for ASP.NET Core
     /// </summary>
     public static class AspNetExtensions
     {
 
         /// <summary>
-        /// Enable NLog as logging provider in ASP.NET 5.
+        /// Enable NLog as logging provider in ASP.NET Core.
         /// </summary>
         /// <param name="factory"></param>
         /// <returns></returns>
