@@ -34,7 +34,6 @@ Known issues
 ---
 - You need to configure where the nlog.config is located (see example above)
 - Installing the NuGet packages [NLog.config](https://www.nuget.org/packages/NLog.Config/) / [NLog.schema](https://www.nuget.org/packages/NLog.Schema/) won't add to your project. 
-- unknown if `${basedir}` works
 - auto load of NLog extensions won't work yet.
 
 
