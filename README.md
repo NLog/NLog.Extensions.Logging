@@ -17,9 +17,11 @@ How to use
 2.  in startup.cs add in `Configure`
 
 ```c#
+  using NLog.Extensions.Logging;
+
   public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
   {
-      //add NLog to aspnet5
+      //add NLog to ASP.NET Core
       loggerFactory.AddNLog();
 
       //configure nlog.config in your project root
