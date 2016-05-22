@@ -29,6 +29,20 @@ How to use
       
       ...
 ```  
+
+3. Include NLog.config for publishing, project.json:
+
+```json
+   "publishOptions": {
+        "include": [
+            "wwwroot",
+            "Views",
+            "appsettings.json",
+            "web.config",
+            "nlog.config"
+        ]
+    },
+```
   
 Known issues
 ---
