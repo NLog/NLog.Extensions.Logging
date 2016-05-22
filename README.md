@@ -162,4 +162,4 @@ How to run the [aspnet-core-example](https://github.com/NLog/NLog.Extensions.Log
 
 1. Install dotnet: http://dot.net 
 2. From source: `dotnet run`
-3. After publish: `dotnet aspnet-core-example.dll`
+3. or, after publish: `dotnet aspnet-core-example.dll`
