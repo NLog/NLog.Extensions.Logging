@@ -157,3 +157,9 @@ In root folder, not wwwroot
 ```
 
 
+### How to run the example (aspnet-core-example)
+How to run the [aspnet-core-example](https://github.com/NLog/NLog.Extensions.Logging/tree/master/examples/aspnet-core-example):
+
+1. Install dotnet: http://dot.net 
+2. From source: `dotnet run`
+3. After publish: `dotnet aspnet-core-example.dll`
