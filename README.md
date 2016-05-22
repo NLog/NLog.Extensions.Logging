@@ -24,9 +24,6 @@ How to use
       //add NLog to ASP.NET Core
       loggerFactory.AddNLog();
 
-      //configure nlog.config in your project root
-      env.ConfigureNLog("nlog.config");
-      
       ...
 ```  
 
@@ -43,10 +40,12 @@ How to use
         ]
     },
 ```
+Notes:
+
+- NLog.Config is found automatically in RC2. 
   
 Known issues
 ---
-- You need to configure where the nlog.config is located (see example above)
 - Installing the NuGet packages [NLog.config](https://www.nuget.org/packages/NLog.Config/) / [NLog.schema](https://www.nuget.org/packages/NLog.Schema/) won't add to your project. 
 - auto load of NLog extensions won't work yet.
 
