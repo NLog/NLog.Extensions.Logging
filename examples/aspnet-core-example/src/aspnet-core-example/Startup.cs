@@ -40,8 +40,7 @@ namespace aspnet_core_example
             //add NLog to ASP.NET Core
             loggerFactory.AddNLog();
 
-            //configure nlog.config in your project root
-            env.ConfigureNLog("nlog.config");
+          
 
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
