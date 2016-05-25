@@ -100,12 +100,16 @@ In HomeController.cs
             Logger.Info("Index page says hello");
             return View();
         }
-        ```
+        
+        ...
+        
+````
 
 
 ### Example Output
 
 #### nlog-all-2016-05-21.log
+
 ```
 2016-05-21 13:39:53.6748|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:5000/   
 2016-05-21 13:39:53.6858|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path / does not match a supported file type 
