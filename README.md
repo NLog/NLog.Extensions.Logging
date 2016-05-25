@@ -87,6 +87,21 @@ In root folder, not wwwroot
   </rules>
 </nlog>
 ```
+### Log statments
+
+In HomeController.cs
+
+```c#
+    public class HomeController : Controller
+    {
+        private static Logger Logger = LogManager.GetCurrentClassLogger();
+        public IActionResult Index()
+        {
+            Logger.Info("Index page says hello");
+            return View();
+        }
+        ```
+
 
 ### Example Output
 
