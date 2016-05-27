@@ -24,6 +24,9 @@ How to use
       //add NLog to ASP.NET Core
       loggerFactory.AddNLog();
 
+
+      //needed for non-NETSTANDARD platforms: configure nlog.config in your project root
+      env.ConfigureNLog("nlog.config");
       ...
 ```  
 
