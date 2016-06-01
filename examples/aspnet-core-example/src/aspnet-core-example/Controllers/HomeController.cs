@@ -3,22 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using NLog;
 
 namespace aspnet_core_example.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
-
+        private static Logger Logger = LogManager.GetCurrentClassLogger();
         public IActionResult Index()
         {
-            _logger.LogInformation("Index page says hello");
+            Logger.Info("Index page says hello");
             return View();
         }
 
@@ -38,7 +32,7 @@ namespace aspnet_core_example.Controllers
 
         public IActionResult Error()
         {
-            _logger.LogError("Oops");
+            Logger.Error("Oops");
             return View();
         }
     }
