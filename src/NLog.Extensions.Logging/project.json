@@ -1,5 +1,5 @@
 {
-    "version": "1.0.0-rc2-final-2016-05-21",
+    "version": "1.0.0-rc2-final-2016-06-16",
     "description": "NLog provider for Microsoft.Extensions.Logging",
     "authors": [ "Microsoft", "Julian Verdurmen" ],
     "packOptions": {

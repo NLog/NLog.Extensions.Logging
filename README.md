@@ -70,12 +70,12 @@ In root folder, not wwwroot
   <!-- define various log targets -->
   <targets>
     <!-- write logs to file -->
-    <target xsi:type="File" name="allfile" fileName="c:\temp\nlog-all-${shortdate}.log"
-                 layout="${longdate}|${logger}|${uppercase:${level}}|${message} ${exception}" />
+     <target xsi:type="File" name="allfile" fileName="c:\temp\nlog-all-${shortdate}.log"
+                 layout="${longdate}|${event-properties:item=EventId.Id}|${logger}|${uppercase:${level}}|${message} ${exception}" />
 
    
     <target xsi:type="File" name="ownFile-web" fileName="c:\temp\nlog-own-${shortdate}.log"
-             layout="${longdate}|${logger}|${uppercase:${level}}|  ${message} ${exception}" />
+             layout="${longdate}|${event-properties:item=EventId.Id}|${logger}|${uppercase:${level}}|  ${message} ${exception}" />
 
     <target xsi:type="Null" name="blackhole" />
   </targets>
@@ -114,60 +114,109 @@ In HomeController.cs
 #### nlog-all-2016-05-21.log
 
 ```
-2016-05-21 13:39:53.6748|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:5000/   
-2016-05-21 13:39:53.6858|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path / does not match a supported file type 
-2016-05-21 13:39:53.6858|Microsoft.AspNetCore.Routing.RouteBase|DEBUG|Request successfully matched the route with name 'default' and template '{controller=Home}/{action=Index}/{id?}'. 
-2016-05-21 13:39:53.6998|Microsoft.AspNetCore.Mvc.Internal.MvcRouteHandler|DEBUG|Executing action aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) 
-2016-05-21 13:39:53.6998|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) with arguments () - ModelState is Valid' 
-2016-05-21 13:39:53.7158|HomeController|INFO|Index page says hello 
-2016-05-21 13:39:53.7318|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example), returned result Microsoft.AspNetCore.Mvc.ViewResult.' 
-2016-05-21 13:39:53.7538|Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine|DEBUG|View lookup cache hit for view 'Index' in controller 'Home'. 
-2016-05-21 13:39:53.7688|Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor|DEBUG|The view 'Index' was found. 
-2016-05-21 13:39:53.7788|Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor|INFO|Executing ViewResult, running view at path /Views/Home/Index.cshtml. 
-2016-05-21 13:39:53.7788|Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine|DEBUG|View lookup cache hit for view '_Layout' in controller 'Home'. 
-2016-05-21 13:39:53.7988|Microsoft.AspNetCore.Mvc.Internal.MvcRouteHandler|INFO|Executed action aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) in 90.0466ms 
-2016-05-21 13:39:53.8322|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 156.7643ms 200 text/html; charset=utf-8 
-2016-05-21 13:39:53.8672|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKS1DIB3985K" completed keep alive response. 
-2016-05-21 13:39:53.8957|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:5000/css/site.min.css?v=_lrVHoJvcjMZQ929rrkg08m5F7_X2ibCOz8cW80kjN0   
-2016-05-21 13:39:53.8957|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:5000/js/site.min.js?v=47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU   
-2016-05-21 13:39:53.8957|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:5000/images/banner1.svg   
-2016-05-21 13:39:53.9322|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|The file /css/site.min.css was not modified 
-2016-05-21 13:39:53.9577|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|The file /js/site.min.js was not modified 
-2016-05-21 13:39:53.9837|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|The file /images/banner1.svg was not modified 
-2016-05-21 13:39:54.0022|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|Handled. Status code: 304 File: /css/site.min.css 
-2016-05-21 13:39:54.0147|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 118.6529ms 304 text/css 
-2016-05-21 13:39:54.0147|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|Handled. Status code: 304 File: /js/site.min.js 
-2016-05-21 13:39:54.0147|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|Handled. Status code: 304 File: /images/banner1.svg 
-2016-05-21 13:39:54.0367|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 140.226ms 304 application/javascript 
-2016-05-21 13:39:54.0447|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 149.1571ms 304 image/svg+xml 
-2016-05-21 13:39:54.0447|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKS1DIB3985K" completed keep alive response. 
-2016-05-21 13:39:54.1077|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKS1DIB3985L" completed keep alive response. 
-2016-05-21 13:39:54.1397|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:5000/images/banner2.svg   
-2016-05-21 13:39:54.1232|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:5000/images/banner3.svg   
-2016-05-21 13:39:54.1232|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKS1DIB3985M" completed keep alive response. 
-2016-05-21 13:39:54.1832|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|The file /images/banner2.svg was not modified 
-2016-05-21 13:39:54.2412|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:5000/images/banner4.svg   
-2016-05-21 13:39:54.2457|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|The file /images/banner3.svg was not modified 
-2016-05-21 13:39:54.2932|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|Handled. Status code: 304 File: /images/banner2.svg 
-2016-05-21 13:39:54.2932|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|The file /images/banner4.svg was not modified 
-2016-05-21 13:39:54.3157|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|Handled. Status code: 304 File: /images/banner3.svg 
-2016-05-21 13:39:54.3242|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 182.8243ms 304 image/svg+xml 
-2016-05-21 13:39:54.3607|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 236.4672ms 304 image/svg+xml 
-2016-05-21 13:39:54.3607|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|Handled. Status code: 304 File: /images/banner4.svg 
-2016-05-21 13:39:54.3877|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKS1DIB3985L" completed keep alive response. 
-2016-05-21 13:39:54.4087|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 167.6258ms 304 image/svg+xml 
-2016-05-21 13:39:54.4087|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKS1DIB3985K" completed keep alive response. 
-2016-05-21 13:39:54.4252|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKS1DIB3985N" started. 
-2016-05-21 13:39:54.4402|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKS1DIB3985M" completed keep alive response. 
-2016-05-21 13:39:54.4627|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:5000/favicon.ico   
-2016-05-21 13:39:54.4757|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|Sending file. Request path: '/favicon.ico'. Physical path: 'X:\_github\nlog\NLog.Framework.logging\examples\aspnet-core-example\src\aspnet-core-example\wwwroot\favicon.ico' 
-2016-05-21 13:39:54.5093|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 46.6747ms 200 image/x-icon 
-2016-05-21 13:39:54.5536|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKS1DIB3985M" completed keep alive response. 
-2016-05-21 13:40:14.3892|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKS1DIB3985N" received FIN. 
-2016-05-21 13:40:14.3892|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKS1DIB3985N" disconnecting. 
-2016-05-21 13:40:14.3892|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKS1DIB3985N" sending FIN. 
-2016-05-21 13:40:14.4072|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKS1DIB3985N" sent FIN with status "0". 
-2016-05-21 13:40:14.4072|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKS1DIB3985N" stopped. 
+2016-06-16 08:34:51.3565|3|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting starting 
+2016-06-16 08:34:51.4785|4|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting started 
+2016-06-16 08:34:51.5425|1|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG6" started. 
+2016-06-16 08:34:51.5425|1|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG5" started. 
+2016-06-16 08:34:51.6395|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/   
+2016-06-16 08:34:51.6395|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 DEBUG http://localhost:59915/  0 
+2016-06-16 08:34:51.7545|4|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path / does not match a supported file type 
+2016-06-16 08:34:51.7545|1|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|DEBUG requests are not supported 
+2016-06-16 08:34:52.0105|1|Microsoft.AspNetCore.Routing.RouteBase|DEBUG|Request successfully matched the route with name 'default' and template '{controller=Home}/{action=Index}/{id?}'. 
+2016-06-16 08:34:52.0105|1|Microsoft.AspNetCore.Routing.RouteBase|DEBUG|Request successfully matched the route with name 'default' and template '{controller=Home}/{action=Index}/{id?}'. 
+2016-06-16 08:34:52.0675|1|Microsoft.AspNetCore.Mvc.Internal.MvcRouteHandler|DEBUG|Executing action aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) 
+2016-06-16 08:34:52.0675|1|Microsoft.AspNetCore.Mvc.Internal.MvcRouteHandler|DEBUG|Executing action aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) 
+2016-06-16 08:34:52.1985|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) with arguments () - ModelState is Valid' 
+2016-06-16 08:34:52.1985|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) with arguments () - ModelState is Valid' 
+2016-06-16 08:34:52.1985||HomeController|INFO|Index page says hello 
+2016-06-16 08:34:52.1985||HomeController|INFO|Index page says hello 
+2016-06-16 08:34:52.2195|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example), returned result Microsoft.AspNetCore.Mvc.ViewResult.' 
+2016-06-16 08:34:52.2195|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example), returned result Microsoft.AspNetCore.Mvc.ViewResult.' 
+2016-06-16 08:34:52.3705|1|Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine|DEBUG|View lookup cache miss for view 'Index' in controller 'Home'. 
+2016-06-16 08:34:52.3705|1|Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine|DEBUG|View lookup cache miss for view 'Index' in controller 'Home'. 
+2016-06-16 08:34:52.3945|1|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/Home/Index.cshtml' started. 
+2016-06-16 08:34:52.8245|2|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/Home/Index.cshtml' completed in 422.8517ms. 
+2016-06-16 08:34:52.8426|1|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/Home/Index.cshtml' started. 
+2016-06-16 08:34:54.5946|2|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/Home/Index.cshtml' completed in 1747.6902ms. 
+2016-06-16 08:34:54.6035|1|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/_ViewStart.cshtml' started. 
+2016-06-16 08:34:54.6035|2|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/_ViewStart.cshtml' completed in 3.9646ms. 
+2016-06-16 08:34:54.6185|1|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/_ViewStart.cshtml' started. 
+2016-06-16 08:34:54.6686|2|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/_ViewStart.cshtml' completed in 45.653ms. 
+2016-06-16 08:34:54.6806|2|Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor|DEBUG|The view 'Index' was found. 
+2016-06-16 08:34:54.6806|2|Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor|DEBUG|The view 'Index' was found. 
+2016-06-16 08:34:54.6806|1|Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor|INFO|Executing ViewResult, running view at path /Views/Home/Index.cshtml. 
+2016-06-16 08:34:54.6806|1|Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor|INFO|Executing ViewResult, running view at path /Views/Home/Index.cshtml. 
+2016-06-16 08:34:54.8665|1|Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine|DEBUG|View lookup cache miss for view '_Layout' in controller 'Home'. 
+2016-06-16 08:34:54.8665|1|Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine|DEBUG|View lookup cache miss for view '_Layout' in controller 'Home'. 
+2016-06-16 08:34:54.8725|1|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/Shared/_Layout.cshtml' started. 
+2016-06-16 08:34:54.9276|2|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/Shared/_Layout.cshtml' completed in 45.8784ms. 
+2016-06-16 08:34:54.9326|1|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/Shared/_Layout.cshtml' started. 
+2016-06-16 08:34:55.0385|2|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/Shared/_Layout.cshtml' completed in 101.793ms. 
+2016-06-16 08:34:55.1975|2|Microsoft.AspNetCore.Mvc.Internal.MvcRouteHandler|INFO|Executed action aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) in 3126.2448ms 
+2016-06-16 08:34:55.2245|6|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG6" received FIN. 
+2016-06-16 08:34:55.1975|2|Microsoft.AspNetCore.Mvc.Internal.MvcRouteHandler|INFO|Executed action aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) in 3123.3629ms 
+2016-06-16 08:34:55.1975|1|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG7" started. 
+2016-06-16 08:34:55.2616|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 3640.8441ms 200 text/html; charset=utf-8 
+2016-06-16 08:34:55.2395|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 3616.0454ms 200 text/html; charset=utf-8 
+2016-06-16 08:34:55.2616|1|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG8" started. 
+2016-06-16 08:34:55.2616|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/lib/bootstrap/dist/css/bootstrap.css   
+2016-06-16 08:34:55.2616|1|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG9" started. 
+2016-06-16 08:34:55.2885|9|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG5" completed keep alive response. 
+2016-06-16 08:34:55.2885|9|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG6" completed keep alive response. 
+2016-06-16 08:34:55.2945|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/css/site.css   
+2016-06-16 08:34:55.3056|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/lib/jquery/dist/jquery.js   
+2016-06-16 08:34:55.2945|14|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|INFO|Connection id "0HKSLM1938KG6" communication error Error -4077 ECONNRESET connection reset by peer
+2016-06-16 08:34:55.3056|6|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|The file /lib/bootstrap/dist/css/bootstrap.css was not modified 
+2016-06-16 08:34:55.3235|6|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|The file /css/site.css was not modified 
+2016-06-16 08:34:55.3056|10|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG6" disconnecting. 
+2016-06-16 08:34:55.3235|6|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|The file /lib/jquery/dist/jquery.js was not modified 
+2016-06-16 08:34:55.3555|8|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|Handled. Status code: 304 File: /lib/bootstrap/dist/css/bootstrap.css 
+2016-06-16 08:34:55.3555|8|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|Handled. Status code: 304 File: /css/site.css 
+2016-06-16 08:34:55.3555|2|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG6" stopped. 
+2016-06-16 08:34:55.3715|8|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|Handled. Status code: 304 File: /lib/jquery/dist/jquery.js 
+2016-06-16 08:34:55.3715|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 109.1999ms 304 text/css 
+2016-06-16 08:34:55.3715|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 85.2485ms 304 text/css 
+2016-06-16 08:34:55.3895|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 83.9817ms 304 application/javascript 
+2016-06-16 08:34:55.3996|9|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG7" completed keep alive response. 
+2016-06-16 08:34:55.3996|9|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG8" completed keep alive response. 
+2016-06-16 08:34:55.3996|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/lib/bootstrap/dist/js/bootstrap.js   
+2016-06-16 08:34:55.3996|1|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KGA" started. 
+2016-06-16 08:34:55.3996|9|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG9" completed keep alive response. 
+2016-06-16 08:34:55.4195|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/js/site.js?v=EWaMeWsJBYWmL2g_KkgXZQ5nPe-a3Ichp0LEgzXczKo   
+2016-06-16 08:34:55.4195|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/images/banner2.svg   
+2016-06-16 08:34:55.4305|6|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|The file /lib/bootstrap/dist/js/bootstrap.js was not modified 
+2016-06-16 08:34:55.4305|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/images/banner1.svg   
+2016-06-16 08:34:55.4305|6|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|The file /js/site.js was not modified 
+2016-06-16 08:34:55.4305|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/lib/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2   
+2016-06-16 08:34:55.4485|6|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|The file /images/banner2.svg was not modified 
+2016-06-16 08:34:55.4485|8|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|Handled. Status code: 304 File: /lib/bootstrap/dist/js/bootstrap.js 
+2016-06-16 08:34:55.4485|6|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|The file /images/banner1.svg was not modified 
+2016-06-16 08:34:55.4655|8|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|Handled. Status code: 304 File: /js/site.js 
+2016-06-16 08:34:55.4655|6|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|The file /lib/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2 was not modified 
+2016-06-16 08:34:55.4655|8|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|Handled. Status code: 304 File: /images/banner2.svg 
+2016-06-16 08:34:55.4805|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 71.7164ms 304 application/javascript 
+2016-06-16 08:34:55.4805|8|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|Handled. Status code: 304 File: /images/banner1.svg 
+2016-06-16 08:34:55.4805|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 70.1508ms 304 application/javascript 
+2016-06-16 08:34:55.4955|8|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|Handled. Status code: 304 File: /lib/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2 
+2016-06-16 08:34:55.4955|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 74.089ms 304 image/svg+xml 
+2016-06-16 08:34:55.4955|9|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG5" completed keep alive response. 
+2016-06-16 08:34:55.4955|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 74.8835ms 304 image/svg+xml 
+2016-06-16 08:34:55.5125|9|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG7" completed keep alive response. 
+2016-06-16 08:34:55.5125|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 82.2974ms 304 application/font-woff2 
+2016-06-16 08:34:55.5125|9|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG8" completed keep alive response. 
+2016-06-16 08:34:55.5255|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/images/banner4.svg   
+2016-06-16 08:34:55.5255|9|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KGA" completed keep alive response. 
+2016-06-16 08:34:55.4305|1|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KGB" started. 
+2016-06-16 08:34:55.5425|9|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG9" completed keep alive response. 
+2016-06-16 08:34:55.5425|6|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|The file /images/banner4.svg was not modified 
+2016-06-16 08:34:55.5585|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/images/banner3.svg   
+2016-06-16 08:34:55.5585|8|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|Handled. Status code: 304 File: /images/banner4.svg 
+2016-06-16 08:34:55.5735|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 50.9481ms 304 image/svg+xml 
+2016-06-16 08:34:55.5735|6|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|The file /images/banner3.svg was not modified 
+2016-06-16 08:34:55.5735|9|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG5" completed keep alive response. 
+2016-06-16 08:34:55.5885|8|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|Handled. Status code: 304 File: /images/banner3.svg 
+2016-06-16 08:34:55.5885|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 37.2668ms 304 image/svg+xml 
+2016-06-16 08:34:55.5885|9|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KGB" completed keep alive response.
 ```
 
 #### nlog-own-2016-05-21.log
