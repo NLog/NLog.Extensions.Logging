@@ -1,5 +1,5 @@
 {
-    "version": "1.0.0-rc2-final-2016-06-16",
+    "version": "1.0.0",
     "description": "NLog provider for Microsoft.Extensions.Logging",
     "authors": [ "Microsoft", "Julian Verdurmen" ],
     "packOptions": {
@@ -18,8 +18,8 @@
         "keyFile": "NLog.snk"
     },
     "dependencies": {
-        "Microsoft.Extensions.Logging.Abstractions": "1.0.0-rc2-final",
-        "Microsoft.AspNetCore.Hosting": "1.0.0-rc2-final"
+        "Microsoft.Extensions.Logging.Abstractions": "1.0.0",
+        "Microsoft.AspNetCore.Hosting": "1.0.0"
     },
     "frameworks": {
         "net451": {
@@ -33,7 +33,7 @@
         },
         "netstandard1.3": {
             "dependencies": {
-                "NLog":  "4.4.0-beta8"
+                "NLog":  "4.4.0-beta12"
             }
         }
     }
