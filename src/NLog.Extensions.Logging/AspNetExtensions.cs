@@ -34,19 +34,45 @@ namespace NLog.Extensions.Logging
         /// </summary>
         /// <param name="env"></param>
         /// <param name="configFileRelativePath">relative path to NLog configuration file.</param>
-        public static void ConfigureNLog(this IHostingEnvironment env, string configFileRelativePath)
+        /// <returns>Current configuration for chaining.</returns>
+        public static LoggingConfiguration ConfigureNLog(this IHostingEnvironment env, string configFileRelativePath)
         {
             var fileName = Path.Combine(Directory.GetParent(env.WebRootPath).FullName, configFileRelativePath);
-            ConfigureNLog(fileName);
+            return ConfigureNLog(fileName);
+        }
+
+        /// <summary>
+        /// Apply NLog configuration from config object.
+        /// </summary>
+        /// <param name="env"></param>
+        /// <param name="config">New NLog config.</param>
+        /// <returns>Current configuration for chaining.</returns>
+        public static LoggingConfiguration ConfigureNLog(this IHostingEnvironment env, LoggingConfiguration config)
+        {
+            LogManager.Configuration = config;
+
+            return config;
+        }
+
+        /// <summary>
+        /// Start NLog configuration.
+        /// </summary>
+        /// <param name="env"></param>
+        /// <returns>Current configuration for chaining.</returns>
+        public static LoggingConfiguration ConfigureNLog(this IHostingEnvironment env)
+        {
+            return LogManager.Configuration;
         }
 
         /// <summary>
         /// Apply NLog configuration from XML config.
         /// </summary>
         /// <param name="fileName">absolute path  NLog configuration file.</param>
-        private static void ConfigureNLog(string fileName)
+        private static LoggingConfiguration ConfigureNLog(string fileName)
         {
-            LogManager.Configuration = new XmlLoggingConfiguration(fileName, true);
+            var configuration = new XmlLoggingConfiguration(fileName, true);
+            LogManager.Configuration = configuration;
+            return configuration;
         }
     }
 }
