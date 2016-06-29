@@ -36,7 +36,7 @@ namespace NLog.Extensions.Logging
         /// <param name="configFileRelativePath">relative path to NLog configuration file.</param>
         public static void ConfigureNLog(this IHostingEnvironment env, string configFileRelativePath)
         {
-            var fileName = Path.Combine(Directory.GetParent(env.WebRootPath).FullName, configFileRelativePath);
+            var fileName = Path.Combine(env.ContentRootPath, configFileRelativePath);
             ConfigureNLog(fileName);
         }
 
