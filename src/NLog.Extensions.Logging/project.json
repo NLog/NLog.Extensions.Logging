@@ -1,5 +1,5 @@
 {
-    "version": "1.0.0-rtm-alpha1",
+    "version": "1.0.0-rtm-alpha2",
     "description": "NLog provider for Microsoft.Extensions.Logging",
     "authors": [ "Microsoft", "Julian Verdurmen" ],
     "packOptions": {
