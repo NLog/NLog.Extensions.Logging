@@ -19,7 +19,7 @@ How to use
       }
     ```
 
-2. Create nlog.config in root of your project file, see [NLog.config example](https://github.com/NLog/NLog.Extensions.Logging/blob/03971763546cc70660529bbe28b282304adb7571/examples/aspnet-core-example/src/aspnet-core-example/nlog.config)
+2. Create nlog.config in root of your project file, see [NLog.config example](https://raw.githubusercontent.com/NLog/NLog.Extensions.Logging/03971763546cc70660529bbe28b282304adb7571/examples/aspnet-core-example/src/aspnet-core-example/nlog.config)
 3.  in startup.cs add in `Configure`
 
     ```c#
