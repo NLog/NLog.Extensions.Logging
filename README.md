@@ -50,10 +50,7 @@ How to use
         },
     ```
     
-Notes:
 
-- NLog.Config is found automatically in RC2. 
-  
 Known issues
 ---
 - Installing the NuGet packages [NLog.config](https://www.nuget.org/packages/NLog.Config/) / [NLog.schema](https://www.nuget.org/packages/NLog.Schema/) won't add to your project. 
