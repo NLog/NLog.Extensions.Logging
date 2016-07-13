@@ -12,37 +12,44 @@ Routes .NET Core log messages to NLog.
 
 How to use
 ----
+1. Add dependency in project.json
+    ```xml
+     "dependencies": {
+        "NLog.Extensions.Logging": "1.0.0-*"
+      }
+    ```
 
-1. Create nlog.config in root of your project file.
-2.  in startup.cs add in `Configure`
+2. Create nlog.config in root of your project file, see [NLog.config example](https://github.com/NLog/NLog.Extensions.Logging/blob/03971763546cc70660529bbe28b282304adb7571/examples/aspnet-core-example/src/aspnet-core-example/nlog.config)
+3.  in startup.cs add in `Configure`
 
-```c#
-  using NLog.Extensions.Logging;
+    ```c#
+      using NLog.Extensions.Logging;
+    
+      public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+      {
+          //add NLog to ASP.NET Core
+          loggerFactory.AddNLog();
+    
+    
+          //needed for non-NETSTANDARD platforms: configure nlog.config in your project root
+          env.ConfigureNLog("nlog.config");
+          ...
+    ```  
 
-  public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
-  {
-      //add NLog to ASP.NET Core
-      loggerFactory.AddNLog();
+4. Include NLog.config for publishing in project.json:
 
-
-      //needed for non-NETSTANDARD platforms: configure nlog.config in your project root
-      env.ConfigureNLog("nlog.config");
-      ...
-```  
-
-3. Include NLog.config for publishing, project.json:
-
-```json
-   "publishOptions": {
-        "include": [
-            "wwwroot",
-            "Views",
-            "appsettings.json",
-            "web.config",
-            "nlog.config"
-        ]
-    },
-```
+    ```json
+       "publishOptions": {
+            "include": [
+                "wwwroot",
+                "Views",
+                "appsettings.json",
+                "web.config",
+                "nlog.config"
+            ]
+        },
+    ```
+    
 Notes:
 
 - NLog.Config is found automatically in RC2. 
