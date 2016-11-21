@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 
 namespace NLog.Extensions.Logging
@@ -35,6 +36,15 @@ namespace NLog.Extensions.Logging
                     eventInfo.Properties["EventId.Id"] = eventId.Id;
                     eventInfo.Properties["EventId.Name"] = eventId.Name;
                     eventInfo.Properties["EventId"] = eventId;
+
+
+                    // Extract all arguments passed in state and add them as event properties
+                    var metadata = state as IEnumerable<KeyValuePair<string, object>>;
+                    foreach (var item in metadata)
+                    {
+                        eventInfo.Properties[item.Key] = item.Value;
+                    }
+
                     _logger.Log(eventInfo);
                 }
             }
