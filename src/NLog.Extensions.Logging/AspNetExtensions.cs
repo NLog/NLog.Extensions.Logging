@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
@@ -22,6 +23,18 @@ namespace NLog.Extensions.Logging
             //ignore this
             LogManager.AddHiddenAssembly(Assembly.Load(new AssemblyName("Microsoft.Extensions.Logging")));
             LogManager.AddHiddenAssembly(Assembly.Load(new AssemblyName("Microsoft.Extensions.Logging.Abstractions")));
+
+            try
+            {
+                //try the Filter extensin
+                var filterAssembly = Assembly.Load(new AssemblyName("Microsoft.Extensions.Logging.Filter"));
+                LogManager.AddHiddenAssembly(filterAssembly);
+            }
+            catch (Exception)
+            {
+                //ignore
+            }
+          
             LogManager.AddHiddenAssembly(typeof(AspNetExtensions).GetTypeInfo().Assembly);
 
             using (var provider = new NLogLoggerProvider())
