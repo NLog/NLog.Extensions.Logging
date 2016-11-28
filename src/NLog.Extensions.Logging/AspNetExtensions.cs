@@ -26,7 +26,7 @@ namespace NLog.Extensions.Logging
 
             try
             {
-                //try the Filter extensin
+                //try the Filter ext
                 var filterAssembly = Assembly.Load(new AssemblyName("Microsoft.Extensions.Logging.Filter"));
                 LogManager.AddHiddenAssembly(filterAssembly);
             }
