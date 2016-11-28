@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-rtm-alpha4",
+  "version": "1.0.0-rtm-alpha5",
   "description": "NLog provider for Microsoft.Extensions.Logging",
   "authors": [ "Microsoft", "Julian Verdurmen" ],
   "packOptions": {
@@ -28,12 +28,12 @@
         "System.Xml.Serialization": "4.0.0.0"
       },
       "dependencies": {
-        "NLog": "4.3.5"
+        "NLog": "4.3.11"
       }
     },
     "netstandard1.3": {
       "dependencies": {
-        "NLog": "4.4.0-beta12"
+        "NLog": "5.0.0-beta03"
       }
     }
   }
