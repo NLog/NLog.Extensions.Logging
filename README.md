@@ -10,6 +10,10 @@
 Routes .NET Core log messages to NLog.
 
 
+**Note**: Microsoft haven't ported all their classes to .NET standard, so not every target/layout renderer is available. 
+Please check [platform support](https://github.com/NLog/NLog/wiki/platform-support)
+
+
 How to use
 ----
 1. Add dependency in project.json
