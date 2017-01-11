@@ -89,14 +89,19 @@ namespace NLog.Extensions.Logging
             }
         }
 
-
+        /// <summary>
+        /// Begin a scope. Log in config with ${ndc} 
+        /// TODO not working with async
+        /// </summary>
+        /// <param name="state">The state</param>
+        /// <returns></returns>
         public IDisposable BeginScope<TState>(TState state)
         {
             if (state == null)
             {
                 throw new ArgumentNullException(nameof(state));
             }
-            //TODO not working with async
+            
             return NestedDiagnosticsContext.Push(state);
         }
     }
