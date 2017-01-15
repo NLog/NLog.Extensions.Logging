@@ -1,19 +1,18 @@
 using System;
 using System.IO;
 using System.Reflection;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Config;
 
 namespace NLog.Extensions.Logging
 {
     /// <summary>
-    /// Helpers for ASP.NET Core
+    /// Helpers for .NET Core
     /// </summary>
-    public static class AspNetExtensions
+    public static class ConfigureExtensions
     {
         /// <summary>
-        /// Enable NLog as logging provider in ASP.NET Core.
+        /// Enable NLog as logging provider in .NET Core.
         /// </summary>
         /// <param name="factory"></param>
         /// <returns></returns>
@@ -23,7 +22,7 @@ namespace NLog.Extensions.Logging
         }
 
         /// <summary>
-        /// Enable NLog as logging provider in ASP.NET Core.
+        /// Enable NLog as logging provider in .NET Core.
         /// </summary>
         /// <param name="factory"></param>
         /// <param name="options">NLog options</param>
@@ -45,7 +44,7 @@ namespace NLog.Extensions.Logging
                 //ignore
             }
           
-            LogManager.AddHiddenAssembly(typeof(AspNetExtensions).GetTypeInfo().Assembly);
+            LogManager.AddHiddenAssembly(typeof(ConfigureExtensions).GetTypeInfo().Assembly);
 
             using (var provider = new NLogLoggerProvider(options))
             {
@@ -59,9 +58,15 @@ namespace NLog.Extensions.Logging
         /// </summary>
         /// <param name="env"></param>
         /// <param name="configFileRelativePath">relative path to NLog configuration file.</param>
-        public static void ConfigureNLog(this IHostingEnvironment env, string configFileRelativePath)
+        public static void ConfigureNLog(this ILoggerFactory env, string configFileRelativePath)
         {
-            var fileName = Path.Combine(env.ContentRootPath, configFileRelativePath);
+#if NETCORE
+            var rootPath = System.AppContext.BaseDirectory;
+#else
+            var rootPath = AppDomain.CurrentDomain.BaseDirectory;
+#endif
+
+            var fileName = Path.Combine(rootPath, configFileRelativePath);
             ConfigureNLog(fileName);
         }
 
