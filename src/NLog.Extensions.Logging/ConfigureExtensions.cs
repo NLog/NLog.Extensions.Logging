@@ -15,7 +15,7 @@ namespace NLog.Extensions.Logging
         /// Enable NLog as logging provider in .NET Core.
         /// </summary>
         /// <param name="factory"></param>
-        /// <returns></returns>
+        /// <returns>ILoggerFactory for chaining</returns>
         public static ILoggerFactory AddNLog(this ILoggerFactory factory)
         {
             return AddNLog(factory, null);
@@ -26,7 +26,7 @@ namespace NLog.Extensions.Logging
         /// </summary>
         /// <param name="factory"></param>
         /// <param name="options">NLog options</param>
-        /// <returns></returns>
+        /// <returns>ILoggerFactory for chaining</returns>
         public static ILoggerFactory AddNLog(this ILoggerFactory factory, NLogProviderOptions options)
         {
             //ignore this
@@ -58,7 +58,8 @@ namespace NLog.Extensions.Logging
         /// </summary>
         /// <param name="env"></param>
         /// <param name="configFileRelativePath">relative path to NLog configuration file.</param>
-        public static void ConfigureNLog(this ILoggerFactory env, string configFileRelativePath)
+          /// <returns>Current configuration for chaining.</returns>
+        public static LoggingConfiguration ConfigureNLog(this ILoggerFactory env, string configFileRelativePath)
         {
 #if NETCORE
             var rootPath = System.AppContext.BaseDirectory;
@@ -67,16 +68,32 @@ namespace NLog.Extensions.Logging
 #endif
 
             var fileName = Path.Combine(rootPath, configFileRelativePath);
-            ConfigureNLog(fileName);
+            return ConfigureNLog(fileName);
         }
+
+      /// <summary>
+       /// Apply NLog configuration from config object.
+       /// </summary>
+       /// <param name="env"></param>
+       /// <param name="config">New NLog config.</param>
+       /// <returns>Current configuration for chaining.</returns>
+       public static LoggingConfiguration ConfigureNLog(this ILoggerFactory env, LoggingConfiguration config)
+       {
+           LogManager.Configuration = config;
+
+           return config;
+       }
 
         /// <summary>
         /// Apply NLog configuration from XML config.
         /// </summary>
         /// <param name="fileName">absolute path  NLog configuration file.</param>
-        private static void ConfigureNLog(string fileName)
+          /// <returns>Current configuration for chaining.</returns>
+        private static LoggingConfiguration ConfigureNLog(string fileName)
         {
-            LogManager.Configuration = new XmlLoggingConfiguration(fileName, true);
+            var config = new XmlLoggingConfiguration(fileName, true);
+            LogManager.Configuration = config;
+            return config;
         }
     }
 }
