@@ -1,9 +1,9 @@
 {
-  "version": "1.0.0-rtm-alpha5",
+  "version": "1.0.0-rtm-beta1",
   "description": "NLog provider for Microsoft.Extensions.Logging",
   "authors": [ "Microsoft", "Julian Verdurmen" ],
   "packOptions": {
-    "tags": [ "NLog", "Microsoft.Extensions.Logging", "Microsoft.Framework.Logging", "log", "logfiles", "aspnet5", "dnx" ],
+    "tags": [ "NLog", "Microsoft.Extensions.Logging", "log", "logfiles", "netcore", "nlog" ],
     "projectUrl": "https://github.com/NLog/NLog.Extensions.Logging",
     "licenseUrl": "https://github.com/NLog/NLog.Extensions.Logging/blob/master/LICENSE",
     "iconUrl": "http://nlog-project.org/NConfig.png",
@@ -18,23 +18,26 @@
     "keyFile": "NLog.snk"
   },
   "dependencies": {
-    "Microsoft.Extensions.Logging.Abstractions": "1.0.0",
-    "Microsoft.AspNetCore.Hosting": "1.0.0"
+    "Microsoft.Extensions.Logging.Abstractions": "1.0.0"
   },
   "frameworks": {
     "net451": {
       "frameworkAssemblies": {
         "System.Xml": "4.0.0.0",
+        "System.Runtime": "4.0.10.0",
         "System.Xml.Serialization": "4.0.0.0"
+        
       },
       "dependencies": {
-        "NLog": "4.3.11"
+        "NLog": "4.4.1"
       }
     },
     "netstandard1.3": {
       "dependencies": {
-        "NLog": "5.0.0-beta03"
-      }
+        "NLog": "5.0.0-beta04",
+        "System.AppContext": "4.3.0"
+      },
+      "buildOptions": {"define": ["NETCORE"]}
     }
   }
 }
