@@ -19,7 +19,7 @@ ASP.NET Core users should also install  [NLog.Web.AspNetCore](https://www.nuget.
 How to use
 ----
 1. Add dependency in project.json
-    ```xml
+    ```json
      "dependencies": {
         "NLog.Extensions.Logging": "1.0.0-*",
         "NLog.Web.AspNetCore": "4.3.0" //only needed for ASP.NET Core users
