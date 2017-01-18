@@ -13,6 +13,8 @@ Routes .NET Core log messages to NLog.
 **Note**: Microsoft haven't ported all their classes to .NET standard, so not every target/layout renderer is available. 
 Please check [platform support](https://github.com/NLog/NLog/wiki/platform-support)
 
+ASP.NET Core users should also install  [NLog.Web.AspNetCore](https://www.nuget.org/packages/NLog.web.aspnetcore)!
+
 
 How to use
 ----
