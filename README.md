@@ -21,7 +21,8 @@ How to use
 1. Add dependency in project.json
     ```xml
      "dependencies": {
-        "NLog.Extensions.Logging": "1.0.0-*"
+        "NLog.Extensions.Logging": "1.0.0-*",
+        "NLog.Web.AspNetCore": "4.3.0" //only needed for ASP.NET Core users
       }
     ```
 
