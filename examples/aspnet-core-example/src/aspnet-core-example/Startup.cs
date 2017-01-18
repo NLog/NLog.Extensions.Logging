@@ -4,10 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
+using NLog.Web;
 
 namespace aspnet_core_example
 {
@@ -30,6 +32,9 @@ namespace aspnet_core_example
         {
             // Add framework services.
             services.AddMvc();
+
+            //needed for NLog.Web
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -40,7 +45,12 @@ namespace aspnet_core_example
             //add NLog to ASP.NET Core
             loggerFactory.AddNLog();
 
+
           
+
+            //add NLog.Web
+            app.AddNLogWeb();
+
 
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
