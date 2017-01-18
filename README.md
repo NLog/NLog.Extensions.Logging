@@ -34,14 +34,30 @@ How to use
     
       public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
       {
-          //add NLog to ASP.NET Core
+          //add NLog to .NET Core
           loggerFactory.AddNLog();
-    
-    
+          
+          //Enable ASP.NET Core features (NLog.web) - only needed for ASP.NET Core users
+          app.AddNLogWeb();
+
           //needed for non-NETSTANDARD platforms: configure nlog.config in your project root
           env.ConfigureNLog("nlog.config");
           ...
     ```  
+    
+    ASP.NET Core users should also enabled `IHttpContextAccessor` in startup.cs
+    ```c#
+           
+        public void ConfigureServices(IServiceCollection services)
+        {
+            // Add framework services.
+            services.AddMvc();
+
+            //needed for NLog.Web
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        }
+     ```
+    
 
 4. Include NLog.config for publishing in project.json:
 
@@ -60,7 +76,7 @@ How to use
 
 Known issues
 ---
-- Installing the NuGet packages [NLog.config](https://www.nuget.org/packages/NLog.Config/) / [NLog.schema](https://www.nuget.org/packages/NLog.Schema/) won't add to your project. 
+- Installing the NuGet packages [NLog.config](https://www.nuget.org/packages/NLog.Config/) / [NLog.schema](https://www.nuget.org/packages/NLog.Schema/) won't add to your project. It's recommend to extract (unzip) the NLog.Schema package and place the NLog.XSD in the same folder as NLog.config.
 - auto load of NLog extensions won't work yet.
 
 
@@ -78,15 +94,21 @@ In root folder, not wwwroot
       internalLogLevel="Warn"
       internalLogFile="c:\temp\internal-nlog.txt">
 
+  <!-- for ASP.NET Core users -->
+  <extensions>
+    <add assembly="NLog.Web.AspNetCore"/>
+  </extensions>
+
   <!-- define various log targets -->
   <targets>
-    <!-- write logs to file -->
+     <!-- write logs to file -->
      <target xsi:type="File" name="allfile" fileName="c:\temp\nlog-all-${shortdate}.log"
                  layout="${longdate}|${event-properties:item=EventId.Id}|${logger}|${uppercase:${level}}|${message} ${exception}" />
 
-   
-    <target xsi:type="File" name="ownFile-web" fileName="c:\temp\nlog-own-${shortdate}.log"
-             layout="${longdate}|${event-properties:item=EventId.Id}|${logger}|${uppercase:${level}}|  ${message} ${exception}" />
+   <!-- only own logs. Uses some ASP.NET core renderers -->
+     <target xsi:type="File" name="ownFile-web" fileName="c:\temp\nlog-own-${shortdate}.log"
+             layout="${longdate}|${event-properties:item=EventId.Id}|${logger}|${uppercase:${level}}|  ${message} ${exception}|url: ${aspnet-request-url}|action: ${aspnet-mvc-action}" />
+
 
     <target xsi:type="Null" name="blackhole" />
   </targets>
@@ -122,118 +144,202 @@ In HomeController.cs
 
 ### Example Output
 
-#### nlog-all-2016-05-21.log
+#### nlog-all-2017-01-18.log
 
 ```
-2016-06-16 08:34:51.3565|3|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting starting 
-2016-06-16 08:34:51.4785|4|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting started 
-2016-06-16 08:34:51.5425|1|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG6" started. 
-2016-06-16 08:34:51.5425|1|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG5" started. 
-2016-06-16 08:34:51.6395|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/   
-2016-06-16 08:34:51.6395|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 DEBUG http://localhost:59915/  0 
-2016-06-16 08:34:51.7545|4|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path / does not match a supported file type 
-2016-06-16 08:34:51.7545|1|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|DEBUG requests are not supported 
-2016-06-16 08:34:52.0105|1|Microsoft.AspNetCore.Routing.RouteBase|DEBUG|Request successfully matched the route with name 'default' and template '{controller=Home}/{action=Index}/{id?}'. 
-2016-06-16 08:34:52.0105|1|Microsoft.AspNetCore.Routing.RouteBase|DEBUG|Request successfully matched the route with name 'default' and template '{controller=Home}/{action=Index}/{id?}'. 
-2016-06-16 08:34:52.0675|1|Microsoft.AspNetCore.Mvc.Internal.MvcRouteHandler|DEBUG|Executing action aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) 
-2016-06-16 08:34:52.0675|1|Microsoft.AspNetCore.Mvc.Internal.MvcRouteHandler|DEBUG|Executing action aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) 
-2016-06-16 08:34:52.1985|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) with arguments () - ModelState is Valid' 
-2016-06-16 08:34:52.1985|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) with arguments () - ModelState is Valid' 
-2016-06-16 08:34:52.1985||HomeController|INFO|Index page says hello 
-2016-06-16 08:34:52.1985||HomeController|INFO|Index page says hello 
-2016-06-16 08:34:52.2195|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example), returned result Microsoft.AspNetCore.Mvc.ViewResult.' 
-2016-06-16 08:34:52.2195|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example), returned result Microsoft.AspNetCore.Mvc.ViewResult.' 
-2016-06-16 08:34:52.3705|1|Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine|DEBUG|View lookup cache miss for view 'Index' in controller 'Home'. 
-2016-06-16 08:34:52.3705|1|Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine|DEBUG|View lookup cache miss for view 'Index' in controller 'Home'. 
-2016-06-16 08:34:52.3945|1|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/Home/Index.cshtml' started. 
-2016-06-16 08:34:52.8245|2|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/Home/Index.cshtml' completed in 422.8517ms. 
-2016-06-16 08:34:52.8426|1|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/Home/Index.cshtml' started. 
-2016-06-16 08:34:54.5946|2|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/Home/Index.cshtml' completed in 1747.6902ms. 
-2016-06-16 08:34:54.6035|1|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/_ViewStart.cshtml' started. 
-2016-06-16 08:34:54.6035|2|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/_ViewStart.cshtml' completed in 3.9646ms. 
-2016-06-16 08:34:54.6185|1|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/_ViewStart.cshtml' started. 
-2016-06-16 08:34:54.6686|2|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/_ViewStart.cshtml' completed in 45.653ms. 
-2016-06-16 08:34:54.6806|2|Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor|DEBUG|The view 'Index' was found. 
-2016-06-16 08:34:54.6806|2|Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor|DEBUG|The view 'Index' was found. 
-2016-06-16 08:34:54.6806|1|Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor|INFO|Executing ViewResult, running view at path /Views/Home/Index.cshtml. 
-2016-06-16 08:34:54.6806|1|Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor|INFO|Executing ViewResult, running view at path /Views/Home/Index.cshtml. 
-2016-06-16 08:34:54.8665|1|Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine|DEBUG|View lookup cache miss for view '_Layout' in controller 'Home'. 
-2016-06-16 08:34:54.8665|1|Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine|DEBUG|View lookup cache miss for view '_Layout' in controller 'Home'. 
-2016-06-16 08:34:54.8725|1|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/Shared/_Layout.cshtml' started. 
-2016-06-16 08:34:54.9276|2|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/Shared/_Layout.cshtml' completed in 45.8784ms. 
-2016-06-16 08:34:54.9326|1|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/Shared/_Layout.cshtml' started. 
-2016-06-16 08:34:55.0385|2|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/Shared/_Layout.cshtml' completed in 101.793ms. 
-2016-06-16 08:34:55.1975|2|Microsoft.AspNetCore.Mvc.Internal.MvcRouteHandler|INFO|Executed action aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) in 3126.2448ms 
-2016-06-16 08:34:55.2245|6|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG6" received FIN. 
-2016-06-16 08:34:55.1975|2|Microsoft.AspNetCore.Mvc.Internal.MvcRouteHandler|INFO|Executed action aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) in 3123.3629ms 
-2016-06-16 08:34:55.1975|1|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG7" started. 
-2016-06-16 08:34:55.2616|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 3640.8441ms 200 text/html; charset=utf-8 
-2016-06-16 08:34:55.2395|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 3616.0454ms 200 text/html; charset=utf-8 
-2016-06-16 08:34:55.2616|1|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG8" started. 
-2016-06-16 08:34:55.2616|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/lib/bootstrap/dist/css/bootstrap.css   
-2016-06-16 08:34:55.2616|1|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG9" started. 
-2016-06-16 08:34:55.2885|9|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG5" completed keep alive response. 
-2016-06-16 08:34:55.2885|9|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG6" completed keep alive response. 
-2016-06-16 08:34:55.2945|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/css/site.css   
-2016-06-16 08:34:55.3056|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/lib/jquery/dist/jquery.js   
-2016-06-16 08:34:55.2945|14|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|INFO|Connection id "0HKSLM1938KG6" communication error Error -4077 ECONNRESET connection reset by peer
-2016-06-16 08:34:55.3056|6|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|The file /lib/bootstrap/dist/css/bootstrap.css was not modified 
-2016-06-16 08:34:55.3235|6|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|The file /css/site.css was not modified 
-2016-06-16 08:34:55.3056|10|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG6" disconnecting. 
-2016-06-16 08:34:55.3235|6|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|The file /lib/jquery/dist/jquery.js was not modified 
-2016-06-16 08:34:55.3555|8|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|Handled. Status code: 304 File: /lib/bootstrap/dist/css/bootstrap.css 
-2016-06-16 08:34:55.3555|8|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|Handled. Status code: 304 File: /css/site.css 
-2016-06-16 08:34:55.3555|2|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG6" stopped. 
-2016-06-16 08:34:55.3715|8|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|Handled. Status code: 304 File: /lib/jquery/dist/jquery.js 
-2016-06-16 08:34:55.3715|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 109.1999ms 304 text/css 
-2016-06-16 08:34:55.3715|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 85.2485ms 304 text/css 
-2016-06-16 08:34:55.3895|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 83.9817ms 304 application/javascript 
-2016-06-16 08:34:55.3996|9|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG7" completed keep alive response. 
-2016-06-16 08:34:55.3996|9|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG8" completed keep alive response. 
-2016-06-16 08:34:55.3996|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/lib/bootstrap/dist/js/bootstrap.js   
-2016-06-16 08:34:55.3996|1|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KGA" started. 
-2016-06-16 08:34:55.3996|9|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG9" completed keep alive response. 
-2016-06-16 08:34:55.4195|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/js/site.js?v=EWaMeWsJBYWmL2g_KkgXZQ5nPe-a3Ichp0LEgzXczKo   
-2016-06-16 08:34:55.4195|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/images/banner2.svg   
-2016-06-16 08:34:55.4305|6|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|The file /lib/bootstrap/dist/js/bootstrap.js was not modified 
-2016-06-16 08:34:55.4305|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/images/banner1.svg   
-2016-06-16 08:34:55.4305|6|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|The file /js/site.js was not modified 
-2016-06-16 08:34:55.4305|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/lib/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2   
-2016-06-16 08:34:55.4485|6|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|The file /images/banner2.svg was not modified 
-2016-06-16 08:34:55.4485|8|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|Handled. Status code: 304 File: /lib/bootstrap/dist/js/bootstrap.js 
-2016-06-16 08:34:55.4485|6|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|The file /images/banner1.svg was not modified 
-2016-06-16 08:34:55.4655|8|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|Handled. Status code: 304 File: /js/site.js 
-2016-06-16 08:34:55.4655|6|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|The file /lib/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2 was not modified 
-2016-06-16 08:34:55.4655|8|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|Handled. Status code: 304 File: /images/banner2.svg 
-2016-06-16 08:34:55.4805|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 71.7164ms 304 application/javascript 
-2016-06-16 08:34:55.4805|8|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|Handled. Status code: 304 File: /images/banner1.svg 
-2016-06-16 08:34:55.4805|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 70.1508ms 304 application/javascript 
-2016-06-16 08:34:55.4955|8|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|Handled. Status code: 304 File: /lib/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2 
-2016-06-16 08:34:55.4955|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 74.089ms 304 image/svg+xml 
-2016-06-16 08:34:55.4955|9|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG5" completed keep alive response. 
-2016-06-16 08:34:55.4955|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 74.8835ms 304 image/svg+xml 
-2016-06-16 08:34:55.5125|9|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG7" completed keep alive response. 
-2016-06-16 08:34:55.5125|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 82.2974ms 304 application/font-woff2 
-2016-06-16 08:34:55.5125|9|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG8" completed keep alive response. 
-2016-06-16 08:34:55.5255|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/images/banner4.svg   
-2016-06-16 08:34:55.5255|9|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KGA" completed keep alive response. 
-2016-06-16 08:34:55.4305|1|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KGB" started. 
-2016-06-16 08:34:55.5425|9|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG9" completed keep alive response. 
-2016-06-16 08:34:55.5425|6|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|The file /images/banner4.svg was not modified 
-2016-06-16 08:34:55.5585|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/images/banner3.svg   
-2016-06-16 08:34:55.5585|8|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|Handled. Status code: 304 File: /images/banner4.svg 
-2016-06-16 08:34:55.5735|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 50.9481ms 304 image/svg+xml 
-2016-06-16 08:34:55.5735|6|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|The file /images/banner3.svg was not modified 
-2016-06-16 08:34:55.5735|9|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KG5" completed keep alive response. 
-2016-06-16 08:34:55.5885|8|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|Handled. Status code: 304 File: /images/banner3.svg 
-2016-06-16 08:34:55.5885|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 37.2668ms 304 image/svg+xml 
-2016-06-16 08:34:55.5885|9|Microsoft.AspNetCore.Server.Kestrel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60|DEBUG|Connection id "0HKSLM1938KGB" completed keep alive response.
+2017-01-18 23:29:25.4588|3|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting starting 
+2017-01-18 23:29:25.6558|4|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting started 
+2017-01-18 23:29:25.7762|1|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VU5QOINJG" started. 
+2017-01-18 23:29:25.8827|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 DEBUG http://localhost:59915/  0 
+2017-01-18 23:29:25.9782|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VU5QOINJG" completed keep alive response. 
+2017-01-18 23:29:25.9902|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 126.8128ms 200  
+2017-01-18 23:29:28.0534|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/   
+2017-01-18 23:29:28.0929|4|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path / does not match a supported file type 
+2017-01-18 23:29:28.2884|1|Microsoft.AspNetCore.Routing.RouteBase|DEBUG|Request successfully matched the route with name 'default' and template '{controller=Home}/{action=Index}/{id?}'. 
+2017-01-18 23:29:28.3499|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) 
+2017-01-18 23:29:28.4019|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) with arguments ((null)) - ModelState is Valid 
+2017-01-18 23:29:28.4144||HomeController|INFO|Index page says hello 
+2017-01-18 23:29:28.4269|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example), returned result Microsoft.AspNetCore.Mvc.ViewResult. 
+2017-01-18 23:29:28.5659|1|Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine|DEBUG|View lookup cache miss for view 'Index' in controller 'Home'. 
+2017-01-18 23:29:28.5889|1|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/Home/Index.cshtml' started. 
+2017-01-18 23:29:28.9989|2|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/Home/Index.cshtml' completed in 404.4264ms. 
+2017-01-18 23:29:29.0259|1|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/Home/Index.cshtml' started. 
+2017-01-18 23:29:30.7494|2|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/Home/Index.cshtml' completed in 1718.0443ms. 
+2017-01-18 23:29:30.7659|1|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/_ViewStart.cshtml' started. 
+2017-01-18 23:29:30.7854|2|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/_ViewStart.cshtml' completed in 7.8932ms. 
+2017-01-18 23:29:30.7854|1|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/_ViewStart.cshtml' started. 
+2017-01-18 23:29:30.8779|2|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/_ViewStart.cshtml' completed in 76.1982ms. 
+2017-01-18 23:29:30.8919|2|Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor|DEBUG|The view 'Index' was found. 
+2017-01-18 23:29:30.8919|1|Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor|INFO|Executing ViewResult, running view at path /Views/Home/Index.cshtml. 
+2017-01-18 23:29:30.9974|0|Microsoft.Extensions.DependencyInjection.DataProtectionServices|INFO|User profile is available. Using 'C:\Users\j.verdurmen\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest. 
+2017-01-18 23:29:31.0884|1|Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine|DEBUG|View lookup cache miss for view '_Layout' in controller 'Home'. 
+2017-01-18 23:29:31.0939|1|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/Shared/_Layout.cshtml' started. 
+2017-01-18 23:29:31.1399|2|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/Shared/_Layout.cshtml' completed in 41.1951ms. 
+2017-01-18 23:29:31.1449|1|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/Shared/_Layout.cshtml' started. 
+2017-01-18 23:29:31.2504|2|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/Shared/_Layout.cshtml' completed in 98.1822ms. 
+2017-01-18 23:29:31.3734|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) in 3018.1612ms 
+2017-01-18 23:29:31.4269|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VU5QOINJG" completed keep alive response. 
+2017-01-18 23:29:31.4409|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 3387.774ms 200 text/html; charset=utf-8 
+2017-01-18 23:29:31.7814|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/favicon.ico   
+2017-01-18 23:29:31.8104|2|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|Sending file. Request path: '/favicon.ico'. Physical path: 'X:\nlog\NLog.Extensions.Logging\examples\aspnet-core-example\src\aspnet-core-example\wwwroot\favicon.ico' 
+2017-01-18 23:29:31.8294|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VU5QOINJG" completed keep alive response. 
+2017-01-18 23:29:31.8479|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 66.3189ms 200 image/x-icon 
+2017-01-18 23:29:39.2429|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/   
+2017-01-18 23:29:39.2529|4|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path / does not match a supported file type 
+2017-01-18 23:29:39.2529|1|Microsoft.AspNetCore.Routing.RouteBase|DEBUG|Request successfully matched the route with name 'default' and template '{controller=Home}/{action=Index}/{id?}'. 
+2017-01-18 23:29:39.2669|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) 
+2017-01-18 23:29:39.2669|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) with arguments ((null)) - ModelState is Valid 
+2017-01-18 23:29:39.2899||HomeController|INFO|Index page says hello 
+2017-01-18 23:29:39.2984|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example), returned result Microsoft.AspNetCore.Mvc.ViewResult. 
+2017-01-18 23:29:39.2984|2|Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine|DEBUG|View lookup cache hit for view 'Index' in controller 'Home'. 
+2017-01-18 23:29:39.3154|2|Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor|DEBUG|The view 'Index' was found. 
+2017-01-18 23:29:39.3154|1|Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor|INFO|Executing ViewResult, running view at path /Views/Home/Index.cshtml. 
+2017-01-18 23:29:39.3334|2|Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine|DEBUG|View lookup cache hit for view '_Layout' in controller 'Home'. 
+2017-01-18 23:29:39.3334|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) in 62.5496ms 
+2017-01-18 23:29:39.3819|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VU5QOINJG" completed keep alive response. 
+2017-01-18 23:29:39.4054|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 162.5895ms 200 text/html; charset=utf-8 
+2017-01-18 23:29:39.6269|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/favicon.ico   
+2017-01-18 23:29:39.6524|2|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|Sending file. Request path: '/favicon.ico'. Physical path: 'X:\nlog\NLog.Extensions.Logging\examples\aspnet-core-example\src\aspnet-core-example\wwwroot\favicon.ico' 
+2017-01-18 23:29:39.6769|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VU5QOINJG" completed keep alive response. 
+2017-01-18 23:29:39.6954|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 68.349ms 200 image/x-icon 
+2017-01-18 23:31:15.7607|6|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VU5QOINJG" received FIN. 
+2017-01-18 23:31:15.7737|10|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VU5QOINJG" disconnecting. 
+2017-01-18 23:31:15.7737|7|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VU5QOINJG" sending FIN. 
+2017-01-18 23:31:15.7887|8|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VU5QOINJG" sent FIN with status "0". 
+2017-01-18 23:31:15.7977|2|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VU5QOINJG" stopped. 
+2017-01-18 23:32:39.8830|1|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VU5QOINJH" started. 
+2017-01-18 23:32:39.8830|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/   
+2017-01-18 23:32:39.9005|4|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path / does not match a supported file type 
+2017-01-18 23:32:39.9005|1|Microsoft.AspNetCore.Routing.RouteBase|DEBUG|Request successfully matched the route with name 'default' and template '{controller=Home}/{action=Index}/{id?}'. 
+2017-01-18 23:32:39.9130|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) 
+2017-01-18 23:32:39.9130|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) with arguments ((null)) - ModelState is Valid 
+2017-01-18 23:32:39.9300||HomeController|INFO|Index page says hello 
+2017-01-18 23:32:39.9445|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example), returned result Microsoft.AspNetCore.Mvc.ViewResult. 
+2017-01-18 23:32:39.9445|2|Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine|DEBUG|View lookup cache hit for view 'Index' in controller 'Home'. 
+2017-01-18 23:32:39.9580|2|Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor|DEBUG|The view 'Index' was found. 
+2017-01-18 23:32:39.9580|1|Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor|INFO|Executing ViewResult, running view at path /Views/Home/Index.cshtml. 
+2017-01-18 23:32:39.9740|2|Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine|DEBUG|View lookup cache hit for view '_Layout' in controller 'Home'. 
+2017-01-18 23:32:39.9740|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) in 59.9152ms 
+2017-01-18 23:32:40.0250|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VU5QOINJH" completed keep alive response. 
+2017-01-18 23:32:40.0425|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 152.2544ms 200 text/html; charset=utf-8 
+2017-01-18 23:32:40.2615|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/favicon.ico   
+2017-01-18 23:32:40.2810|2|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|Sending file. Request path: '/favicon.ico'. Physical path: 'X:\nlog\NLog.Extensions.Logging\examples\aspnet-core-example\src\aspnet-core-example\wwwroot\favicon.ico' 
+2017-01-18 23:32:40.3280|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VU5QOINJH" completed keep alive response. 
+2017-01-18 23:32:40.3400|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 78.7128ms 200 image/x-icon 
+2017-01-18 23:34:41.7558|10|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VU5QOINJH" disconnecting. 
+2017-01-18 23:34:41.7753|7|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VU5QOINJH" sending FIN. 
+2017-01-18 23:34:41.7973|8|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VU5QOINJH" sent FIN with status "0". 
+2017-01-18 23:34:41.8178|2|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VU5QOINJH" stopped. 
+2017-01-18 23:36:12.2705|3|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting starting 
+2017-01-18 23:36:12.4640|4|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting started 
+2017-01-18 23:36:12.5510|1|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VU9JVRFCH" started. 
+2017-01-18 23:36:12.6935|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 DEBUG http://localhost:59915/  0 
+2017-01-18 23:36:12.8110|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VU9JVRFCH" completed keep alive response. 
+2017-01-18 23:36:12.8295|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 155.3934ms 200  
+2017-01-18 23:36:16.4743|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/   
+2017-01-18 23:36:16.5119|4|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path / does not match a supported file type 
+2017-01-18 23:36:16.7058|1|Microsoft.AspNetCore.Routing.RouteBase|DEBUG|Request successfully matched the route with name 'default' and template '{controller=Home}/{action=Index}/{id?}'. 
+2017-01-18 23:36:16.7708|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) 
+2017-01-18 23:36:16.8198|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) with arguments ((null)) - ModelState is Valid 
+2017-01-18 23:36:16.8293||HomeController|INFO|Index page says hello 
+2017-01-18 23:36:16.8518|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example), returned result Microsoft.AspNetCore.Mvc.ViewResult. 
+2017-01-18 23:36:16.9938|1|Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine|DEBUG|View lookup cache miss for view 'Index' in controller 'Home'. 
+2017-01-18 23:36:17.0153|1|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/Home/Index.cshtml' started. 
+2017-01-18 23:36:17.4663|2|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/Home/Index.cshtml' completed in 441.4617ms. 
+2017-01-18 23:36:17.4923|1|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/Home/Index.cshtml' started. 
+2017-01-18 23:36:18.9044|2|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/Home/Index.cshtml' completed in 1407.1852ms. 
+2017-01-18 23:36:18.9174|1|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/_ViewStart.cshtml' started. 
+2017-01-18 23:36:18.9324|2|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/_ViewStart.cshtml' completed in 9.2933ms. 
+2017-01-18 23:36:18.9379|1|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/_ViewStart.cshtml' started. 
+2017-01-18 23:36:18.9919|2|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/_ViewStart.cshtml' completed in 46.9855ms. 
+2017-01-18 23:36:19.0044|2|Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor|DEBUG|The view 'Index' was found. 
+2017-01-18 23:36:19.0044|1|Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor|INFO|Executing ViewResult, running view at path /Views/Home/Index.cshtml. 
+2017-01-18 23:36:19.1189|0|Microsoft.Extensions.DependencyInjection.DataProtectionServices|INFO|User profile is available. Using 'C:\Users\j.verdurmen\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest. 
+2017-01-18 23:36:19.1969|1|Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine|DEBUG|View lookup cache miss for view '_Layout' in controller 'Home'. 
+2017-01-18 23:36:19.1969|1|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/Shared/_Layout.cshtml' started. 
+2017-01-18 23:36:19.2479|2|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/Shared/_Layout.cshtml' completed in 39.443ms. 
+2017-01-18 23:36:19.2549|1|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/Shared/_Layout.cshtml' started. 
+2017-01-18 23:36:19.3739|2|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/Shared/_Layout.cshtml' completed in 111.0883ms. 
+2017-01-18 23:36:19.5929|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) in 2816.0444ms 
+2017-01-18 23:36:19.6319|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VU9JVRFCH" completed keep alive response. 
+2017-01-18 23:36:19.6584|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 3184.0505ms 200 text/html; charset=utf-8 
+2017-01-18 23:36:19.8779|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/favicon.ico   
+2017-01-18 23:36:19.9124|2|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|Sending file. Request path: '/favicon.ico'. Physical path: 'X:\nlog\NLog.Extensions.Logging\examples\aspnet-core-example\src\aspnet-core-example\wwwroot\favicon.ico' 
+2017-01-18 23:36:19.9484|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VU9JVRFCH" completed keep alive response. 
+2017-01-18 23:36:19.9704|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 92.6676ms 200 image/x-icon 
+2017-01-18 23:36:29.6721|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/   
+2017-01-18 23:36:29.6721|4|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path / does not match a supported file type 
+2017-01-18 23:36:29.6881|1|Microsoft.AspNetCore.Routing.RouteBase|DEBUG|Request successfully matched the route with name 'default' and template '{controller=Home}/{action=Index}/{id?}'. 
+2017-01-18 23:36:29.6881|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) 
+2017-01-18 23:36:29.6881|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) with arguments ((null)) - ModelState is Valid 
+2017-01-18 23:36:29.7091||HomeController|INFO|Index page says hello 
+2017-01-18 23:36:29.7091|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example), returned result Microsoft.AspNetCore.Mvc.ViewResult. 
+2017-01-18 23:36:29.7277|2|Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine|DEBUG|View lookup cache hit for view 'Index' in controller 'Home'. 
+2017-01-18 23:36:29.7277|2|Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor|DEBUG|The view 'Index' was found. 
+2017-01-18 23:36:29.7421|1|Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor|INFO|Executing ViewResult, running view at path /Views/Home/Index.cshtml. 
+2017-01-18 23:36:29.7561|2|Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine|DEBUG|View lookup cache hit for view '_Layout' in controller 'Home'. 
+2017-01-18 23:36:29.7731|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) in 74.1014ms 
+2017-01-18 23:36:29.8236|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VU9JVRFCH" completed keep alive response. 
+2017-01-18 23:36:29.8386|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 166.5265ms 200 text/html; charset=utf-8 
+2017-01-18 23:36:30.0336|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/favicon.ico   
+2017-01-18 23:36:30.1151|2|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|Sending file. Request path: '/favicon.ico'. Physical path: 'X:\nlog\NLog.Extensions.Logging\examples\aspnet-core-example\src\aspnet-core-example\wwwroot\favicon.ico' 
+2017-01-18 23:36:30.1371|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VU9JVRFCH" completed keep alive response. 
+2017-01-18 23:36:30.1566|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 123.3436ms 200 image/x-icon 
+2017-01-18 23:36:56.8117|3|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting starting 
+2017-01-18 23:36:56.9572|4|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting started 
+2017-01-18 23:36:57.1297|1|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VUA190S9S" started. 
+2017-01-18 23:36:57.2272|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 DEBUG http://localhost:59915/  0 
+2017-01-18 23:36:57.2802|1|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VUA190S9T" started. 
+2017-01-18 23:36:57.2942|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/   
+2017-01-18 23:36:57.3512|4|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path / does not match a supported file type 
+2017-01-18 23:36:57.3602|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VUA190S9S" completed keep alive response. 
+2017-01-18 23:36:57.3817|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 169.3665ms 200  
+2017-01-18 23:36:57.5492|1|Microsoft.AspNetCore.Routing.RouteBase|DEBUG|Request successfully matched the route with name 'default' and template '{controller=Home}/{action=Index}/{id?}'. 
+2017-01-18 23:36:57.6107|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) 
+2017-01-18 23:36:57.6572|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) with arguments ((null)) - ModelState is Valid 
+2017-01-18 23:36:57.6572||HomeController|INFO|Index page says hello 
+2017-01-18 23:36:57.6842|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example), returned result Microsoft.AspNetCore.Mvc.ViewResult. 
+2017-01-18 23:36:57.8136|1|Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine|DEBUG|View lookup cache miss for view 'Index' in controller 'Home'. 
+2017-01-18 23:36:57.8351|1|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/Home/Index.cshtml' started. 
+2017-01-18 23:36:58.4256|2|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/Home/Index.cshtml' completed in 580.275ms. 
+2017-01-18 23:36:58.4636|1|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/Home/Index.cshtml' started. 
+2017-01-18 23:37:01.2131|2|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/Home/Index.cshtml' completed in 2731.0185ms. 
+2017-01-18 23:37:01.2266|1|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/_ViewStart.cshtml' started. 
+2017-01-18 23:37:01.2446|2|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/_ViewStart.cshtml' completed in 12.4182ms. 
+2017-01-18 23:37:01.2506|1|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/_ViewStart.cshtml' started. 
+2017-01-18 23:37:01.3141|2|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/_ViewStart.cshtml' completed in 58.1588ms. 
+2017-01-18 23:37:01.3301|2|Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor|DEBUG|The view 'Index' was found. 
+2017-01-18 23:37:01.3301|1|Microsoft.AspNetCore.Mvc.ViewFeatures.Internal.ViewResultExecutor|INFO|Executing ViewResult, running view at path /Views/Home/Index.cshtml. 
+2017-01-18 23:37:01.4346|0|Microsoft.Extensions.DependencyInjection.DataProtectionServices|INFO|User profile is available. Using 'C:\Users\j.verdurmen\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest. 
+2017-01-18 23:37:01.5111|1|Microsoft.AspNetCore.Mvc.Razor.RazorViewEngine|DEBUG|View lookup cache miss for view '_Layout' in controller 'Home'. 
+2017-01-18 23:37:01.5206|1|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/Shared/_Layout.cshtml' started. 
+2017-01-18 23:37:01.5701|2|Microsoft.AspNetCore.Mvc.Razor.Internal.RazorCompilationService|DEBUG|Code generation for the Razor file at '/Views/Shared/_Layout.cshtml' completed in 41.2716ms. 
+2017-01-18 23:37:01.5701|1|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/Shared/_Layout.cshtml' started. 
+2017-01-18 23:37:01.7111|2|Microsoft.AspNetCore.Mvc.Razor.Internal.DefaultRoslynCompilationService|DEBUG|Compilation of the generated code for the Razor file at '/Views/Shared/_Layout.cshtml' completed in 131.4635ms. 
+2017-01-18 23:37:01.8561|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action aspnet_core_example.Controllers.HomeController.Index (aspnet-core-example) in 4240.0228ms 
+2017-01-18 23:37:01.8911|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VUA190S9T" completed keep alive response. 
+2017-01-18 23:37:01.9076|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 4613.3417ms 200 text/html; charset=utf-8 
+2017-01-18 23:37:02.3031|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:59915/favicon.ico   
+2017-01-18 23:37:02.3311|2|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|INFO|Sending file. Request path: '/favicon.ico'. Physical path: 'X:\nlog\NLog.Extensions.Logging\examples\aspnet-core-example\src\aspnet-core-example\wwwroot\favicon.ico' 
+2017-01-18 23:37:02.3596|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VUA190S9S" completed keep alive response. 
+2017-01-18 23:37:02.3596|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 68.7946ms 200 image/x-icon 
+2017-01-18 23:38:47.1142|6|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VUA190S9T" received FIN. 
+2017-01-18 23:38:47.1142|6|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VUA190S9S" received FIN. 
+2017-01-18 23:38:47.1277|10|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VUA190S9T" disconnecting. 
+2017-01-18 23:38:47.1277|10|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VUA190S9S" disconnecting. 
+2017-01-18 23:38:47.1277|7|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VUA190S9T" sending FIN. 
+2017-01-18 23:38:47.1447|7|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VUA190S9S" sending FIN. 
+2017-01-18 23:38:47.1447|8|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VUA190S9T" sent FIN with status "0". 
+2017-01-18 23:38:47.1587|8|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VUA190S9S" sent FIN with status "0". 
+2017-01-18 23:38:47.1587|2|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VUA190S9T" stopped. 
+2017-01-18 23:38:47.1587|2|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL1VUA190S9S" stopped. 
+
 ```
 
-#### nlog-own-2016-05-21.log
+#### nlog-own-2017-01-18.log
 
 ```
-2016-05-21 13:39:53.7158|HomeController|INFO|  Index page says hello 
+2017-01-18 23:36:57.6572||HomeController|INFO|  Index page says hello |url: http://localhost/|action: Index
 
 ```
 
