@@ -80,7 +80,12 @@ How to use
 Known issues
 ---
 - Installing the NuGet packages [NLog.config](https://www.nuget.org/packages/NLog.Config/) / [NLog.schema](https://www.nuget.org/packages/NLog.Schema/) won't add to your project. It's recommend to extract (unzip) the NLog.Schema package and place the NLog.XSD in the same folder as NLog.config.
-- auto load of NLog extensions won't work yet.
+- auto load of NLog extensions won't work yet. Use `<extensions>` (see below)
+
+.NET Core issues: 
+
+- `${basedir}` isn't working will in .NET Core
+- `LogManager.GetCurrentClassLogger()` will use the filename instead of the full class name (class name and namespace, like in NLog 4). This will be fixed in the final of NLog 5 (after the release of NETSTANDARD 2.0)
 
 
 Example
