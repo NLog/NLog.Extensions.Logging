@@ -33,47 +33,47 @@ How to use
 3.  in startup.cs add in `Configure`
 
     ```c#
-      using NLog.Extensions.Logging;
+    using NLog.Extensions.Logging;
     
-      public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
-      {
-          //add NLog to .NET Core
-          loggerFactory.AddNLog();
-          
-          //Enable ASP.NET Core features (NLog.web) - only needed for ASP.NET Core users
-          app.AddNLogWeb();
+    public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+    {
+        //add NLog to .NET Core
+        loggerFactory.AddNLog();
+         
+        //Enable ASP.NET Core features (NLog.web) - only needed for ASP.NET Core users
+        app.AddNLogWeb();
 
-          //needed for non-NETSTANDARD platforms: configure nlog.config in your project root
-          env.ConfigureNLog("nlog.config");
-          ...
+        //needed for non-NETSTANDARD platforms: configure nlog.config in your project root. NB: you need NLog.Web.AspNetCore package for this. 
+        env.ConfigureNLog("nlog.config");
+        ...
     ```  
     
     ASP.NET Core users should also enabled `IHttpContextAccessor` in startup.cs
     ```c#
            
-        public void ConfigureServices(IServiceCollection services)
-        {
-            // Add framework services.
-            services.AddMvc();
+    public void ConfigureServices(IServiceCollection services)
+    {
+        // Add framework services.
+        services.AddMvc();
 
-            //needed for NLog.Web
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-        }
+        //needed for NLog.Web
+        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+    }
      ```
     
 
 4. Include NLog.config for publishing in project.json:
 
     ```json
-       "publishOptions": {
-            "include": [
-                "wwwroot",
-                "Views",
-                "appsettings.json",
-                "web.config",
-                "nlog.config"
-            ]
-        },
+    "publishOptions": {
+         "include": [
+             "wwwroot",
+             "Views",
+             "appsettings.json",
+             "web.config",
+             "nlog.config"
+         ]
+     },
     ```
     
 
