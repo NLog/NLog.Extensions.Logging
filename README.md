@@ -19,6 +19,18 @@ Please check [platform support](https://github.com/NLog/NLog/wiki/platform-suppo
 ASP.NET Core users should also install  [NLog.Web.AspNetCore](https://www.nuget.org/packages/NLog.web.aspnetcore)!
 
 
+Upgrade from alpha version
+---
+
+Upgrading from the alphas? Since the move to the beta, the dependency to ASP.NET (Core) has been removed. All functionality is still there, but moved to the [NLog.Web.AspNetCore package](https://www.nuget.org/packages/NLog.web.aspnetcore).
+
+Since the beta there is a `ConfigureNLog` on `ILoggerFactory` and on `IHostingEnvironment`. The difference is how the base path (for relative paths) are determined. `IHostingEnvironment` uses `IHostingEnvironment.ContentRootPath` and `ILoggerFactory` uses `System.AppContext.BaseDirectory`.  ASP.NET Core users should use `IHostingEnvironment.ConfigureNLog`. NON-ASP.NET Core users (e.g. console applications), use `ILoggerFactory.ConfigureNLog`.
+
+Due to the move of `IHostingEnvironment.ConfigureNLog` to NLog.Web.AspNetCore, the namespace of `IHostingEnvironment.ConfigureNLog` has been changed.
+
+
+
+
 How to use
 ----
 1. Add dependency in project.json
