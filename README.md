@@ -20,7 +20,9 @@ ASP.NET Core
 ----
 
 **ASP.NET Core** users should (also) install  [NLog.Web.AspNetCore](https://www.nuget.org/packages/NLog.web.aspnetcore)!
-Since the beta this library is also work nicely for .NET Core users (so non ASP.NET). We have removed all reference ASP.NET Core. ASP.NET Core users should install NLog.Web.AspNetCore which has a dependency on this library. 
+Since the beta this library is also work nicely for .NET Core users (so non ASP.NET). We have removed all reference ASP.NET Core. 
+
+NLog.Web.AspNetCore which has a dependency on this library, so there is no need to directly install it anymore. 
 
 
 ####  Upgrading from alpha version?
