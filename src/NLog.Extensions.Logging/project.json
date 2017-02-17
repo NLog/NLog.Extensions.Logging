@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-rtm-beta2",
+  "version": "1.0.0-rtm-beta3",
   "description": "NLog provider for Microsoft.Extensions.Logging",
   "authors": [ "Microsoft", "Julian Verdurmen" ],
   "packOptions": {
@@ -10,7 +10,8 @@
     "repository": {
       "type": "git",
       "url": "git://github.com/NLog/NLog.Extensions.Logging"
-    }
+    },
+    "releaseNotes": "Fix installation issues on .NET 4.6+"
   },
 
   "buildOptions": {
@@ -23,9 +24,9 @@
   "frameworks": {
     "net451": {
       "frameworkAssemblies": {
-        "System.Xml": "4.0.0.0",
-        "System.Runtime": "4.0.10.0",
-        "System.Xml.Serialization": "4.0.0.0"
+        "System.Xml": { "type": "build" },
+        "System.Runtime": { "type": "build" },
+        "System.Xml.Serialization": { "type": "build" }
         
       },
       "dependencies": {
