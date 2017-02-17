@@ -60,8 +60,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExampleLibrary.cs" />
-    <Compile Include="ExampleLibraryLoggerFactory.cs" />
+    <Compile Include="ExampleWorker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

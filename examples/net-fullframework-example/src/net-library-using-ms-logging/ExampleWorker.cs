@@ -8,12 +8,16 @@ using System.Threading.Tasks;
 namespace net_library_using_ms_logging
 {
     /// <summary>
-    /// Represents an external library which logs messages via the generic Microsoft.Extensions.Logging
+    /// Represents an external library method which can log messages via the generic Microsoft.Extensions.Logging
     /// </summary>
-    public class ExampleLibrary
+    public class ExampleWorker
     {
-        private Lazy<ILogger> _logger = new Lazy<ILogger>(() => ExampleLibraryLoggerFactory.Instance.CreateLogger<ExampleLibrary>());
-        private ILogger Logger { get { return _logger.Value; } }
+        private readonly ILogger _logger;
+
+        public ExampleWorker(ILogger<ExampleWorker> logger = null)
+        {
+            _logger = logger;
+        }
 
         /// <summary>
         /// Simulates a long-running task which logs various messages during its lifetime.
@@ -21,15 +25,15 @@ namespace net_library_using_ms_logging
         /// <returns></returns>
         public async Task DoWorkAsync()
         {
-            Logger.LogInformation("Starting work.");
+            _logger?.LogInformation("Starting work.");
 
             for (int i = 0; i <= 100; i += 20)
             {
                 await Task.Delay(TimeSpan.FromSeconds(1));
-                Logger.LogDebug($"Completed {i}% of work");
+                _logger?.LogDebug($"Completed {i}% of work");
             }
 
-            Logger.LogInformation("Finished work.");
+            _logger?.LogInformation("Finished work.");
         }
     }
 }
