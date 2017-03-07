@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-rtm-beta3",
+  "version": "1.0.0-rtm-beta4",
   "description": "NLog provider for Microsoft.Extensions.Logging",
   "authors": [ "Microsoft", "Julian Verdurmen" ],
   "packOptions": {
@@ -30,12 +30,12 @@
         
       },
       "dependencies": {
-        "NLog": "4.4.2"
+        "NLog": "4.4.3"
       }
     },
     "netstandard1.3": {
       "dependencies": {
-        "NLog": "5.0.0-beta05",
+        "NLog": "5.0.0-beta06",
         "System.AppContext": "4.3.0"
       },
       "buildOptions": {"define": ["NETCORE"]}
