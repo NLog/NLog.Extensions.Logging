@@ -11,7 +11,7 @@
       "type": "git",
       "url": "git://github.com/NLog/NLog.Extensions.Logging"
     },
-    "releaseNotes": "Fix installation issues on .NET 4.6+"
+    "releaseNotes": "Update dependencies"
   },
 
   "buildOptions": {
