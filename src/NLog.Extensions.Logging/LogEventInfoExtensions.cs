@@ -26,7 +26,7 @@ namespace NLog.Extensions.Logging
 
             // try get EventId properties or use defaults
             var id = (logEvent.Properties.ContainsKey(idKey)) ? (int)logEvent.Properties[idKey] : defaultValue.Id;
-            var name = (logEvent.Properties.ContainsKey(nameKey)) ? logEvent.Properties[nameKey].ToString() : defaultValue.Name;
+            var name = (logEvent.Properties.ContainsKey(nameKey)) ? logEvent.Properties[nameKey]?.ToString() : defaultValue.Name;
 
             return new EventId(id, name);
         }
