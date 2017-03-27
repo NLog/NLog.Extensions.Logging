@@ -40,17 +40,14 @@ namespace aspnet_core_example
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-
-            
             //add NLog to ASP.NET Core
             loggerFactory.AddNLog();
 
-
-          
-
             //add NLog.Web
             app.AddNLogWeb();
-
+            
+            //needed for non-NETSTANDARD platforms: configure nlog.config in your project root. NB: you need NLog.Web.AspNetCore package for this. 		
+            env.ConfigureNLog("nlog.config");
 
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
