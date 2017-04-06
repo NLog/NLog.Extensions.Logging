@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 
 namespace NLog.Extensions.Logging
@@ -37,6 +38,21 @@ namespace NLog.Extensions.Logging
                     eventInfo.Properties["EventId" + _options.EventIdSeparator + "Id"] = eventId.Id;
                     eventInfo.Properties["EventId" + _options.EventIdSeparator + "Name"] = eventId.Name;
                     eventInfo.Properties["EventId"] = eventId;
+
+                    var structure = state as IEnumerable<KeyValuePair<string, object>>;
+                    if (structure != null)
+                    {
+                        foreach (var property in structure)
+                        {
+                            if(property.Key == _options.OriginalFormatPropertyName)
+                            {
+                                continue;
+                            }
+
+                            eventInfo.Properties.Add(property.Key, property.Value);
+                        }
+                    }
+
                     _logger.Log(eventInfo);
                 }
             }
