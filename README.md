@@ -36,7 +36,10 @@ Due to the move of `IHostingEnvironment.ConfigureNLog` to NLog.Web.AspNetCore, t
 
 How to use
 ----
-- [Getting Started with ASP.NET Core (project json)](https://github.com/NLog/NLog.Web/wiki/Getting-started-with-ASP.NET-Core-(project.json))
+
+- [Getting Started with ASP.NET Core (project.json - vs2015)](https://github.com/NLog/NLog.Web/wiki/Getting-started-with-ASP.NET-Core-(project.json))
+- [Getting started with ASP.NET Core (csproj - vs2017)](https://github.com/NLog/NLog.Web/wiki/Getting-started-with-ASP.NET-Core-(csproj---vs2017))
+- [Multiple blogs to get started with ASP.NET Core and NLog](https://github.com/damienbod/AspNetCoreNlog)
     
 
 Known issues
