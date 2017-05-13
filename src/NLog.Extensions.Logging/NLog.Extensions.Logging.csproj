@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <Description>NLog provider for Microsoft.Extensions.Logging</Description>
-    <VersionPrefix>1.0.0-rtm-beta4</VersionPrefix>
+    <VersionPrefix>1.0.0-rtm-beta5</VersionPrefix>
     <Authors>Microsoft;Julian Verdurmen</Authors>
     <TargetFrameworks>net451;netstandard1.3</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
-    <PackageReference Include="NLog" Version="4.4.3" />
+    <PackageReference Include="NLog" Version="4.4.9" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Runtime" />
     <Reference Include="System.Xml.Serialization" />
@@ -38,7 +38,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-    <PackageReference Include="NLog" Version="5.0.0-beta06" />
+    <PackageReference Include="NLog" Version="5.0.0-beta07" />
     <PackageReference Include="System.AppContext" Version="4.3.0" />
   </ItemGroup>
 
