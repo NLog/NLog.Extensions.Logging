@@ -12,10 +12,13 @@ namespace NLog.Extensions.Logging
         /// </summary>
         public string EventIdSeparator { get; set; }
 
+        public string OriginalFormatPropertyName { get; set; }
+
         /// <summary>Initializes a new instance of the <see cref="T:System.Object" /> class.</summary>
         public NLogProviderOptions()
         {
             EventIdSeparator = ".";
+            OriginalFormatPropertyName = "{OriginalFormat}";
         }
 
         /// <summary>
