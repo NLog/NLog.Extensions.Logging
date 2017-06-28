@@ -102,7 +102,7 @@ namespace NLog.Extensions.Logging
                 throw new ArgumentNullException(nameof(state));
             }
             
-            return NestedDiagnosticsContext.Push(state);
+            return NestedDiagnosticsLogicalContext.Push(state);
         }
     }
 }
