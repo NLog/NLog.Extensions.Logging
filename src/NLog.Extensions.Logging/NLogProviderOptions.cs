@@ -12,6 +12,11 @@ namespace NLog.Extensions.Logging
         /// </summary>
         public string EventIdSeparator { get; set; }
 
+        /// <summary>
+        /// Skip allocation of <see cref="LogEventInfo.Properties" />-dictionary when <see cref="default(EventId)"/>
+        /// </summary>
+        public bool IgnoreEmptyEventId { get; set; }
+
         /// <summary>Initializes a new instance of the <see cref="T:System.Object" /> class.</summary>
         public NLogProviderOptions()
         {
