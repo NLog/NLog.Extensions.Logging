@@ -11,6 +11,10 @@ namespace NLog.Extensions.Logging
         private readonly Logger _logger;
         private readonly NLogProviderOptions _options;
 
+        private static readonly object _emptyEventId = default(EventId);    // Cache boxing of empty EventId-struct
+        private static readonly object _zeroEventId = default(EventId).Id;  // Cache boxing of zero EventId-Value
+        private Tuple<string, string, string> _eventIdPropertyNames;
+
         public NLogLogger(Logger logger, NLogProviderOptions options)
         {
             _logger = logger;
@@ -34,9 +38,25 @@ namespace NLog.Extensions.Logging
                     //message arguments are not needed as it is already checked that the loglevel is enabled.
                     var eventInfo = LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
                     eventInfo.Exception = exception;
-                    eventInfo.Properties["EventId" + _options.EventIdSeparator + "Id"] = eventId.Id;
-                    eventInfo.Properties["EventId" + _options.EventIdSeparator + "Name"] = eventId.Name;
-                    eventInfo.Properties["EventId"] = eventId;
+                    if (!_options.IgnoreEmptyEventId || eventId.Id != 0 || !string.IsNullOrEmpty(eventId.Name))
+                    {
+                        /// Attempt to reuse the same string-allocations based on the current <see cref="NLogProviderOptions.EventIdSeparator"/>
+                        var eventIdPropertyNames = _eventIdPropertyNames ?? new Tuple<string, string, string>(null, null, null);
+                        var eventIdSeparator = _options.EventIdSeparator ?? string.Empty;
+                        if (!ReferenceEquals(eventIdPropertyNames.Item1, eventIdSeparator))
+                        {
+                            // Perform atomic cache update of the string-allocations matching the current separator
+                            eventIdPropertyNames = new Tuple<string, string, string>(
+                                eventIdSeparator,
+                                string.Concat("EventId", eventIdSeparator, "Id"),
+                                string.Concat("EventId", eventIdSeparator, "Name"));
+                            _eventIdPropertyNames = eventIdPropertyNames;
+                        }
+
+                        eventInfo.Properties[eventIdPropertyNames.Item2] = eventId.Id == 0 ? _zeroEventId : eventId.Id;
+                        eventInfo.Properties[eventIdPropertyNames.Item3] = eventId.Name;
+                        eventInfo.Properties["EventId"] = (eventId.Id == 0 && eventId.Name == null) ? _emptyEventId : eventId;
+                    }
                     _logger.Log(eventInfo);
                 }
             }
