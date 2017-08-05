@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
-    <PackageReference Include="NLog" Version="4.4.9" />
+    <PackageReference Include="NLog" Version="4.4.11" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Runtime" />
     <Reference Include="System.Xml.Serialization" />
@@ -38,7 +38,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-    <PackageReference Include="NLog" Version="5.0.0-beta07" />
+    <PackageReference Include="NLog" Version="5.0.0-beta09" />
     <PackageReference Include="System.AppContext" Version="4.3.0" />
   </ItemGroup>
 
