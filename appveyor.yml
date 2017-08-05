@@ -7,3 +7,6 @@ build_script:
     dotnet pack src\NLog.Extensions.Logging --configuration Release
 artifacts:
 - path: 'src\NLog.Extensions.Logging\bin\release\*.nupkg'
+
+test_script:
+- ps: .\run-tests.ps1
