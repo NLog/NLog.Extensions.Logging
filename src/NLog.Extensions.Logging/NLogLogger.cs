@@ -33,32 +33,30 @@ namespace NLog.Extensions.Logging
                 }
                 var message = formatter(state, exception);
 
-                if (!string.IsNullOrEmpty(message))
+                //message arguments are not needed as it is already checked that the loglevel is enabled.
+                var eventInfo = LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
+                eventInfo.Exception = exception;
+                if (!_options.IgnoreEmptyEventId || eventId.Id != 0 || !string.IsNullOrEmpty(eventId.Name))
                 {
-                    //message arguments are not needed as it is already checked that the loglevel is enabled.
-                    var eventInfo = LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
-                    eventInfo.Exception = exception;
-                    if (!_options.IgnoreEmptyEventId || eventId.Id != 0 || !string.IsNullOrEmpty(eventId.Name))
+                    /// Attempt to reuse the same string-allocations based on the current <see cref="NLogProviderOptions.EventIdSeparator"/>
+                    var eventIdPropertyNames = _eventIdPropertyNames ?? new Tuple<string, string, string>(null, null, null);
+                    var eventIdSeparator = _options.EventIdSeparator ?? string.Empty;
+                    if (!ReferenceEquals(eventIdPropertyNames.Item1, eventIdSeparator))
                     {
-                        /// Attempt to reuse the same string-allocations based on the current <see cref="NLogProviderOptions.EventIdSeparator"/>
-                        var eventIdPropertyNames = _eventIdPropertyNames ?? new Tuple<string, string, string>(null, null, null);
-                        var eventIdSeparator = _options.EventIdSeparator ?? string.Empty;
-                        if (!ReferenceEquals(eventIdPropertyNames.Item1, eventIdSeparator))
-                        {
-                            // Perform atomic cache update of the string-allocations matching the current separator
-                            eventIdPropertyNames = new Tuple<string, string, string>(
-                                eventIdSeparator,
-                                string.Concat("EventId", eventIdSeparator, "Id"),
-                                string.Concat("EventId", eventIdSeparator, "Name"));
-                            _eventIdPropertyNames = eventIdPropertyNames;
-                        }
-
-                        eventInfo.Properties[eventIdPropertyNames.Item2] = eventId.Id == 0 ? _zeroEventId : eventId.Id;
-                        eventInfo.Properties[eventIdPropertyNames.Item3] = eventId.Name;
-                        eventInfo.Properties["EventId"] = (eventId.Id == 0 && eventId.Name == null) ? _emptyEventId : eventId;
+                        // Perform atomic cache update of the string-allocations matching the current separator
+                        eventIdPropertyNames = new Tuple<string, string, string>(
+                            eventIdSeparator,
+                            string.Concat("EventId", eventIdSeparator, "Id"),
+                            string.Concat("EventId", eventIdSeparator, "Name"));
+                        _eventIdPropertyNames = eventIdPropertyNames;
                     }
-                    _logger.Log(eventInfo);
+                    
+                    eventInfo.Properties[eventIdPropertyNames.Item2] = eventId.Id == 0 ? _zeroEventId : eventId.Id;
+                    eventInfo.Properties[eventIdPropertyNames.Item3] = eventId.Name;
+                    eventInfo.Properties["EventId"] = (eventId.Id == 0 && eventId.Name == null) ? _emptyEventId : eventId;
                 }
+                _logger.Log(eventInfo);
+                
             }
         }
 
