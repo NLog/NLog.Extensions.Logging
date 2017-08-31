@@ -27,7 +27,7 @@ namespace NLog.Extensions.Logging
         /// <param name="builder"></param>
         /// <param name="options">NLog options</param>
         /// <returns>ILoggerFactory for chaining</returns>
-        public static ILoggerFactory AddNLog(this ILoggingBuilder builder, NLogProviderOptions options)
+        public static ILoggingBuilder AddNLog(this ILoggingBuilder builder, NLogProviderOptions options)
         {
             //ignore this
             LogManager.AddHiddenAssembly(Assembly.Load(new AssemblyName("Microsoft.Extensions.Logging")));
