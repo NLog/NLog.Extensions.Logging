@@ -14,20 +14,20 @@ namespace NLog.Extensions.Logging
         /// <summary>
         /// Enable NLog as logging provider in .NET Core.
         /// </summary>
-        /// <param name="factory"></param>
-        /// <returns>ILoggerFactory for chaining</returns>
-        public static ILoggerFactory AddNLog(this ILoggerFactory factory)
+        /// <param name="builder"></param>
+        /// <returns>ILoggingBuilder for chaining</returns>
+        public static ILoggingBuilder AddNLog(this ILoggingBuilder builder)
         {
-            return AddNLog(factory, null);
+            return AddNLog(builder, null);
         }
 
         /// <summary>
         /// Enable NLog as logging provider in .NET Core.
         /// </summary>
-        /// <param name="factory"></param>
+        /// <param name="builder"></param>
         /// <param name="options">NLog options</param>
         /// <returns>ILoggerFactory for chaining</returns>
-        public static ILoggerFactory AddNLog(this ILoggerFactory factory, NLogProviderOptions options)
+        public static ILoggingBuilder AddNLog(this ILoggingBuilder builder, NLogProviderOptions options)
         {
             //ignore this
             LogManager.AddHiddenAssembly(Assembly.Load(new AssemblyName("Microsoft.Extensions.Logging")));
@@ -48,9 +48,9 @@ namespace NLog.Extensions.Logging
 
             using (var provider = new NLogLoggerProvider(options))
             {
-                factory.AddProvider(provider);
+                builder.AddProvider(provider);
             }
-            return factory;
+            return builder;
         }
 
         /// <summary>
