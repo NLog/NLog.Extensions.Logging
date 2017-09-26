@@ -1,7 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Description>NLog provider for Microsoft.Extensions.Logging</Description>
-    <VersionPrefix>1.0.0-rtm-beta5</VersionPrefix>
+    <Description>NLog provider for Microsoft.Extensions.Logging for usage in .NET Standard libraries and console applicaties.
+
+For ASP.NET Core, use NLog.Web.AspNetCore</Description>
+
     <Authors>Microsoft;Julian Verdurmen</Authors>
     <TargetFrameworks>net451;netstandard1.3;netstandard2.0</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -11,12 +13,17 @@
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>NLog.Extensions.Logging</PackageId>
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logfiles;netcore;nlog</PackageTags>
-    <PackageReleaseNotes>Update dependencies</PackageReleaseNotes>
+    <PackageReleaseNotes>- switch from NestedDiagnosticsContext to NestedDiagnosticsLogicalContext  - use ${NDLC} instead of ${NDC} in your config when using BeginScope.
+- Log exceptions when log message empty
+- Minimize string-allocations when adding EventId-properties
+- Update dependencies</PackageReleaseNotes>
     <PackageIconUrl>http://nlog-project.org/NConfig.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/NLog/NLog.Extensions.Logging</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/NLog/NLog.Extensions.Logging/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/NLog/NLog.Extensions.Logging</RepositoryUrl>
+    <VersionPrefix>1.0.0-rtm-beta6</VersionPrefix>
+    <Version>1.0.0-rtm-beta6</Version>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
