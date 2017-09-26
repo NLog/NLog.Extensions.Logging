@@ -19,6 +19,16 @@ Please check [platform support](https://github.com/NLog/NLog/wiki/platform-suppo
 ASP.NET Core
 ----
 
+------
+ ℹ️  Missing the trace en debug logs in .NET Core 2? Set `ILoggingBuilder.SetMinimumLevel()`
+
+-----
+
+:warning: Not all targets and layout renders are implemented for .NET Standard. See the [Platform support table](https://github.com/NLog/NLog/wiki/platform-support)
+
+-----
+
+
 **ASP.NET Core** users should install  [NLog.Web.AspNetCore](https://www.nuget.org/packages/NLog.web.aspnetcore)!
 This was needed to support also the non-ASP.NET users.
 
