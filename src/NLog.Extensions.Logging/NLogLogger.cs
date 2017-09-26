@@ -38,7 +38,7 @@ namespace NLog.Extensions.Logging
                 eventInfo.Exception = exception;
                 if (!_options.IgnoreEmptyEventId || eventId.Id != 0 || !string.IsNullOrEmpty(eventId.Name))
                 {
-                    /// Attempt to reuse the same string-allocations based on the current <see cref="NLogProviderOptions.EventIdSeparator"/>
+                    // Attempt to reuse the same string-allocations based on the current <see cref="NLogProviderOptions.EventIdSeparator"/>
                     var eventIdPropertyNames = _eventIdPropertyNames ?? new Tuple<string, string, string>(null, null, null);
                     var eventIdSeparator = _options.EventIdSeparator ?? string.Empty;
                     if (!ReferenceEquals(eventIdPropertyNames.Item1, eventIdSeparator))
