@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace NLog.Extensions.Logging
 {
+    /// <summary>
+    /// Options for logging to NLog with 
+    /// </summary>
     public class NLogProviderOptions
     {
         /// <summary>
