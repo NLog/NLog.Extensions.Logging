@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace NLog.Extensions.Logging
 {
@@ -13,8 +12,11 @@ namespace NLog.Extensions.Logging
         public string EventIdSeparator { get; set; }
 
         /// <summary>
-        /// Skip allocation of <see cref="LogEventInfo.Properties" />-dictionary when <see cref="default(EventId)"/>
+        /// Skip allocation of <see cref="LogEventInfo.Properties" />-dictionary
         /// </summary>
+        /// <remarks>
+        /// using
+        ///     <c>default(EventId)</c></remarks>
         public bool IgnoreEmptyEventId { get; set; }
 
         /// <summary>Initializes a new instance of the <see cref="T:System.Object" /> class.</summary>
