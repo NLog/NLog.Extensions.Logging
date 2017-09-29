@@ -1,7 +1,7 @@
 ﻿namespace NLog.Extensions.Logging
 {
     /// <summary>
-    /// Provider logger for NLog.
+    /// Provider logger for NLog + Microsoft.Extensions.Logging
     /// </summary>
     public class NLogLoggerProvider : Microsoft.Extensions.Logging.ILoggerProvider
     {
