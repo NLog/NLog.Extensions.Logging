@@ -5,7 +5,7 @@
 For ASP.NET Core, use NLog.Web.AspNetCore</Description>
 
     <Authors>Microsoft;Julian Verdurmen</Authors>
-    <TargetFrameworks>net451;netstandard1.3;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net451;net461;netstandard1.3;netstandard2.0</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AssemblyName>NLog.Extensions.Logging</AssemblyName>
     <AssemblyOriginatorKeyFile>NLog.snk</AssemblyOriginatorKeyFile>
@@ -35,6 +35,15 @@ For ASP.NET Core, use NLog.Web.AspNetCore</Description>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <PackageReference Include="NLog" Version="4.4.12" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Runtime" />
+    <Reference Include="System.Xml.Serialization" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' Or '$(TargetFramework)' == 'netstandard2.0'">
     <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
   </PropertyGroup>
@@ -45,7 +54,7 @@ For ASP.NET Core, use NLog.Web.AspNetCore</Description>
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
-    <PackageReference Include="NLog" Version="4.5.0-beta01" />
+    <PackageReference Include="NLog" Version="4.5.0-beta02" />
     <PackageReference Include="System.AppContext" Version="4.3.0" />
   </ItemGroup>
 </Project>
