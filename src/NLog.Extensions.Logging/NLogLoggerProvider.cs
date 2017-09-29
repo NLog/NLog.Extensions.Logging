@@ -11,14 +11,14 @@
         public NLogProviderOptions Options { get; set; }
 
         /// <summary>
-        /// <see cref="NLogLoggerProvider"/> with default options.
+        /// New provider with default options, see <see cref="Options"/>
         /// </summary>
         public NLogLoggerProvider() 
         {
         }
 
         /// <summary>
-        /// <see cref="NLogLoggerProvider"/> with default options.
+        /// New provider with options
         /// </summary>
         /// <param name="options"></param>
         public NLogLoggerProvider(NLogProviderOptions options)
