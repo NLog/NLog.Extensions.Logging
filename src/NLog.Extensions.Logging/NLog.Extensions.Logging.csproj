@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Description>NLog provider for Microsoft.Extensions.Logging for usage in .NET Standard libraries and console applicaties.
 
-For ASP.NET Core, use NLog.Web.AspNetCore</Description>
+For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.Web.AspNetCore</Description>
 
     <Authors>Microsoft;Julian Verdurmen</Authors>
     <TargetFrameworks>net451;net461;netstandard1.3;netstandard2.0</TargetFrameworks>
@@ -13,16 +13,16 @@ For ASP.NET Core, use NLog.Web.AspNetCore</Description>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>NLog.Extensions.Logging</PackageId>
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logfiles;netcore;nlog</PackageTags>
-    <PackageReleaseNotes>- switch from NestedDiagnosticsContext to NestedDiagnosticsLogicalContext  - use ${NDLC} instead of ${NDC} in your config when using BeginScope.
-- Log exceptions when log message empty
-- Minimize string-allocations when adding EventId-properties
-- Update dependencies</PackageReleaseNotes>
+    <PackageReleaseNotes>- Added NLogLoggerFactory 
+- Support .NET 4.6.1 + Microsoft.Extensions.Logging 2.0
+- XML Docs in package   
+    </PackageReleaseNotes>
     <PackageIconUrl>http://nlog-project.org/NConfig.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/NLog/NLog.Extensions.Logging</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/NLog/NLog.Extensions.Logging/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/NLog/NLog.Extensions.Logging</RepositoryUrl>
-    <Version>1.0.0-rtm-beta6</Version>
+    <Version>1.0.0-rtm-beta7</Version>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
