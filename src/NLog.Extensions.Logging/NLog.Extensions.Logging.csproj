@@ -22,7 +22,6 @@ For ASP.NET Core, use NLog.Web.AspNetCore</Description>
     <PackageLicenseUrl>https://github.com/NLog/NLog.Extensions.Logging/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/NLog/NLog.Extensions.Logging</RepositoryUrl>
-    <VersionPrefix>1.0.0-rtm-beta6</VersionPrefix>
     <Version>1.0.0-rtm-beta6</Version>
   </PropertyGroup>
 
