@@ -13,16 +13,16 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>NLog.Extensions.Logging</PackageId>
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logfiles;netcore;nlog</PackageTags>
-    <PackageReleaseNotes>- Added NLogLoggerFactory 
-- Support .NET 4.6.1 + Microsoft.Extensions.Logging 2.0
-- XML Docs in package   
+    <PackageReleaseNotes>
+      - .Net Standard 2: log parameters also as structured data. 
+
     </PackageReleaseNotes>
     <PackageIconUrl>http://nlog-project.org/NConfig.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/NLog/NLog.Extensions.Logging</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/NLog/NLog.Extensions.Logging/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/NLog/NLog.Extensions.Logging</RepositoryUrl>
-    <Version>1.0.0-rtm-beta7</Version>
+    <Version>1.0.0-rc1</Version>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
