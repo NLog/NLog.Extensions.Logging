@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 
 namespace NLog.Extensions.Logging
@@ -11,6 +12,7 @@ namespace NLog.Extensions.Logging
         private readonly Logger _logger;
         private readonly NLogProviderOptions _options;
 
+        internal const string OriginalFormatPropertyName = "{OriginalFormat}";
         private static readonly object EmptyEventId = default(EventId);    // Cache boxing of empty EventId-struct
         private static readonly object ZeroEventId = default(EventId).Id;  // Cache boxing of zero EventId-Value
         private Tuple<string, string, string> _eventIdPropertyNames;
@@ -35,8 +37,8 @@ namespace NLog.Extensions.Logging
             }
             var message = formatter(state, exception);
 
-            //message arguments are not needed as it is already checked that the loglevel is enabled.
-            var eventInfo = LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
+            var messageTemplate = _options.EnableStructuredLogging ? state as IReadOnlyList<KeyValuePair<string, object>> : null;
+            LogEventInfo eventInfo = CreateLogEventInfo(nLogLogLevel, message, messageTemplate);
             eventInfo.Exception = exception;
             if (!_options.IgnoreEmptyEventId || eventId.Id != 0 || !string.IsNullOrEmpty(eventId.Name))
             {
@@ -58,7 +60,62 @@ namespace NLog.Extensions.Logging
                 eventInfo.Properties[eventIdPropertyNames.Item3] = eventId.Name;
                 eventInfo.Properties["EventId"] = idIsZero && eventId.Name == null ? EmptyEventId : eventId;
             }
+
             _logger.Log(eventInfo);
+        }
+
+        private LogEventInfo CreateLogEventInfo(LogLevel nLogLogLevel, string message, IReadOnlyList<KeyValuePair<string, object>> parameterList)
+        {
+            if (parameterList != null && parameterList.Count > 1)
+            {
+                // More than a single parameter (last parameter is the {OriginalFormat})
+                var firstParameterName = parameterList[0].Key;
+                if (!string.IsNullOrEmpty(firstParameterName))
+                {
+                    if (firstParameterName.Length != 1 || !char.IsDigit(firstParameterName[0]))
+                    {
+#if NETSTANDARD2_0
+                        var originalFormat = parameterList[parameterList.Count - 1];
+                        string originalMessage = null;
+                        if (originalFormat.Key == OriginalFormatPropertyName)
+                        {
+                            // Attempt to capture original message with placeholders
+                            originalMessage = originalFormat.Value as string;
+                        }
+
+                        var messageTemplateParameters = new NLogMessageParameterList(parameterList, originalMessage != null);
+                        var eventInfo = new LogEventInfo(nLogLogLevel, _logger.Name, originalMessage ?? message, messageTemplateParameters);
+                        if (originalMessage != null)
+                        {
+                            eventInfo.Parameters = new object[messageTemplateParameters.Count + 1];
+                            for (int i = 0; i < messageTemplateParameters.Count; ++i)
+                                eventInfo.Parameters[i] = messageTemplateParameters[i].Value;
+                            eventInfo.Parameters[messageTemplateParameters.Count] = message;
+                            eventInfo.MessageFormatter = (l) => (string)l.Parameters[l.Parameters.Length - 1];
+                        }
+                        return eventInfo;
+#else
+                        var eventInfo = LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
+                        for (int i = 0; i < parameterList.Count; ++i)
+                        {
+                            var parameter = parameterList[i];
+                            if (string.IsNullOrEmpty(parameter.Key))
+                                break;  // Skip capture of invalid parameters
+
+                            var parameterName = parameter.Key;
+                            switch (parameterName[0])
+                            {
+                                case '@': parameterName = parameterName.Substring(1); break;
+                                case '$': parameterName = parameterName.Substring(1); break;
+                            }
+                            eventInfo.Properties[parameterName] = parameter.Value;
+                        }
+                        return eventInfo;
+#endif
+                    }
+                }
+            }
+            return LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
         }
 
         /// <summary>
@@ -119,7 +176,7 @@ namespace NLog.Extensions.Logging
             {
                 throw new ArgumentNullException(nameof(state));
             }
-            
+
             return NestedDiagnosticsLogicalContext.Push(state);
         }
     }

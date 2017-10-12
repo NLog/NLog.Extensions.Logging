@@ -56,7 +56,7 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
-    <PackageReference Include="NLog" Version="4.5.0-beta02" />
+    <PackageReference Include="NLog" Version="4.5.0-beta06" />
     <PackageReference Include="System.AppContext" Version="4.3.0" />
   </ItemGroup>
 </Project>

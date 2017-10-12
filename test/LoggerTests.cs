@@ -24,7 +24,6 @@ namespace NLog.Extensions.Logging.Tests
 
             var target = GetTarget();
             Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|init runner |0", target.Logs.FirstOrDefault());
-           
         }
 
         [Fact]
@@ -34,7 +33,24 @@ namespace NLog.Extensions.Logging.Tests
 
             var target = GetTarget();
             Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id |20", target.Logs.FirstOrDefault());
-           
+        }
+
+        [Fact]
+        public void TestParameters()
+        {
+            GetRunner().LogDebugWithParameters();
+
+            var target = GetTarget();
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters |0", target.Logs.FirstOrDefault());
+        }
+
+        [Fact]
+        public void TestStructuredLogging()
+        {
+            GetRunner().LogDebugWithStructuredParameters();
+
+            var target = GetTarget();
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters |01", target.Logs.FirstOrDefault());
         }
 
         [Theory]
@@ -152,11 +168,10 @@ namespace NLog.Extensions.Logging.Tests
             var serviceProvider = services.BuildServiceProvider();
             var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
 
-            loggerFactory.AddNLog();
+            loggerFactory.AddNLog(new NLogProviderOptions() { EnableStructuredLogging = true });
             loggerFactory.ConfigureNLog("nlog.config");
             return serviceProvider;
         }
-
 
         public class Runner
         {
@@ -166,7 +181,6 @@ namespace NLog.Extensions.Logging.Tests
             {
                 _logger = fac.CreateLogger<Runner>();
             }
-
 
             public void LogDebugWithId()
             {
@@ -200,6 +214,16 @@ namespace NLog.Extensions.Logging.Tests
                 }
             }
 
+            public void LogDebugWithParameters()
+            {
+                _logger.LogDebug("message with id and {0} parameters", "1");
+            }
+
+            public void LogDebugWithStructuredParameters()
+            {
+                _logger.LogDebug("message with id and {ParameterCount} parameters", "1");
+            }
+
             public void LogWithScope()
             {
                 using (_logger.BeginScope("scope1"))
@@ -211,7 +235,6 @@ namespace NLog.Extensions.Logging.Tests
             public void Init()
             {
                 _logger.LogDebug("init runner");
-
             }
         }
     }
