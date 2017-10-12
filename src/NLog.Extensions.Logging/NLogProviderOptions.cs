@@ -22,6 +22,11 @@ namespace NLog.Extensions.Logging
         ///     <c>default(EventId)</c></remarks>
         public bool IgnoreEmptyEventId { get; set; }
 
+        /// <summary>
+        /// Attempt to capture parameter names and values and insert into <see cref="LogEventInfo.Properties" />-dictionary
+        /// </summary>
+        public bool EnableStructuredLogging { get; set; }
+
         /// <summary>Initializes a new instance of the <see cref="T:System.Object" /> class.</summary>
         public NLogProviderOptions()
         {
