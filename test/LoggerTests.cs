@@ -168,7 +168,7 @@ namespace NLog.Extensions.Logging.Tests
             var serviceProvider = services.BuildServiceProvider();
             var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
 
-            loggerFactory.AddNLog(new NLogProviderOptions() { EnableStructuredLogging = true });
+            loggerFactory.AddNLog(new NLogProviderOptions() { CaptureMessageTemplates = true });
             loggerFactory.ConfigureNLog("nlog.config");
             return serviceProvider;
         }

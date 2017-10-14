@@ -37,7 +37,7 @@ namespace NLog.Extensions.Logging
             }
             var message = formatter(state, exception);
 
-            var messageTemplate = _options.EnableStructuredLogging ? state as IReadOnlyList<KeyValuePair<string, object>> : null;
+            var messageTemplate = _options.CaptureMessageTemplates ? state as IReadOnlyList<KeyValuePair<string, object>> : null;
             LogEventInfo eventInfo = CreateLogEventInfo(nLogLogLevel, message, messageTemplate);
             eventInfo.Exception = exception;
             if (!_options.IgnoreEmptyEventId || eventId.Id != 0 || !string.IsNullOrEmpty(eventId.Name))
