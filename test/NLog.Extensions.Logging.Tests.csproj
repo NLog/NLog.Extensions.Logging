@@ -16,13 +16,13 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="1.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.2" />
-    <PackageReference Include="NLog" Version="5.0.0-beta11" />
+    <PackageReference Include="NLog" Version="4.5.0-beta07" />
     <PackageReference Include="System.AppContext" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
-    <PackageReference Include="NLog" Version="4.5.0-beta06" />
+    <PackageReference Include="NLog" Version="4.5.0-beta07" />
     <PackageReference Include="System.AppContext" Version="4.3.0" />
   </ItemGroup>
 

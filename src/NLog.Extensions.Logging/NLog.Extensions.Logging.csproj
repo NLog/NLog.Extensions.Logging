@@ -5,7 +5,7 @@
 For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.Web.AspNetCore</Description>
 
     <Authors>Microsoft;Julian Verdurmen</Authors>
-    <TargetFrameworks>net451;net461;netstandard1.3;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net451;net461;netstandard1.3;netstandard1.5;netstandard2.0</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AssemblyName>NLog.Extensions.Logging</AssemblyName>
     <AssemblyOriginatorKeyFile>NLog.snk</AssemblyOriginatorKeyFile>
@@ -43,7 +43,7 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' Or '$(TargetFramework)' == 'netstandard2.0'">
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' Or '$(TargetFramework)' == 'netstandard1.5' Or '$(TargetFramework)' == 'netstandard2.0'">
     <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
@@ -54,9 +54,14 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
     <PackageReference Include="NLog" Version="5.0.0-beta11" />
     <PackageReference Include="System.AppContext" Version="4.3.0" />
   </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.2" />
+    <PackageReference Include="NLog" Version="4.5.0-beta07" />
+    <PackageReference Include="System.AppContext" Version="4.3.0" />
+  </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
-    <PackageReference Include="NLog" Version="4.5.0-beta06" />
+    <PackageReference Include="NLog" Version="4.5.0-beta07" />
     <PackageReference Include="System.AppContext" Version="4.3.0" />
   </ItemGroup>
 </Project>

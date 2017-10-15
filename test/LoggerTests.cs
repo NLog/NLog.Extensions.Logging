@@ -60,7 +60,7 @@ namespace NLog.Extensions.Logging.Tests
             GetRunner().LogDebugWithMessageProperties();
 
             var target = GetTarget();
-            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 property |01", target.Logs.FirstOrDefault());
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 property |1", target.Logs.FirstOrDefault());
         }
 
         [Fact]
@@ -69,7 +69,7 @@ namespace NLog.Extensions.Logging.Tests
             GetRunner().LogWithScopeParameters();
 
             var target = GetTarget();
-            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters |0Hello", target.Logs.FirstOrDefault());
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters |Hello", target.Logs.FirstOrDefault());
         }
 
         [Theory]
