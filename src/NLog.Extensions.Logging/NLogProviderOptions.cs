@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace NLog.Extensions.Logging
 {
@@ -30,7 +28,8 @@ namespace NLog.Extensions.Logging
         /// <summary>Initializes a new instance of the <see cref="T:System.Object" /> class.</summary>
         public NLogProviderOptions()
         {
-            EventIdSeparator = ".";
+            EventIdSeparator = "_";
+            IgnoreEmptyEventId = true;
         }
 
         /// <summary>

@@ -23,7 +23,7 @@ namespace NLog.Extensions.Logging.Tests
             GetRunner().Init();
 
             var target = GetTarget();
-            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|init runner |0", target.Logs.FirstOrDefault());
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|init runner |", target.Logs.FirstOrDefault());
         }
 
         [Fact]
@@ -41,7 +41,7 @@ namespace NLog.Extensions.Logging.Tests
             GetRunner().LogDebugWithParameters();
 
             var target = GetTarget();
-            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters |0", target.Logs.FirstOrDefault());
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters |", target.Logs.FirstOrDefault());
         }
 
         [Fact]
@@ -50,7 +50,7 @@ namespace NLog.Extensions.Logging.Tests
             GetRunner().LogDebugWithStructuredParameters();
 
             var target = GetTarget();
-            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters |01", target.Logs.FirstOrDefault());
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters |1", target.Logs.FirstOrDefault());
         }
 
         [Theory]
