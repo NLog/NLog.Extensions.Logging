@@ -40,25 +40,12 @@ namespace NLog.Extensions.Logging
             var messageTemplate = _options.CaptureMessageTemplates ? state as IReadOnlyList<KeyValuePair<string, object>> : null;
             LogEventInfo eventInfo = CreateLogEventInfo(nLogLogLevel, message, messageTemplate);
             eventInfo.Exception = exception;
-            if (!_options.IgnoreEmptyEventId || eventId.Id != 0 || !string.IsNullOrEmpty(eventId.Name))
-            {
-                // Attempt to reuse the same string-allocations based on the current <see cref="NLogProviderOptions.EventIdSeparator"/>
-                var eventIdPropertyNames = _eventIdPropertyNames ?? new Tuple<string, string, string>(null, null, null);
-                var eventIdSeparator = _options.EventIdSeparator ?? string.Empty;
-                if (!ReferenceEquals(eventIdPropertyNames.Item1, eventIdSeparator))
-                {
-                    // Perform atomic cache update of the string-allocations matching the current separator
-                    eventIdPropertyNames = new Tuple<string, string, string>(
-                        eventIdSeparator,
-                        string.Concat("EventId", eventIdSeparator, "Id"),
-                        string.Concat("EventId", eventIdSeparator, "Name"));
-                    _eventIdPropertyNames = eventIdPropertyNames;
-                }
 
-                var idIsZero = eventId.Id == 0;
-                eventInfo.Properties[eventIdPropertyNames.Item2] = idIsZero ? ZeroEventId : eventId.Id;
-                eventInfo.Properties[eventIdPropertyNames.Item3] = eventId.Name;
-                eventInfo.Properties["EventId"] = idIsZero && eventId.Name == null ? EmptyEventId : eventId;
+            CaptureEventId(eventId, eventInfo);
+
+            if (_options.CaptureMessageProperties && messageTemplate == null)
+            {
+                CaptureMessageProperties(state, eventInfo);
             }
 
             _logger.Log(eventInfo);
@@ -118,6 +105,44 @@ namespace NLog.Extensions.Logging
             return LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
         }
 
+        private void CaptureEventId(EventId eventId, LogEventInfo eventInfo)
+        {
+            if (!_options.IgnoreEmptyEventId || eventId.Id != 0 || !string.IsNullOrEmpty(eventId.Name))
+            {
+                // Attempt to reuse the same string-allocations based on the current <see cref="NLogProviderOptions.EventIdSeparator"/>
+                var eventIdPropertyNames = _eventIdPropertyNames ?? new Tuple<string, string, string>(null, null, null);
+                var eventIdSeparator = _options.EventIdSeparator ?? string.Empty;
+                if (!ReferenceEquals(eventIdPropertyNames.Item1, eventIdSeparator))
+                {
+                    // Perform atomic cache update of the string-allocations matching the current separator
+                    eventIdPropertyNames = new Tuple<string, string, string>(
+                        eventIdSeparator,
+                        string.Concat("EventId", eventIdSeparator, "Id"),
+                        string.Concat("EventId", eventIdSeparator, "Name"));
+                    _eventIdPropertyNames = eventIdPropertyNames;
+                }
+
+                var idIsZero = eventId.Id == 0;
+                eventInfo.Properties[eventIdPropertyNames.Item2] = idIsZero ? ZeroEventId : eventId.Id;
+                eventInfo.Properties[eventIdPropertyNames.Item3] = eventId.Name;
+                eventInfo.Properties["EventId"] = idIsZero && eventId.Name == null ? EmptyEventId : eventId;
+            }
+        }
+
+        private static void CaptureMessageProperties<TState>(TState state, LogEventInfo eventInfo)
+        {
+            if (state is IEnumerable<KeyValuePair<string, object>> messageProperties)
+            {
+                foreach (var property in messageProperties)
+                {
+                    if (string.IsNullOrEmpty(property.Key))
+                        continue;
+
+                    eventInfo.Properties[property.Key] = property.Value;
+                }
+            }
+        }
+
         /// <summary>
         /// Is logging enabled for this logger at this <paramref name="logLevel"/>?
         /// </summary>
@@ -165,6 +190,57 @@ namespace NLog.Extensions.Logging
             }
         }
 
+        class ScopeProperties : IDisposable
+        {
+            List<IDisposable> _properties;
+            List<IDisposable> Properties { get { return _properties ?? (_properties = new List<IDisposable>()); } }
+
+            class ScopeProperty : IDisposable
+            {
+                string _key;
+
+                public ScopeProperty(string key, object value)
+                {
+                    _key = key;
+                    MappedDiagnosticsLogicalContext.Set(key, value);
+                }
+
+                public void Dispose()
+                {
+                    MappedDiagnosticsLogicalContext.Remove(_key);
+                }
+            }
+
+            public void AddDispose(IDisposable disposable)
+            {
+                Properties.Add(disposable);
+            }
+
+            public void AddProperty(string key, object value)
+            {
+                AddDispose(new ScopeProperty(key, value));
+            }
+
+            public void Dispose()
+            {
+                var properties = _properties;
+                if (properties != null)
+                {
+                    _properties = null;
+                    foreach (var property in properties)
+                    {
+                        try
+                        {
+                            property.Dispose();
+                        }
+                        catch
+                        {
+                        }
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// Begin a scope. Use in config with ${ndlc} 
         /// </summary>
@@ -175,6 +251,25 @@ namespace NLog.Extensions.Logging
             if (state == null)
             {
                 throw new ArgumentNullException(nameof(state));
+            }
+
+            if (_options.CaptureMessageProperties)
+            {
+                if (state is IEnumerable<KeyValuePair<string, object>> messageProperties)
+                {
+                    ScopeProperties scope = new ScopeProperties();
+
+                    foreach (var property in messageProperties)
+                    {
+                        if (string.IsNullOrEmpty(property.Key))
+                            continue;
+
+                        scope.AddProperty(property.Key, property.Value);
+                    }
+
+                    scope.AddDispose(NestedDiagnosticsLogicalContext.Push(state));
+                    return scope;
+                }
             }
 
             return NestedDiagnosticsLogicalContext.Push(state);

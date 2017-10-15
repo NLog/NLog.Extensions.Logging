@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -51,6 +52,24 @@ namespace NLog.Extensions.Logging.Tests
 
             var target = GetTarget();
             Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters |01", target.Logs.FirstOrDefault());
+        }
+
+        [Fact]
+        public void TestMessageProperties()
+        {
+            GetRunner().LogDebugWithMessageProperties();
+
+            var target = GetTarget();
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 property |01", target.Logs.FirstOrDefault());
+        }
+
+        [Fact]
+        public void TestScopeProperties()
+        {
+            GetRunner().LogWithScopeParameters();
+
+            var target = GetTarget();
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters |0Hello", target.Logs.FirstOrDefault());
         }
 
         [Theory]
@@ -168,7 +187,7 @@ namespace NLog.Extensions.Logging.Tests
             var serviceProvider = services.BuildServiceProvider();
             var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
 
-            loggerFactory.AddNLog(new NLogProviderOptions() { CaptureMessageTemplates = true });
+            loggerFactory.AddNLog(new NLogProviderOptions() { CaptureMessageTemplates = true, CaptureMessageProperties = true });
             loggerFactory.ConfigureNLog("nlog.config");
             return serviceProvider;
         }
@@ -224,11 +243,24 @@ namespace NLog.Extensions.Logging.Tests
                 _logger.LogDebug("message with id and {ParameterCount} parameters", "1");
             }
 
+            public void LogDebugWithMessageProperties()
+            {
+                _logger.Log(Microsoft.Extensions.Logging.LogLevel.Debug, default(EventId), new Dictionary<string, object> { { "ParameterCount", "1" } }, null, (s,ex) => "message with id and 1 property");
+            }
+
             public void LogWithScope()
             {
                 using (_logger.BeginScope("scope1"))
                 {
                     _logger.LogDebug(20, "message with id and {0} parameters", 1);
+                }
+            }
+
+            public void LogWithScopeParameters()
+            {
+                using (_logger.BeginScope(new[] { new KeyValuePair<string, object>("scope1", "Hello") }))
+                {
+                    _logger.LogDebug("message with id and {0} parameters", 1);
                 }
             }
 
