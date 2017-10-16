@@ -1,6 +1,6 @@
 ## Change Log
 
-### v1.0-rc1 (2017/10/16)
+### 1.0.0-rtm-rc1 (2017/10/16)
 
 ####  breaking changes:
 Breaking changes in behavior!
