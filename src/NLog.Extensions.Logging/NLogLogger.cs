@@ -23,7 +23,6 @@ namespace NLog.Extensions.Logging
             _options = options ?? NLogProviderOptions.Default;
         }
 
-        //todo  callsite showing the framework logging classes/methods
         public void Log<TState>(Microsoft.Extensions.Logging.LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
             var nLogLogLevel = ConvertLogLevel(logLevel);
