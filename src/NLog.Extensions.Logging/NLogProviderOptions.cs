@@ -35,6 +35,8 @@ namespace NLog.Extensions.Logging
         {
             EventIdSeparator = "_";
             IgnoreEmptyEventId = true;
+            CaptureMessageTemplates = true;
+            CaptureMessageProperties = true;
         }
 
         /// <summary>
