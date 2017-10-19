@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
+using NLog.Common;
 using NLog.Config;
 
 namespace NLog.Extensions.Logging
@@ -71,22 +72,30 @@ namespace NLog.Extensions.Logging
 
         private static void ConfigureHiddenAssemblies()
         {
-            //ignore this
-            LogManager.AddHiddenAssembly(Assembly.Load(new AssemblyName("Microsoft.Extensions.Logging")));
-            LogManager.AddHiddenAssembly(Assembly.Load(new AssemblyName("Microsoft.Extensions.Logging.Abstractions")));
-
             try
             {
-                //try the Filter ext
-                var filterAssembly = Assembly.Load(new AssemblyName("Microsoft.Extensions.Logging.Filter"));
-                LogManager.AddHiddenAssembly(filterAssembly);
-            }
-            catch (Exception)
-            {
-                //ignore
-            }
+                //ignore these assemblies for ${callsite}
+                LogManager.AddHiddenAssembly(typeof(Microsoft.Extensions.Logging.LoggerFactoryExtensions).GetTypeInfo().Assembly); //Microsoft.Extensions.Logging
+                LogManager.AddHiddenAssembly(typeof(Microsoft.Extensions.Logging.ILogger).GetTypeInfo().Assembly); // Microsoft.Extensions.Logging.Abstractions
+                LogManager.AddHiddenAssembly(typeof(NLog.Extensions.Logging.ConfigureExtensions).GetTypeInfo().Assembly); //NLog.Extensions.Logging
 
-            LogManager.AddHiddenAssembly(typeof(ConfigureExtensions).GetTypeInfo().Assembly);
+                try
+                {
+                    //try the Filter ext
+                    var filterAssembly = Assembly.Load(new AssemblyName("Microsoft.Extensions.Logging.Filter"));
+                    LogManager.AddHiddenAssembly(filterAssembly);
+
+                }
+                catch (Exception ex)
+                {
+                    InternalLogger.Trace(ex, "filtering Microsoft.Extensions.Logging.Filter failed. Not an issue probably");
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                InternalLogger.Debug(ex, "failure in ignoring assemblies. This could influence the ${callsite}");
+            }
         }
 
         /// <summary>
