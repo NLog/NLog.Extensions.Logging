@@ -26,7 +26,7 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
-    <PackageReference Include="NLog" Version="4.4.12" />
+    <PackageReference Include="NLog" Version="[4.4.12,5)" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.2" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Runtime" />
@@ -35,7 +35,7 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <PackageReference Include="NLog" Version="4.4.12" />
+    <PackageReference Include="NLog" Version="[4.4.12,5)" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Runtime" />
@@ -56,12 +56,12 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.2" />
-    <PackageReference Include="NLog" Version="4.5.0-beta07" />
+    <PackageReference Include="NLog" Version="[4.5.0-beta07,5)" />
     <PackageReference Include="System.AppContext" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
-    <PackageReference Include="NLog" Version="4.5.0-beta07" />
+    <PackageReference Include="NLog" Version="[4.5.0-beta07,5)" />
     <PackageReference Include="System.AppContext" Version="4.3.0" />
   </ItemGroup>
 </Project>
