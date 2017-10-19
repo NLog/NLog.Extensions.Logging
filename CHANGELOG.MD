@@ -1,5 +1,13 @@
 ## Change Log
 
+### 1.0.0-rtm-rc2 (2017/10/19)
+
+#### Fixes
+
+- [#159](https://github.com/nlog/NLog.Extensions.Logging/pull/159) Fix Recursive resource lookup bug (@304NotModified)
+- [#158](https://github.com/nlog/NLog.Extensions.Logging/pull/158) Update dependencies version range (@304NotModified)
+
+
 ### 1.0.0-rtm-rc1 (2017/10/16)
 
 ####  breaking changes:
