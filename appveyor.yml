@@ -4,6 +4,8 @@ build_script:
 - ps: >-
     dotnet restore src\NLog.Extensions.Logging
 
+     .\patchFileVersion.ps1 "NLog.Extensions.Logging.csproj" "$env:appveyor_build_version"
+
     dotnet pack src\NLog.Extensions.Logging --configuration Release
 artifacts:
 - path: 'src\NLog.Extensions.Logging\bin\release\*.nupkg'

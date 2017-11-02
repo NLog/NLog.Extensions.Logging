@@ -28,6 +28,11 @@ rc2 (see https://github.com/NLog/NLog.Extensions.Logging/milestone/9?closed=1)
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/NLog/NLog.Extensions.Logging</RepositoryUrl>
     <Version>1.0.0-rtm-rc2</Version>
+    
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <!--AssemblyVersion: keep 1.0.0.0-->
+    <FileVersion>1.0.0.0</FileVersion>
+    <!-- FileVersion = AssemblyFileVersionAttribute, patched by AppVeyor -->
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
