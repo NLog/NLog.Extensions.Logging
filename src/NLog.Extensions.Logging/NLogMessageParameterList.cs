@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace NLog.Extensions.Logging
 {
-#if NETSTANDARD2_0
+#if !NETSTANDARD1_3
     /// <summary>
     /// Converts Microsoft Extension Logging ParameterList into NLog MessageTemplate ParameterList
     /// </summary>
