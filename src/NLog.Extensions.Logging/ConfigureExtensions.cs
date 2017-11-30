@@ -40,8 +40,7 @@ namespace NLog.Extensions.Logging
             return factory;
         }
 
-#if NETSTANDARD2_0
-
+#if !NETCORE1_0
         /// <summary>
         /// Enable NLog as logging provider in .NET Core.
         /// </summary>
@@ -75,6 +74,9 @@ namespace NLog.Extensions.Logging
             try
             {
                 //ignore these assemblies for ${callsite}
+#if !NETCORE1_0
+                LogManager.AddHiddenAssembly(typeof(Microsoft.Extensions.Logging.ILoggingBuilder).GetTypeInfo().Assembly); //Microsoft.Logging
+#endif
                 LogManager.AddHiddenAssembly(typeof(Microsoft.Extensions.Logging.LoggerFactoryExtensions).GetTypeInfo().Assembly); //Microsoft.Extensions.Logging
                 LogManager.AddHiddenAssembly(typeof(Microsoft.Extensions.Logging.ILogger).GetTypeInfo().Assembly); // Microsoft.Extensions.Logging.Abstractions
                 LogManager.AddHiddenAssembly(typeof(NLog.Extensions.Logging.ConfigureExtensions).GetTypeInfo().Assembly); //NLog.Extensions.Logging
@@ -106,8 +108,7 @@ namespace NLog.Extensions.Logging
         /// <returns>Current configuration for chaining.</returns>
         public static LoggingConfiguration ConfigureNLog(this ILoggerFactory loggerFactory, string configFileRelativePath)
         {
-
-#if NETCORE
+#if NETCORE1_0 && !NET451
             var rootPath = System.AppContext.BaseDirectory;
 #else
             var rootPath = AppDomain.CurrentDomain.BaseDirectory;
