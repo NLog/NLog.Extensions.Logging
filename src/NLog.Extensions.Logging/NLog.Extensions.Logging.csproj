@@ -14,12 +14,8 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
     <PackageId>NLog.Extensions.Logging</PackageId>
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logfiles;netcore;nlog</PackageTags>
     <PackageReleaseNotes>
-      - .Net Standard 2: log parameters also as structured data. 
-
-rc2 (see https://github.com/NLog/NLog.Extensions.Logging/milestone/9?closed=1)
-- Fix Recursive resource lookup bug
-- Disallow NLog 5 for platforms dependend on NLog 4
-
+      
+support for .NET 4.6.1, support for message templates .NET standard 1.5+ and .NET 4.5.1+
 
     </PackageReleaseNotes>
     <PackageIconUrl>http://nlog-project.org/NConfig.png</PackageIconUrl>
@@ -27,7 +23,7 @@ rc2 (see https://github.com/NLog/NLog.Extensions.Logging/milestone/9?closed=1)
     <PackageLicenseUrl>https://github.com/NLog/NLog.Extensions.Logging/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/NLog/NLog.Extensions.Logging</RepositoryUrl>
-    <Version>1.0.0-rtm-rc2</Version>
+    <Version>1.0.0-rtm-rc3</Version>
     
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <!--AssemblyVersion: keep 1.0.0.0-->
