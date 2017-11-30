@@ -60,7 +60,7 @@ namespace NLog.Extensions.Logging
                 {
                     if (firstParameterName.Length != 1 || !char.IsDigit(firstParameterName[0]))
                     {
-#if NETSTANDARD2_0
+#if !NETSTANDARD1_3
                         var originalFormat = parameterList[parameterList.Count - 1];
                         string originalMessage = null;
                         if (originalFormat.Key == OriginalFormatPropertyName)
