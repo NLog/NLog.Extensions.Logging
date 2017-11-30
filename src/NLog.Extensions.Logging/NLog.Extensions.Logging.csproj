@@ -45,7 +45,7 @@ rc2 (see https://github.com/NLog/NLog.Extensions.Logging/milestone/9?closed=1)
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <PackageReference Include="NLog" Version="[4.4.12,5)" />
+    <PackageReference Include="NLog" Version="[4.5-rc01,5)" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Runtime" />
@@ -53,8 +53,8 @@ rc2 (see https://github.com/NLog/NLog.Extensions.Logging/milestone/9?closed=1)
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' Or '$(TargetFramework)' == 'netstandard1.5' Or '$(TargetFramework)' == 'netstandard2.0'">
-    <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' Or '$(TargetFramework)' == 'netstandard1.5' Or '$(TargetFramework)' == 'net451'">
+    <DefineConstants>$(DefineConstants);NETCORE1_0</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\NLog.Extensions.Logging.xml</DocumentationFile>
@@ -66,12 +66,11 @@ rc2 (see https://github.com/NLog/NLog.Extensions.Logging/milestone/9?closed=1)
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.2" />
-    <PackageReference Include="NLog" Version="[4.5.0-beta07,5)" />
+    <PackageReference Include="NLog" Version="[4.5.0-rc01,5)" />
     <PackageReference Include="System.AppContext" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
-    <PackageReference Include="NLog" Version="[4.5.0-beta07,5)" />
-    <PackageReference Include="System.AppContext" Version="4.3.0" />
+    <PackageReference Include="NLog" Version="[4.5.0-rc01,5)" />
   </ItemGroup>
 </Project>
