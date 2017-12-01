@@ -278,26 +278,28 @@ namespace NLog.Extensions.Logging
                 throw new ArgumentNullException(nameof(state));
             }
 
-            if (_options.CaptureMessageProperties)
+            if (_options.CaptureMessageProperties && state is IEnumerable<KeyValuePair<string, object>> messageProperties)
             {
-                if (state is IEnumerable<KeyValuePair<string, object>> messageProperties)
-                {
-                    ScopeProperties scope = new ScopeProperties();
-
-                    foreach (var property in messageProperties)
-                    {
-                        if (string.IsNullOrEmpty(property.Key))
-                            continue;
-
-                        scope.AddProperty(property.Key, property.Value);
-                    }
-
-                    scope.AddDispose(NestedDiagnosticsLogicalContext.Push(state));
-                    return scope;
-                }
+                return CreateScopeProperties(state, messageProperties);
             }
 
             return NestedDiagnosticsLogicalContext.Push(state);
+        }
+
+        private static IDisposable CreateScopeProperties<TState>(TState state, IEnumerable<KeyValuePair<string, object>> messageProperties)
+        {
+            ScopeProperties scope = new ScopeProperties();
+
+            foreach (var property in messageProperties)
+            {
+                if (string.IsNullOrEmpty(property.Key))
+                    continue;
+
+                scope.AddProperty(property.Key, property.Value);
+            }
+
+            scope.AddDispose(NestedDiagnosticsLogicalContext.Push(state));
+            return scope;
         }
     }
 }
