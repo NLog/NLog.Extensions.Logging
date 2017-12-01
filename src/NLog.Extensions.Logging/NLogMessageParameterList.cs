@@ -17,15 +17,15 @@ namespace NLog.Extensions.Logging
 
         public NLogMessageParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList, bool includesOriginalMessage)
         {
-            List<KeyValuePair<string, object>> validParameterList = includesOriginalMessage ? null : new List<KeyValuePair<string, object>>();
+            var validParameterList = includesOriginalMessage ? null : new List<KeyValuePair<string, object>>();
             for (int i = 0; i < parameterList.Count; ++i)
             {
-                if (!string.IsNullOrEmpty(parameterList[i].Key) && (parameterList[i].Key != NLogLogger.OriginalFormatPropertyName || i == parameterList.Count - 1))
+                var paramPair = parameterList[i];
+                if (!string.IsNullOrEmpty(paramPair.Key) && (paramPair.Key != NLogLogger.OriginalFormatPropertyName || i == parameterList.Count - 1))
                 {
-                    if (validParameterList != null)
+                    if (validParameterList != null && paramPair.Key != NLogLogger.OriginalFormatPropertyName)
                     {
-                        if (parameterList[i].Key != NLogLogger.OriginalFormatPropertyName)
-                            validParameterList.Add(parameterList[i]);
+                        validParameterList.Add(paramPair);
                     }
                 }
                 else
@@ -38,10 +38,7 @@ namespace NLog.Extensions.Logging
                     }
                 }
             }
-            if (validParameterList != null)
-            {
-                validParameterList.Add(new KeyValuePair<string, object>());
-            }
+            validParameterList?.Add(new KeyValuePair<string, object>());
             _parameterList = validParameterList ?? parameterList;
         }
 
