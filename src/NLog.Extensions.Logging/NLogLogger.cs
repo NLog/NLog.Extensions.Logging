@@ -51,13 +51,9 @@ namespace NLog.Extensions.Logging
 
         private LogEventInfo CreateLogEventInfo(LogLevel nLogLogLevel, string message, IReadOnlyList<KeyValuePair<string, object>> parameterList)
         {
-            if (parameterList != null && parameterList.Count > 1)
+            if (parameterList != null && parameterList.Count > 1 && IsNonDigitValue(parameterList[0].Key))
             {
-                // 
-                if (IsNonDigitValue(parameterList[0].Key))
-                {
-                    return CreateLogEventInfoWithMultipleParameters(nLogLogLevel, message, parameterList);
-                }
+                return CreateLogEventInfoWithMultipleParameters(nLogLogLevel, message, parameterList);
             }
             return LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
         }
