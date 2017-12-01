@@ -48,7 +48,7 @@ namespace NLog.Extensions.Logging
             _logger.Log(eventInfo);
         }
 
-       
+
         private LogEventInfo CreateLogEventInfo(LogLevel nLogLogLevel, string message, IReadOnlyList<KeyValuePair<string, object>> parameterList)
         {
             if (parameterList != null && parameterList.Count > 1)
@@ -137,7 +137,7 @@ namespace NLog.Extensions.Logging
                 if (!ReferenceEquals(eventIdPropertyNames.Item1, eventIdSeparator))
                 {
                     // Perform atomic cache update of the string-allocations matching the current separator
-                    _eventIdPropertyNames = CreateEventIdPropertyNames(eventIdSeparator);
+                    _eventIdPropertyNames = eventIdPropertyNames = CreateEventIdPropertyNames(eventIdSeparator);
                 }
 
                 var idIsZero = eventId.Id == 0;
@@ -260,7 +260,7 @@ namespace NLog.Extensions.Logging
                         {
                             property.Dispose();
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
                             InternalLogger.Trace(ex, "Exception in Dispose property {0}", property);
                         }
