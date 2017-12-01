@@ -21,9 +21,10 @@ namespace NLog.Extensions.Logging
             for (int i = 0; i < parameterList.Count; ++i)
             {
                 var paramPair = parameterList[i];
-                if (!string.IsNullOrEmpty(paramPair.Key) && (paramPair.Key != NLogLogger.OriginalFormatPropertyName || i == parameterList.Count - 1))
+                bool isNonOriginalFormatName;
+                if (!string.IsNullOrEmpty(paramPair.Key) && ((isNonOriginalFormatName = paramPair.Key != NLogLogger.OriginalFormatPropertyName) || i == parameterList.Count - 1))
                 {
-                    if (validParameterList != null && paramPair.Key != NLogLogger.OriginalFormatPropertyName)
+                    if (validParameterList != null && isNonOriginalFormatName)
                     {
                         validParameterList.Add(paramPair);
                     }
