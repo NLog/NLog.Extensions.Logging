@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using NLog.Common;
 
 namespace NLog.Extensions.Logging
 {
@@ -40,71 +41,89 @@ namespace NLog.Extensions.Logging
             LogEventInfo eventInfo = CreateLogEventInfo(nLogLogLevel, message, messageTemplate);
             eventInfo.Exception = exception;
 
-            CaptureEventId(eventId, eventInfo);
+            CaptureEventId(eventInfo, eventId);
 
-            if (_options.CaptureMessageProperties && messageTemplate == null)
-            {
-                CaptureMessageProperties(state, eventInfo);
-            }
+            CaptureMessageProperties(eventInfo, state, messageTemplate);
 
             _logger.Log(eventInfo);
         }
 
+
         private LogEventInfo CreateLogEventInfo(LogLevel nLogLogLevel, string message, IReadOnlyList<KeyValuePair<string, object>> parameterList)
         {
-            if (parameterList != null && parameterList.Count > 1)
+            if (parameterList != null && parameterList.Count > 1 && IsNonDigitValue(parameterList[0].Key))
             {
-                // More than a single parameter (last parameter is the {OriginalFormat})
-                var firstParameterName = parameterList[0].Key;
-                if (!string.IsNullOrEmpty(firstParameterName))
-                {
-                    if (firstParameterName.Length != 1 || !char.IsDigit(firstParameterName[0]))
-                    {
-#if !NETSTANDARD1_3
-                        var originalFormat = parameterList[parameterList.Count - 1];
-                        string originalMessage = null;
-                        if (originalFormat.Key == OriginalFormatPropertyName)
-                        {
-                            // Attempt to capture original message with placeholders
-                            originalMessage = originalFormat.Value as string;
-                        }
-
-                        var messageTemplateParameters = new NLogMessageParameterList(parameterList, originalMessage != null);
-                        var eventInfo = new LogEventInfo(nLogLogLevel, _logger.Name, originalMessage ?? message, messageTemplateParameters);
-                        if (originalMessage != null)
-                        {
-                            eventInfo.Parameters = new object[messageTemplateParameters.Count + 1];
-                            for (int i = 0; i < messageTemplateParameters.Count; ++i)
-                                eventInfo.Parameters[i] = messageTemplateParameters[i].Value;
-                            eventInfo.Parameters[messageTemplateParameters.Count] = message;
-                            eventInfo.MessageFormatter = (l) => (string)l.Parameters[l.Parameters.Length - 1];
-                        }
-                        return eventInfo;
-#else
-                        var eventInfo = LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
-                        for (int i = 0; i < parameterList.Count; ++i)
-                        {
-                            var parameter = parameterList[i];
-                            if (string.IsNullOrEmpty(parameter.Key))
-                                break;  // Skip capture of invalid parameters
-
-                            var parameterName = parameter.Key;
-                            switch (parameterName[0])
-                            {
-                                case '@': parameterName = parameterName.Substring(1); break;
-                                case '$': parameterName = parameterName.Substring(1); break;
-                            }
-                            eventInfo.Properties[parameterName] = parameter.Value;
-                        }
-                        return eventInfo;
-#endif
-                    }
-                }
+                return CreateLogEventInfoWithMultipleParameters(nLogLogLevel, message, parameterList);
             }
             return LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
         }
 
-        private void CaptureEventId(EventId eventId, LogEventInfo eventInfo)
+        private static bool IsNonDigitValue(string value)
+        {
+            return !string.IsNullOrEmpty(value) && (value.Length != 1 || !char.IsDigit(value[0]));
+        }
+
+#if !NETSTANDARD1_3
+
+        /// <summary>
+        /// Create Log Event with multiple parameters (last parameter is the {OriginalFormat})
+        /// </summary>
+        private LogEventInfo CreateLogEventInfoWithMultipleParameters(LogLevel nLogLogLevel, string message, IReadOnlyList<KeyValuePair<string, object>> parameterList)
+        {
+            var originalFormat = parameterList[parameterList.Count - 1];
+            string originalMessage = null;
+            if (originalFormat.Key == OriginalFormatPropertyName)
+            {
+                // Attempt to capture original message with placeholders
+                originalMessage = originalFormat.Value as string;
+            }
+
+            var messageTemplateParameters = new NLogMessageParameterList(parameterList, originalMessage != null);
+            var eventInfo = new LogEventInfo(nLogLogLevel, _logger.Name, originalMessage ?? message, messageTemplateParameters);
+            if (originalMessage != null)
+            {
+                SetEventInfoParameters(eventInfo, messageTemplateParameters);
+                eventInfo.Parameters[messageTemplateParameters.Count] = message;
+                eventInfo.MessageFormatter = (l) => (string)l.Parameters[l.Parameters.Length - 1];
+            }
+            return eventInfo;
+        }
+
+        private static void SetEventInfoParameters(LogEventInfo eventInfo, NLogMessageParameterList messageTemplateParameters)
+        {
+            eventInfo.Parameters = new object[messageTemplateParameters.Count + 1];
+            for (int i = 0; i < messageTemplateParameters.Count; ++i)
+                eventInfo.Parameters[i] = messageTemplateParameters[i].Value;
+        }
+
+#else
+
+        /// <summary>
+        /// Create Log Event with multiple parameters (last parameter is the {OriginalFormat})
+        /// </summary>
+        private LogEventInfo CreateLogEventInfoWithMultipleParameters(LogLevel nLogLogLevel, string message, IReadOnlyList<KeyValuePair<string, object>> parameterList)
+        {
+            var eventInfo = LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
+            for (int i = 0; i < parameterList.Count; ++i)
+            {
+                var parameter = parameterList[i];
+                if (string.IsNullOrEmpty(parameter.Key))
+                    break; // Skip capture of invalid parameters
+
+                var parameterName = parameter.Key;
+                if (parameterName[0] == '@' || parameterName[0] == '$')
+                {
+                    parameterName = parameterName.Substring(1);
+                }
+                eventInfo.Properties[parameterName] = parameter.Value;
+            }
+            return eventInfo;
+        }
+
+#endif
+
+
+        private void CaptureEventId(LogEventInfo eventInfo, EventId eventId)
         {
             if (!_options.IgnoreEmptyEventId || eventId.Id != 0 || !string.IsNullOrEmpty(eventId.Name))
             {
@@ -114,11 +133,7 @@ namespace NLog.Extensions.Logging
                 if (!ReferenceEquals(eventIdPropertyNames.Item1, eventIdSeparator))
                 {
                     // Perform atomic cache update of the string-allocations matching the current separator
-                    eventIdPropertyNames = new Tuple<string, string, string>(
-                        eventIdSeparator,
-                        string.Concat("EventId", eventIdSeparator, "Id"),
-                        string.Concat("EventId", eventIdSeparator, "Name"));
-                    _eventIdPropertyNames = eventIdPropertyNames;
+                    _eventIdPropertyNames = eventIdPropertyNames = CreateEventIdPropertyNames(eventIdSeparator);
                 }
 
                 var idIsZero = eventId.Id == 0;
@@ -128,9 +143,18 @@ namespace NLog.Extensions.Logging
             }
         }
 
-        private static void CaptureMessageProperties<TState>(TState state, LogEventInfo eventInfo)
+        private static Tuple<string, string, string> CreateEventIdPropertyNames(string eventIdSeparator)
         {
-            if (state is IEnumerable<KeyValuePair<string, object>> messageProperties)
+            var eventIdPropertyNames = new Tuple<string, string, string>(
+                eventIdSeparator,
+                string.Concat("EventId", eventIdSeparator, "Id"),
+                string.Concat("EventId", eventIdSeparator, "Name"));
+            return eventIdPropertyNames;
+        }
+
+        private void CaptureMessageProperties<TState>(LogEventInfo eventInfo, TState state, IReadOnlyList<KeyValuePair<string, object>> messageTemplate)
+        {
+            if (_options.CaptureMessageProperties && messageTemplate == null && state is IEnumerable<KeyValuePair<string, object>> messageProperties)
             {
                 foreach (var property in messageProperties)
                 {
@@ -192,24 +216,25 @@ namespace NLog.Extensions.Logging
         class ScopeProperties : IDisposable
         {
             List<IDisposable> _properties;
-            List<IDisposable> Properties { get { return _properties ?? (_properties = new List<IDisposable>()); } }
+            List<IDisposable> Properties => _properties ?? (_properties = new List<IDisposable>());
 
-            class ScopeProperty : IDisposable
+
+            public static IDisposable CreateFromState<TState>(TState state, IEnumerable<KeyValuePair<string, object>> messageProperties)
             {
-                string _key;
+                ScopeProperties scope = new ScopeProperties();
 
-                public ScopeProperty(string key, object value)
+                foreach (var property in messageProperties)
                 {
-                    _key = key;
-                    MappedDiagnosticsLogicalContext.Set(key, value);
+                    if (String.IsNullOrEmpty(property.Key))
+                        continue;
+
+                    scope.AddProperty(property.Key, property.Value);
                 }
 
-                public void Dispose()
-                {
-                    MappedDiagnosticsLogicalContext.Remove(_key);
-                }
+                scope.AddDispose(NestedDiagnosticsLogicalContext.Push(state));
+                return scope;
             }
-
+            
             public void AddDispose(IDisposable disposable)
             {
                 Properties.Add(disposable);
@@ -232,12 +257,30 @@ namespace NLog.Extensions.Logging
                         {
                             property.Dispose();
                         }
-                        catch
+                        catch (Exception ex)
                         {
+                            InternalLogger.Trace(ex, "Exception in Dispose property {0}", property);
                         }
                     }
                 }
             }
+
+            class ScopeProperty : IDisposable
+            {
+                string _key;
+
+                public ScopeProperty(string key, object value)
+                {
+                    _key = key;
+                    MappedDiagnosticsLogicalContext.Set(key, value);
+                }
+
+                public void Dispose()
+                {
+                    MappedDiagnosticsLogicalContext.Remove(_key);
+                }
+            }
+
         }
 
         /// <summary>
@@ -252,23 +295,9 @@ namespace NLog.Extensions.Logging
                 throw new ArgumentNullException(nameof(state));
             }
 
-            if (_options.CaptureMessageProperties)
+            if (_options.CaptureMessageProperties && state is IEnumerable<KeyValuePair<string, object>> messageProperties)
             {
-                if (state is IEnumerable<KeyValuePair<string, object>> messageProperties)
-                {
-                    ScopeProperties scope = new ScopeProperties();
-
-                    foreach (var property in messageProperties)
-                    {
-                        if (string.IsNullOrEmpty(property.Key))
-                            continue;
-
-                        scope.AddProperty(property.Key, property.Value);
-                    }
-
-                    scope.AddDispose(NestedDiagnosticsLogicalContext.Push(state));
-                    return scope;
-                }
+                return ScopeProperties.CreateFromState(state, messageProperties);
             }
 
             return NestedDiagnosticsLogicalContext.Push(state);

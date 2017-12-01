@@ -69,11 +69,13 @@ namespace NLog.Extensions.Logging
         }
 #endif
 
+        /// <summary>
+        /// Ignore assemblies for ${callsite}
+        /// </summary>
         private static void ConfigureHiddenAssemblies()
         {
             try
             {
-                //ignore these assemblies for ${callsite}
                 InternalLogger.Trace("Hide assemblies for callsite");
 
 #if NETCORE1_0
