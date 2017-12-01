@@ -55,13 +55,17 @@ namespace NLog.Extensions.Logging
             if (parameterList != null && parameterList.Count > 1)
             {
                 // More than a single parameter (last parameter is the {OriginalFormat})
-                var firstParameterName = parameterList[0].Key;
-                if (!string.IsNullOrEmpty(firstParameterName) && (firstParameterName.Length != 1 || !char.IsDigit(firstParameterName[0])))
+                if (IsNonDigitValue(parameterList[0].Key))
                 {
                     return CreateLogEventInfoWithMultipleParameters(nLogLogLevel, message, parameterList);
                 }
             }
             return LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
+        }
+
+        private static bool IsNonDigitValue(string value)
+        {
+            return !string.IsNullOrEmpty(value) && (value.Length != 1 || !char.IsDigit(value[0]));
         }
 
 #if !NETSTANDARD1_3
@@ -206,7 +210,7 @@ namespace NLog.Extensions.Logging
         class ScopeProperties : IDisposable
         {
             List<IDisposable> _properties;
-            List<IDisposable> Properties { get { return _properties ?? (_properties = new List<IDisposable>()); } }
+            List<IDisposable> Properties => _properties ?? (_properties = new List<IDisposable>());
 
             class ScopeProperty : IDisposable
             {
