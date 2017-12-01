@@ -137,11 +137,7 @@ namespace NLog.Extensions.Logging
                 if (!ReferenceEquals(eventIdPropertyNames.Item1, eventIdSeparator))
                 {
                     // Perform atomic cache update of the string-allocations matching the current separator
-                    eventIdPropertyNames = new Tuple<string, string, string>(
-                        eventIdSeparator,
-                        string.Concat("EventId", eventIdSeparator, "Id"),
-                        string.Concat("EventId", eventIdSeparator, "Name"));
-                    _eventIdPropertyNames = eventIdPropertyNames;
+                    _eventIdPropertyNames = CreateEventIdPropertyNames(eventIdSeparator);
                 }
 
                 var idIsZero = eventId.Id == 0;
@@ -149,6 +145,15 @@ namespace NLog.Extensions.Logging
                 eventInfo.Properties[eventIdPropertyNames.Item3] = eventId.Name;
                 eventInfo.Properties["EventId"] = idIsZero && eventId.Name == null ? EmptyEventId : eventId;
             }
+        }
+
+        private static Tuple<string, string, string> CreateEventIdPropertyNames(string eventIdSeparator)
+        {
+            var eventIdPropertyNames = new Tuple<string, string, string>(
+                eventIdSeparator,
+                string.Concat("EventId", eventIdSeparator, "Id"),
+                string.Concat("EventId", eventIdSeparator, "Name"));
+            return eventIdPropertyNames;
         }
 
         private void CaptureMessageProperties<TState>(LogEventInfo eventInfo, TState state, IReadOnlyList<KeyValuePair<string, object>> messageTemplate)
