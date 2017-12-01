@@ -263,6 +263,22 @@ namespace NLog.Extensions.Logging
                     }
                 }
             }
+
+            public static IDisposable CreateFromState<TState>(TState state, IEnumerable<KeyValuePair<string, object>> messageProperties)
+            {
+                ScopeProperties scope = new ScopeProperties();
+
+                foreach (var property in messageProperties)
+                {
+                    if (String.IsNullOrEmpty(property.Key))
+                        continue;
+
+                    scope.AddProperty(property.Key, property.Value);
+                }
+
+                scope.AddDispose(NestedDiagnosticsLogicalContext.Push(state));
+                return scope;
+            }
         }
 
         /// <summary>
@@ -279,26 +295,10 @@ namespace NLog.Extensions.Logging
 
             if (_options.CaptureMessageProperties && state is IEnumerable<KeyValuePair<string, object>> messageProperties)
             {
-                return CreateScopeProperties(state, messageProperties);
+                return ScopeProperties.CreateFromState(state, messageProperties);
             }
 
             return NestedDiagnosticsLogicalContext.Push(state);
-        }
-
-        private static IDisposable CreateScopeProperties<TState>(TState state, IEnumerable<KeyValuePair<string, object>> messageProperties)
-        {
-            ScopeProperties scope = new ScopeProperties();
-
-            foreach (var property in messageProperties)
-            {
-                if (string.IsNullOrEmpty(property.Key))
-                    continue;
-
-                scope.AddProperty(property.Key, property.Value);
-            }
-
-            scope.AddDispose(NestedDiagnosticsLogicalContext.Push(state));
-            return scope;
         }
     }
 }
