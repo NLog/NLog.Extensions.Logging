@@ -80,13 +80,18 @@ namespace NLog.Extensions.Logging
             var eventInfo = new LogEventInfo(nLogLogLevel, _logger.Name, originalMessage ?? message, messageTemplateParameters);
             if (originalMessage != null)
             {
-                eventInfo.Parameters = new object[messageTemplateParameters.Count + 1];
-                for (int i = 0; i < messageTemplateParameters.Count; ++i)
-                    eventInfo.Parameters[i] = messageTemplateParameters[i].Value;
+                SetEventInfoParameters(eventInfo, messageTemplateParameters);
                 eventInfo.Parameters[messageTemplateParameters.Count] = message;
                 eventInfo.MessageFormatter = (l) => (string)l.Parameters[l.Parameters.Length - 1];
             }
             return eventInfo;
+        }
+
+        private static void SetEventInfoParameters(LogEventInfo eventInfo, NLogMessageParameterList messageTemplateParameters)
+        {
+            eventInfo.Parameters = new object[messageTemplateParameters.Count + 1];
+            for (int i = 0; i < messageTemplateParameters.Count; ++i)
+                eventInfo.Parameters[i] = messageTemplateParameters[i].Value;
         }
 
 #else
