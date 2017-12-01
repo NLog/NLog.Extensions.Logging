@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using NLog.Common;
 
 namespace NLog.Extensions.Logging
 {
@@ -250,8 +251,9 @@ namespace NLog.Extensions.Logging
                         {
                             property.Dispose();
                         }
-                        catch
+                        catch(Exception ex)
                         {
+                            InternalLogger.Trace(ex, "Exception in Dispose property {0}", property);
                         }
                     }
                 }
