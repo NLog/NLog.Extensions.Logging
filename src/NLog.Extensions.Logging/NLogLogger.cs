@@ -41,16 +41,14 @@ namespace NLog.Extensions.Logging
             LogEventInfo eventInfo = CreateLogEventInfo(nLogLogLevel, message, messageTemplate);
             eventInfo.Exception = exception;
 
-            CaptureEventId(eventId, eventInfo);
+            CaptureEventId(eventInfo, eventId);
 
-            if (_options.CaptureMessageProperties && messageTemplate == null)
-            {
-                CaptureMessageProperties(state, eventInfo);
-            }
+            CaptureMessageProperties(eventInfo, state, messageTemplate);
 
             _logger.Log(eventInfo);
         }
 
+       
         private LogEventInfo CreateLogEventInfo(LogLevel nLogLogLevel, string message, IReadOnlyList<KeyValuePair<string, object>> parameterList)
         {
             if (parameterList != null && parameterList.Count > 1)
@@ -129,7 +127,7 @@ namespace NLog.Extensions.Logging
 #endif
 
 
-        private void CaptureEventId(EventId eventId, LogEventInfo eventInfo)
+        private void CaptureEventId(LogEventInfo eventInfo, EventId eventId)
         {
             if (!_options.IgnoreEmptyEventId || eventId.Id != 0 || !string.IsNullOrEmpty(eventId.Name))
             {
@@ -153,9 +151,9 @@ namespace NLog.Extensions.Logging
             }
         }
 
-        private static void CaptureMessageProperties<TState>(TState state, LogEventInfo eventInfo)
+        private void CaptureMessageProperties<TState>(LogEventInfo eventInfo, TState state, IReadOnlyList<KeyValuePair<string, object>> messageTemplate)
         {
-            if (state is IEnumerable<KeyValuePair<string, object>> messageProperties)
+            if (_options.CaptureMessageProperties && messageTemplate == null && state is IEnumerable<KeyValuePair<string, object>> messageProperties)
             {
                 foreach (var property in messageProperties)
                 {
