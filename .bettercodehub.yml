@@ -1,0 +1,6 @@
+exclude:
+- /build.sh
+- /examples/.*
+component_depth: 1
+languages:
+- csharp
