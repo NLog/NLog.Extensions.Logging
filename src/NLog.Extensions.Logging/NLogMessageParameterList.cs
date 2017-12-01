@@ -62,7 +62,7 @@ namespace NLog.Extensions.Logging
                 }
                 return new NLog.MessageTemplates.MessageTemplateParameter(parameter.Key, parameter.Value, null, captureType);
             }
-            set => throw new NotImplementedException();
+            set => throw new NotSupportedException();
         }
 
         public int Count => _parameterList.Count - 1;
@@ -71,22 +71,22 @@ namespace NLog.Extensions.Logging
 
         public void Add(NLog.MessageTemplates.MessageTemplateParameter item)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public void Clear()
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public bool Contains(NLog.MessageTemplates.MessageTemplateParameter item)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public void CopyTo(NLog.MessageTemplates.MessageTemplateParameter[] array, int arrayIndex)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public IEnumerator<NLog.MessageTemplates.MessageTemplateParameter> GetEnumerator()
@@ -96,22 +96,22 @@ namespace NLog.Extensions.Logging
 
         public int IndexOf(NLog.MessageTemplates.MessageTemplateParameter item)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public void Insert(int index, NLog.MessageTemplates.MessageTemplateParameter item)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public bool Remove(NLog.MessageTemplates.MessageTemplateParameter item)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public void RemoveAt(int index)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
