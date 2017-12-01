@@ -218,22 +218,23 @@ namespace NLog.Extensions.Logging
             List<IDisposable> _properties;
             List<IDisposable> Properties => _properties ?? (_properties = new List<IDisposable>());
 
-            class ScopeProperty : IDisposable
+
+            public static IDisposable CreateFromState<TState>(TState state, IEnumerable<KeyValuePair<string, object>> messageProperties)
             {
-                string _key;
+                ScopeProperties scope = new ScopeProperties();
 
-                public ScopeProperty(string key, object value)
+                foreach (var property in messageProperties)
                 {
-                    _key = key;
-                    MappedDiagnosticsLogicalContext.Set(key, value);
+                    if (String.IsNullOrEmpty(property.Key))
+                        continue;
+
+                    scope.AddProperty(property.Key, property.Value);
                 }
 
-                public void Dispose()
-                {
-                    MappedDiagnosticsLogicalContext.Remove(_key);
-                }
+                scope.AddDispose(NestedDiagnosticsLogicalContext.Push(state));
+                return scope;
             }
-
+            
             public void AddDispose(IDisposable disposable)
             {
                 Properties.Add(disposable);
@@ -264,21 +265,22 @@ namespace NLog.Extensions.Logging
                 }
             }
 
-            public static IDisposable CreateFromState<TState>(TState state, IEnumerable<KeyValuePair<string, object>> messageProperties)
+            class ScopeProperty : IDisposable
             {
-                ScopeProperties scope = new ScopeProperties();
+                string _key;
 
-                foreach (var property in messageProperties)
+                public ScopeProperty(string key, object value)
                 {
-                    if (String.IsNullOrEmpty(property.Key))
-                        continue;
-
-                    scope.AddProperty(property.Key, property.Value);
+                    _key = key;
+                    MappedDiagnosticsLogicalContext.Set(key, value);
                 }
 
-                scope.AddDispose(NestedDiagnosticsLogicalContext.Push(state));
-                return scope;
+                public void Dispose()
+                {
+                    MappedDiagnosticsLogicalContext.Remove(_key);
+                }
             }
+
         }
 
         /// <summary>
