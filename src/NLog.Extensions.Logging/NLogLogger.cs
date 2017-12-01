@@ -55,7 +55,7 @@ namespace NLog.Extensions.Logging
         {
             if (parameterList != null && parameterList.Count > 1)
             {
-                // More than a single parameter (last parameter is the {OriginalFormat})
+                // 
                 if (IsNonDigitValue(parameterList[0].Key))
                 {
                     return CreateLogEventInfoWithMultipleParameters(nLogLogLevel, message, parameterList);
@@ -71,6 +71,9 @@ namespace NLog.Extensions.Logging
 
 #if !NETSTANDARD1_3
 
+        /// <summary>
+        /// Create Log Event with multiple parameters (last parameter is the {OriginalFormat})
+        /// </summary>
         private LogEventInfo CreateLogEventInfoWithMultipleParameters(LogLevel nLogLogLevel, string message, IReadOnlyList<KeyValuePair<string, object>> parameterList)
         {
             var originalFormat = parameterList[parameterList.Count - 1];
@@ -101,6 +104,9 @@ namespace NLog.Extensions.Logging
 
 #else
 
+        /// <summary>
+        /// Create Log Event with multiple parameters (last parameter is the {OriginalFormat})
+        /// </summary>
         private LogEventInfo CreateLogEventInfoWithMultipleParameters(LogLevel nLogLogLevel, string message, IReadOnlyList<KeyValuePair<string, object>> parameterList)
         {
             var eventInfo = LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
