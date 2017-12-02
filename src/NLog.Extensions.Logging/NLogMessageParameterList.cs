@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace NLog.Extensions.Logging
 {
 #if !NETSTANDARD1_3
@@ -49,21 +50,27 @@ namespace NLog.Extensions.Logging
             {
                 var parameter = _parameterList[index];
                 var parameterName = parameter.Key;
-                NLog.MessageTemplates.CaptureType captureType = NLog.MessageTemplates.CaptureType.Normal;
-                switch (parameterName[0])
-                {
-                    case '@':
-                        parameterName = parameterName.Substring(1); 
-                        captureType = NLog.MessageTemplates.CaptureType.Serialize;
-                        break;
-                    case '$':
-                        parameterName = parameterName.Substring(1); 
-                        captureType = NLog.MessageTemplates.CaptureType.Stringify;
-                        break;
-                }
-                return new NLog.MessageTemplates.MessageTemplateParameter(parameter.Key, parameter.Value, null, captureType);
+                var capture = GetCaptureType(parameterName);
+                parameterName = NLogLogger.RemoveMarkerFromName(parameterName);
+                return new NLog.MessageTemplates.MessageTemplateParameter(parameterName, parameter.Value, null, capture);
             }
             set => throw new NotSupportedException();
+        }
+
+        private static NLog.MessageTemplates.CaptureType GetCaptureType(string parameterName)
+        {
+            var captureType = NLog.MessageTemplates.CaptureType.Normal;
+
+            switch (parameterName[0])
+            {
+                case '@':
+                    captureType = NLog.MessageTemplates.CaptureType.Serialize;
+                    break;
+                case '$':
+                    captureType = NLog.MessageTemplates.CaptureType.Stringify;
+                    break;
+            }
+            return captureType;
         }
 
         public int Count => _parameterList.Count - 1;

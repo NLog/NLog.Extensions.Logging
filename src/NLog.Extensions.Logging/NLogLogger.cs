@@ -60,7 +60,7 @@ namespace NLog.Extensions.Logging
 
         private static bool IsNonDigitValue(string value)
         {
-            return !string.IsNullOrEmpty(value) && (value.Length != 1 || !char.IsDigit(value[0]));
+            return !String.IsNullOrEmpty(value) && (value.Length != 1 || !Char.IsDigit(value[0]));
         }
 
 #if !NETSTANDARD1_3
@@ -110,11 +110,7 @@ namespace NLog.Extensions.Logging
                 if (string.IsNullOrEmpty(parameter.Key))
                     break; // Skip capture of invalid parameters
 
-                var parameterName = parameter.Key;
-                if (parameterName[0] == '@' || parameterName[0] == '$')
-                {
-                    parameterName = parameterName.Substring(1);
-                }
+                var parameterName = RemoveMarkerFromName(parameter.Key);
                 eventInfo.Properties[parameterName] = parameter.Value;
             }
             return eventInfo;
@@ -125,11 +121,11 @@ namespace NLog.Extensions.Logging
 
         private void CaptureEventId(LogEventInfo eventInfo, EventId eventId)
         {
-            if (!_options.IgnoreEmptyEventId || eventId.Id != 0 || !string.IsNullOrEmpty(eventId.Name))
+            if (!_options.IgnoreEmptyEventId || eventId.Id != 0 || !String.IsNullOrEmpty(eventId.Name))
             {
                 // Attempt to reuse the same string-allocations based on the current <see cref="NLogProviderOptions.EventIdSeparator"/>
                 var eventIdPropertyNames = _eventIdPropertyNames ?? new Tuple<string, string, string>(null, null, null);
-                var eventIdSeparator = _options.EventIdSeparator ?? string.Empty;
+                var eventIdSeparator = _options.EventIdSeparator ?? String.Empty;
                 if (!ReferenceEquals(eventIdPropertyNames.Item1, eventIdSeparator))
                 {
                     // Perform atomic cache update of the string-allocations matching the current separator
@@ -147,8 +143,8 @@ namespace NLog.Extensions.Logging
         {
             var eventIdPropertyNames = new Tuple<string, string, string>(
                 eventIdSeparator,
-                string.Concat("EventId", eventIdSeparator, "Id"),
-                string.Concat("EventId", eventIdSeparator, "Name"));
+                String.Concat("EventId", eventIdSeparator, "Id"),
+                String.Concat("EventId", eventIdSeparator, "Name"));
             return eventIdPropertyNames;
         }
 
@@ -158,7 +154,7 @@ namespace NLog.Extensions.Logging
             {
                 foreach (var property in messageProperties)
                 {
-                    if (string.IsNullOrEmpty(property.Key))
+                    if (String.IsNullOrEmpty(property.Key))
                         continue;
 
                     eventInfo.Properties[property.Key] = property.Value;
@@ -234,7 +230,7 @@ namespace NLog.Extensions.Logging
                 scope.AddDispose(NestedDiagnosticsLogicalContext.Push(state));
                 return scope;
             }
-            
+
             public void AddDispose(IDisposable disposable)
             {
                 Properties.Add(disposable);
@@ -301,6 +297,16 @@ namespace NLog.Extensions.Logging
             }
 
             return NestedDiagnosticsLogicalContext.Push(state);
+        }
+
+        internal static string RemoveMarkerFromName(string parameterName)
+        {
+            var firstChar = parameterName[0];
+            if (firstChar == '@' || firstChar == '$')
+            {
+                parameterName = parameterName.Substring(1);
+            }
+            return parameterName;
         }
     }
 }
