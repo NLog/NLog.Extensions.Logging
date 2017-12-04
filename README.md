@@ -2,7 +2,7 @@
 
 [![Build status Windows](https://ci.appveyor.com/api/projects/status/0nrg8cksp4b6tab1/branch/master?svg=true)](https://ci.appveyor.com/project/nlog/nlog-framework-logging/branch/master)
 [![Build Status Linux](https://travis-ci.org/NLog/NLog.Extensions.Logging.svg?branch=master)](https://travis-ci.org/NLog/NLog.Extensions.Logging)
-[![BCH compliance](https://bettercodehub.com/edge/badge/NLog/NLog.Extensions.Logging?branch=components)](https://bettercodehub.com/)
+[![BCH compliance](https://bettercodehub.com/edge/badge/NLog/NLog.Extensions.Logging?branch=components)](https://bettercodehub.com/results/NLog/NLog.Extensions.Logging)
 
 [![NuGet Pre Release](https://img.shields.io/nuget/vpre/NLog.Extensions.Logging.svg)](https://www.nuget.org/packages/NLog.Extensions.Logging)
 
