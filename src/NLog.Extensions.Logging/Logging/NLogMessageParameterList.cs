@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 namespace NLog.Extensions.Logging
 {
-#if !NETSTANDARD1_3
     /// <summary>
     /// Converts Microsoft Extension Logging ParameterList into NLog MessageTemplate ParameterList
     /// </summary>
@@ -157,5 +156,4 @@ namespace NLog.Extensions.Logging
             return GetEnumerator();
         }
     }
-#endif
 }

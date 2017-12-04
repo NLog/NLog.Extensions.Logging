@@ -63,8 +63,6 @@ namespace NLog.Extensions.Logging
             return !String.IsNullOrEmpty(value) && (value.Length != 1 || !Char.IsDigit(value[0]));
         }
 
-#if !NETSTANDARD1_3
-
         /// <summary>
         /// Create Log Event with multiple parameters (last parameter is the {OriginalFormat})
         /// </summary>
@@ -95,29 +93,6 @@ namespace NLog.Extensions.Logging
             for (int i = 0; i < messageTemplateParameters.Count; ++i)
                 eventInfo.Parameters[i] = messageTemplateParameters[i].Value;
         }
-
-#else
-
-        /// <summary>
-        /// Create Log Event with multiple parameters (last parameter is the {OriginalFormat})
-        /// </summary>
-        private LogEventInfo CreateLogEventInfoWithMultipleParameters(LogLevel nLogLogLevel, string message, IReadOnlyList<KeyValuePair<string, object>> parameterList)
-        {
-            var eventInfo = LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
-            for (int i = 0; i < parameterList.Count; ++i)
-            {
-                var parameter = parameterList[i];
-                if (string.IsNullOrEmpty(parameter.Key))
-                    break; // Skip capture of invalid parameters
-
-                var parameterName = RemoveMarkerFromName(parameter.Key);
-                eventInfo.Properties[parameterName] = parameter.Value;
-            }
-            return eventInfo;
-        }
-
-#endif
-
 
         private void CaptureEventId(LogEventInfo eventInfo, EventId eventId)
         {
