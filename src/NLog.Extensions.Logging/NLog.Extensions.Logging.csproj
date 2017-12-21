@@ -1,13 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+
+    <TargetFrameworks>net451;net461;netstandard1.5;netstandard2.0</TargetFrameworks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
     <Description>NLog provider for Microsoft.Extensions.Logging for usage in .NET Standard libraries and console applicaties.
 
 For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.Web.AspNetCore
     </Description>
 
     <Authors>Microsoft;Julian Verdurmen</Authors>
-    <TargetFrameworks>net451;net461;netstandard1.5;netstandard2.0</TargetFrameworks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Company>NLog</Company>
     <AssemblyName>NLog.Extensions.Logging</AssemblyName>
     <AssemblyOriginatorKeyFile>NLog.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
@@ -32,35 +37,32 @@ rc3: Support for .NET 4.6.1, support for message templates .NET standard 1.5+ an
     <FileVersion>1.0.0.0</FileVersion>
     <!-- FileVersion = AssemblyFileVersionAttribute, patched by AppVeyor -->
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' Or '$(TargetFramework)' == 'net451' ">
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net451' ">
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <DefineConstants>$(DefineConstants);NETCORE1_0</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup>
-    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\NLog.Extensions.Logging.xml</DocumentationFile>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
+    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
+    <DefineConstants>$(DefineConstants);NETCORE1_0</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NLog" Version="[4.5.0-rc02,5)" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.2" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Runtime" />
-    <Reference Include="System.Xml.Serialization" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.0.2" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Runtime" />
-    <Reference Include="System.Xml.Serialization" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.2" />
-    <PackageReference Include="System.AppContext" Version="4.3.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.0.2" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
