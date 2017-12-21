@@ -21,7 +21,7 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logfiles;netcore;nlog</PackageTags>
     <PackageReleaseNotes>
       
-      
+rc5: Fix System.Runtime not found in the GAC on .NET 4.5 / 4.6      
 rc4: Fixed bug with message templates, removed NLog 5 dependency
 rc3: Support for .NET 4.6.1, support for message templates .NET standard 1.5+ and .NET 4.5.1+
 
@@ -31,7 +31,7 @@ rc3: Support for .NET 4.6.1, support for message templates .NET standard 1.5+ an
     <PackageLicenseUrl>https://github.com/NLog/NLog.Extensions.Logging/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/NLog/NLog.Extensions.Logging</RepositoryUrl>
-    <Version>1.0.0-rtm-rc4</Version>
+    <Version>1.0.0-rtm-rc5</Version>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <!--AssemblyVersion: keep 1.0.0.0-->
     <FileVersion>1.0.0.0</FileVersion>
