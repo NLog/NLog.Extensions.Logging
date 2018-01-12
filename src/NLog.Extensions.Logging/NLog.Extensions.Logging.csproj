@@ -9,10 +9,10 @@
     <Product>NLog.Extensions.Logging v$(ProductVersion)</Product>
     <InformationalVersion>$(ProductVersion)</InformationalVersion>
     <Authors>Microsoft;Julian Verdurmen</Authors>
-    <Description>
-      NLog provider for Microsoft.Extensions.Logging for usage in .NET Standard libraries and console applicaties.
+    <Company>NLog</Company>
+    <Description>NLog provider for Microsoft.Extensions.Logging for usage in .NET Standard libraries and console applicaties.
 
-      For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.Web.AspNetCore
+For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.Web.AspNetCore
     </Description>
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logfiles;netcore;nlog</PackageTags>
     <PackageReleaseNotes>
@@ -34,17 +34,21 @@ rc3: Support for .NET 4.6.1, support for message templates .NET standard 1.5+ an
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <Title>NLog.Extensions.Logging for .NET Framework 4.6.1</Title>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net451' ">
+    <Title>NLog.Extensions.Logging for .NET Framework 4.5.1</Title>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <DefineConstants>$(DefineConstants);NETCORE1_0</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
+    <Title>NLog.Extensions.Logging for NetStandard 1.5</Title>
     <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
     <DefineConstants>$(DefineConstants);NETCORE1_0</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'uap10.0' ">
+    <Title>NLog.Extensions.Logging for UWP</Title>
     <NugetTargetMoniker>UAP,Version=v10.0</NugetTargetMoniker>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
