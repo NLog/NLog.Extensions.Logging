@@ -5,19 +5,15 @@
     <TargetFrameworks>net451;net461;netstandard1.5;netstandard2.0</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-
-    <Description>NLog provider for Microsoft.Extensions.Logging for usage in .NET Standard libraries and console applicaties.
-
-For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.Web.AspNetCore
-    </Description>
-
+    
+    <Product>NLog.Extensions.Logging v$(ProductVersion)</Product>
+    <InformationalVersion>$(ProductVersion)</InformationalVersion>
     <Authors>Microsoft;Julian Verdurmen</Authors>
-    <Company>NLog</Company>
-    <AssemblyName>NLog.Extensions.Logging</AssemblyName>
-    <AssemblyOriginatorKeyFile>NLog.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>NLog.Extensions.Logging</PackageId>
+    <Description>
+      NLog provider for Microsoft.Extensions.Logging for usage in .NET Standard libraries and console applicaties.
+
+      For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.Web.AspNetCore
+    </Description>
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logfiles;netcore;nlog</PackageTags>
     <PackageReleaseNotes>
       
@@ -31,11 +27,11 @@ rc3: Support for .NET 4.6.1, support for message templates .NET standard 1.5+ an
     <PackageLicenseUrl>https://github.com/NLog/NLog.Extensions.Logging/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/NLog/NLog.Extensions.Logging</RepositoryUrl>
-    <Version>1.0.0-rtm-rc5</Version>
+
+    <SignAssembly>true</SignAssembly>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <!--AssemblyVersion: keep 1.0.0.0-->
-    <FileVersion>1.0.0.0</FileVersion>
-    <!-- FileVersion = AssemblyFileVersionAttribute, patched by AppVeyor -->
+    <AssemblyOriginatorKeyFile>NLog.snk</AssemblyOriginatorKeyFile>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
@@ -46,6 +42,17 @@ rc3: Support for .NET 4.6.1, support for message templates .NET standard 1.5+ an
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
     <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
+    <DefineConstants>$(DefineConstants);NETCORE1_0</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'uap10.0' ">
+    <NugetTargetMoniker>UAP,Version=v10.0</NugetTargetMoniker>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
+    <TargetFrameworkIdentifier>.NETCore</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
+    <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
+    <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.15083.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
     <DefineConstants>$(DefineConstants);NETCORE1_0</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
@@ -60,6 +67,9 @@ rc3: Support for .NET 4.6.1, support for message templates .NET standard 1.5+ an
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'uap10.0' ">
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.0.2" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.0.2" />

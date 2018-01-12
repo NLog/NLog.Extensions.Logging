@@ -1,17 +1,18 @@
 version: 1.0.{build}
+image: Visual Studio 2017
 configuration: Release
+
+install:
+  - '"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat"'
+
 build_script:
-- ps: >-
-    dotnet restore src\NLog.Extensions.Logging
+  - ps: .\build.ps1
 
-     .\patchFileVersion.ps1 "NLog.Extensions.Logging.csproj" "$env:appveyor_build_version"
-
-    dotnet pack src\NLog.Extensions.Logging --configuration Release
 artifacts:
-- path: 'src\NLog.Extensions.Logging\bin\release\*.nupkg'
+  - path: 'artifacts\*.nupkg'
 
 test_script:
-- ps: .\run-tests.ps1
+  - ps: .\run-tests.ps1
 
 deploy:
 - provider: NuGet
