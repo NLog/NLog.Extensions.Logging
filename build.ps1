@@ -3,7 +3,7 @@
 dotnet --version
 
 $versionPrefix = "1.0.0"
-$versionSuffix = "rtm-rc5"
+$versionSuffix = "rtm-rc6"
 $versionFile = $versionPrefix + "." + ${env:APPVEYOR_BUILD_NUMBER}
 $versionProduct = $versionPrefix;
 if (-Not $versionSuffix.Equals(""))
