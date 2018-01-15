@@ -55,9 +55,27 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Fact]
+        public void TestSimulateStructuredLogging()
+        {
+            GetRunner().LogDebugWithSimulatedStructuredParameters();
+
+            var target = GetTarget();
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 property |1", target.Logs.FirstOrDefault());
+        }
+
+        [Fact]
         public void TestMessageProperties()
         {
             GetRunner().LogDebugWithMessageProperties();
+
+            var target = GetTarget();
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 property |1", target.Logs.FirstOrDefault());
+        }
+
+        [Fact]
+        public void TestMessagePropertiesList()
+        {
+            GetRunner().LogDebugWithMessagePropertiesList();
 
             var target = GetTarget();
             Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 property |1", target.Logs.FirstOrDefault());
@@ -243,9 +261,19 @@ namespace NLog.Extensions.Logging.Tests
                 _logger.LogDebug("message with id and {ParameterCount} parameters", "1");
             }
 
+            public void LogDebugWithSimulatedStructuredParameters()
+            {
+                _logger.Log(Microsoft.Extensions.Logging.LogLevel.Debug, default(EventId), new List<KeyValuePair<string, object>>(new [] { new KeyValuePair<string,object>("{OriginalFormat}", "message with id and {ParameterCount} property"), new KeyValuePair<string, object>("ParameterCount", 1) }), null, (s, ex) => "message with id and 1 property");
+            }
+
             public void LogDebugWithMessageProperties()
             {
                 _logger.Log(Microsoft.Extensions.Logging.LogLevel.Debug, default(EventId), new Dictionary<string, object> { { "ParameterCount", "1" } }, null, (s,ex) => "message with id and 1 property");
+            }
+
+            public void LogDebugWithMessagePropertiesList()
+            {
+                _logger.Log(Microsoft.Extensions.Logging.LogLevel.Debug, default(EventId), new List<KeyValuePair<string, object>>(new[] { new KeyValuePair<string, object>("ParameterCount", "1") }), null, (s, ex) => "message with id and 1 property");
             }
 
             public void LogWithScope()
