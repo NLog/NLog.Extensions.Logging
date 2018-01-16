@@ -138,6 +138,39 @@ namespace NLog.Extensions.Logging
             return config;
         }
 
+#if !NETCORE1_0
+        /// <summary>
+        /// Apply NLog configuration from XML config.
+        /// </summary>
+        /// <param name="loggerFactory"></param>
+        /// <param name="configFileRelativePath">relative path to NLog configuration file.</param>
+        /// <returns>Current configuration for chaining.</returns>
+        public static LoggingConfiguration ConfigureNLog(this ILoggingBuilder loggerFactory, string configFileRelativePath)
+        {
+#if NETCORE1_0 && !NET451
+            var rootPath = System.AppContext.BaseDirectory;
+#else
+            var rootPath = AppDomain.CurrentDomain.BaseDirectory;
+#endif
+
+            var fileName = Path.Combine(rootPath, configFileRelativePath);
+            return ConfigureNLog(fileName);
+        }
+
+        /// <summary>
+        /// Apply NLog configuration from config object.
+        /// </summary>
+        /// <param name="loggerFactory"></param>
+        /// <param name="config">New NLog config.</param>
+        /// <returns>Current configuration for chaining.</returns>
+        public static LoggingConfiguration ConfigureNLog(this ILoggingBuilder loggerFactory, LoggingConfiguration config)
+        {
+            LogManager.Configuration = config;
+
+            return config;
+        }
+#endif
+
         /// <summary>
         /// Apply NLog configuration from XML config.
         /// </summary>
