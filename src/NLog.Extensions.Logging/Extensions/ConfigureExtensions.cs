@@ -69,7 +69,7 @@ namespace NLog.Extensions.Logging
         /// </summary>
         private static void ConfigureHiddenAssemblies()
         {
-#if NETCORE1_0
+#if NETCORE1_0 && !NET451
             InternalLogger.Trace("Hide assemblies for callsite");
 
             SafeAddHiddenAssembly("Microsoft.Logging");
@@ -83,7 +83,7 @@ namespace NLog.Extensions.Logging
 #endif
         }
 
-#if NETCORE1_0
+#if NETCORE1_0 && !NET451
         private static void SafeAddHiddenAssembly(string assemblyName, bool logOnException = true)
         {
             try
