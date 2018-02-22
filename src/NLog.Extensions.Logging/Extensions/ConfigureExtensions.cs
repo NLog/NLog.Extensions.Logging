@@ -110,8 +110,7 @@ namespace NLog.Extensions.Logging
         /// <returns>Current configuration for chaining.</returns>
         public static LoggingConfiguration ConfigureNLog(this ILoggerFactory loggerFactory, string configFileRelativePath)
         {
-            ConfigureHiddenAssemblies();
-            return LogManager.LoadConfiguration(configFileRelativePath).Configuration;
+            return ConfigureNLog(configFileRelativePath);
         }
 
         /// <summary>
@@ -122,9 +121,7 @@ namespace NLog.Extensions.Logging
         /// <returns>Current configuration for chaining.</returns>
         public static LoggingConfiguration ConfigureNLog(this ILoggerFactory loggerFactory, LoggingConfiguration config)
         {
-            ConfigureHiddenAssemblies();
-            LogManager.Configuration = config;
-            return config;
+            return ConfigureNLog(config);
         }
 
         /// <summary>
@@ -135,8 +132,7 @@ namespace NLog.Extensions.Logging
         /// <returns>Current configuration for chaining.</returns>
         public static LoggingConfiguration ConfigureNLog(this ILoggingBuilder loggerBuilder, string configFileRelativePath)
         {
-            ConfigureHiddenAssemblies();
-            return LogManager.LoadConfiguration(configFileRelativePath).Configuration;
+            return ConfigureNLog(configFileRelativePath);
         }
 
         /// <summary>
@@ -146,6 +142,27 @@ namespace NLog.Extensions.Logging
         /// <param name="config">New NLog config.</param>
         /// <returns>Current configuration for chaining.</returns>
         public static LoggingConfiguration ConfigureNLog(this ILoggingBuilder loggerBuilder, LoggingConfiguration config)
+        {
+            return ConfigureNLog(config);
+        }
+
+        /// <summary>
+        /// Apply NLog configuration from XML config.
+        /// </summary>
+        /// <param name="configFileRelativePath">relative path to NLog configuration file.</param>
+        /// <returns>Current configuration for chaining.</returns>
+        private static LoggingConfiguration ConfigureNLog(string configFileRelativePath)
+        {
+            ConfigureHiddenAssemblies();
+            return LogManager.LoadConfiguration(configFileRelativePath).Configuration;
+        }
+
+        /// <summary>
+        /// Apply NLog configuration from config object.
+        /// </summary>
+        /// <param name="config">New NLog config.</param>
+        /// <returns>Current configuration for chaining.</returns>
+        private static LoggingConfiguration ConfigureNLog(LoggingConfiguration config)
         {
             ConfigureHiddenAssemblies();
             LogManager.Configuration = config;
