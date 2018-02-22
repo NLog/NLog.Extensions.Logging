@@ -48,6 +48,9 @@ rc3: Support for .NET 4.6.1, support for message templates .NET standard 1.5+ an
     <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
     <DefineConstants>$(DefineConstants);NETCORE1_0</DefineConstants>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <Title>NLog.Extensions.Logging for NetStandard 2.0</Title>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'uap10.0' ">
     <Title>NLog.Extensions.Logging for UWP</Title>
     <NugetTargetMoniker>UAP,Version=v10.0</NugetTargetMoniker>
@@ -82,4 +85,8 @@ rc3: Support for .NET 4.6.1, support for message templates .NET standard 1.5+ an
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <AssemblyTitle>$(Title)</AssemblyTitle>
+  </PropertyGroup>
 </Project>
