@@ -124,6 +124,7 @@ namespace NLog.Extensions.Logging
             return ConfigureNLog(config);
         }
 
+#if !NETCORE1_0
         /// <summary>
         /// Apply NLog configuration from XML config.
         /// </summary>
@@ -145,6 +146,7 @@ namespace NLog.Extensions.Logging
         {
             return ConfigureNLog(config);
         }
+#endif
 
         /// <summary>
         /// Apply NLog configuration from XML config.
