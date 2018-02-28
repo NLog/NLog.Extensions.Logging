@@ -273,7 +273,7 @@ namespace NLog.Extensions.Logging.Tests
 
             public void LogDebugWithStructuredParameters()
             {
-                _logger.LogDebug("message with id and {$ParameterCount} parameters", "1");
+                _logger.LogDebug("message with id and {ParameterCount} parameters", "1");
             }
 
             public void LogDebugWithStructuredParameterFormater()
