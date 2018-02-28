@@ -51,7 +51,7 @@ namespace NLog.Extensions.Logging.Tests
             GetRunner().LogDebugWithStructuredParameters();
 
             var target = GetTarget();
-            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters |1", target.Logs.FirstOrDefault());
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and \"1\" parameters |1", target.Logs.FirstOrDefault());
         }
 
         [Fact]
@@ -184,9 +184,9 @@ namespace NLog.Extensions.Logging.Tests
         public void TestStructuredLoggingFormatting()
         {
             GetRunner().LogDebugWithStructuredParameterFormater();
-
+            
             var target = GetJsonlayoutTarget();
-            Assert.Equal(@"{""level"": ""DEBUG"", ""message"": ""message with id and {""TestValue"": ""This is the test value""}"" }", target.Logs.FirstOrDefault());
+            Assert.Equal("{ \"level\": \"DEBUG\", \"message\": \"message with id and {\\\"TestValue\\\":\\\"This is the test value\\\"} parameters\" }", target.Logs.FirstOrDefault());
         }
 
 
@@ -273,7 +273,7 @@ namespace NLog.Extensions.Logging.Tests
 
             public void LogDebugWithStructuredParameters()
             {
-                _logger.LogDebug("message with id and {ParameterCount} parameters", "1");
+                _logger.LogDebug("message with id and {$ParameterCount} parameters", "1");
             }
 
             public void LogDebugWithStructuredParameterFormater()

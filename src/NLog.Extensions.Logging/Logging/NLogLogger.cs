@@ -84,14 +84,17 @@ namespace NLog.Extensions.Logging
             return logEvent;
         }
 
-        private static void SetLogEventMessageFormatter(LogEventInfo logEvent, NLogMessageParameterList messageTemplateParameters, string formattedMessage)
+        private  void SetLogEventMessageFormatter(LogEventInfo logEvent, NLogMessageParameterList messageTemplateParameters, string formattedMessage)
         {
             var parameters = new object[messageTemplateParameters.Count + 1];
             for (int i = 0; i < parameters.Length - 1; ++i)
                 parameters[i] = messageTemplateParameters[i].Value;
             parameters[parameters.Length - 1] = formattedMessage;
             logEvent.Parameters = parameters;
-            logEvent.MessageFormatter = (l) => (string)l.Parameters[l.Parameters.Length - 1];
+            if (!_options.CaptureMessageProperties && !_options.CaptureMessageTemplates)
+            {
+                logEvent.MessageFormatter = (l) => (string)l.Parameters[l.Parameters.Length - 1];
+            }
         }
 
         private void CaptureEventId(LogEventInfo eventInfo, EventId eventId)
