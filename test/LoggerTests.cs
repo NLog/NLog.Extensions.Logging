@@ -8,10 +8,8 @@ using Xunit;
 
 namespace NLog.Extensions.Logging.Tests
 {
-    public class LoggerTests
+    public class LoggerTests : NLogTestBase
     {
-        private static Lazy<IServiceProvider> ServiceProvider = new Lazy<IServiceProvider>(BuildDi);
-
         public LoggerTests()
         {
             var target = GetTarget();
@@ -144,7 +142,7 @@ namespace NLog.Extensions.Logging.Tests
         [InlineData(Microsoft.Extensions.Logging.LogLevel.Warning, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|WARN|message |20")]
         public void TestMessageWithNullException(Microsoft.Extensions.Logging.LogLevel logLevel, string expectedLogMessage)
         {
-            GetRunner().Log(logLevel, 20, null, "message");
+            GetRunner<Runner>().Log(logLevel, 20, null, "message");
             
             var target = GetTarget();
             Assert.Equal(expectedLogMessage, target.Logs.FirstOrDefault()); 
@@ -180,43 +178,25 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Equal(expectedLogMessage, target.Logs.FirstOrDefault()); 
         }
         
-        private static Runner GetRunner()
-        {
-            var serviceProvider = ServiceProvider.Value;
-
-            // Start program
-            var runner = serviceProvider.GetRequiredService<Runner>();
-            return runner;
-        }
-
         private static MemoryTarget GetTarget()
         {
             var target = LogManager.Configuration.FindTargetByName<MemoryTarget>("target1");
             return target;
         }
 
-        private static IServiceProvider BuildDi()
+        private Runner GetRunner()
         {
-            var services = new ServiceCollection();
-
-            services.AddTransient<Runner>();
-            services.AddSingleton<ILoggerFactory, LoggerFactory>();
-
-            var serviceProvider = services.BuildServiceProvider();
-            var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-
-            loggerFactory.AddNLog(new NLogProviderOptions() { CaptureMessageTemplates = true, CaptureMessageProperties = true });
-            loggerFactory.ConfigureNLog("nlog.config");
-            return serviceProvider;
+            base.ConfigureServiceProvider<Runner>((s) => LogManager.LoadConfiguration("nlog.config"));
+            return base.GetRunner<Runner>();
         }
 
         public class Runner
         {
             private readonly ILogger<Runner> _logger;
 
-            public Runner(ILoggerFactory fac)
+            public Runner(ILogger<Runner> logger)
             {
-                _logger = fac.CreateLogger<Runner>();
+                _logger = logger;
             }
 
             public void LogDebugWithId()

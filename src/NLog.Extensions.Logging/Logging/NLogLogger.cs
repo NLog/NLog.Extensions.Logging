@@ -51,7 +51,7 @@ namespace NLog.Extensions.Logging
                 CaptureMessageProperties(eventInfo, state);
             }
 
-            _logger.Log(eventInfo);
+            _logger.Log(typeof(Microsoft.Extensions.Logging.ILogger), eventInfo);
         }
 
 
