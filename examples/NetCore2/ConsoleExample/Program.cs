@@ -16,6 +16,8 @@ namespace ConsoleExample
 
             Console.WriteLine("Press ANY key to exit");
             Console.ReadLine();
+
+            NLog.LogManager.Shutdown(); // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
         }
 
 
