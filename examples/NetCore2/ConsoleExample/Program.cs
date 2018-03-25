@@ -9,15 +9,28 @@ namespace ConsoleExample
     {
         static void Main(string[] args)
         {
-            var servicesProvider = BuildDi();
-            var runner = servicesProvider.GetRequiredService<Runner>();
+            var logger = NLog.LogManager.LoadConfiguration("nlog.config").GetCurrentClassLogger();
+            try
+            {
+                var servicesProvider = BuildDi();
+                var runner = servicesProvider.GetRequiredService<Runner>();
 
-            runner.DoAction("Action1");
+                runner.DoAction("Action1");
 
-            Console.WriteLine("Press ANY key to exit");
-            Console.ReadLine();
-
-            NLog.LogManager.Shutdown(); // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
+                Console.WriteLine("Press ANY key to exit");
+                Console.ReadLine();
+            }
+            catch (Exception ex)
+            {
+                //NLog: catch setup errors
+                logger.Error(ex, "Stopped program because of exception");
+                throw;
+            }
+            finally
+            {
+                // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
+                NLog.LogManager.Shutdown();
+            }
         }
 
 
@@ -38,8 +51,6 @@ namespace ConsoleExample
 
             //configure NLog
             loggerFactory.AddNLog(new NLogProviderOptions { CaptureMessageTemplates = true, CaptureMessageProperties = true });
-            loggerFactory.ConfigureNLog("nlog.config");
-
             return serviceProvider;
         }
     }
@@ -58,7 +69,5 @@ namespace ConsoleExample
         {
             _logger.LogDebug(20, "Doing hard work! {Action}", name);
         }
-
-
     }
 }
