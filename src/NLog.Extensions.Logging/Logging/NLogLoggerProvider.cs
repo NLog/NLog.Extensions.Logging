@@ -1,6 +1,9 @@
-﻿#if !NETCORE1_0
+﻿using System;
+using System.Reflection;
+#if !NETCORE1_0
 using Microsoft.Extensions.Logging;
 #endif
+using NLog.Common;
 
 namespace NLog.Extensions.Logging
 {
@@ -20,7 +23,8 @@ namespace NLog.Extensions.Logging
         /// <summary>
         /// New provider with default options, see <see cref="Options"/>
         /// </summary>
-        public NLogLoggerProvider() 
+        public NLogLoggerProvider()
+            :this(null)
         {
         }
 
@@ -31,6 +35,7 @@ namespace NLog.Extensions.Logging
         public NLogLoggerProvider(NLogProviderOptions options)
         {
             Options = options;
+            RegisterHiddenAssembliesForCallSite();
         }
 
         /// <summary>
@@ -49,6 +54,58 @@ namespace NLog.Extensions.Logging
         public void Dispose()
         {
         }
+
+        /// <summary>
+        /// Ignore assemblies for ${callsite}
+        /// </summary>
+        private static void RegisterHiddenAssembliesForCallSite()
+        {
+            InternalLogger.Debug("Hide assemblies for callsite");
+            LogManager.AddHiddenAssembly(typeof(NLogLoggerProvider).GetTypeInfo().Assembly);
+
+#if !NETCORE1_0
+            var allAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var assembly in allAssemblies)
+            {
+                if (assembly.FullName.StartsWith("NLog.Extensions.Logging,", StringComparison.OrdinalIgnoreCase)
+                    || assembly.FullName.StartsWith("NLog.Web,", StringComparison.OrdinalIgnoreCase)
+                    || assembly.FullName.StartsWith("NLog.Web.AspNetCore,", StringComparison.OrdinalIgnoreCase)
+                    || assembly.FullName.StartsWith("Microsoft.Extensions.Logging,", StringComparison.OrdinalIgnoreCase)
+                    || assembly.FullName.StartsWith("Microsoft.Extensions.Logging.Abstractions,", StringComparison.OrdinalIgnoreCase)
+                    || assembly.FullName.StartsWith("Microsoft.Extensions.Logging.Filter,", StringComparison.OrdinalIgnoreCase)
+                    || assembly.FullName.StartsWith("Microsoft.Logging,", StringComparison.OrdinalIgnoreCase))
+                {
+                    LogManager.AddHiddenAssembly(assembly);
+                }
+            }
+#else
+            SafeAddHiddenAssembly("Microsoft.Logging");
+            SafeAddHiddenAssembly("Microsoft.Extensions.Logging");
+            SafeAddHiddenAssembly("Microsoft.Extensions.Logging.Abstractions");
+
+            //try the Filter ext, this one is not mandatory so could fail
+            SafeAddHiddenAssembly("Microsoft.Extensions.Logging.Filter", false);
+#endif
+        }
+
+#if NETCORE1_0
+        private static void SafeAddHiddenAssembly(string assemblyName, bool logOnException = true)
+        {
+            try
+            {
+                InternalLogger.Trace("Hide {0}", assemblyName);
+                var assembly = Assembly.Load(new AssemblyName(assemblyName));
+                LogManager.AddHiddenAssembly(assembly);
+            }
+            catch (Exception ex)
+            {
+                if (logOnException)
+                {
+                    InternalLogger.Debug(ex, "Hiding assembly {0} failed. This could influence the ${callsite}", assemblyName);
+                }
+            }
+        }
+#endif
     }
 }
 
