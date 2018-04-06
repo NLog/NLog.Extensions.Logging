@@ -1,8 +1,15 @@
-﻿namespace NLog.Extensions.Logging
+﻿#if !NETCORE1_0
+using Microsoft.Extensions.Logging;
+#endif
+
+namespace NLog.Extensions.Logging
 {
     /// <summary>
     /// Provider logger for NLog + Microsoft.Extensions.Logging
     /// </summary>
+ #if !NETCORE1_0
+    [ProviderAlias("NLog")]
+#endif
     public class NLogLoggerProvider : Microsoft.Extensions.Logging.ILoggerProvider
     {
         /// <summary>
