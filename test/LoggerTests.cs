@@ -49,7 +49,7 @@ namespace NLog.Extensions.Logging.Tests
             GetRunner().LogDebugWithStructuredParameters();
 
             var target = GetTarget();
-            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters |1", target.Logs.FirstOrDefault());
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and \"1\" parameters |1", target.Logs.FirstOrDefault());
         }
 
         [Fact]
@@ -177,10 +177,34 @@ namespace NLog.Extensions.Logging.Tests
             var target = GetTarget();
             Assert.Equal(expectedLogMessage, target.Logs.FirstOrDefault()); 
         }
-        
+
+        [Fact]
+        public void TestStructuredLoggingFormatting()
+        {
+            GetRunner().LogDebugWithStructuredParameterFormater();
+            
+            var target = GetJsonlayoutTarget();
+            Assert.Equal("{ \"level\": \"DEBUG\", \"message\": \"message with id and {\\\"TestValue\\\":\\\"This is the test value\\\"} parameters\" }", target.Logs.FirstOrDefault());
+        }
+
+
+        private static Runner GetRunner()
+        {
+            var serviceProvider = ServiceProvider.Value;
+
+            // Start program
+            var runner = serviceProvider.GetRequiredService<Runner>();
+            return runner;
+        }
+
         private static MemoryTarget GetTarget()
         {
             var target = LogManager.Configuration.FindTargetByName<MemoryTarget>("target1");
+            return target;
+        }
+        private static MemoryTarget GetJsonlayoutTarget()
+        {
+            var target = LogManager.Configuration.FindTargetByName<MemoryTarget>("target2");
             return target;
         }
 
@@ -241,6 +265,11 @@ namespace NLog.Extensions.Logging.Tests
                 _logger.LogDebug("message with id and {ParameterCount} parameters", "1");
             }
 
+            public void LogDebugWithStructuredParameterFormater()
+            {
+                _logger.LogDebug("message with id and {@ObjectParameter} parameters", new TestObject());
+            }
+
             public void LogDebugWithSimulatedStructuredParameters()
             {
                 _logger.Log(Microsoft.Extensions.Logging.LogLevel.Debug, default(EventId), new List<KeyValuePair<string, object>>(new [] { new KeyValuePair<string,object>("{OriginalFormat}", "message with id and {ParameterCount} property"), new KeyValuePair<string, object>("ParameterCount", 1) }), null, (s, ex) => "message with id and 1 property");
@@ -276,6 +305,11 @@ namespace NLog.Extensions.Logging.Tests
             {
                 _logger.LogDebug("init runner");
             }
+        }
+
+        public class TestObject
+        {
+            public string TestValue { get; set; } = "This is the test value";
         }
     }
 }
