@@ -29,7 +29,6 @@ namespace NLog.Extensions.Logging
         /// <returns>ILoggerFactory for chaining</returns>
         public static ILoggerFactory AddNLog(this ILoggerFactory factory, NLogProviderOptions options)
         {
-            ConfigureHiddenAssemblies();
             using (var provider = new NLogLoggerProvider(options))
             {
                 factory.AddProvider(provider);
@@ -65,52 +64,15 @@ namespace NLog.Extensions.Logging
 #endif
 
         /// <summary>
-        /// Ignore assemblies for ${callsite}
-        /// </summary>
-        private static void ConfigureHiddenAssemblies()
-        {
-#if NETCORE1_0 && !NET451
-            InternalLogger.Trace("Hide assemblies for callsite");
-
-            SafeAddHiddenAssembly("Microsoft.Logging");
-
-            SafeAddHiddenAssembly("Microsoft.Extensions.Logging");
-            SafeAddHiddenAssembly("Microsoft.Extensions.Logging.Abstractions");
-            SafeAddHiddenAssembly("NLog.Extensions.Logging");
-
-            //try the Filter ext, this one is not mandatory so could fail
-            SafeAddHiddenAssembly("Microsoft.Extensions.Logging.Filter", false);
-#endif
-        }
-
-#if NETCORE1_0 && !NET451
-        private static void SafeAddHiddenAssembly(string assemblyName, bool logOnException = true)
-        {
-            try
-            {
-                InternalLogger.Trace("Hide {0}", assemblyName);
-                var assembly = Assembly.Load(new AssemblyName(assemblyName));
-                LogManager.AddHiddenAssembly(assembly);
-            }
-            catch (Exception ex)
-            {
-                if (logOnException)
-                {
-                    InternalLogger.Debug(ex, "Hiding assembly {0} failed. This could influence the ${callsite}", assemblyName);
-                }
-            }
-        }
-#endif
-
-        /// <summary>
         /// Apply NLog configuration from XML config.
         /// </summary>
         /// <param name="loggerFactory"></param>
         /// <param name="configFileRelativePath">relative path to NLog configuration file.</param>
         /// <returns>Current configuration for chaining.</returns>
+        [Obsolete("Instead use NLog.LogManager.LoadConfiguration()")]
         public static LoggingConfiguration ConfigureNLog(this ILoggerFactory loggerFactory, string configFileRelativePath)
         {
-            ConfigureHiddenAssemblies();
+            LogManager.AddHiddenAssembly(typeof(NLogLoggerProvider).GetTypeInfo().Assembly);
             return LogManager.LoadConfiguration(configFileRelativePath).Configuration;
         }
 
@@ -120,9 +82,10 @@ namespace NLog.Extensions.Logging
         /// <param name="loggerFactory"></param>
         /// <param name="config">New NLog config.</param>
         /// <returns>Current configuration for chaining.</returns>
+        [Obsolete("Instead assign property NLog.LogManager.Configuration")]
         public static LoggingConfiguration ConfigureNLog(this ILoggerFactory loggerFactory, LoggingConfiguration config)
         {
-            ConfigureHiddenAssemblies();
+            LogManager.AddHiddenAssembly(typeof(NLogLoggerProvider).GetTypeInfo().Assembly);
             LogManager.Configuration = config;
             return config;
         }

@@ -1,5 +1,46 @@
 ## Change Log
 
+### v1.0.1 (2018/04/07)
+- [#210](https://github.com/nlog/NLog.Extensions.Logging/pull/210) Automatic loading of hidden assemblies for callsite logic in NetCore2 (@snakefoot)
+- [#206](https://github.com/nlog/NLog.Extensions.Logging/pull/206) Add Alias attribute to NLogLoggerProvider (@leewadhams)
+- [#207](https://github.com/nlog/NLog.Extensions.Logging/pull/207) Update dependencies (@304NotModified)
+
+### v1.0 (2018/03/25)
+- [#205](https://github.com/nlog/NLog.Extensions.Logging/pull/205) Release 1.0 (@304NotModified)
+- [#204](https://github.com/nlog/NLog.Extensions.Logging/pull/204) CallSite should recognize all Microsoft.Extensions.Logging.ILogger (@snakefoot)
+- [#203](https://github.com/nlog/NLog.Extensions.Logging/pull/203) Update NetCore2 ConsoleExample with LogManager.Shutdown (@snakefoot)
+- [#200](https://github.com/nlog/NLog.Extensions.Logging/pull/200) ConfigureHiddenAssemblies only needed for NetCoreApp1 (@snakefoot)
+
+### 1.0.0-rtm-rc7 (2018/02/20)
+- [#199](https://github.com/nlog/NLog.Extensions.Logging/pull/199) Prepare RC7 (@snakefoot)
+- [#194](https://github.com/nlog/NLog.Extensions.Logging/pull/194) MessageProperties - Support list with single property (@snakefoot)
+- [#195](https://github.com/nlog/NLog.Extensions.Logging/pull/195) Using LogManager.LoadConfiguration (@snakefoot)
+
+### 1.0.0-rtm-rc6 (2018/01/15)
+- [#193](https://github.com/nlog/NLog.Extensions.Logging/pull/193) Support for UAP10/UWP, Update NLog dependency (@304NotModified, @snakefoot)
+
+### 1.0.0-rtm-rc5 (2017/12/21)
+- [#186](https://github.com/nlog/NLog.Extensions.Logging/pull/186) RC5 version and changelog (@304NotModified)
+- [#185](https://github.com/nlog/NLog.Extensions.Logging/pull/185) Removed System.Runtime for net451 (@snakefoot)
+- [#184](https://github.com/nlog/NLog.Extensions.Logging/pull/184) Better hide assemblies for ${callsite} (@304NotModified)
+- [#183](https://github.com/nlog/NLog.Extensions.Logging/pull/183) Cleanup #if (@304NotModified)
+- [#182](https://github.com/nlog/NLog.Extensions.Logging/pull/182) Remove old examples (@304NotModified)
+
+### 1.0.0-rtm-rc4 (2017/12/04)
+- [#181](https://github.com/nlog/NLog.Extensions.Logging/pull/181) Upgrade to NLog 4.5 rc2, remove nlog 5 reference, version to rc4 (@304NotModified)
+- [#178](https://github.com/nlog/NLog.Extensions.Logging/pull/178) Move files into component folders (@304NotModified)
+- [#180](https://github.com/nlog/NLog.Extensions.Logging/pull/180) NLogMessageParameterList - Refactor validation of parameterList (@snakefoot)
+- [#177](https://github.com/nlog/NLog.Extensions.Logging/pull/177) Fix: Captured parameter name has unwanted @ or $ prefix (@304NotModified)
+- [#176](https://github.com/nlog/NLog.Extensions.Logging/pull/176) Refactor: split methods, docs, error handling, smaller methodes and consistency  (#176) (@304NotModified)
+
+### 1.0.0-rtm-rc3 (2017/11/30)
+- [#174](https://github.com/nlog/NLog.Extensions.Logging/pull/174) 1.0.0-rtm-rc3 + changelog (@304NotModified)
+- [#173](https://github.com/nlog/NLog.Extensions.Logging/pull/173) Fix callsite (@304NotModified)
+- [#171](https://github.com/nlog/NLog.Extensions.Logging/pull/171) Implement .NET standard 2 features for .NET 4.6.1 + update dependencies + messagetemplates (@snakefoot)
+- [#162](https://github.com/nlog/NLog.Extensions.Logging/pull/162) Auto patch file version on AppVeyor (@304NotModified)
+- [#167](https://github.com/nlog/NLog.Extensions.Logging/pull/167) Update NetCore2 ConsoleExample to include the minimumlevel. (@seblucas)
+
+
 ### 1.0.0-rtm-rc2 (2017/10/19)
 
 #### Fixes

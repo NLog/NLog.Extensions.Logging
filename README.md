@@ -30,7 +30,6 @@ Please check [platform support](https://github.com/NLog/NLog/wiki/platform-suppo
 
 Known issues
 ---
-- Installing the NuGet packages [NLog.config](https://www.nuget.org/packages/NLog.Config/) / [NLog.schema](https://www.nuget.org/packages/NLog.Schema/) won't add to your project. It's recommend to extract (unzip) the NLog.Schema package and place the NLog.XSD in the same folder as NLog.config.
 - auto load of NLog extensions won't work yet. Use `<extensions>` (see below)
 
 
