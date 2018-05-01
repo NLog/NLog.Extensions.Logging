@@ -36,9 +36,19 @@ namespace NLog.Extensions.Logging
                 throw new ArgumentNullException(nameof(formatter));
             }
 
-            var message = formatter(state, exception);
-            var messageTemplate = _options.CaptureMessageTemplates ? state as IReadOnlyList<KeyValuePair<string, object>> : null;
-            LogEventInfo eventInfo = CreateLogEventInfo(nLogLogLevel, message, messageTemplate);
+            LogEventInfo eventInfo = null;
+            var messageParameters = NLogMessageParameterList.TryParseList(_options.CaptureMessageTemplates ? state as IReadOnlyList<KeyValuePair<string, object>> : null);
+            if (messageParameters?.OriginalMessage != null && (messageParameters.CustomCaptureTypes || (_options.ParseMessageTemplates && messageParameters.Count > 0)))
+            {
+                eventInfo = TryParseLogEventInfo(nLogLogLevel, messageParameters);
+            }
+
+            if (eventInfo == null)
+            {
+                var message = formatter(state, exception);
+                eventInfo = CreateLogEventInfo(nLogLogLevel, message, messageParameters);
+            }
+
             if (exception != null)
             {
                 eventInfo.Exception = exception;
@@ -46,7 +56,7 @@ namespace NLog.Extensions.Logging
 
             CaptureEventId(eventInfo, eventId);
 
-            if (messageTemplate == null)
+            if (messageParameters == null)
             {
                 CaptureMessageProperties(eventInfo, state);
             }
@@ -55,33 +65,126 @@ namespace NLog.Extensions.Logging
         }
 
 
-        private LogEventInfo CreateLogEventInfo(LogLevel nLogLogLevel, string message, IReadOnlyList<KeyValuePair<string, object>> parameterList)
+        private LogEventInfo CreateLogEventInfo(LogLevel nLogLogLevel, string message, NLogMessageParameterList messageParameters)
         {
-            if (parameterList != null && parameterList.Count > 0 && IsNonDigitValue(parameterList[0].Key))
+            if (messageParameters?.IsPositional == false)
             {
-                return CreateLogEventInfoWithMultipleParameters(nLogLogLevel, message, parameterList);
+                var originalMessage = messageParameters.OriginalMessage as string;
+                var eventInfo = new LogEventInfo(nLogLogLevel, _logger.Name, originalMessage ?? message, messageParameters);
+                if (originalMessage != null)
+                {
+                    SetLogEventMessageFormatter(eventInfo, messageParameters, message);
+                }
+                return eventInfo;
             }
-            return LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
+            else
+            {
+                return LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
+            }
         }
 
-        private static bool IsNonDigitValue(string value)
+        private static readonly object[] _singleItemArray = { null };
+
+        /// <summary>
+        /// Attempt to parse the OriginalMessage using the NLog MessageTemplate-parser
+        /// and activate the NLog MessageTemplate-formatter
+        /// </summary>
+        /// <remarks>
+        /// Calling this method will hurt performance: 1 x Microsoft Parser -> 2 x NLog Parser -> 1 x NLog Formatter
+        /// </remarks>
+        private LogEventInfo TryParseLogEventInfo(LogLevel nLogLogLevel, NLogMessageParameterList messageParameters)
         {
-            return !String.IsNullOrEmpty(value) && (value.Length != 1 || !Char.IsDigit(value[0]));
+            var eventInfo = new LogEventInfo(nLogLogLevel, _logger.Name, null, messageParameters.OriginalMessage as string, _singleItemArray);
+            var messagetTemplateParameters = eventInfo.MessageTemplateParameters;   // Forces parsing of OriginalMessage
+            if (messagetTemplateParameters.Count > 0)
+            {
+                // We have parsed the message and found parameters, now we need to do the parameter mapping
+                eventInfo.Parameters = CreateLogEventInfoParameters(messageParameters, messagetTemplateParameters);
+                return eventInfo;
+            }
+
+            return null;    // Not able to parse the message, so better fallback
         }
 
         /// <summary>
-        /// Create Log Event with multiple parameters (last parameter is the {OriginalFormat})
+        /// Allocates object[]-array for <see cref="LogEventInfo.Parameters"/> after checking
+        /// for mismatch between Microsoft Extension Logging and NLog Message Template Parser
         /// </summary>
-        private LogEventInfo CreateLogEventInfoWithMultipleParameters(LogLevel nLogLogLevel, string message, IReadOnlyList<KeyValuePair<string, object>> parameterList)
+        /// <remarks>
+        /// Cannot trust the parameters received from Microsoft Extension Logging, as extra parameters can be injected
+        /// </remarks>
+        private object[] CreateLogEventInfoParameters(NLogMessageParameterList messageParameters, NLog.MessageTemplates.MessageTemplateParameters messagetTemplateParameters)
         {
-            var messageTemplateParameters = new NLogMessageParameterList(parameterList);
-            var originalMessage = messageTemplateParameters.OriginalMessage as string;
-            var logEvent = new LogEventInfo(nLogLogLevel, _logger.Name, originalMessage ?? message, messageTemplateParameters);
-            if (originalMessage != null)
+            if (messagetTemplateParameters.Count == messageParameters.Count && !messagetTemplateParameters.IsPositional)
             {
-                SetLogEventMessageFormatter(logEvent, messageTemplateParameters, message);
+                for (int i = 0; i < messagetTemplateParameters.Count; ++i)
+                {
+                    if (messagetTemplateParameters[i].Name != messageParameters[i].Name)
+                    {
+                        return CreateLogEventInfoParametersSlow(messageParameters, messagetTemplateParameters);
+                    }
+                }
+
+                // Everything is mapped correctly, inject messageParameters directly as params-array
+                var paramsArray = new object[messagetTemplateParameters.Count];
+                for (int i = 0; i < paramsArray.Length; ++i)
+                    paramsArray[i] = messageParameters[i].Value;
+                return paramsArray;
             }
-            return logEvent;
+
+            return CreateLogEventInfoParametersSlow(messageParameters, messagetTemplateParameters);
+        }
+
+        /// <summary>
+        /// Resolves mismatch between the input from Microsoft Extension Logging TState and NLog Message Template Parser
+        /// </summary>
+        private object[] CreateLogEventInfoParametersSlow(NLogMessageParameterList messageParameters, NLog.MessageTemplates.MessageTemplateParameters messagetTemplateParameters)
+        {
+            if (messagetTemplateParameters.IsPositional)
+            {
+                // Find max number
+                int maxIndex = 0;
+                for (int i = 0; i < messagetTemplateParameters.Count; ++i)
+                {
+                    if (messagetTemplateParameters[i].Name.Length == 1)
+                        maxIndex = Math.Max(maxIndex, messagetTemplateParameters[i].Name[0] - '0');
+                    else
+                        maxIndex = Math.Max(maxIndex, int.Parse(messagetTemplateParameters[i].Name));
+                }
+                var paramsArray = new object[maxIndex + 1];
+                for (int i = 0; i < messageParameters.Count; ++i)
+                {
+                    // First positional name is the startPos
+                    if (char.IsDigit(messagetTemplateParameters[i].Name[0]))
+                    {
+                        for (int j = 0; j <= maxIndex; ++j)
+                        {
+                            if (i + j < messageParameters.Count)
+                                paramsArray[j] = messageParameters[i + j].Value;
+                        }
+                        break;
+                    }
+                }
+                return paramsArray;
+            }
+            else
+            {
+                var paramsArray = new object[messagetTemplateParameters.Count];
+                int startPos = 0;
+                for (int i = 0; i < messagetTemplateParameters.Count; ++i)
+                {
+                    for (int j = startPos; j < messageParameters.Count; ++i)
+                    {
+                        if (messagetTemplateParameters[i].Name == messageParameters[j].Name)
+                        {
+                            paramsArray[i] = messageParameters[i].Value;
+                            if (startPos == i)
+                                startPos++;
+                        }
+                    }
+                }
+                return paramsArray;
+            }
         }
 
         private static void SetLogEventMessageFormatter(LogEventInfo logEvent, NLogMessageParameterList messageTemplateParameters, string formattedMessage)

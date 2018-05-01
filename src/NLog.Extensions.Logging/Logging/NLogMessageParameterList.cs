@@ -14,23 +14,39 @@ namespace NLog.Extensions.Logging
         public object OriginalMessage => _originalMessageIndex.HasValue ? _parameterList[_originalMessageIndex.Value].Value : null;
         public int? _originalMessageIndex;
 
+        public bool CustomCaptureTypes => _customCaptureTypes;
+        public bool _customCaptureTypes;
+
+        public bool IsPositional => _isPositional;
+        public bool _isPositional;
+
         public NLogMessageParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList)
         {
-            if (IsValidParameterList(parameterList, out _originalMessageIndex))
+            if (IsValidParameterList(parameterList, out _originalMessageIndex, out _customCaptureTypes, out _isPositional))
             {
                 _parameterList = parameterList;
             }
             else
             {
-                _parameterList = CreateValidParameterList(parameterList);
+                _parameterList = CreateValidParameterList(parameterList, out _customCaptureTypes, out _isPositional);
             }
+        }
+
+        /// <summary>
+        /// Attempts to parse the input parameterList
+        /// </summary>
+        public static NLogMessageParameterList TryParseList(IReadOnlyList<KeyValuePair<string, object>> parameterList)
+        {
+            return parameterList?.Count > 0 ? new NLogMessageParameterList(parameterList) : null;
         }
 
         /// <summary>
         /// Verify that the input parameterList contains non-empty key-values and the orignal-format-property at the end
         /// </summary>
-        private bool IsValidParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList, out int? originalMessageIndex)
+        private static bool IsValidParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList, out int? originalMessageIndex, out bool customCaptureTypes, out bool isPositional)
         {
+            isPositional = true;
+            customCaptureTypes = false;
             originalMessageIndex = null;
             for (int i = 0; i < parameterList.Count; ++i)
             {
@@ -41,15 +57,28 @@ namespace NLog.Extensions.Logging
                     return false;
                 }
 
-                if (paramPair.Key == NLogLogger.OriginalFormatPropertyName)
+                char firstChar = paramPair.Key[0];
+                if (!char.IsDigit(firstChar))
                 {
-                    if (originalMessageIndex.HasValue)
+                    if (firstChar == '@' || firstChar == '$')
                     {
-                        originalMessageIndex = null;
-                        return false;
+                        customCaptureTypes = true;
+                        isPositional = false;
                     }
+                    else if (firstChar == '{' && paramPair.Key == NLogLogger.OriginalFormatPropertyName)
+                    {
+                        if (originalMessageIndex.HasValue)
+                        {
+                            originalMessageIndex = null;
+                            return false;
+                        }
 
-                    originalMessageIndex = i;
+                        originalMessageIndex = i;
+                    }
+                    else
+                    {
+                        isPositional = false;
+                    }
                 }
             }
 
@@ -59,8 +88,10 @@ namespace NLog.Extensions.Logging
         /// <summary>
         /// Extract all valid properties from the input parameterList, and return them in a newly allocated list
         /// </summary>
-        private IReadOnlyList<KeyValuePair<string, object>> CreateValidParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList)
+        private static IReadOnlyList<KeyValuePair<string, object>> CreateValidParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList, out bool customCaptureTypes, out bool isPositional)
         {
+            customCaptureTypes = false;
+            isPositional = true;
             var validParameterList = new List<KeyValuePair<string, object>>(parameterList.Count);
             for (int i = 0; i < parameterList.Count; ++i)
             {
@@ -68,8 +99,23 @@ namespace NLog.Extensions.Logging
                 if (string.IsNullOrEmpty(paramPair.Key))
                     continue;
 
-                if (paramPair.Key == NLogLogger.OriginalFormatPropertyName)
-                    continue;
+                char firstChar = paramPair.Key[0];
+                if (!char.IsDigit(firstChar))
+                {
+                    if (firstChar == '@' || firstChar == '$')
+                    {
+                        customCaptureTypes = true;
+                        isPositional = false;
+                    }
+                    else if (firstChar == '{' && paramPair.Key == NLogLogger.OriginalFormatPropertyName)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        isPositional = false;
+                    }
+                }
 
                 validParameterList.Add(parameterList[i]);
             }
@@ -105,19 +151,13 @@ namespace NLog.Extensions.Logging
 
         private static NLog.MessageTemplates.CaptureType GetCaptureType(string parameterName)
         {
-            var captureType = NLog.MessageTemplates.CaptureType.Normal;
-
             switch (parameterName[0])
             {
-                case '@':
-                    captureType = NLog.MessageTemplates.CaptureType.Serialize;
-                    break;
-                case '$':
-                    captureType = NLog.MessageTemplates.CaptureType.Stringify;
-                    break;
+                case '@': return NLog.MessageTemplates.CaptureType.Serialize;
+                case '$': return NLog.MessageTemplates.CaptureType.Stringify;
+                default: return NLog.MessageTemplates.CaptureType.Normal;
             }
-            return captureType;
-        }
+}
 
         public int Count => _parameterList.Count - (_originalMessageIndex.HasValue ? 1 : 0);
 
