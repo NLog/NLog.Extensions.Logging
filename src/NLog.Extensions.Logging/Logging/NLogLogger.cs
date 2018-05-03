@@ -38,7 +38,7 @@ namespace NLog.Extensions.Logging
             }
 
             LogEventInfo eventInfo = null;
-            var messageParameters = NLogMessageParameterList.CreateIfNeeded(_options.CaptureMessageTemplates ? state as IReadOnlyList<KeyValuePair<string, object>> : null);
+            var messageParameters = NLogMessageParameterList.TryParse(_options.CaptureMessageTemplates ? state as IReadOnlyList<KeyValuePair<string, object>> : null);
             if (messageParameters?.OriginalMessage != null && (messageParameters.CustomCaptureTypes || (_options.ParseMessageTemplates && messageParameters.Count > 0)))
             {
                 eventInfo = TryParseLogEventInfo(nLogLogLevel, messageParameters);
@@ -89,7 +89,7 @@ namespace NLog.Extensions.Logging
         /// and activate the NLog MessageTemplate-formatter
         /// </summary>
         /// <remarks>
-        /// Calling this method will hurt performance: 1 x Microsoft Parser -> 2 x NLog Parser -> 1 x NLog Formatter
+        /// Calling this method will hurt performance: 1 x Microsoft Parser - 2 x NLog Parser - 1 x NLog Formatter
         /// </remarks>
         private LogEventInfo TryParseLogEventInfo(LogLevel nLogLogLevel, NLogMessageParameterList messageParameters)
         {

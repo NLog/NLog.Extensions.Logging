@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using NLog.MessageTemplates;
 
 namespace NLog.Extensions.Logging
 {
     /// <summary>
     /// Converts Microsoft Extension Logging ParameterList into NLog MessageTemplate ParameterList
     /// </summary>
-    internal class NLogMessageParameterList : IList<NLog.MessageTemplates.MessageTemplateParameter>
+    internal class NLogMessageParameterList : IList<MessageTemplateParameter>
     {
         private readonly IReadOnlyList<KeyValuePair<string, object>> _parameterList;
 
@@ -60,15 +61,9 @@ namespace NLog.Extensions.Logging
                     return false;
                 }
 
-                char firstChar = paramPair.Key[0];
-                if (!char.IsDigit(firstChar))
+                if (IsStructuredParameterName(paramPair.Key, ref customCaptureTypes))
                 {
-                    if (firstChar == '@' || firstChar == '$')
-                    {
-                        customCaptureTypes = true;
-                        isPositional = false;
-                    }
-                    else if (firstChar == '{' && paramPair.Key == NLogLogger.OriginalFormatPropertyName)
+                    if (paramPair.Key == NLogLogger.OriginalFormatPropertyName)
                     {
                         if (originalMessageIndex.HasValue)
                         {
@@ -88,6 +83,23 @@ namespace NLog.Extensions.Logging
             return true;
         }
 
+        private static bool IsStructuredParameterName(string parameterName, ref bool customCaptureTypes)
+        {
+            char firstChar = parameterName[0];
+
+            if (!char.IsDigit(firstChar))
+            {
+                if (GetCaptureType(firstChar) != CaptureType.Normal)
+                {
+                    customCaptureTypes = true;
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// Extract all valid properties from the input parameterList, and return them in a newly allocated list
         /// </summary>
@@ -102,22 +114,14 @@ namespace NLog.Extensions.Logging
                 if (string.IsNullOrEmpty(paramPair.Key))
                     continue;
 
-                char firstChar = paramPair.Key[0];
-                if (!char.IsDigit(firstChar))
+                if (IsStructuredParameterName(paramPair.Key, ref customCaptureTypes))
                 {
-                    if (firstChar == '@' || firstChar == '$')
-                    {
-                        customCaptureTypes = true;
-                        isPositional = false;
-                    }
-                    else if (firstChar == '{' && paramPair.Key == NLogLogger.OriginalFormatPropertyName)
+                    if (paramPair.Key == NLogLogger.OriginalFormatPropertyName)
                     {
                         continue;
                     }
-                    else
-                    {
-                        isPositional = false;
-                    }
+
+                    isPositional = false;
                 }
 
                 validParameterList.Add(parameterList[i]);
@@ -125,7 +129,7 @@ namespace NLog.Extensions.Logging
             return validParameterList;
         }
 
-        public NLog.MessageTemplates.MessageTemplateParameter this[int index]
+        public MessageTemplateParameter this[int index]
         {
             get
             {
@@ -134,39 +138,30 @@ namespace NLog.Extensions.Logging
 
                 var parameter = _parameterList[index];
                 var parameterName = parameter.Key;
-                var capture = GetCaptureType(parameterName);
-                if (capture != MessageTemplates.CaptureType.Normal)
-                    parameterName = RemoveMarkerFromName(parameterName);
-                return new NLog.MessageTemplates.MessageTemplateParameter(parameterName, parameter.Value, null, capture);
+                var capture = GetCaptureType(parameterName[0]);
+                if (capture != CaptureType.Normal)
+                    parameterName = parameterName.Substring(1);
+                return new MessageTemplateParameter(parameterName, parameter.Value, null, capture);
             }
             set => throw new NotSupportedException();
         }
 
-        private static string RemoveMarkerFromName(string parameterName)
+        private static CaptureType GetCaptureType(char firstChar)
         {
-            var firstChar = parameterName[0];
-            if (firstChar == '@' || firstChar == '$')
-            {
-                parameterName = parameterName.Substring(1);
-            }
-            return parameterName;
+            if (firstChar == '@')
+                return CaptureType.Serialize;
+            else if (firstChar == '$')
+                return CaptureType.Stringify;
+            else
+                return CaptureType.Normal;
         }
 
-        private static NLog.MessageTemplates.CaptureType GetCaptureType(string parameterName)
-        {
-            switch (parameterName[0])
-            {
-                case '@': return NLog.MessageTemplates.CaptureType.Serialize;
-                case '$': return NLog.MessageTemplates.CaptureType.Stringify;
-                default: return NLog.MessageTemplates.CaptureType.Normal;
-            }
-}
 
         public int Count => _parameterList.Count - (_originalMessageIndex.HasValue ? 1 : 0);
 
         public bool IsReadOnly => true;
 
-        public void Add(NLog.MessageTemplates.MessageTemplateParameter item)
+        public void Add(MessageTemplateParameter item)
         {
             throw new NotSupportedException();
         }
@@ -176,34 +171,34 @@ namespace NLog.Extensions.Logging
             throw new NotSupportedException();
         }
 
-        public bool Contains(NLog.MessageTemplates.MessageTemplateParameter item)
+        public bool Contains(MessageTemplateParameter item)
         {
             throw new NotSupportedException();
         }
 
-        public void CopyTo(NLog.MessageTemplates.MessageTemplateParameter[] array, int arrayIndex)
+        public void CopyTo(MessageTemplateParameter[] array, int arrayIndex)
         {
             for (int i = 0; i < Count; ++i)
                 array[i + arrayIndex] = this[i];
         }
 
-        public IEnumerator<NLog.MessageTemplates.MessageTemplateParameter> GetEnumerator()
+        public IEnumerator<MessageTemplateParameter> GetEnumerator()
         {
             for (int i = 0; i < Count; ++i)
                 yield return this[i];
         }
 
-        public int IndexOf(NLog.MessageTemplates.MessageTemplateParameter item)
+        public int IndexOf(MessageTemplateParameter item)
         {
             throw new NotSupportedException();
         }
 
-        public void Insert(int index, NLog.MessageTemplates.MessageTemplateParameter item)
+        public void Insert(int index, MessageTemplateParameter item)
         {
             throw new NotSupportedException();
         }
 
-        public bool Remove(NLog.MessageTemplates.MessageTemplateParameter item)
+        public bool Remove(MessageTemplateParameter item)
         {
             throw new NotSupportedException();
         }
