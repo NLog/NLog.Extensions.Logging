@@ -116,8 +116,7 @@ namespace NLog.Extensions.Logging
         {
             if (!AllParameterCorrectlyPositionalMapped(messageParameters, messagetTemplateParameters))
             {
-                var logEventInfoParameters = CreateLogEventInfoParametersSlow(messageParameters, messagetTemplateParameters);
-                return logEventInfoParameters;
+                return CreateLogEventInfoParametersSlow(messageParameters, messagetTemplateParameters);
             }
 
             // Everything is mapped correctly, inject messageParameters directly as params-array
@@ -158,41 +157,51 @@ namespace NLog.Extensions.Logging
         {
             if (messagetTemplateParameters.IsPositional)
             {
-                var maxIndex = FindMaxIndex(messagetTemplateParameters);
-                var paramsArray = new object[maxIndex + 1];
-                for (int i = 0; i < messageParameters.Count; ++i)
-                {
-                    // First positional name is the startPos
-                    if (char.IsDigit(messagetTemplateParameters[i].Name[0]))
-                    {
-                        for (int j = 0; j <= maxIndex; ++j)
-                        {
-                            if (i + j < messageParameters.Count)
-                                paramsArray[j] = messageParameters[i + j].Value;
-                        }
-                        break;
-                    }
-                }
-                return paramsArray;
+                return CreatePositionalLogEventInfoParameters(messageParameters, messagetTemplateParameters);
             }
             else
             {
-                var paramsArray = new object[messagetTemplateParameters.Count];
-                int startPos = 0;
-                for (int i = 0; i < messagetTemplateParameters.Count; ++i)
+                return CreateStructuredLogEventInfoParameters(messageParameters, messagetTemplateParameters);
+            }
+        }
+
+        private static object[] CreateStructuredLogEventInfoParameters(NLogMessageParameterList messageParameters, MessageTemplateParameters messagetTemplateParameters)
+        {
+            var paramsArray = new object[messagetTemplateParameters.Count];
+            int startPos = 0;
+            for (int i = 0; i < messagetTemplateParameters.Count; ++i)
+            {
+                for (int j = startPos; j < messageParameters.Count; ++j)
                 {
-                    for (int j = startPos; j < messageParameters.Count; ++j)
+                    if (messagetTemplateParameters[i].Name == messageParameters[j].Name)
                     {
-                        if (messagetTemplateParameters[i].Name == messageParameters[j].Name)
-                        {
-                            paramsArray[i] = messageParameters[i].Value;
-                            if (startPos == i)
-                                startPos++;
-                        }
+                        paramsArray[i] = messageParameters[i].Value;
+                        if (startPos == i)
+                            startPos++;
                     }
                 }
-                return paramsArray;
             }
+            return paramsArray;
+        }
+
+        private static object[] CreatePositionalLogEventInfoParameters(NLogMessageParameterList messageParameters, MessageTemplateParameters messagetTemplateParameters)
+        {
+            var maxIndex = FindMaxIndex(messagetTemplateParameters);
+            var paramsArray = new object[maxIndex + 1];
+            for (int i = 0; i < messageParameters.Count; ++i)
+            {
+                // First positional name is the startPos
+                if (char.IsDigit(messagetTemplateParameters[i].Name[0]))
+                {
+                    for (int j = 0; j <= maxIndex; ++j)
+                    {
+                        if (i + j < messageParameters.Count)
+                            paramsArray[j] = messageParameters[i + j].Value;
+                    }
+                    break;
+                }
+            }
+            return paramsArray;
         }
 
         /// <summary>
