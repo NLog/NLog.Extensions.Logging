@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using NLog.Common;
+using NLog.MessageTemplates;
 
 namespace NLog.Extensions.Logging
 {
@@ -37,7 +38,7 @@ namespace NLog.Extensions.Logging
             }
 
             LogEventInfo eventInfo = null;
-            var messageParameters = NLogMessageParameterList.TryParseList(_options.CaptureMessageTemplates ? state as IReadOnlyList<KeyValuePair<string, object>> : null);
+            var messageParameters = NLogMessageParameterList.CreateIfNeeded(_options.CaptureMessageTemplates ? state as IReadOnlyList<KeyValuePair<string, object>> : null);
             if (messageParameters?.OriginalMessage != null && (messageParameters.CustomCaptureTypes || (_options.ParseMessageTemplates && messageParameters.Count > 0)))
             {
                 eventInfo = TryParseLogEventInfo(nLogLogLevel, messageParameters);
@@ -77,10 +78,8 @@ namespace NLog.Extensions.Logging
                 }
                 return eventInfo;
             }
-            else
-            {
-                return LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
-            }
+
+            return LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
         }
 
         private static readonly object[] _singleItemArray = { null };
@@ -115,42 +114,51 @@ namespace NLog.Extensions.Logging
         /// </remarks>
         private object[] CreateLogEventInfoParameters(NLogMessageParameterList messageParameters, NLog.MessageTemplates.MessageTemplateParameters messagetTemplateParameters)
         {
-            if (messagetTemplateParameters.Count == messageParameters.Count && !messagetTemplateParameters.IsPositional)
+            if (!AllParameterCorrectlyPositionalMapped(messageParameters, messagetTemplateParameters))
             {
-                for (int i = 0; i < messagetTemplateParameters.Count; ++i)
-                {
-                    if (messagetTemplateParameters[i].Name != messageParameters[i].Name)
-                    {
-                        return CreateLogEventInfoParametersSlow(messageParameters, messagetTemplateParameters);
-                    }
-                }
-
-                // Everything is mapped correctly, inject messageParameters directly as params-array
-                var paramsArray = new object[messagetTemplateParameters.Count];
-                for (int i = 0; i < paramsArray.Length; ++i)
-                    paramsArray[i] = messageParameters[i].Value;
-                return paramsArray;
+                var logEventInfoParameters = CreateLogEventInfoParametersSlow(messageParameters, messagetTemplateParameters);
+                return logEventInfoParameters;
             }
 
-            return CreateLogEventInfoParametersSlow(messageParameters, messagetTemplateParameters);
+            // Everything is mapped correctly, inject messageParameters directly as params-array
+            var paramsArray = new object[messagetTemplateParameters.Count];
+            for (int i = 0; i < paramsArray.Length; ++i)
+                paramsArray[i] = messageParameters[i].Value;
+            return paramsArray;
+        }
+
+        /// <summary>
+        /// Are all parameters positional and correctly mapped?
+        /// </summary>
+        /// <param name="messageParameters"></param>
+        /// <param name="messagetTemplateParameters"></param>
+        /// <returns>true if correct</returns>
+        private static bool AllParameterCorrectlyPositionalMapped(NLogMessageParameterList messageParameters, MessageTemplateParameters messagetTemplateParameters)
+        {
+            if (messagetTemplateParameters.Count != messageParameters.Count || messagetTemplateParameters.IsPositional)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < messagetTemplateParameters.Count; ++i)
+            {
+                if (messagetTemplateParameters[i].Name != messageParameters[i].Name)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         /// <summary>
         /// Resolves mismatch between the input from Microsoft Extension Logging TState and NLog Message Template Parser
         /// </summary>
-        private object[] CreateLogEventInfoParametersSlow(NLogMessageParameterList messageParameters, NLog.MessageTemplates.MessageTemplateParameters messagetTemplateParameters)
+        private static object[] CreateLogEventInfoParametersSlow(NLogMessageParameterList messageParameters, NLog.MessageTemplates.MessageTemplateParameters messagetTemplateParameters)
         {
             if (messagetTemplateParameters.IsPositional)
             {
-                // Find max number
-                int maxIndex = 0;
-                for (int i = 0; i < messagetTemplateParameters.Count; ++i)
-                {
-                    if (messagetTemplateParameters[i].Name.Length == 1)
-                        maxIndex = Math.Max(maxIndex, messagetTemplateParameters[i].Name[0] - '0');
-                    else
-                        maxIndex = Math.Max(maxIndex, int.Parse(messagetTemplateParameters[i].Name));
-                }
+                var maxIndex = FindMaxIndex(messagetTemplateParameters);
                 var paramsArray = new object[maxIndex + 1];
                 for (int i = 0; i < messageParameters.Count; ++i)
                 {
@@ -173,7 +181,7 @@ namespace NLog.Extensions.Logging
                 int startPos = 0;
                 for (int i = 0; i < messagetTemplateParameters.Count; ++i)
                 {
-                    for (int j = startPos; j < messageParameters.Count; ++i)
+                    for (int j = startPos; j < messageParameters.Count; ++j)
                     {
                         if (messagetTemplateParameters[i].Name == messageParameters[j].Name)
                         {
@@ -185,6 +193,25 @@ namespace NLog.Extensions.Logging
                 }
                 return paramsArray;
             }
+        }
+
+        /// <summary>
+        /// Find max index of the parameters
+        /// </summary>
+        /// <param name="messagetTemplateParameters"></param>
+        /// <returns>index, 0 or higher</returns>
+        private static int FindMaxIndex(MessageTemplateParameters messagetTemplateParameters)
+        {
+            int maxIndex = 0;
+            for (int i = 0; i < messagetTemplateParameters.Count; ++i)
+            {
+                if (messagetTemplateParameters[i].Name.Length == 1)
+                    maxIndex = Math.Max(maxIndex, messagetTemplateParameters[i].Name[0] - '0');
+                else
+                    maxIndex = Math.Max(maxIndex, int.Parse(messagetTemplateParameters[i].Name));
+            }
+
+            return maxIndex;
         }
 
         private static void SetLogEventMessageFormatter(LogEventInfo logEvent, NLogMessageParameterList messageTemplateParameters, string formattedMessage)
@@ -290,6 +317,10 @@ namespace NLog.Extensions.Logging
         class ScopeProperties : IDisposable
         {
             List<IDisposable> _properties;
+
+            /// <summary>
+            /// Properties, never null and lazy init
+            /// </summary>
             List<IDisposable> Properties => _properties ?? (_properties = new List<IDisposable>());
 
 

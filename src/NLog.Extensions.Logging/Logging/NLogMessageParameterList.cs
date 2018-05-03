@@ -33,9 +33,12 @@ namespace NLog.Extensions.Logging
         }
 
         /// <summary>
-        /// Attempts to parse the input parameterList
+        /// Create a <see cref="NLogMessageParameterList"/> if <paramref name="parameterList"/> has values, otherwise <c>null</c>
         /// </summary>
-        public static NLogMessageParameterList TryParseList(IReadOnlyList<KeyValuePair<string, object>> parameterList)
+        /// <remarks>
+        /// The LogMessageParameterList-constructor initiates all the parsing/scanning
+        /// </remarks>
+        public static NLogMessageParameterList TryParse(IReadOnlyList<KeyValuePair<string, object>> parameterList)
         {
             return parameterList?.Count > 0 ? new NLogMessageParameterList(parameterList) : null;
         }
