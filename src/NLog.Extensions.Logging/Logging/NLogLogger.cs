@@ -39,7 +39,7 @@ namespace NLog.Extensions.Logging
 
             LogEventInfo eventInfo = null;
             var messageParameters = NLogMessageParameterList.TryParse(_options.CaptureMessageTemplates ? state as IReadOnlyList<KeyValuePair<string, object>> : null);
-            if (messageParameters?.OriginalMessage != null && (messageParameters.CustomCaptureTypes || (_options.ParseMessageTemplates && messageParameters.Count > 0)))
+            if (messageParameters?.OriginalMessage != null && (messageParameters.HasMessageTemplateCapture || (_options.ParseMessageTemplates && messageParameters.Count > 0)))
             {
                 eventInfo = TryParseLogEventInfo(nLogLogLevel, messageParameters);
             }
@@ -68,7 +68,7 @@ namespace NLog.Extensions.Logging
 
         private LogEventInfo CreateLogEventInfo(LogLevel nLogLogLevel, string message, NLogMessageParameterList messageParameters)
         {
-            if (messageParameters?.IsPositional == false)
+            if (messageParameters?.HasMessageTemplateCapture == false)
             {
                 var originalMessage = messageParameters.OriginalMessage as string;
                 var eventInfo = new LogEventInfo(nLogLogLevel, _logger.Name, originalMessage ?? message, messageParameters);

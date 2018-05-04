@@ -15,21 +15,18 @@ namespace NLog.Extensions.Logging
         public object OriginalMessage => _originalMessageIndex.HasValue ? _parameterList[_originalMessageIndex.Value].Value : null;
         public int? _originalMessageIndex;
 
-        public bool CustomCaptureTypes => _customCaptureTypes;
-        public bool _customCaptureTypes;
-
-        public bool IsPositional => _isPositional;
-        public bool _isPositional;
+        public bool HasMessageTemplateCapture => _hasMessageTemplateCapture;
+        public bool _hasMessageTemplateCapture;
 
         public NLogMessageParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList)
         {
-            if (IsValidParameterList(parameterList, out _originalMessageIndex, out _customCaptureTypes, out _isPositional))
+            if (IsValidParameterList(parameterList, out _originalMessageIndex, out _hasMessageTemplateCapture))
             {
                 _parameterList = parameterList;
             }
             else
             {
-                _parameterList = CreateValidParameterList(parameterList, out _customCaptureTypes, out _isPositional);
+                _parameterList = CreateValidParameterList(parameterList);
             }
         }
 
@@ -47,10 +44,9 @@ namespace NLog.Extensions.Logging
         /// <summary>
         /// Verify that the input parameterList contains non-empty key-values and the orignal-format-property at the end
         /// </summary>
-        private static bool IsValidParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList, out int? originalMessageIndex, out bool customCaptureTypes, out bool isPositional)
+        private static bool IsValidParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList, out int? originalMessageIndex, out bool hasMessageTemplateCapture)
         {
-            isPositional = true;
-            customCaptureTypes = false;
+            hasMessageTemplateCapture = false;
             originalMessageIndex = null;
             for (int i = 0; i < parameterList.Count; ++i)
             {
@@ -61,52 +57,30 @@ namespace NLog.Extensions.Logging
                     return false;
                 }
 
-                if (IsStructuredParameterName(paramPair.Key, ref customCaptureTypes))
+                if (GetCaptureType(paramPair.Key[0]) != CaptureType.Normal)
                 {
-                    if (paramPair.Key == NLogLogger.OriginalFormatPropertyName)
+                    hasMessageTemplateCapture = true;
+                }
+                else if (paramPair.Key == NLogLogger.OriginalFormatPropertyName)
+                {
+                    if (originalMessageIndex.HasValue)
                     {
-                        if (originalMessageIndex.HasValue)
-                        {
-                            originalMessageIndex = null;
-                            return false;
-                        }
+                        originalMessageIndex = null;
+                        return false;
+                    }
 
-                        originalMessageIndex = i;
-                    }
-                    else
-                    {
-                        isPositional = false;
-                    }
+                    originalMessageIndex = i;
                 }
             }
 
             return true;
         }
 
-        private static bool IsStructuredParameterName(string parameterName, ref bool customCaptureTypes)
-        {
-            char firstChar = parameterName[0];
-
-            if (!char.IsDigit(firstChar))
-            {
-                if (GetCaptureType(firstChar) != CaptureType.Normal)
-                {
-                    customCaptureTypes = true;
-                }
-
-                return true;
-            }
-
-            return false;
-        }
-
         /// <summary>
         /// Extract all valid properties from the input parameterList, and return them in a newly allocated list
         /// </summary>
-        private static IReadOnlyList<KeyValuePair<string, object>> CreateValidParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList, out bool customCaptureTypes, out bool isPositional)
+        private static IReadOnlyList<KeyValuePair<string, object>> CreateValidParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList)
         {
-            customCaptureTypes = false;
-            isPositional = true;
             var validParameterList = new List<KeyValuePair<string, object>>(parameterList.Count);
             for (int i = 0; i < parameterList.Count; ++i)
             {
@@ -114,14 +88,9 @@ namespace NLog.Extensions.Logging
                 if (string.IsNullOrEmpty(paramPair.Key))
                     continue;
 
-                if (IsStructuredParameterName(paramPair.Key, ref customCaptureTypes))
+                if (paramPair.Key == NLogLogger.OriginalFormatPropertyName)
                 {
-                    if (paramPair.Key == NLogLogger.OriginalFormatPropertyName)
-                    {
-                        continue;
-                    }
-
-                    isPositional = false;
+                    continue;
                 }
 
                 validParameterList.Add(parameterList[i]);
