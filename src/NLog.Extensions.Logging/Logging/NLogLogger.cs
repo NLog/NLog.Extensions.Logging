@@ -37,19 +37,12 @@ namespace NLog.Extensions.Logging
                 throw new ArgumentNullException(nameof(formatter));
             }
 
-            LogEventInfo eventInfo = null;
             var messageParameters = NLogMessageParameterList.TryParse(_options.CaptureMessageTemplates ? state as IReadOnlyList<KeyValuePair<string, object>> : null);
-            if (messageParameters?.OriginalMessage != null && (messageParameters.HasMessageTemplateCapture || (_options.ParseMessageTemplates && messageParameters.Count > 0)))
-            {
-                eventInfo = TryParseLogEventInfo(nLogLogLevel, messageParameters);
-            }
 
-            if (eventInfo == null)
-            {
-                var message = formatter(state, exception);
-                eventInfo = CreateLogEventInfo(nLogLogLevel, message, messageParameters);
-            }
-
+            LogEventInfo eventInfo =
+                TryParseLogEventInfo(nLogLogLevel, messageParameters) ??
+                CreateLogEventInfo(nLogLogLevel, formatter(state, exception), messageParameters);
+                
             if (exception != null)
             {
                 eventInfo.Exception = exception;
@@ -65,11 +58,11 @@ namespace NLog.Extensions.Logging
             _logger.Log(typeof(Microsoft.Extensions.Logging.ILogger), eventInfo);
         }
 
-
         private LogEventInfo CreateLogEventInfo(LogLevel nLogLogLevel, string message, NLogMessageParameterList messageParameters)
         {
             if (messageParameters?.HasMessageTemplateCapture == false)
             {
+                // Parsing not needed, we take the fast route 
                 var originalMessage = messageParameters.OriginalMessage as string;
                 var eventInfo = new LogEventInfo(nLogLogLevel, _logger.Name, originalMessage ?? message, messageParameters);
                 if (originalMessage != null)
@@ -78,32 +71,49 @@ namespace NLog.Extensions.Logging
                 }
                 return eventInfo;
             }
-
-            return LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
+            else
+            {
+                // Parsing failed or no messageParameters
+                var eventInfo = LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
+                if (messageParameters?.Count > 0)
+                {
+                    for (int i = 0; i < messageParameters.Count; ++i)
+                    {
+                        var property = messageParameters[i];
+                        eventInfo.Properties[property.Name] = property.Value;
+                    }
+                }
+                return eventInfo;
+            }
         }
 
-        private static readonly object[] _singleItemArray = { null };
-
         /// <summary>
-        /// Attempt to parse the OriginalMessage using the NLog MessageTemplate-parser
-        /// and activate the NLog MessageTemplate-formatter
+        /// Checks if the already parsed input message-parameters must be sent through
+        /// the NLog MessageTemplate Parser for proper handling of message-template syntax.
         /// </summary>
         /// <remarks>
-        /// Calling this method will hurt performance: 1 x Microsoft Parser - 2 x NLog Parser - 1 x NLog Formatter
+        /// Using the NLog MesageTemplate Parser will hurt performance: 1 x Microsoft Parser - 2 x NLog Parser - 1 x NLog Formatter
         /// </remarks>
         private LogEventInfo TryParseLogEventInfo(LogLevel nLogLogLevel, NLogMessageParameterList messageParameters)
         {
-            var eventInfo = new LogEventInfo(nLogLogLevel, _logger.Name, null, messageParameters.OriginalMessage as string, _singleItemArray);
-            var messagetTemplateParameters = eventInfo.MessageTemplateParameters;   // Forces parsing of OriginalMessage
-            if (messagetTemplateParameters.Count > 0)
+            if (messageParameters?.OriginalMessage != null && (messageParameters.HasMessageTemplateCapture || (_options.ParseMessageTemplates && messageParameters.Count > 0)))
             {
-                // We have parsed the message and found parameters, now we need to do the parameter mapping
-                eventInfo.Parameters = CreateLogEventInfoParameters(messageParameters, messagetTemplateParameters);
-                return eventInfo;
+                // NLog MessageTemplate Parser must be used
+                var eventInfo = new LogEventInfo(nLogLogLevel, _logger.Name, null, messageParameters.OriginalMessage as string, _singleItemArray);
+                var messagetTemplateParameters = eventInfo.MessageTemplateParameters;   // Forces parsing of OriginalMessage
+                if (messagetTemplateParameters.Count > 0)
+                {
+                    // We have parsed the message and found parameters, now we need to do the parameter mapping
+                    eventInfo.Parameters = CreateLogEventInfoParameters(messageParameters, messagetTemplateParameters);
+                    return eventInfo;
+                }
+
+                return null;    // Parsing not possible
             }
 
-            return null;    // Not able to parse the message, so better fallback
+            return null;    // Parsing not needed
         }
+        private static readonly object[] _singleItemArray = { null };
 
         /// <summary>
         /// Allocates object[]-array for <see cref="LogEventInfo.Parameters"/> after checking
@@ -112,7 +122,7 @@ namespace NLog.Extensions.Logging
         /// <remarks>
         /// Cannot trust the parameters received from Microsoft Extension Logging, as extra parameters can be injected
         /// </remarks>
-        private object[] CreateLogEventInfoParameters(NLogMessageParameterList messageParameters, NLog.MessageTemplates.MessageTemplateParameters messagetTemplateParameters)
+        private static object[] CreateLogEventInfoParameters(NLogMessageParameterList messageParameters, NLog.MessageTemplates.MessageTemplateParameters messagetTemplateParameters)
         {
             if (!AllParameterCorrectlyPositionalMapped(messageParameters, messagetTemplateParameters))
             {
