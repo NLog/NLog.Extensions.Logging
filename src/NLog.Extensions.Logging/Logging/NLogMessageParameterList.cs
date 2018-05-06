@@ -13,10 +13,10 @@ namespace NLog.Extensions.Logging
         private readonly IReadOnlyList<KeyValuePair<string, object>> _parameterList;
 
         public object OriginalMessage => _originalMessageIndex.HasValue ? _parameterList[_originalMessageIndex.Value].Value : null;
-        public int? _originalMessageIndex;
+        private int? _originalMessageIndex;
 
         public bool HasMessageTemplateCapture => _hasMessageTemplateCapture;
-        public bool _hasMessageTemplateCapture;
+        private bool _hasMessageTemplateCapture;
 
         public NLogMessageParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList)
         {
