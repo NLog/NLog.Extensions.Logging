@@ -16,6 +16,7 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
     </Description>
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logfiles;netcore;nlog</PackageTags>
     <PackageReleaseNotes>
+        1.0.2: Update NLog dependency, exclude NLog 5 pre-releases (@aweebs, @304NotModified)
     </PackageReleaseNotes>
     <PackageIconUrl>http://nlog-project.org/NConfig.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/NLog/NLog.Extensions.Logging</PackageProjectUrl>

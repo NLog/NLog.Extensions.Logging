@@ -1,5 +1,11 @@
 ## Change Log
 
+Date format: (year/month/day)
+
+### v1.0.2 (2018/05/10)
+- [#220](https://github.com/nlog/NLog.Extensions.Logging/pull/220) Exclude NLog 5 pre-releases as dependency  (@aweebs, @304NotModified)
+- [#217](https://github.com/nlog/NLog.Extensions.Logging/pull/217) Update NLog dependency,  (@304NotModified)
+
 ### v1.0.1 (2018/04/07)
 - [#210](https://github.com/nlog/NLog.Extensions.Logging/pull/210) Automatic loading of hidden assemblies for callsite logic in NetCore2 (@snakefoot)
 - [#206](https://github.com/nlog/NLog.Extensions.Logging/pull/206) Add Alias attribute to NLogLoggerProvider (@leewadhams)
