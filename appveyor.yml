@@ -13,8 +13,7 @@ install:
 
 build_script:
   - ps: .\build.ps1
-  - ps: .\run-sonar.ps1
-
+  
 artifacts:
   - path: 'artifacts\*.nupkg'
 
@@ -24,6 +23,7 @@ test_script:
   - OpenCover\tools\OpenCover.Console.exe -register:user -mergeoutput -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test -f netcoreapp2.0" -filter:"+[NLog.Extensions.Logging]* -[NLog.Extensions.Logging.Tests]*" -output:"coverage.xml" -oldstyle -targetdir:"test"
   - pip install codecov
   - codecov -f "coverage.xml"
+  - ps: .\run-sonar.ps1
   - ps: .\run-tests.ps1
 
 deploy:
