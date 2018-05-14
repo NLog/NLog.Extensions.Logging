@@ -77,20 +77,10 @@ namespace NLog.Extensions.Logging
                 }
                 else 
                 {
-                    if (!char.IsDigit(firstChar))
-                    {
-                        if (!firstParameterIsPositional.HasValue)
-                            firstParameterIsPositional = true;
-                        else if (firstParameterIsPositional == false)
-                            isMixedPositional = true;
-                    }
-                    else
-                    {
-                        if (!firstParameterIsPositional.HasValue)
-                            firstParameterIsPositional = false;
-                        else if (firstParameterIsPositional == true)
-                            isMixedPositional = true;
-                    }
+                    if (!firstParameterIsPositional.HasValue)
+                        firstParameterIsPositional = char.IsDigit(firstChar);
+                    else if (char.IsDigit(firstChar) != firstParameterIsPositional)
+                        isMixedPositional = true;
                 }
             }
 
