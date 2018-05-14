@@ -58,13 +58,14 @@ namespace NLog.Extensions.Logging
             _logger.Log(typeof(Microsoft.Extensions.Logging.ILogger), eventInfo);
         }
 
+
         private LogEventInfo CreateLogEventInfo(LogLevel nLogLogLevel, string message, NLogMessageParameterList messageParameters)
         {
             if (messageParameters?.HasComplexParameters == false)
             {
                 // Parsing not needed, we take the fast route 
                 var originalMessage = messageParameters.OriginalMessage as string;
-                var eventInfo = new LogEventInfo(nLogLogLevel, _logger.Name, originalMessage ?? message, messageParameters);
+                var eventInfo = new LogEventInfo(nLogLogLevel, _logger.Name, originalMessage ?? message, messageParameters.IsPositional ? _emptyParameterArray : messageParameters);
                 if (originalMessage != null)
                 {
                     SetLogEventMessageFormatter(eventInfo, messageParameters, message);
@@ -153,6 +154,7 @@ namespace NLog.Extensions.Logging
         }
 
         private static readonly object[] _singleItemArray = { null };
+        private static readonly IList<MessageTemplateParameter> _emptyParameterArray = new MessageTemplateParameter[] { };
 
         /// <summary>
         /// Are all parameters positional and correctly mapped?

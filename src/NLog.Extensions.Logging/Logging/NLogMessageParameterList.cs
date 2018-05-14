@@ -19,9 +19,12 @@ namespace NLog.Extensions.Logging
         private bool _hasMessageTemplateCapture;
         private bool _isMixedPositional;
 
+        public bool IsPositional => _isPositional;
+        private bool _isPositional;
+
         public NLogMessageParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList)
         {
-            if (IsValidParameterList(parameterList, out _originalMessageIndex, out _hasMessageTemplateCapture, out _isMixedPositional))
+            if (IsValidParameterList(parameterList, out _originalMessageIndex, out _hasMessageTemplateCapture, out _isMixedPositional, out _isPositional))
             {
                 _parameterList = parameterList;
             }
@@ -45,10 +48,11 @@ namespace NLog.Extensions.Logging
         /// <summary>
         /// Verify that the input parameterList contains non-empty key-values and the orignal-format-property at the end
         /// </summary>
-        private static bool IsValidParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList, out int? originalMessageIndex, out bool hasMessageTemplateCapture, out bool isMixedPositional)
+        private static bool IsValidParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList, out int? originalMessageIndex, out bool hasMessageTemplateCapture, out bool isMixedPositional, out bool isPositional)
         {
             hasMessageTemplateCapture = false;
             isMixedPositional = false;
+            isPositional = false;
             originalMessageIndex = null;
             bool? firstParameterIsPositional = null;
             for (int i = 0; i < parameterList.Count; ++i)
@@ -83,6 +87,9 @@ namespace NLog.Extensions.Logging
                         isMixedPositional = true;
                 }
             }
+
+            if (firstParameterIsPositional == true && !isMixedPositional)
+                isPositional = true;
 
             return true;
         }
