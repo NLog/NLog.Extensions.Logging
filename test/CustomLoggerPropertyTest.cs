@@ -22,6 +22,19 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Equal(@"Hello ""World""|userid=World, ActivityId=42", target.Logs[0]);
         }
 
+        [Fact]
+        public void TestExtraPropertySayHigh5()
+        {
+            ConfigureServiceProvider<CustomLoggerPropertyTestRunner>((s) => s.AddSingleton(typeof(ILogger<>), typeof(SameAssemblyLogger<>)));
+            var runner = GetRunner<CustomLoggerPropertyTestRunner>();
+
+            var target = new NLog.Targets.MemoryTarget() { Layout = "${message}|${all-event-properties}" };
+            NLog.Config.SimpleConfigurator.ConfigureForTargetLogging(target);
+            runner.SayHigh5();
+            Assert.Single(target.Logs);
+            Assert.Equal(@"Hi 5|ActivityId=42", target.Logs[0]);
+        }
+
         public class SameAssemblyLogger<T> : ILogger<T>
         {
             private readonly Microsoft.Extensions.Logging.ILogger _logger;
@@ -60,6 +73,11 @@ namespace NLog.Extensions.Logging.Tests
             public void SayHello()
             {
                 _logger.LogInformation("Hello {$userid}", "World");
+            }
+
+            public void SayHigh5()
+            {
+                _logger.LogInformation("Hi {0}", 5);
             }
         }
 

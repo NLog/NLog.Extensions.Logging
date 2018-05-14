@@ -60,7 +60,7 @@ namespace NLog.Extensions.Logging
 
         private LogEventInfo CreateLogEventInfo(LogLevel nLogLogLevel, string message, NLogMessageParameterList messageParameters)
         {
-            if (messageParameters?.HasMessageTemplateCapture == false)
+            if (messageParameters?.HasComplexParameters == false)
             {
                 // Parsing not needed, we take the fast route 
                 var originalMessage = messageParameters.OriginalMessage as string;
@@ -96,7 +96,7 @@ namespace NLog.Extensions.Logging
         /// </remarks>
         private LogEventInfo TryParseLogEventInfo(LogLevel nLogLogLevel, NLogMessageParameterList messageParameters)
         {
-            if (messageParameters?.OriginalMessage != null && (messageParameters.HasMessageTemplateCapture || (_options.ParseMessageTemplates && messageParameters.Count > 0)))
+            if (messageParameters?.OriginalMessage != null && (messageParameters.HasComplexParameters || (_options.ParseMessageTemplates && messageParameters.Count > 0)))
             {
                 // NLog MessageTemplate Parser must be used
                 var eventInfo = new LogEventInfo(nLogLogLevel, _logger.Name, null, messageParameters.OriginalMessage as string, _singleItemArray);

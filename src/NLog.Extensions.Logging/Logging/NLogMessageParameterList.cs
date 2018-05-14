@@ -15,12 +15,13 @@ namespace NLog.Extensions.Logging
         public object OriginalMessage => _originalMessageIndex.HasValue ? _parameterList[_originalMessageIndex.Value].Value : null;
         private int? _originalMessageIndex;
 
-        public bool HasMessageTemplateCapture => _hasMessageTemplateCapture;
+        public bool HasComplexParameters => _hasMessageTemplateCapture || _isMixedPositional;
         private bool _hasMessageTemplateCapture;
+        private bool _isMixedPositional;
 
         public NLogMessageParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList)
         {
-            if (IsValidParameterList(parameterList, out _originalMessageIndex, out _hasMessageTemplateCapture))
+            if (IsValidParameterList(parameterList, out _originalMessageIndex, out _hasMessageTemplateCapture, out _isMixedPositional))
             {
                 _parameterList = parameterList;
             }
@@ -44,10 +45,12 @@ namespace NLog.Extensions.Logging
         /// <summary>
         /// Verify that the input parameterList contains non-empty key-values and the orignal-format-property at the end
         /// </summary>
-        private static bool IsValidParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList, out int? originalMessageIndex, out bool hasMessageTemplateCapture)
+        private static bool IsValidParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList, out int? originalMessageIndex, out bool hasMessageTemplateCapture, out bool isMixedPositional)
         {
             hasMessageTemplateCapture = false;
+            isMixedPositional = false;
             originalMessageIndex = null;
+            bool? firstParameterIsPositional = null;
             for (int i = 0; i < parameterList.Count; ++i)
             {
                 var paramPair = parameterList[i];
@@ -57,7 +60,8 @@ namespace NLog.Extensions.Logging
                     return false;
                 }
 
-                if (GetCaptureType(paramPair.Key[0]) != CaptureType.Normal)
+                char firstChar = paramPair.Key[0];
+                if (GetCaptureType(firstChar) != CaptureType.Normal)
                 {
                     hasMessageTemplateCapture = true;
                 }
@@ -70,6 +74,23 @@ namespace NLog.Extensions.Logging
                     }
 
                     originalMessageIndex = i;
+                }
+                else 
+                {
+                    if (!char.IsDigit(firstChar))
+                    {
+                        if (!firstParameterIsPositional.HasValue)
+                            firstParameterIsPositional = true;
+                        else if (firstParameterIsPositional == false)
+                            isMixedPositional = true;
+                    }
+                    else
+                    {
+                        if (!firstParameterIsPositional.HasValue)
+                            firstParameterIsPositional = false;
+                        else if (firstParameterIsPositional == true)
+                            isMixedPositional = true;
+                    }
                 }
             }
 
