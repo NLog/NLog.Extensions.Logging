@@ -1,22 +1,30 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using NLog.MessageTemplates;
 
 namespace NLog.Extensions.Logging
 {
     /// <summary>
     /// Converts Microsoft Extension Logging ParameterList into NLog MessageTemplate ParameterList
     /// </summary>
-    internal class NLogMessageParameterList : IList<NLog.MessageTemplates.MessageTemplateParameter>
+    internal class NLogMessageParameterList : IList<MessageTemplateParameter>
     {
         private readonly IReadOnlyList<KeyValuePair<string, object>> _parameterList;
 
         public object OriginalMessage => _originalMessageIndex.HasValue ? _parameterList[_originalMessageIndex.Value].Value : null;
-        public int? _originalMessageIndex;
+        private int? _originalMessageIndex;
+
+        public bool HasComplexParameters => _hasMessageTemplateCapture || _isMixedPositional;
+        private bool _hasMessageTemplateCapture;
+        private bool _isMixedPositional;
+
+        public bool IsPositional => _isPositional;
+        private bool _isPositional;
 
         public NLogMessageParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList)
         {
-            if (IsValidParameterList(parameterList, out _originalMessageIndex))
+            if (IsValidParameterList(parameterList, out _originalMessageIndex, out _hasMessageTemplateCapture, out _isMixedPositional, out _isPositional))
             {
                 _parameterList = parameterList;
             }
@@ -27,11 +35,26 @@ namespace NLog.Extensions.Logging
         }
 
         /// <summary>
+        /// Create a <see cref="NLogMessageParameterList"/> if <paramref name="parameterList"/> has values, otherwise <c>null</c>
+        /// </summary>
+        /// <remarks>
+        /// The LogMessageParameterList-constructor initiates all the parsing/scanning
+        /// </remarks>
+        public static NLogMessageParameterList TryParse(IReadOnlyList<KeyValuePair<string, object>> parameterList)
+        {
+            return parameterList?.Count > 0 ? new NLogMessageParameterList(parameterList) : null;
+        }
+
+        /// <summary>
         /// Verify that the input parameterList contains non-empty key-values and the orignal-format-property at the end
         /// </summary>
-        private bool IsValidParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList, out int? originalMessageIndex)
+        private static bool IsValidParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList, out int? originalMessageIndex, out bool hasMessageTemplateCapture, out bool isMixedPositional, out bool isPositional)
         {
+            hasMessageTemplateCapture = false;
+            isMixedPositional = false;
+            isPositional = false;
             originalMessageIndex = null;
+            bool? firstParameterIsPositional = null;
             for (int i = 0; i < parameterList.Count; ++i)
             {
                 var paramPair = parameterList[i];
@@ -41,7 +64,12 @@ namespace NLog.Extensions.Logging
                     return false;
                 }
 
-                if (paramPair.Key == NLogLogger.OriginalFormatPropertyName)
+                char firstChar = paramPair.Key[0];
+                if (GetCaptureType(firstChar) != CaptureType.Normal)
+                {
+                    hasMessageTemplateCapture = true;
+                }
+                else if (paramPair.Key == NLogLogger.OriginalFormatPropertyName)
                 {
                     if (originalMessageIndex.HasValue)
                     {
@@ -51,7 +79,17 @@ namespace NLog.Extensions.Logging
 
                     originalMessageIndex = i;
                 }
+                else 
+                {
+                    if (!firstParameterIsPositional.HasValue)
+                        firstParameterIsPositional = char.IsDigit(firstChar);
+                    else if (char.IsDigit(firstChar) != firstParameterIsPositional)
+                        isMixedPositional = true;
+                }
             }
+
+            if (firstParameterIsPositional == true && !isMixedPositional)
+                isPositional = true;
 
             return true;
         }
@@ -59,7 +97,7 @@ namespace NLog.Extensions.Logging
         /// <summary>
         /// Extract all valid properties from the input parameterList, and return them in a newly allocated list
         /// </summary>
-        private IReadOnlyList<KeyValuePair<string, object>> CreateValidParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList)
+        private static IReadOnlyList<KeyValuePair<string, object>> CreateValidParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList)
         {
             var validParameterList = new List<KeyValuePair<string, object>>(parameterList.Count);
             for (int i = 0; i < parameterList.Count; ++i)
@@ -69,14 +107,16 @@ namespace NLog.Extensions.Logging
                     continue;
 
                 if (paramPair.Key == NLogLogger.OriginalFormatPropertyName)
+                {
                     continue;
+                }
 
                 validParameterList.Add(parameterList[i]);
             }
             return validParameterList;
         }
 
-        public NLog.MessageTemplates.MessageTemplateParameter this[int index]
+        public MessageTemplateParameter this[int index]
         {
             get
             {
@@ -85,45 +125,30 @@ namespace NLog.Extensions.Logging
 
                 var parameter = _parameterList[index];
                 var parameterName = parameter.Key;
-                var capture = GetCaptureType(parameterName);
-                if (capture != MessageTemplates.CaptureType.Normal)
-                    parameterName = RemoveMarkerFromName(parameterName);
-                return new NLog.MessageTemplates.MessageTemplateParameter(parameterName, parameter.Value, null, capture);
+                var capture = GetCaptureType(parameterName[0]);
+                if (capture != CaptureType.Normal)
+                    parameterName = parameterName.Substring(1);
+                return new MessageTemplateParameter(parameterName, parameter.Value, null, capture);
             }
             set => throw new NotSupportedException();
         }
 
-        private static string RemoveMarkerFromName(string parameterName)
+        private static CaptureType GetCaptureType(char firstChar)
         {
-            var firstChar = parameterName[0];
-            if (firstChar == '@' || firstChar == '$')
-            {
-                parameterName = parameterName.Substring(1);
-            }
-            return parameterName;
+            if (firstChar == '@')
+                return CaptureType.Serialize;
+            else if (firstChar == '$')
+                return CaptureType.Stringify;
+            else
+                return CaptureType.Normal;
         }
 
-        private static NLog.MessageTemplates.CaptureType GetCaptureType(string parameterName)
-        {
-            var captureType = NLog.MessageTemplates.CaptureType.Normal;
-
-            switch (parameterName[0])
-            {
-                case '@':
-                    captureType = NLog.MessageTemplates.CaptureType.Serialize;
-                    break;
-                case '$':
-                    captureType = NLog.MessageTemplates.CaptureType.Stringify;
-                    break;
-            }
-            return captureType;
-        }
 
         public int Count => _parameterList.Count - (_originalMessageIndex.HasValue ? 1 : 0);
 
         public bool IsReadOnly => true;
 
-        public void Add(NLog.MessageTemplates.MessageTemplateParameter item)
+        public void Add(MessageTemplateParameter item)
         {
             throw new NotSupportedException();
         }
@@ -133,34 +158,34 @@ namespace NLog.Extensions.Logging
             throw new NotSupportedException();
         }
 
-        public bool Contains(NLog.MessageTemplates.MessageTemplateParameter item)
+        public bool Contains(MessageTemplateParameter item)
         {
             throw new NotSupportedException();
         }
 
-        public void CopyTo(NLog.MessageTemplates.MessageTemplateParameter[] array, int arrayIndex)
+        public void CopyTo(MessageTemplateParameter[] array, int arrayIndex)
         {
             for (int i = 0; i < Count; ++i)
                 array[i + arrayIndex] = this[i];
         }
 
-        public IEnumerator<NLog.MessageTemplates.MessageTemplateParameter> GetEnumerator()
+        public IEnumerator<MessageTemplateParameter> GetEnumerator()
         {
             for (int i = 0; i < Count; ++i)
                 yield return this[i];
         }
 
-        public int IndexOf(NLog.MessageTemplates.MessageTemplateParameter item)
+        public int IndexOf(MessageTemplateParameter item)
         {
             throw new NotSupportedException();
         }
 
-        public void Insert(int index, NLog.MessageTemplates.MessageTemplateParameter item)
+        public void Insert(int index, MessageTemplateParameter item)
         {
             throw new NotSupportedException();
         }
 
-        public bool Remove(NLog.MessageTemplates.MessageTemplateParameter item)
+        public bool Remove(MessageTemplateParameter item)
         {
             throw new NotSupportedException();
         }

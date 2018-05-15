@@ -33,10 +33,10 @@ namespace NLog.Extensions.Logging.Tests
             public void Log<TState>(Microsoft.Extensions.Logging.LogLevel logLevel, EventId eventId, TState state, Exception exception,
                 Func<TState, Exception, string> formatter)
             {
-                string Formatter(TState innserState, Exception innerException)
+                string Formatter(TState innerState, Exception innerException)
                 {
                     // additional logic for all providers goes here
-                    var message = formatter(innserState, innerException) ?? string.Empty;
+                    var message = formatter(innerState, innerException) ?? string.Empty;
                     return message + " additional stuff in here";
                 }
 

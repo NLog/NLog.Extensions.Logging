@@ -30,6 +30,11 @@ namespace NLog.Extensions.Logging
         /// </summary>
         public bool CaptureMessageProperties { get; set; }
 
+        /// <summary>
+        /// Use the NLog engine for parsing the message template (again) and format using the NLog formatter
+        /// </summary>
+        public bool ParseMessageTemplates { get; set; }
+
         /// <summary>Initializes a new instance of the <see cref="T:System.Object" /> class.</summary>
         public NLogProviderOptions()
         {
@@ -37,6 +42,7 @@ namespace NLog.Extensions.Logging
             IgnoreEmptyEventId = true;
             CaptureMessageTemplates = true;
             CaptureMessageProperties = true;
+            ParseMessageTemplates = false;
         }
 
         /// <summary>
