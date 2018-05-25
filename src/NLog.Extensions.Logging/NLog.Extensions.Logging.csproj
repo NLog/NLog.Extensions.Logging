@@ -16,7 +16,8 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
     </Description>
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logfiles;netcore;nlog</PackageTags>
     <PackageReleaseNotes>
-        1.0.2: Update NLog dependency, exclude NLog 5 pre-releases (@aweebs, @304NotModified)
+
+        1.1: Added support for using NLog MessageTemplate Parser (NLogProviderOptions.ParseMessageTemplates)  (@snakefoot)
     </PackageReleaseNotes>
     <PackageIconUrl>http://nlog-project.org/NConfig.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/NLog/NLog.Extensions.Logging</PackageProjectUrl>
@@ -52,7 +53,7 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
     <Title>NLog.Extensions.Logging for NetStandard 2.0</Title>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NLog" Version="[4.5.4,5.0.0-beta01)" />
+    <PackageReference Include="NLog" Version="[4.5.5,5.0.0-beta01)" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.0.2" />
