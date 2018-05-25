@@ -2,6 +2,10 @@
 
 Date format: (year/month/day)
 
+### v1.1 (2018/05/25)
+- [#213](https://github.com/NLog/NLog.Extensions.Logging/pull/213) Added support for using NLog MessageTemplate Parser (NLogProviderOptions.ParseMessageTemplates)  (@snakefoot)
+
+
 ### v1.0.2 (2018/05/10)
 - [#220](https://github.com/nlog/NLog.Extensions.Logging/pull/220) Exclude NLog 5 pre-releases as dependency  (@aweebs, @304NotModified)
 - [#217](https://github.com/nlog/NLog.Extensions.Logging/pull/217) Update NLog dependency,  (@304NotModified)
