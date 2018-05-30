@@ -89,12 +89,30 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Fact]
-        public void TestScopeProperties()
+        public void TestScopeProperty()
         {
-            GetRunner().LogWithScopeParameters();
+            GetRunner().LogWithScopeParameter();
 
             var target = GetTarget();
-            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters |Hello", target.Logs.FirstOrDefault());
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters |Hello", target.Logs.LastOrDefault());
+        }
+
+        [Fact]
+        public void TestScopePropertyList()
+        {
+            GetRunner().LogWithScopeParameterList();
+
+            var target = GetTarget();
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters |Hello", target.Logs.LastOrDefault());
+        }
+
+        [Fact]
+        public void TestScopePropertyDictionary()
+        {
+            GetRunner().LogWithScopeParameterDictionary();
+
+            var target = GetTarget();
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters |Hello", target.Logs.LastOrDefault());
         }
 
         [Theory]
@@ -107,7 +125,7 @@ namespace NLog.Extensions.Logging.Tests
         public void TestExceptionWithMessage(Microsoft.Extensions.Logging.LogLevel logLevel, string expectedLogMessage)
         {
             GetRunner().Log(logLevel, 20, new Exception(), "message");
-            
+
             var target = GetTarget();
             Assert.Equal(expectedLogMessage, target.Logs.FirstOrDefault());
         }
@@ -122,11 +140,11 @@ namespace NLog.Extensions.Logging.Tests
         public void TestExceptionWithEmptyMessage(Microsoft.Extensions.Logging.LogLevel logLevel, string expectedLogMessage)
         {
             GetRunner().Log(logLevel, 20, new Exception(), string.Empty);
-            
+
             var target = GetTarget();
             Assert.Equal(expectedLogMessage, target.Logs.FirstOrDefault());
         }
-        
+
         [Theory]
         [InlineData(Microsoft.Extensions.Logging.LogLevel.Critical, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|FATAL|[null] Exception of type 'System.Exception' was thrown.|20")]
         [InlineData(Microsoft.Extensions.Logging.LogLevel.Debug, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|[null] Exception of type 'System.Exception' was thrown.|20")]
@@ -137,11 +155,11 @@ namespace NLog.Extensions.Logging.Tests
         public void TestExceptionWithNullMessage(Microsoft.Extensions.Logging.LogLevel logLevel, string expectedLogMessage)
         {
             GetRunner().Log(logLevel, 20, new Exception(), null);
-            
+
             var target = GetTarget();
             Assert.Equal(expectedLogMessage, target.Logs.FirstOrDefault());
         }
-        
+
         [Theory]
         [InlineData(Microsoft.Extensions.Logging.LogLevel.Critical, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|FATAL|message |20")]
         [InlineData(Microsoft.Extensions.Logging.LogLevel.Debug, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message |20")]
@@ -152,11 +170,11 @@ namespace NLog.Extensions.Logging.Tests
         public void TestMessageWithNullException(Microsoft.Extensions.Logging.LogLevel logLevel, string expectedLogMessage)
         {
             GetRunner<Runner>().Log(logLevel, 20, null, "message");
-            
+
             var target = GetTarget();
-            Assert.Equal(expectedLogMessage, target.Logs.FirstOrDefault()); 
+            Assert.Equal(expectedLogMessage, target.Logs.FirstOrDefault());
         }
-        
+
         [Theory]
         [InlineData(Microsoft.Extensions.Logging.LogLevel.Critical, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|FATAL|[null] |20")]
         [InlineData(Microsoft.Extensions.Logging.LogLevel.Debug, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|[null] |20")]
@@ -167,11 +185,11 @@ namespace NLog.Extensions.Logging.Tests
         public void TestWithNullMessageAndNullException(Microsoft.Extensions.Logging.LogLevel logLevel, string expectedLogMessage)
         {
             GetRunner().Log(logLevel, 20, null, null);
-            
+
             var target = GetTarget();
-            Assert.Equal(expectedLogMessage, target.Logs.FirstOrDefault()); 
+            Assert.Equal(expectedLogMessage, target.Logs.FirstOrDefault());
         }
-        
+
         [Theory]
         [InlineData(Microsoft.Extensions.Logging.LogLevel.Critical, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|FATAL| |20")]
         [InlineData(Microsoft.Extensions.Logging.LogLevel.Debug, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG| |20")]
@@ -182,11 +200,11 @@ namespace NLog.Extensions.Logging.Tests
         public void TestWithEmptyMessageAndNullException(Microsoft.Extensions.Logging.LogLevel logLevel, string expectedLogMessage)
         {
             GetRunner().Log(logLevel, 20, null, string.Empty);
-            
+
             var target = GetTarget();
-            Assert.Equal(expectedLogMessage, target.Logs.FirstOrDefault()); 
+            Assert.Equal(expectedLogMessage, target.Logs.FirstOrDefault());
         }
-        
+
         private static MemoryTarget GetTarget()
         {
             var target = LogManager.Configuration.FindTargetByName<MemoryTarget>("target1");
@@ -212,7 +230,7 @@ namespace NLog.Extensions.Logging.Tests
             {
                 _logger.LogDebug(20, "message with id");
             }
-            
+
             public void Log(Microsoft.Extensions.Logging.LogLevel logLevel, int eventId, Exception exception, string message)
             {
                 switch (logLevel)
@@ -257,12 +275,12 @@ namespace NLog.Extensions.Logging.Tests
 
             public void LogDebugWithSimulatedStructuredParameters()
             {
-                _logger.Log(Microsoft.Extensions.Logging.LogLevel.Debug, default(EventId), new List<KeyValuePair<string, object>>(new [] { new KeyValuePair<string,object>("{OriginalFormat}", "message with id and {ParameterCount} property"), new KeyValuePair<string, object>("ParameterCount", 1) }), null, (s, ex) => "message with id and 1 property");
+                _logger.Log(Microsoft.Extensions.Logging.LogLevel.Debug, default(EventId), new List<KeyValuePair<string, object>>(new[] { new KeyValuePair<string, object>("{OriginalFormat}", "message with id and {ParameterCount} property"), new KeyValuePair<string, object>("ParameterCount", 1) }), null, (s, ex) => "message with id and 1 property");
             }
 
             public void LogDebugWithMessageProperties()
             {
-                _logger.Log(Microsoft.Extensions.Logging.LogLevel.Debug, default(EventId), new Dictionary<string, object> { { "ParameterCount", "1" } }, null, (s,ex) => "message with id and 1 property");
+                _logger.Log(Microsoft.Extensions.Logging.LogLevel.Debug, default(EventId), new Dictionary<string, object> { { "ParameterCount", "1" } }, null, (s, ex) => "message with id and 1 property");
             }
 
             public void LogDebugWithMessagePropertiesList()
@@ -278,9 +296,25 @@ namespace NLog.Extensions.Logging.Tests
                 }
             }
 
-            public void LogWithScopeParameters()
+            public void LogWithScopeParameter()
+            {
+                using (_logger.BeginScope(new KeyValuePair<string, string>("scope1", "Hello")))
+                {
+                    _logger.LogDebug("message with id and {0} parameters", 1);
+                }
+            }
+
+            public void LogWithScopeParameterList()
             {
                 using (_logger.BeginScope(new[] { new KeyValuePair<string, object>("scope1", "Hello") }))
+                {
+                    _logger.LogDebug("message with id and {0} parameters", 1);
+                }
+            }
+
+            public void LogWithScopeParameterDictionary()
+            {
+                using (_logger.BeginScope(new Dictionary<string, string>() { ["scope1"] = "Hello" }))
                 {
                     _logger.LogDebug("message with id and {0} parameters", 1);
                 }
