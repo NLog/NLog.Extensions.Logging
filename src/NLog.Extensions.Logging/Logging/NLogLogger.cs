@@ -50,7 +50,7 @@ namespace NLog.Extensions.Logging
 
             CaptureEventId(eventInfo, eventId);
 
-            if (messageParameters == null)
+            if (messageParameters == null && _options.CaptureMessageProperties)
             {
                 CaptureMessageProperties(eventInfo, state);
             }
@@ -300,8 +300,21 @@ namespace NLog.Extensions.Logging
 
         private void CaptureMessageProperties<TState>(LogEventInfo eventInfo, TState state)
         {
-            if (_options.CaptureMessageProperties && state is IEnumerable<KeyValuePair<string, object>> messageProperties)
+            // Microsoft.Extensions.Logging.LoggerExtensions and LoggerMessage.Define() uses a state object that implements IReadOnlyList<KeyValuePair<string, object>>
+            // Let's check for this and use a for loop to prevent allocation of an Enumerator.
+            if (state is IReadOnlyList<KeyValuePair<string, object>> messagePropertiesAsList)
             {
+                for (int i = 0; i < messagePropertiesAsList.Count; i++)
+                {
+                    if (String.IsNullOrEmpty(messagePropertiesAsList[i].Key))
+                        continue;
+
+                    eventInfo.Properties[messagePropertiesAsList[i].Key] = messagePropertiesAsList[i].Value;
+                }
+            }
+            else if (state is IEnumerable<KeyValuePair<string, object>> messageProperties)
+            {
+                // Fallback to using IEnumerable and an Enumerator in a foreach
                 foreach (var property in messageProperties)
                 {
                     if (String.IsNullOrEmpty(property.Key))
