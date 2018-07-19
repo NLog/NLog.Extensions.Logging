@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Reflection;
 using Microsoft.Extensions.Logging;
 using NLog.Common;
 using NLog.MessageTemplates;
@@ -11,6 +13,8 @@ namespace NLog.Extensions.Logging
     /// </summary>
     internal class NLogLogger : Microsoft.Extensions.Logging.ILogger
     {
+        private readonly ConcurrentDictionary<Type, KeyValuePair<Func<object, object>, Func<object, object>>> _scopeStateExtractors = new ConcurrentDictionary<Type, KeyValuePair<Func<object, object>, Func<object, object>>>();
+
         private readonly Logger _logger;
         private readonly NLogProviderOptions _options;
 
@@ -42,7 +46,7 @@ namespace NLog.Extensions.Logging
             LogEventInfo eventInfo =
                 TryParseLogEventInfo(nLogLogLevel, messageParameters) ??
                 CreateLogEventInfo(nLogLogLevel, formatter(state, exception), messageParameters);
-                
+
             if (exception != null)
             {
                 eventInfo.Exception = exception;
@@ -359,7 +363,7 @@ namespace NLog.Extensions.Logging
             }
         }
 
-        class ScopeProperties : IDisposable
+        private class ScopeProperties : IDisposable
         {
             List<IDisposable> _properties;
 
@@ -368,20 +372,91 @@ namespace NLog.Extensions.Logging
             /// </summary>
             List<IDisposable> Properties => _properties ?? (_properties = new List<IDisposable>());
 
-
-            public static IDisposable CreateFromState<TState>(TState state, IEnumerable<KeyValuePair<string, object>> messageProperties)
+            public static ScopeProperties CreateFromState(IList<KeyValuePair<string, object>> messageProperties)
             {
                 ScopeProperties scope = new ScopeProperties();
 
-                foreach (var property in messageProperties)
+                for (int i = 0; i < messageProperties.Count; ++i)
                 {
-                    if (String.IsNullOrEmpty(property.Key))
-                        continue;
-
+                    var property = messageProperties[i];
                     scope.AddProperty(property.Key, property.Value);
                 }
 
-                scope.AddDispose(NestedDiagnosticsLogicalContext.Push(state));
+                scope.AddDispose(NestedDiagnosticsLogicalContext.Push(messageProperties));
+                return scope;
+            }
+
+            public static bool TryCreateExtractor<T>(ConcurrentDictionary<Type, KeyValuePair<Func<object, object>, Func<object, object>>> stateExractor, T property, out KeyValuePair<Func<object, object>, Func<object, object>> keyValueExtractor)
+            {
+                Type propertyType = property.GetType();
+
+                if (!stateExractor.TryGetValue(propertyType, out keyValueExtractor))
+                {
+                    var itemType = propertyType.GetTypeInfo();
+                    if (!itemType.IsGenericType || itemType.GetGenericTypeDefinition() != typeof(KeyValuePair<,>))
+                        return false;
+
+                    var keyPropertyInfo = itemType.GetDeclaredProperty("Key");
+                    var valuePropertyInfo = itemType.GetDeclaredProperty("Value");
+                    if (valuePropertyInfo == null || keyPropertyInfo == null)
+                        return false;
+
+                    var keyValuePairObjParam = System.Linq.Expressions.Expression.Parameter(typeof(object), "pair");
+                    var keyValuePairTypeParam = System.Linq.Expressions.Expression.Convert(keyValuePairObjParam, propertyType);
+
+                    var propertyKeyAccess = System.Linq.Expressions.Expression.Property(keyValuePairTypeParam, keyPropertyInfo);
+                    var propertyKeyAccessObj = System.Linq.Expressions.Expression.Convert(propertyKeyAccess, typeof(object));
+                    var propertyKeyLambda = System.Linq.Expressions.Expression.Lambda<Func<object, object>>(propertyKeyAccessObj, keyValuePairObjParam).Compile();
+
+                    var propertyValueAccess = System.Linq.Expressions.Expression.Property(keyValuePairTypeParam, valuePropertyInfo);
+                    var propertyValueLambda = System.Linq.Expressions.Expression.Lambda<Func<object, object>>(propertyValueAccess, keyValuePairObjParam).Compile();
+
+                    keyValueExtractor = new KeyValuePair<Func<object, object>, Func<object, object>>(propertyKeyLambda, propertyValueLambda);
+
+                    stateExractor[propertyType] = keyValueExtractor;
+                }
+
+                return true;
+            }
+
+            public static IDisposable CreateFromStateExtractor<TState>(TState state, ConcurrentDictionary<Type, KeyValuePair<Func<object, object>, Func<object, object>>> stateExractor)
+            {
+                ScopeProperties scope = null;
+                var keyValueExtractor = default(KeyValuePair<Func<object, object>, Func<object, object>>);
+                if (state is System.Collections.IEnumerable messageProperties)
+                {
+                    foreach (var property in messageProperties)
+                    {
+                        if (property == null)
+                            return null;
+
+                        if (scope == null)
+                        {
+                            if (!TryCreateExtractor<object>(stateExractor, property, out keyValueExtractor))
+                                return null;
+
+                            scope = new ScopeProperties();
+                        }
+
+                        var propertyKey = keyValueExtractor.Key.Invoke(property);
+                        var propertyValue = keyValueExtractor.Value.Invoke(property);
+                        scope.AddProperty(propertyKey?.ToString() ?? string.Empty, propertyValue);
+                    }
+                }
+                else
+                {
+                    if (!TryCreateExtractor(stateExractor, state, out keyValueExtractor))
+                        return null;
+
+                    scope = new ScopeProperties();
+                    object property = state;    // Single boxing
+                    var propertyKey = keyValueExtractor.Key.Invoke(property);
+                    var propertyValue = keyValueExtractor.Value.Invoke(property);
+                    scope.AddProperty(propertyKey?.ToString() ?? string.Empty, propertyValue);
+                }
+
+                if (scope != null)
+                    scope.AddDispose(NestedDiagnosticsLogicalContext.Push(state));
                 return scope;
             }
 
@@ -445,9 +520,18 @@ namespace NLog.Extensions.Logging
                 throw new ArgumentNullException(nameof(state));
             }
 
-            if (_options.CaptureMessageProperties && state is IEnumerable<KeyValuePair<string, object>> messageProperties)
+            if (_options.CaptureMessageProperties)
             {
-                return ScopeProperties.CreateFromState(state, messageProperties);
+                if (state is IList<KeyValuePair<string, object>> contextProperties)
+                {
+                    return ScopeProperties.CreateFromState(contextProperties);
+                }
+                else if (!(state is string))
+                {
+                    var scope = ScopeProperties.CreateFromStateExtractor(state, _scopeStateExtractors);
+                    if (scope != null)
+                        return scope;
+                }
             }
 
             return NestedDiagnosticsLogicalContext.Push(state);
