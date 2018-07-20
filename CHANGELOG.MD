@@ -2,6 +2,10 @@
 
 Date format: (year/month/day)
 
+### v1.2 (2018/07/20)
+- [#223](https://github.com/NLog/NLog.Extensions.Logging/pull/223) BeginScope accepts any type of KeyValuePair and Dictionary  (@snakefoot)
+
+
 ### v1.1 (2018/05/25)
 - [#213](https://github.com/NLog/NLog.Extensions.Logging/pull/213) Added support for using NLog MessageTemplate Parser (NLogProviderOptions.ParseMessageTemplates)  (@snakefoot)
 
