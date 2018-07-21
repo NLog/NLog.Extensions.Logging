@@ -392,31 +392,40 @@ namespace NLog.Extensions.Logging
 
                 if (!stateExractor.TryGetValue(propertyType, out keyValueExtractor))
                 {
-                    var itemType = propertyType.GetTypeInfo();
-                    if (!itemType.IsGenericType || itemType.GetGenericTypeDefinition() != typeof(KeyValuePair<,>))
-                        return false;
+                    try
+                    {
+                        var itemType = propertyType.GetTypeInfo();
+                        if (!itemType.IsGenericType || itemType.GetGenericTypeDefinition() != typeof(KeyValuePair<,>))
+                            return false;
 
-                    var keyPropertyInfo = itemType.GetDeclaredProperty("Key");
-                    var valuePropertyInfo = itemType.GetDeclaredProperty("Value");
-                    if (valuePropertyInfo == null || keyPropertyInfo == null)
-                        return false;
+                        var keyPropertyInfo = itemType.GetDeclaredProperty("Key");
+                        var valuePropertyInfo = itemType.GetDeclaredProperty("Value");
+                        if (valuePropertyInfo == null || keyPropertyInfo == null)
+                            return false;
 
-                    var keyValuePairObjParam = System.Linq.Expressions.Expression.Parameter(typeof(object), "pair");
-                    var keyValuePairTypeParam = System.Linq.Expressions.Expression.Convert(keyValuePairObjParam, propertyType);
+                        var keyValuePairObjParam = System.Linq.Expressions.Expression.Parameter(typeof(object), "pair");
+                        var keyValuePairTypeParam = System.Linq.Expressions.Expression.Convert(keyValuePairObjParam, propertyType);
 
-                    var propertyKeyAccess = System.Linq.Expressions.Expression.Property(keyValuePairTypeParam, keyPropertyInfo);
-                    var propertyKeyAccessObj = System.Linq.Expressions.Expression.Convert(propertyKeyAccess, typeof(object));
-                    var propertyKeyLambda = System.Linq.Expressions.Expression.Lambda<Func<object, object>>(propertyKeyAccessObj, keyValuePairObjParam).Compile();
+                        var propertyKeyAccess = System.Linq.Expressions.Expression.Property(keyValuePairTypeParam, keyPropertyInfo);
+                        var propertyKeyAccessObj = System.Linq.Expressions.Expression.Convert(propertyKeyAccess, typeof(object));
+                        var propertyKeyLambda = System.Linq.Expressions.Expression.Lambda<Func<object, object>>(propertyKeyAccessObj, keyValuePairObjParam).Compile();
 
-                    var propertyValueAccess = System.Linq.Expressions.Expression.Property(keyValuePairTypeParam, valuePropertyInfo);
-                    var propertyValueLambda = System.Linq.Expressions.Expression.Lambda<Func<object, object>>(propertyValueAccess, keyValuePairObjParam).Compile();
+                        var propertyValueAccess = System.Linq.Expressions.Expression.Property(keyValuePairTypeParam, valuePropertyInfo);
+                        var propertyValueLambda = System.Linq.Expressions.Expression.Lambda<Func<object, object>>(propertyValueAccess, keyValuePairObjParam).Compile();
 
-                    keyValueExtractor = new KeyValuePair<Func<object, object>, Func<object, object>>(propertyKeyLambda, propertyValueLambda);
-
-                    stateExractor[propertyType] = keyValueExtractor;
+                        keyValueExtractor = new KeyValuePair<Func<object, object>, Func<object, object>>(propertyKeyLambda, propertyValueLambda);
+                    }
+                    catch (Exception ex)
+                    {
+                        InternalLogger.Debug(ex, "Exception in creating scope property extractor");
+                    }
+                    finally
+                    {
+                        stateExractor[propertyType] = keyValueExtractor;
+                    }
                 }
 
-                return true;
+                return keyValueExtractor.Key != null;
             }
 
             public static IDisposable CreateFromStateExtractor<TState>(TState state, ConcurrentDictionary<Type, KeyValuePair<Func<object, object>, Func<object, object>>> stateExractor)
@@ -438,9 +447,7 @@ namespace NLog.Extensions.Logging
                             scope = new ScopeProperties();
                         }
 
-                        var propertyKey = keyValueExtractor.Key.Invoke(property);
-                        var propertyValue = keyValueExtractor.Value.Invoke(property);
-                        scope.AddProperty(propertyKey?.ToString() ?? string.Empty, propertyValue);
+                        AddKeyValueProperty(scope, keyValueExtractor, property);
                     }
                 }
                 else
@@ -449,15 +456,26 @@ namespace NLog.Extensions.Logging
                         return null;
 
                     scope = new ScopeProperties();
-                    object property = state;    // Single boxing
-                    var propertyKey = keyValueExtractor.Key.Invoke(property);
-                    var propertyValue = keyValueExtractor.Value.Invoke(property);
-                    scope.AddProperty(propertyKey?.ToString() ?? string.Empty, propertyValue);
+                    AddKeyValueProperty(scope, keyValueExtractor, state);
                 }
 
                 if (scope != null)
                     scope.AddDispose(NestedDiagnosticsLogicalContext.Push(state));
                 return scope;
+            }
+
+            private static void AddKeyValueProperty(ScopeProperties scope, KeyValuePair<Func<object, object>, Func<object, object>> keyValueExtractor, object property)
+            {
+                try
+                {
+                    var propertyKey = keyValueExtractor.Key.Invoke(property);
+                    var propertyValue = keyValueExtractor.Value.Invoke(property);
+                    scope.AddProperty(propertyKey?.ToString() ?? string.Empty, propertyValue);
+                }
+                catch (Exception ex)
+                {
+                    InternalLogger.Trace(ex, "Exception in adding scope property");
+                }
             }
 
             public void AddDispose(IDisposable disposable)
