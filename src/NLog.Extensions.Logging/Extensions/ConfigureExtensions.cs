@@ -1,8 +1,12 @@
+using Microsoft.Extensions.Logging;
+using NLog.Config;
 using System;
 using System.Reflection;
-using Microsoft.Extensions.Logging;
-using NLog.Common;
-using NLog.Config;
+
+#if !NETCORE1_0
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+#endif
 
 namespace NLog.Extensions.Logging
 {
@@ -60,6 +64,32 @@ namespace NLog.Extensions.Logging
                 factory.AddProvider(provider);
             }
             return factory;
+        }
+
+        /// <summary>
+        /// Enable and configure NLog as a logging provider for buildable generic host (.NET Core 2.1+). Can be used in discrete containers as well. 
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <returns>IHostBuilder for chaining</returns>
+        public static IHostBuilder UseNLog(this IHostBuilder builder)
+        {
+            if (builder == null) throw new ArgumentException($"{nameof(builder)} is null.");
+
+            builder.ConfigureServices(services =>
+            {
+                ConfigurationItemFactory.Default.RegisterItemsFromAssembly(
+                    typeof(ConfigureExtensions).GetTypeInfo().Assembly);
+
+                LogManager.AddHiddenAssembly(typeof(ConfigureExtensions).GetTypeInfo().Assembly);
+
+                services.AddSingleton(new LoggerFactory().AddNLog(new NLogProviderOptions
+                {
+                    CaptureMessageTemplates = true,
+                    CaptureMessageProperties = true
+                }));
+            });
+
+            return builder;
         }
 #endif
 

@@ -1,16 +1,17 @@
-﻿using System;
+﻿using NLog.Common;
+using System;
 using System.Reflection;
+
 #if !NETCORE1_0
 using Microsoft.Extensions.Logging;
 #endif
-using NLog.Common;
 
 namespace NLog.Extensions.Logging
 {
     /// <summary>
     /// Provider logger for NLog + Microsoft.Extensions.Logging
     /// </summary>
- #if !NETCORE1_0
+#if !NETCORE1_0
     [ProviderAlias("NLog")]
 #endif
     public class NLogLoggerProvider : Microsoft.Extensions.Logging.ILoggerProvider
@@ -108,5 +109,3 @@ namespace NLog.Extensions.Logging
 #endif
     }
 }
-
-
