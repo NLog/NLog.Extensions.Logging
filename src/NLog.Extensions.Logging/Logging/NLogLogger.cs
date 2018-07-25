@@ -372,7 +372,7 @@ namespace NLog.Extensions.Logging
             /// </summary>
             List<IDisposable> Properties => _properties ?? (_properties = new List<IDisposable>());
 
-            public static ScopeProperties CreateFromState(IList<KeyValuePair<string, object>> messageProperties)
+            public static ScopeProperties CreateFromState(IReadOnlyList<KeyValuePair<string, object>> messageProperties)
             {
                 ScopeProperties scope = new ScopeProperties();
 
@@ -382,8 +382,29 @@ namespace NLog.Extensions.Logging
                     scope.AddProperty(property.Key, property.Value);
                 }
 
-                scope.AddDispose(NestedDiagnosticsLogicalContext.Push(messageProperties));
+                scope.AddDispose(CreateDiagnosticLogicalContext(messageProperties));
                 return scope;
+            }
+
+            public static IDisposable CreateDiagnosticLogicalContext<T>(T state)
+            {
+                try
+                {
+#if NETSTANDARD
+                    return NestedDiagnosticsLogicalContext.Push(state); // AsyncLocal has no requirement to be Serializable
+#else
+                    // TODO Add support for Net46 in NLog (AsyncLocal), then we only have to do this check for legacy Net451 (CallContext)
+                    if (state?.GetType().IsSerializable ?? true)
+                        return NestedDiagnosticsLogicalContext.Push(state);
+                    else
+                        return NestedDiagnosticsLogicalContext.Push(state.ToString());  // Support ViewComponentLogScope, ActionLogScope and others
+#endif
+                }
+                catch (Exception ex)
+                {
+                    InternalLogger.Debug(ex, "Exception in BeginScope push NestedDiagnosticsLogicalContext");
+                    return null;
+                }
             }
 
             public static bool TryCreateExtractor<T>(ConcurrentDictionary<Type, KeyValuePair<Func<object, object>, Func<object, object>>> stateExractor, T property, out KeyValuePair<Func<object, object>, Func<object, object>> keyValueExtractor)
@@ -417,7 +438,7 @@ namespace NLog.Extensions.Logging
                     }
                     catch (Exception ex)
                     {
-                        InternalLogger.Debug(ex, "Exception in creating scope property extractor");
+                        InternalLogger.Debug(ex, "Exception in BeginScope create property extractor");
                     }
                     finally
                     {
@@ -460,7 +481,7 @@ namespace NLog.Extensions.Logging
                 }
 
                 if (scope != null)
-                    scope.AddDispose(NestedDiagnosticsLogicalContext.Push(state));
+                    scope.AddDispose(CreateDiagnosticLogicalContext(state));
                 return scope;
             }
 
@@ -474,13 +495,14 @@ namespace NLog.Extensions.Logging
                 }
                 catch (Exception ex)
                 {
-                    InternalLogger.Trace(ex, "Exception in adding scope property");
+                    InternalLogger.Debug(ex, "Exception in BeginScope add property");
                 }
             }
 
             public void AddDispose(IDisposable disposable)
             {
-                Properties.Add(disposable);
+                if (disposable != null)
+                    Properties.Add(disposable);
             }
 
             public void AddProperty(string key, object value)
@@ -502,7 +524,7 @@ namespace NLog.Extensions.Logging
                         }
                         catch (Exception ex)
                         {
-                            InternalLogger.Trace(ex, "Exception in Dispose property {0}", property);
+                            InternalLogger.Debug(ex, "Exception in BeginScope dispose property {0}", property);
                         }
                     }
                 }
@@ -540,19 +562,24 @@ namespace NLog.Extensions.Logging
 
             if (_options.CaptureMessageProperties)
             {
-                if (state is IList<KeyValuePair<string, object>> contextProperties)
+                if (state is IReadOnlyList<KeyValuePair<string, object>> contextProperties)
                 {
                     return ScopeProperties.CreateFromState(contextProperties);
                 }
-                else if (!(state is string))
+
+                if (!(state is string))
                 {
                     var scope = ScopeProperties.CreateFromStateExtractor(state, _scopeStateExtractors);
                     if (scope != null)
                         return scope;
                 }
+                else
+                {
+                    return NestedDiagnosticsLogicalContext.Push(state);
+                }
             }
 
-            return NestedDiagnosticsLogicalContext.Push(state);
+            return NestedDiagnosticsLogicalContext.Push(ScopeProperties.CreateDiagnosticLogicalContext(state));
         }
     }
 }
