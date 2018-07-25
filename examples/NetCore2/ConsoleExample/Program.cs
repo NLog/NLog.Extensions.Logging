@@ -12,13 +12,14 @@ namespace ConsoleExample
             var logger = NLog.LogManager.LoadConfiguration("nlog.config").GetCurrentClassLogger();
             try
             {
-                var servicesProvider = BuildDi();
-                var runner = servicesProvider.GetRequiredService<Runner>();
+                using (var servicesProvider = BuildDi())
+                {
+                    var runner = servicesProvider.GetRequiredService<Runner>();
+                    runner.DoAction("Action1");
 
-                runner.DoAction("Action1");
-
-                Console.WriteLine("Press ANY key to exit");
-                Console.ReadLine();
+                    Console.WriteLine("Press ANY key to exit");
+                    Console.ReadLine();
+                }
             }
             catch (Exception ex)
             {
@@ -34,7 +35,7 @@ namespace ConsoleExample
         }
 
 
-        private static IServiceProvider BuildDi()
+        private static ServiceProvider BuildDi()
         {
             var services = new ServiceCollection();
 
