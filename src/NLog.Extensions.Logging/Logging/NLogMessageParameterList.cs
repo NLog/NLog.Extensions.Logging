@@ -13,14 +13,14 @@ namespace NLog.Extensions.Logging
         private readonly IReadOnlyList<KeyValuePair<string, object>> _parameterList;
 
         public object OriginalMessage => _originalMessageIndex.HasValue ? _parameterList[_originalMessageIndex.Value].Value : null;
-        private int? _originalMessageIndex;
+        private readonly int? _originalMessageIndex;
 
         public bool HasComplexParameters => _hasMessageTemplateCapture || _isMixedPositional;
-        private bool _hasMessageTemplateCapture;
-        private bool _isMixedPositional;
+        private readonly bool _hasMessageTemplateCapture;
+        private readonly bool _isMixedPositional;
 
         public bool IsPositional => _isPositional;
-        private bool _isPositional;
+        private readonly bool _isPositional;
 
         public NLogMessageParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList)
         {

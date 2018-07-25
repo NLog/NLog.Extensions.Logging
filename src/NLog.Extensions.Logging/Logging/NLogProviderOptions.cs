@@ -48,6 +48,6 @@ namespace NLog.Extensions.Logging
         /// <summary>
         /// Default options
         /// </summary>
-        internal static NLogProviderOptions Default = new NLogProviderOptions();
+        internal static readonly NLogProviderOptions Default = new NLogProviderOptions();
     }
 }
