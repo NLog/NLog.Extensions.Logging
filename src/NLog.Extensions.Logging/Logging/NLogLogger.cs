@@ -32,19 +32,22 @@ namespace NLog.Extensions.Logging
         public void Log<TState>(Microsoft.Extensions.Logging.LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
             var nLogLogLevel = ConvertLogLevel(logLevel);
-            if (!IsEnabled(nLogLogLevel))
+            if (!_logger.IsEnabled(nLogLogLevel))
             {
                 return;
             }
+
             if (formatter == null)
             {
                 throw new ArgumentNullException(nameof(formatter));
             }
 
-            var messageParameters = NLogMessageParameterList.TryParse(_options.CaptureMessageTemplates ? state as IReadOnlyList<KeyValuePair<string, object>> : null);
+            var messageParameters = _options.CaptureMessageTemplates
+                ? NLogMessageParameterList.TryParse(state as IReadOnlyList<KeyValuePair<string, object>>)
+                : null;
 
             LogEventInfo eventInfo =
-                TryParseLogEventInfo(nLogLogLevel, messageParameters) ??
+                TryParseMessageTemplate(nLogLogLevel, messageParameters) ??
                 CreateLogEventInfo(nLogLogLevel, formatter(state, exception), messageParameters);
 
             if (exception != null)
@@ -52,12 +55,15 @@ namespace NLog.Extensions.Logging
                 eventInfo.Exception = exception;
             }
 
-            CaptureEventId(eventInfo, eventId);
-
-            if (messageParameters == null)
+            if (messageParameters == null && _options.CaptureMessageProperties)
             {
-                CaptureMessageProperties(eventInfo, state);
+                if (_options.CaptureMessageTemplates || !CaptureMessagePropertiesList(eventInfo, state))
+                {
+                    CaptureMessageProperties(eventInfo, state);
+                }
             }
+
+            CaptureEventId(eventInfo, eventId);
 
             _logger.Log(typeof(Microsoft.Extensions.Logging.ILogger), eventInfo);
         }
@@ -99,7 +105,7 @@ namespace NLog.Extensions.Logging
         /// <remarks>
         /// Using the NLog MesageTemplate Parser will hurt performance: 1 x Microsoft Parser - 2 x NLog Parser - 1 x NLog Formatter
         /// </remarks>
-        private LogEventInfo TryParseLogEventInfo(LogLevel nLogLogLevel, NLogMessageParameterList messageParameters)
+        private LogEventInfo TryParseMessageTemplate(LogLevel nLogLogLevel, NLogMessageParameterList messageParameters)
         {
             if (messageParameters?.OriginalMessage != null && (messageParameters.HasComplexParameters || (_options.ParseMessageTemplates && messageParameters.Count > 0)))
             {
@@ -304,7 +310,7 @@ namespace NLog.Extensions.Logging
 
         private void CaptureMessageProperties<TState>(LogEventInfo eventInfo, TState state)
         {
-            if (_options.CaptureMessageProperties && state is IEnumerable<KeyValuePair<string, object>> messageProperties)
+            if (state is IEnumerable<KeyValuePair<string, object>> messageProperties)
             {
                 foreach (var property in messageProperties)
                 {
@@ -314,6 +320,27 @@ namespace NLog.Extensions.Logging
                     eventInfo.Properties[property.Key] = property.Value;
                 }
             }
+        }
+
+        private bool CaptureMessagePropertiesList<TState>(LogEventInfo eventInfo, TState state)
+        {
+            if (state is IReadOnlyList<KeyValuePair<string, object>> messageProperties)
+            {
+                for (int i = 0; i < messageProperties.Count; ++i)
+                {
+                    var property = messageProperties[i];
+                    if (String.IsNullOrEmpty(property.Key))
+                        continue;
+
+                    if (i == messageProperties.Count - 1 && property.Key == OriginalFormatPropertyName)
+                        continue;
+
+                    eventInfo.Properties[property.Key] = property.Value;
+                }
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
