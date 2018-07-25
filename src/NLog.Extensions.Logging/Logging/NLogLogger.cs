@@ -370,6 +370,11 @@ namespace NLog.Extensions.Logging
         /// <returns></returns>
         public IDisposable BeginScope<TState>(TState state)
         {
+            if (!_options.IncludeScopes)
+            {
+                return NullScope.Instance;
+            }
+
             if (state == null)
             {
                 throw new ArgumentNullException(nameof(state));
@@ -381,6 +386,20 @@ namespace NLog.Extensions.Logging
             }
 
             return NLogBeginScopeParser.CreateDiagnosticLogicalContext(state);
+        }
+
+        private class NullScope : IDisposable
+        {
+            public static NullScope Instance { get; } = new NullScope();
+
+            private NullScope()
+            {
+            }
+
+            /// <inheritdoc />
+            public void Dispose()
+            {
+            }
         }
     }
 }

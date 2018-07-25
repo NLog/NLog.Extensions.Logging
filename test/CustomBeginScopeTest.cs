@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Xunit;
@@ -10,16 +11,26 @@ namespace NLog.Extensions.Logging.Tests
     public class CustomBeginScopeTest : NLogTestBase
     {
         [Fact]
-        public void TestCallSiteSayHello()
+        public void TestNonSerializableSayHello()
         {
             var runner = GetRunner<CustomBeginScopeTestRunner>();
             var target = new NLog.Targets.MemoryTarget() { Layout = "${message} ${ndlc}" };
             NLog.Config.SimpleConfigurator.ConfigureForTargetLogging(target);
-            runner.SayHello();
+            runner.SayHello().Wait();
             Assert.Single(target.Logs);
             Assert.Contains("Hello World", target.Logs[0]);
         }
 
+        [Fact]
+        public void TestNonSerializableSayNothing()
+        {
+            var runner = GetRunner<CustomBeginScopeTestRunner>(new NLogProviderOptions() { IncludeScopes = false });
+            var target = new NLog.Targets.MemoryTarget() { Layout = "${message} ${ndlc}" };
+            NLog.Config.SimpleConfigurator.ConfigureForTargetLogging(target);
+            runner.SayHello().Wait();
+            Assert.Single(target.Logs);
+            Assert.Contains("Hello ", target.Logs[0]);
+        }
 
         public class CustomBeginScopeTestRunner
         {
@@ -30,10 +41,11 @@ namespace NLog.Extensions.Logging.Tests
                 _logger = logger;
             }
 
-            public void SayHello()
+            public async Task SayHello()
             {
                 using (_logger.BeginScope(new ActionLogScope("World")))
                 {
+                    await Task.Yield();
                     _logger.LogInformation("Hello");
                 }
             }

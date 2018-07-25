@@ -47,7 +47,9 @@ namespace NLog.Extensions.Logging
         /// <returns>New Logger</returns>
         public Microsoft.Extensions.Logging.ILogger CreateLogger(string name)
         {
-            var beginScopeExtractor = (Options?.CaptureMessageProperties ?? true) ? (_beginScopeParser ?? System.Threading.Interlocked.CompareExchange(ref _beginScopeParser, new NLogBeginScopeParser(Options), null)) : null;
+            var beginScopeExtractor = ((Options?.CaptureMessageProperties ?? true) && (Options?.IncludeScopes ?? true))
+                ? (_beginScopeParser ?? System.Threading.Interlocked.CompareExchange(ref _beginScopeParser, new NLogBeginScopeParser(Options), null))
+                : null;
             return new NLogLogger(LogManager.GetLogger(name), Options, beginScopeExtractor);
         }
 

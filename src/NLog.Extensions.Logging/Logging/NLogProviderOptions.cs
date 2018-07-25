@@ -35,6 +35,11 @@ namespace NLog.Extensions.Logging
         /// </summary>
         public bool ParseMessageTemplates { get; set; }
 
+        /// <summary>
+        /// Enable capture of scope information and inject into <see cref="NestedDiagnosticsLogicalContext" /> and <see cref="MappedDiagnosticsLogicalContext" />
+        /// </summary>
+        public bool IncludeScopes { get; set; }
+
         /// <summary>Initializes a new instance of the <see cref="T:System.Object" /> class.</summary>
         public NLogProviderOptions()
         {
@@ -43,6 +48,7 @@ namespace NLog.Extensions.Logging
             CaptureMessageTemplates = true;
             CaptureMessageProperties = true;
             ParseMessageTemplates = false;
+            IncludeScopes = true;
         }
 
         /// <summary>
