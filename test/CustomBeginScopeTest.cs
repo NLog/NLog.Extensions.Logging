@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Xunit;
 
@@ -14,22 +13,33 @@ namespace NLog.Extensions.Logging.Tests
         public void TestNonSerializableSayHello()
         {
             var runner = GetRunner<CustomBeginScopeTestRunner>();
-            var target = new NLog.Targets.MemoryTarget() { Layout = "${message} ${ndlc}" };
+            var target = new NLog.Targets.MemoryTarget() { Layout = "${message} ${mdlc:World}. Welcome ${ndlc}" };
             NLog.Config.SimpleConfigurator.ConfigureForTargetLogging(target);
             runner.SayHello().Wait();
             Assert.Single(target.Logs);
-            Assert.Contains("Hello World", target.Logs[0]);
+            Assert.Equal("Hello Earth. Welcome Earth People", target.Logs[0]);
         }
 
         [Fact]
         public void TestNonSerializableSayNothing()
         {
             var runner = GetRunner<CustomBeginScopeTestRunner>(new NLogProviderOptions() { IncludeScopes = false });
-            var target = new NLog.Targets.MemoryTarget() { Layout = "${message} ${ndlc}" };
+            var target = new NLog.Targets.MemoryTarget() { Layout = "${message} ${mdlc:World}. Welcome ${ndlc}" };
             NLog.Config.SimpleConfigurator.ConfigureForTargetLogging(target);
             runner.SayHello().Wait();
             Assert.Single(target.Logs);
-            Assert.Contains("Hello ", target.Logs[0]);
+            Assert.Equal("Hello . Welcome ", target.Logs[0]);
+        }
+
+        [Fact]
+        public void TestNonSerializableSayHi()
+        {
+            var runner = GetRunner<CustomBeginScopeTestRunner>();
+            var target = new NLog.Targets.MemoryTarget() { Layout = "${message} ${mdlc:World}. Welcome ${ndlc}" };
+            NLog.Config.SimpleConfigurator.ConfigureForTargetLogging(target);
+            runner.SayHi().Wait();
+            Assert.Single(target.Logs);
+            Assert.Equal("Hi Earth. Welcome Earth People", target.Logs[0]);
         }
 
         public class CustomBeginScopeTestRunner
@@ -43,26 +53,35 @@ namespace NLog.Extensions.Logging.Tests
 
             public async Task SayHello()
             {
-                using (_logger.BeginScope(new ActionLogScope("World")))
+                using (_logger.BeginScope(new ActionLogScope("Earth")))
                 {
                     await Task.Yield();
                     _logger.LogInformation("Hello");
+                }
+            }
+
+            public async Task SayHi()
+            {
+                using (_logger.BeginScope("{World} People", "Earth"))
+                {
+                    await Task.Yield();
+                    _logger.LogInformation("Hi");
                 }
             }
         }
 
         private class ActionLogScope : IReadOnlyList<KeyValuePair<string, object>>
         {
-            private readonly string _action;
+            private readonly string _world;
 
-            public ActionLogScope(string action)
+            public ActionLogScope(string world)
             {
-                if (action == null)
+                if (world == null)
                 {
-                    throw new ArgumentNullException(nameof(action));
+                    throw new ArgumentNullException(nameof(world));
                 }
 
-                _action = action;
+                _world = world;
             }
 
             public KeyValuePair<string, object> this[int index]
@@ -71,7 +90,7 @@ namespace NLog.Extensions.Logging.Tests
                 {
                     if (index == 0)
                     {
-                        return new KeyValuePair<string, object>("ActionId", _action);
+                        return new KeyValuePair<string, object>("World", _world);
                     }
                     throw new IndexOutOfRangeException(nameof(index));
                 }
@@ -91,7 +110,7 @@ namespace NLog.Extensions.Logging.Tests
             {
                 // We don't include the _action.Id here because it's just an opaque guid, and if
                 // you have text logging, you can already use the requestId for correlation.
-                return _action;
+                return string.Concat(_world, " People");
             }
 
             IEnumerator IEnumerable.GetEnumerator()

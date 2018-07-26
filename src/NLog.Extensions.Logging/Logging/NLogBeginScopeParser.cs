@@ -54,7 +54,7 @@ namespace NLog.Extensions.Logging
                 if (state?.GetType().IsSerializable ?? true)
                     return NestedDiagnosticsLogicalContext.Push(state);
                 else
-                    return NestedDiagnosticsLogicalContext.Push(state.ToString());  // Support ViewComponentLogScope, ActionLogScope and others
+                    return NestedDiagnosticsLogicalContext.Push(state.ToString());  // Support HostingLogScope, ActionLogScope, FormattedLogValues and others
 #endif
             }
             catch (Exception ex)
@@ -80,6 +80,9 @@ namespace NLog.Extensions.Logging
                 for (int i = 0; i < messageProperties.Count; ++i)
                 {
                     var property = messageProperties[i];
+                    if (i == messageProperties.Count - 1 && i > 0 && property.Key == NLogLogger.OriginalFormatPropertyName)
+                        continue;   // Handle BeginScope("Hello {World}", "Earth")
+
                     scope.AddProperty(property.Key, property.Value);
                 }
 
