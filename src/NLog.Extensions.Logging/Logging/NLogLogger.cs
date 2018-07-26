@@ -42,13 +42,17 @@ namespace NLog.Extensions.Logging
                 throw new ArgumentNullException(nameof(formatter));
             }
 
-            var messageParameters = _options.CaptureMessageTemplates
-                ? NLogMessageParameterList.TryParse(state as IReadOnlyList<KeyValuePair<string, object>>)
+            var messageProperties = (_options.CaptureMessageTemplates || _options.CaptureMessageProperties)
+                ? state as IReadOnlyList<KeyValuePair<string, object>>
+                : null;
+
+            var messageParameters = (messageProperties != null && _options.CaptureMessageTemplates)
+                ? NLogMessageParameterList.TryParse(messageProperties)
                 : null;
 
             LogEventInfo eventInfo =
-                TryParseMessageTemplate(nLogLogLevel, messageParameters) ??
-                CreateLogEventInfo(nLogLogLevel, formatter(state, exception), messageParameters);
+                TryParseMessageTemplate(nLogLogLevel, messageProperties, messageParameters) ??
+                CreateLogEventInfo(nLogLogLevel, formatter(state, exception), messageProperties, messageParameters);
 
             if (exception != null)
             {
@@ -57,7 +61,7 @@ namespace NLog.Extensions.Logging
 
             if (messageParameters == null && _options.CaptureMessageProperties)
             {
-                if (_options.CaptureMessageTemplates || !CaptureMessagePropertiesList(eventInfo, state))
+                if (!CaptureMessagePropertiesList(eventInfo, messageProperties))
                 {
                     CaptureMessageProperties(eventInfo, state);
                 }
@@ -69,12 +73,12 @@ namespace NLog.Extensions.Logging
         }
 
 
-        private LogEventInfo CreateLogEventInfo(LogLevel nLogLogLevel, string message, NLogMessageParameterList messageParameters)
+        private LogEventInfo CreateLogEventInfo(LogLevel nLogLogLevel, string message, IReadOnlyList<KeyValuePair<string, object>> messageProperties, NLogMessageParameterList messageParameters)
         {
             if (messageParameters?.HasComplexParameters == false)
             {
                 // Parsing not needed, we take the fast route 
-                var originalMessage = messageParameters.OriginalMessage as string;
+                var originalMessage = messageParameters.GetOriginalMessage(messageProperties);
                 var eventInfo = new LogEventInfo(nLogLogLevel, _logger.Name, originalMessage ?? message, messageParameters.IsPositional ? _emptyParameterArray : messageParameters);
                 if (originalMessage != null)
                 {
@@ -105,12 +109,13 @@ namespace NLog.Extensions.Logging
         /// <remarks>
         /// Using the NLog MesageTemplate Parser will hurt performance: 1 x Microsoft Parser - 2 x NLog Parser - 1 x NLog Formatter
         /// </remarks>
-        private LogEventInfo TryParseMessageTemplate(LogLevel nLogLogLevel, NLogMessageParameterList messageParameters)
+        private LogEventInfo TryParseMessageTemplate(LogLevel nLogLogLevel, IReadOnlyList<KeyValuePair<string, object>> messageProperties, NLogMessageParameterList messageParameters)
         {
-            if (messageParameters?.OriginalMessage != null && (messageParameters.HasComplexParameters || (_options.ParseMessageTemplates && messageParameters.Count > 0)))
+            if ((messageParameters?.HasOriginalMessage ?? false) && (messageParameters.HasComplexParameters || (_options.ParseMessageTemplates && messageParameters.Count > 0)))
             {
                 // NLog MessageTemplate Parser must be used
-                var eventInfo = new LogEventInfo(nLogLogLevel, _logger.Name, null, messageParameters.OriginalMessage as string, _singleItemArray);
+                var originalMessage = messageParameters.GetOriginalMessage(messageProperties);
+                var eventInfo = new LogEventInfo(nLogLogLevel, _logger.Name, null, originalMessage, _singleItemArray);
                 var messagetTemplateParameters = eventInfo.MessageTemplateParameters;   // Forces parsing of OriginalMessage
                 if (messagetTemplateParameters.Count > 0)
                 {
@@ -322,9 +327,9 @@ namespace NLog.Extensions.Logging
             }
         }
 
-        private bool CaptureMessagePropertiesList<TState>(LogEventInfo eventInfo, TState state)
+        private bool CaptureMessagePropertiesList(LogEventInfo eventInfo, IReadOnlyList<KeyValuePair<string, object>> messageProperties)
         {
-            if (state is IReadOnlyList<KeyValuePair<string, object>> messageProperties)
+            if (messageProperties != null)
             {
                 for (int i = 0; i < messageProperties.Count; ++i)
                 {

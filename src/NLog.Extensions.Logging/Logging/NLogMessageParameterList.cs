@@ -11,8 +11,10 @@ namespace NLog.Extensions.Logging
     internal class NLogMessageParameterList : IList<MessageTemplateParameter>
     {
         private readonly IReadOnlyList<KeyValuePair<string, object>> _parameterList;
+        private static readonly NLogMessageParameterList  EmptyList = new NLogMessageParameterList(new KeyValuePair<string, object>[0]);
+        private static readonly NLogMessageParameterList OriginalMessageList = new NLogMessageParameterList(new[] { new KeyValuePair<string, object>(NLogLogger.OriginalFormatPropertyName, string.Empty) });
 
-        public object OriginalMessage => _originalMessageIndex.HasValue ? _parameterList[_originalMessageIndex.Value].Value : null;
+        public bool HasOriginalMessage => _originalMessageIndex.HasValue;
         private readonly int? _originalMessageIndex;
 
         public bool HasComplexParameters => _hasMessageTemplateCapture || _isMixedPositional;
@@ -42,7 +44,32 @@ namespace NLog.Extensions.Logging
         /// </remarks>
         public static NLogMessageParameterList TryParse(IReadOnlyList<KeyValuePair<string, object>> parameterList)
         {
-            return parameterList?.Count > 0 ? new NLogMessageParameterList(parameterList) : null;
+            if (parameterList != null)
+            {
+                if (parameterList.Count > 1 || parameterList[0].Key != NLogLogger.OriginalFormatPropertyName)
+                {
+                    return new NLogMessageParameterList(parameterList);
+                }
+                else if (parameterList.Count == 1)
+                {
+                    return OriginalMessageList; // Skip allocation
+                }
+                else if (parameterList.Count == 0)
+                {
+                    return EmptyList;           // Skip allocation
+                }
+            }
+
+            return null;
+        }
+
+        public string GetOriginalMessage(IReadOnlyList<KeyValuePair<string, object>> messageProperties)
+        {
+            if (_originalMessageIndex < messageProperties?.Count)
+            {
+                return messageProperties[_originalMessageIndex.Value].Value as string;
+            }
+            return null;
         }
 
         /// <summary>
