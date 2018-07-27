@@ -37,9 +37,10 @@ namespace NLog.Extensions.Logging.Tests
             var runner = GetRunner<CustomBeginScopeTestRunner>();
             var target = new NLog.Targets.MemoryTarget() { Layout = "${message} ${mdlc:World}. Welcome ${ndlc}" };
             NLog.Config.SimpleConfigurator.ConfigureForTargetLogging(target);
-            runner.SayHi().Wait();
+            var scopeString = runner.SayHi().Result;
             Assert.Single(target.Logs);
             Assert.Equal("Hi Earth. Welcome Earth People", target.Logs[0]);
+            Assert.Equal("Earth People", scopeString);
         }
 
         public class CustomBeginScopeTestRunner
@@ -60,12 +61,13 @@ namespace NLog.Extensions.Logging.Tests
                 }
             }
 
-            public async Task SayHi()
+            public async Task<string> SayHi()
             {
-                using (_logger.BeginScope("{World} People", "Earth"))
+                using (var scopeState = _logger.BeginScope("{World} People", "Earth"))
                 {
                     await Task.Yield();
                     _logger.LogInformation("Hi");
+                    return scopeState.ToString();
                 }
             }
         }

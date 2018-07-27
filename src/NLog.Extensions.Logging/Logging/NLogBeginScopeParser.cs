@@ -66,16 +66,22 @@ namespace NLog.Extensions.Logging
 
         private class ScopeProperties : IDisposable
         {
-            List<IDisposable> _properties;
+            Stack<IDisposable> _properties;
 
             /// <summary>
             /// Properties, never null and lazy init
             /// </summary>
-            List<IDisposable> Properties => _properties ?? (_properties = new List<IDisposable>());
+            Stack<IDisposable> Properties => _properties ?? (_properties = new Stack<IDisposable>());
+
+            public ScopeProperties(int initialCapacity = 0)
+            {
+                if (initialCapacity > 0)
+                    _properties = new Stack<IDisposable>(initialCapacity);
+            }
 
             public static ScopeProperties CreateFromState(IReadOnlyList<KeyValuePair<string, object>> messageProperties)
             {
-                ScopeProperties scope = new ScopeProperties();
+                ScopeProperties scope = new ScopeProperties(messageProperties.Count + 1);
 
                 for (int i = 0; i < messageProperties.Count; ++i)
                 {
@@ -185,7 +191,7 @@ namespace NLog.Extensions.Logging
             public void AddDispose(IDisposable disposable)
             {
                 if (disposable != null)
-                    Properties.Add(disposable);
+                    Properties.Push(disposable);
             }
 
             public void AddProperty(string key, object value)
@@ -198,11 +204,12 @@ namespace NLog.Extensions.Logging
                 var properties = _properties;
                 if (properties != null)
                 {
-                    _properties = null;
-                    foreach (var property in properties)
+                    IDisposable property = null;
+                    while (properties.Count > 0)
                     {
                         try
                         {
+                            property = properties.Pop();
                             property.Dispose();
                         }
                         catch (Exception ex)
@@ -211,6 +218,11 @@ namespace NLog.Extensions.Logging
                         }
                     }
                 }
+            }
+
+            public override string ToString()
+            {
+                return (_properties?.Count > 0 ? _properties.Peek()?.ToString() : null) ?? base.ToString();
             }
         }
     }
