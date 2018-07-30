@@ -67,32 +67,13 @@ namespace NLog.Extensions.Logging
         }
 
         /// <summary>
-        /// Enable and configure NLog as a logging provider for buildable generic host (.NET Core 2.1+).
-        /// Can be used in discrete containers as well. 
+        /// Enable and configure NLog as a logging provider for buildable generic host (.NET Core 2.1+). Can be used in discrete containers as well. 
         /// </summary>
         /// <param name="builder"></param>
         /// <returns>IHostBuilder for chaining</returns>
         public static IHostBuilder UseNLog(this IHostBuilder builder)
         {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-
-            return builder.UseNLog(new NLogProviderOptions
-            {
-                CaptureMessageTemplates = true, 
-                CaptureMessageProperties = true
-            });
-        }
-
-        /// <summary>
-        /// Enable and configure NLog as a logging provider for buildable generic host (.NET Core 2.1+).
-        /// Can be used in discrete containers as well. 
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="options"></param>
-        /// <returns>IHostBuilder for chaining</returns>
-        public static IHostBuilder UseNLog(this IHostBuilder builder, NLogProviderOptions options)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
+            if (builder == null) throw new ArgumentException($"{nameof(builder)} is null.");
 
             builder.ConfigureServices(services =>
             {
@@ -101,10 +82,11 @@ namespace NLog.Extensions.Logging
 
                 LogManager.AddHiddenAssembly(typeof(ConfigureExtensions).GetTypeInfo().Assembly);
 
-                using (var factory = new LoggerFactory())
+                services.AddSingleton(new LoggerFactory().AddNLog(new NLogProviderOptions
                 {
-                    services.AddSingleton(factory.AddNLog(options));
-                }
+                    CaptureMessageTemplates = true,
+                    CaptureMessageProperties = true
+                }));
             });
 
             return builder;
