@@ -17,7 +17,7 @@ install:
 
   # Restore dependencies
   - dotnet restore src/NLog.Extensions.Logging
-  - dotnet restore test
+  - dotnet restore test/NLog.Extensions.Logging.Tests
 
 script:
  # Run tests
