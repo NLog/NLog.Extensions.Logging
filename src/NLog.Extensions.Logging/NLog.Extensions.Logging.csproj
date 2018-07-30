@@ -5,28 +5,26 @@
     <TargetFrameworks>net451;net461;netstandard1.3;netstandard1.5;netstandard2.0</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-
+    
     <Product>NLog.Extensions.Logging v$(ProductVersion)</Product>
     <InformationalVersion>$(ProductVersion)</InformationalVersion>
     <Authors>Microsoft;Julian Verdurmen</Authors>
     <Company>NLog</Company>
-    <Description>
-      NLog provider for Microsoft.Extensions.Logging for usage in .NET Standard libraries and console applicaties.
+    <Description>NLog provider for Microsoft.Extensions.Logging for usage in .NET Standard libraries and console applicaties.
 
-      For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.Web.AspNetCore
+For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.Web.AspNetCore
     </Description>
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logfiles;netcore;nlog</PackageTags>
     <PackageReleaseNotes>
 
-      1.1: Added support for using NLog MessageTemplate Parser (NLogProviderOptions.ParseMessageTemplates)  (@snakefoot)
+        1.2: BeginScope accepts any type of KeyValuePair and Dictionary  (@snakefoot)
     </PackageReleaseNotes>
     <PackageIconUrl>http://nlog-project.org/NConfig.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/NLog/NLog.Extensions.Logging</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/NLog/NLog.Extensions.Logging/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/NLog/NLog.Extensions.Logging</RepositoryUrl>
-    <ProjectGuid>{6A236D76-C9D9-4B1D-8DDE-F6978D110288}</ProjectGuid>
-    <!--Project guid for Sonar-->
+    <ProjectGuid>{6A236D76-C9D9-4B1D-8DDE-F6978D110288}</ProjectGuid> <!--Project guid for Sonar-->
     <SignAssembly>true</SignAssembly>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <AssemblyOriginatorKeyFile>NLog.snk</AssemblyOriginatorKeyFile>
@@ -63,7 +61,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.1" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
@@ -74,38 +72,14 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.0.2" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="Microsoft.Extensions.Hosting">
-      <Version>2.1.1</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions">
-      <Version>2.1.1</Version>
-    </PackageReference>
-
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
-      <Version>2.1.1</Version>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
-    <PackageReference Include="Microsoft.Extensions.Hosting">
-      <Version>2.1.1</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions">
-      <Version>2.1.1</Version>
-    </PackageReference>
-
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
-      <Version>2.1.1</Version>
-    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.1" />
   </ItemGroup>
 
   <PropertyGroup>
     <AssemblyTitle>$(Title)</AssemblyTitle>
   </PropertyGroup>
 
-
+ 
 
   <PropertyGroup>
     <DebugType>full</DebugType>
