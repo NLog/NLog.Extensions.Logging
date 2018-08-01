@@ -42,6 +42,15 @@ namespace NLog.Extensions.Logging
                 throw new ArgumentNullException(nameof(formatter));
             }
 
+            LogEventInfo eventInfo = CreateLogEventInfo(nLogLogLevel, state, exception, formatter);
+
+            CaptureEventId(eventInfo, eventId);
+
+            _logger.Log(typeof(Microsoft.Extensions.Logging.ILogger), eventInfo);
+        }
+
+        private LogEventInfo CreateLogEventInfo<TState>(LogLevel nLogLogLevel, TState state, Exception exception, Func<TState, Exception, string> formatter)
+        {
             var messageProperties = (_options.CaptureMessageTemplates || _options.CaptureMessageProperties)
                 ? state as IReadOnlyList<KeyValuePair<string, object>>
                 : null;
@@ -50,56 +59,23 @@ namespace NLog.Extensions.Logging
                 ? NLogMessageParameterList.TryParse(messageProperties)
                 : null;
 
+            string formattedMesage = null;
             LogEventInfo eventInfo =
                 TryParseMessageTemplate(nLogLogLevel, messageProperties, messageParameters) ??
-                CreateLogEventInfo(nLogLogLevel, formatter(state, exception), messageProperties, messageParameters);
+                TryCaptureMessageTemplate(nLogLogLevel, formattedMesage ?? (formattedMesage = formatter(state, exception)), messageProperties, messageParameters) ??
+                CreateSimpleLogEventInfo(nLogLogLevel, formattedMesage, messageProperties, messageParameters);
+
+            if (messageParameters == null && messageProperties == null && _options.CaptureMessageProperties)
+            {
+                CaptureMessageProperties(eventInfo, state);
+            }
 
             if (exception != null)
             {
                 eventInfo.Exception = exception;
             }
 
-            if (messageParameters == null && _options.CaptureMessageProperties)
-            {
-                if (!CaptureMessagePropertiesList(eventInfo, messageProperties))
-                {
-                    CaptureMessageProperties(eventInfo, state);
-                }
-            }
-
-            CaptureEventId(eventInfo, eventId);
-
-            _logger.Log(typeof(Microsoft.Extensions.Logging.ILogger), eventInfo);
-        }
-
-
-        private LogEventInfo CreateLogEventInfo(LogLevel nLogLogLevel, string message, IReadOnlyList<KeyValuePair<string, object>> messageProperties, NLogMessageParameterList messageParameters)
-        {
-            if (messageParameters?.HasComplexParameters == false)
-            {
-                // Parsing not needed, we take the fast route 
-                var originalMessage = messageParameters.GetOriginalMessage(messageProperties);
-                var eventInfo = new LogEventInfo(nLogLogLevel, _logger.Name, originalMessage ?? message, messageParameters.IsPositional ? _emptyParameterArray : messageParameters);
-                if (originalMessage != null)
-                {
-                    SetLogEventMessageFormatter(eventInfo, messageParameters, message);
-                }
-                return eventInfo;
-            }
-            else
-            {
-                // Parsing failed or no messageParameters
-                var eventInfo = LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
-                if (messageParameters?.Count > 0)
-                {
-                    for (int i = 0; i < messageParameters.Count; ++i)
-                    {
-                        var property = messageParameters[i];
-                        eventInfo.Properties[property.Name] = property.Value;
-                    }
-                }
-                return eventInfo;
-            }
+            return eventInfo;
         }
 
         /// <summary>
@@ -134,6 +110,41 @@ namespace NLog.Extensions.Logging
             }
 
             return null;    // Parsing not needed
+        }
+
+        private LogEventInfo TryCaptureMessageTemplate(LogLevel nLogLogLevel, string message, IReadOnlyList<KeyValuePair<string, object>> messageProperties, NLogMessageParameterList messageParameters)
+        {
+            if (messageParameters?.HasComplexParameters == false)
+            {
+                // Parsing not needed, we take the fast route 
+                var originalMessage = messageParameters.GetOriginalMessage(messageProperties);
+                var eventInfo = new LogEventInfo(nLogLogLevel, _logger.Name, originalMessage ?? message, messageParameters.IsPositional ? _emptyParameterArray : messageParameters);
+                if (originalMessage != null)
+                {
+                    SetLogEventMessageFormatter(eventInfo, messageParameters, message);
+                }
+                return eventInfo;
+            }
+            return null;
+        }
+
+        private LogEventInfo CreateSimpleLogEventInfo(LogLevel nLogLogLevel, string message, IReadOnlyList<KeyValuePair<string, object>> messageProperties, NLogMessageParameterList messageParameters)
+        {
+            // Parsing failed or no messageParameters
+            var eventInfo = LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
+            if (messageParameters != null)
+            {
+                for (int i = 0; i < messageParameters.Count; ++i)
+                {
+                    var property = messageParameters[i];
+                    eventInfo.Properties[property.Name] = property.Value;
+                }
+            }
+            else if (messageProperties != null && _options.CaptureMessageProperties)
+            {
+                CaptureMessagePropertiesList(eventInfo, messageProperties);
+            }
+            return eventInfo;
         }
 
         /// <summary>
