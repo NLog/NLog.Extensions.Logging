@@ -33,7 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\NLog.Extensions.Logging\NLog.Extensions.Logging.csproj" />
+    <ProjectReference Include="..\..\src\NLog.Extensions.Logging\NLog.Extensions.Logging.csproj" />
   </ItemGroup>
 
   <ItemGroup>
