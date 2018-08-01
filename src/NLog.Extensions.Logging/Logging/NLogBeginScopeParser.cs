@@ -23,16 +23,17 @@ namespace NLog.Extensions.Logging
         {
             if (_options.CaptureMessageProperties)
             {
-                if (state is IReadOnlyList<KeyValuePair<string, object>> contextProperties)
+                if (state is IReadOnlyList<KeyValuePair<string, object>> scopePropertyList)
                 {
-                    return ScopeProperties.CreateFromState(contextProperties);
+                    return ScopeProperties.CaptureScopeProperties(scopePropertyList);
                 }
 
                 if (!(state is string))
                 {
-                    var scope = ScopeProperties.CreateFromStateExtractor(state, _scopeStateExtractors);
-                    if (scope != null)
-                        return scope;
+                    if (state is System.Collections.IEnumerable scopePropertyCollection)
+                        return ScopeProperties.CaptureScopeProperties(scopePropertyCollection, _scopeStateExtractors);
+                    else
+                        return ScopeProperties.CaptureScopeProperty(state, _scopeStateExtractors);
                 }
                 else
                 {
@@ -79,27 +80,73 @@ namespace NLog.Extensions.Logging
                     _properties = new Stack<IDisposable>(initialCapacity);
             }
 
-            public static ScopeProperties CreateFromState(IReadOnlyList<KeyValuePair<string, object>> messageProperties)
+            public static ScopeProperties CaptureScopeProperties(IReadOnlyList<KeyValuePair<string, object>> scopePropertyList)
             {
-                ScopeProperties scope = new ScopeProperties(messageProperties.Count + 1);
+                ScopeProperties scope = new ScopeProperties(scopePropertyList.Count + 1);
 
-                for (int i = 0; i < messageProperties.Count; ++i)
+                for (int i = 0; i < scopePropertyList.Count; ++i)
                 {
-                    var property = messageProperties[i];
-                    if (i == messageProperties.Count - 1 && i > 0 && property.Key == NLogLogger.OriginalFormatPropertyName)
+                    var property = scopePropertyList[i];
+                    if (i == scopePropertyList.Count - 1 && i > 0 && property.Key == NLogLogger.OriginalFormatPropertyName)
                         continue;   // Handle BeginScope("Hello {World}", "Earth")
 
                     scope.AddProperty(property.Key, property.Value);
                 }
 
-                scope.AddDispose(CreateDiagnosticLogicalContext(messageProperties));
+                scope.AddDispose(CreateDiagnosticLogicalContext(scopePropertyList));
                 return scope;
             }
 
-            public static bool TryCreateExtractor<T>(ConcurrentDictionary<Type, KeyValuePair<Func<object, object>, Func<object, object>>> stateExractor, T property, out KeyValuePair<Func<object, object>, Func<object, object>> keyValueExtractor)
+            public static ScopeProperties CaptureScopeProperties(System.Collections.IEnumerable scopePropertyCollection, ConcurrentDictionary<Type, KeyValuePair<Func<object, object>, Func<object, object>>> stateExractor)
             {
-                Type propertyType = property.GetType();
+                ScopeProperties scope = null;
+                var keyValueExtractor = default(KeyValuePair<Func<object, object>, Func<object, object>>);
+                foreach (var property in scopePropertyCollection)
+                {
+                    if (property == null)
+                        return null;
 
+                    if (scope == null)
+                    {
+                        if (!TryCreateExtractor(stateExractor, property.GetType(), out keyValueExtractor))
+                            return null;
+
+                        scope = new ScopeProperties();
+                    }
+
+                    AddKeyValueProperty(scope, keyValueExtractor, property);
+                }
+                scope.AddDispose(CreateDiagnosticLogicalContext(scopePropertyCollection));
+                return scope;
+            }
+
+            public static ScopeProperties CaptureScopeProperty<TState>(TState scopeProperty, ConcurrentDictionary<Type, KeyValuePair<Func<object, object>, Func<object, object>>> stateExractor)
+            {
+                if (!TryCreateExtractor(stateExractor, scopeProperty.GetType(), out var keyValueExtractor))
+                    return null;
+
+                var scope = new ScopeProperties();
+                AddKeyValueProperty(scope, keyValueExtractor, scopeProperty);
+                scope.AddDispose(CreateDiagnosticLogicalContext(scopeProperty));
+                return scope;
+            }
+
+            private static void AddKeyValueProperty(ScopeProperties scope, KeyValuePair<Func<object, object>, Func<object, object>> keyValueExtractor, object property)
+            {
+                try
+                {
+                    var propertyKey = keyValueExtractor.Key.Invoke(property);
+                    var propertyValue = keyValueExtractor.Value.Invoke(property);
+                    scope.AddProperty(propertyKey?.ToString() ?? string.Empty, propertyValue);
+                }
+                catch (Exception ex)
+                {
+                    InternalLogger.Debug(ex, "Exception in BeginScope add property");
+                }
+            }
+
+            public static bool TryCreateExtractor(ConcurrentDictionary<Type, KeyValuePair<Func<object, object>, Func<object, object>>> stateExractor, Type propertyType, out KeyValuePair<Func<object, object>, Func<object, object>> keyValueExtractor)
+            {
                 if (!stateExractor.TryGetValue(propertyType, out keyValueExtractor))
                 {
                     try
@@ -136,56 +183,6 @@ namespace NLog.Extensions.Logging
                 }
 
                 return keyValueExtractor.Key != null;
-            }
-
-            public static IDisposable CreateFromStateExtractor<TState>(TState state, ConcurrentDictionary<Type, KeyValuePair<Func<object, object>, Func<object, object>>> stateExractor)
-            {
-                ScopeProperties scope = null;
-                var keyValueExtractor = default(KeyValuePair<Func<object, object>, Func<object, object>>);
-                if (state is System.Collections.IEnumerable messageProperties)
-                {
-                    foreach (var property in messageProperties)
-                    {
-                        if (property == null)
-                            return null;
-
-                        if (scope == null)
-                        {
-                            if (!TryCreateExtractor<object>(stateExractor, property, out keyValueExtractor))
-                                return null;
-
-                            scope = new ScopeProperties();
-                        }
-
-                        AddKeyValueProperty(scope, keyValueExtractor, property);
-                    }
-                }
-                else
-                {
-                    if (!TryCreateExtractor(stateExractor, state, out keyValueExtractor))
-                        return null;
-
-                    scope = new ScopeProperties();
-                    AddKeyValueProperty(scope, keyValueExtractor, state);
-                }
-
-                if (scope != null)
-                    scope.AddDispose(CreateDiagnosticLogicalContext(state));
-                return scope;
-            }
-
-            private static void AddKeyValueProperty(ScopeProperties scope, KeyValuePair<Func<object, object>, Func<object, object>> keyValueExtractor, object property)
-            {
-                try
-                {
-                    var propertyKey = keyValueExtractor.Key.Invoke(property);
-                    var propertyValue = keyValueExtractor.Value.Invoke(property);
-                    scope.AddProperty(propertyKey?.ToString() ?? string.Empty, propertyValue);
-                }
-                catch (Exception ex)
-                {
-                    InternalLogger.Debug(ex, "Exception in BeginScope add property");
-                }
             }
 
             public void AddDispose(IDisposable disposable)
