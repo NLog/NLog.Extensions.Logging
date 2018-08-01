@@ -108,7 +108,7 @@ namespace NLog.Extensions.Logging
 
                     if (scope == null)
                     {
-                        if (!TryCreateExtractor(stateExractor, property.GetType(), out keyValueExtractor))
+                        if (!TryLookupExtractor(stateExractor, property.GetType(), out keyValueExtractor))
                             return null;
 
                         scope = new ScopeProperties();
@@ -122,7 +122,7 @@ namespace NLog.Extensions.Logging
 
             public static ScopeProperties CaptureScopeProperty<TState>(TState scopeProperty, ConcurrentDictionary<Type, KeyValuePair<Func<object, object>, Func<object, object>>> stateExractor)
             {
-                if (!TryCreateExtractor(stateExractor, scopeProperty.GetType(), out var keyValueExtractor))
+                if (!TryLookupExtractor(stateExractor, scopeProperty.GetType(), out var keyValueExtractor))
                     return null;
 
                 var scope = new ScopeProperties();
@@ -145,32 +145,13 @@ namespace NLog.Extensions.Logging
                 }
             }
 
-            public static bool TryCreateExtractor(ConcurrentDictionary<Type, KeyValuePair<Func<object, object>, Func<object, object>>> stateExractor, Type propertyType, out KeyValuePair<Func<object, object>, Func<object, object>> keyValueExtractor)
+            private static bool TryLookupExtractor(ConcurrentDictionary<Type, KeyValuePair<Func<object, object>, Func<object, object>>> stateExractor, Type propertyType, out KeyValuePair<Func<object, object>, Func<object, object>> keyValueExtractor)
             {
                 if (!stateExractor.TryGetValue(propertyType, out keyValueExtractor))
                 {
                     try
                     {
-                        var itemType = propertyType.GetTypeInfo();
-                        if (!itemType.IsGenericType || itemType.GetGenericTypeDefinition() != typeof(KeyValuePair<,>))
-                            return false;
-
-                        var keyPropertyInfo = itemType.GetDeclaredProperty("Key");
-                        var valuePropertyInfo = itemType.GetDeclaredProperty("Value");
-                        if (valuePropertyInfo == null || keyPropertyInfo == null)
-                            return false;
-
-                        var keyValuePairObjParam = System.Linq.Expressions.Expression.Parameter(typeof(object), "pair");
-                        var keyValuePairTypeParam = System.Linq.Expressions.Expression.Convert(keyValuePairObjParam, propertyType);
-
-                        var propertyKeyAccess = System.Linq.Expressions.Expression.Property(keyValuePairTypeParam, keyPropertyInfo);
-                        var propertyKeyAccessObj = System.Linq.Expressions.Expression.Convert(propertyKeyAccess, typeof(object));
-                        var propertyKeyLambda = System.Linq.Expressions.Expression.Lambda<Func<object, object>>(propertyKeyAccessObj, keyValuePairObjParam).Compile();
-
-                        var propertyValueAccess = System.Linq.Expressions.Expression.Property(keyValuePairTypeParam, valuePropertyInfo);
-                        var propertyValueLambda = System.Linq.Expressions.Expression.Lambda<Func<object, object>>(propertyValueAccess, keyValuePairObjParam).Compile();
-
-                        keyValueExtractor = new KeyValuePair<Func<object, object>, Func<object, object>>(propertyKeyLambda, propertyValueLambda);
+                        return TryBuildExtractor(propertyType, out keyValueExtractor);
                     }
                     catch (Exception ex)
                     {
@@ -183,6 +164,33 @@ namespace NLog.Extensions.Logging
                 }
 
                 return keyValueExtractor.Key != null;
+            }
+
+            private static bool TryBuildExtractor(Type propertyType, out KeyValuePair<Func<object, object>, Func<object, object>> keyValueExtractor)
+            {
+                keyValueExtractor = default(KeyValuePair<Func<object, object>, Func<object, object>>);
+
+                var itemType = propertyType.GetTypeInfo();
+                if (!itemType.IsGenericType || itemType.GetGenericTypeDefinition() != typeof(KeyValuePair<,>))
+                    return false;
+
+                var keyPropertyInfo = itemType.GetDeclaredProperty("Key");
+                var valuePropertyInfo = itemType.GetDeclaredProperty("Value");
+                if (valuePropertyInfo == null || keyPropertyInfo == null)
+                    return false;
+
+                var keyValuePairObjParam = System.Linq.Expressions.Expression.Parameter(typeof(object), "pair");
+                var keyValuePairTypeParam = System.Linq.Expressions.Expression.Convert(keyValuePairObjParam, propertyType);
+
+                var propertyKeyAccess = System.Linq.Expressions.Expression.Property(keyValuePairTypeParam, keyPropertyInfo);
+                var propertyKeyAccessObj = System.Linq.Expressions.Expression.Convert(propertyKeyAccess, typeof(object));
+                var propertyKeyLambda = System.Linq.Expressions.Expression.Lambda<Func<object, object>>(propertyKeyAccessObj, keyValuePairObjParam).Compile();
+
+                var propertyValueAccess = System.Linq.Expressions.Expression.Property(keyValuePairTypeParam, valuePropertyInfo);
+                var propertyValueLambda = System.Linq.Expressions.Expression.Lambda<Func<object, object>>(propertyValueAccess, keyValuePairObjParam).Compile();
+
+                keyValueExtractor = new KeyValuePair<Func<object, object>, Func<object, object>>(propertyKeyLambda, propertyValueLambda);
+                return true;
             }
 
             public void AddDispose(IDisposable disposable)
