@@ -21,4 +21,4 @@ install:
 
 script:
  # Run tests
-  - dotnet test test --configuration Release --framework netcoreapp2.0
+  - dotnet test test/NLog.Extensions.Logging.Tests --configuration Release --framework netcoreapp2.0
