@@ -21,7 +21,7 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Fact]
-        public void TestNonSerializableSayNothing()
+        public void TestNonSerializableSayHelloWithScope()
         {
             var runner = GetRunner<CustomBeginScopeTestRunner>(new NLogProviderOptions() { IncludeScopes = false });
             var target = new NLog.Targets.MemoryTarget() { Layout = "${message} ${mdlc:World}. Welcome ${ndlc}" };
@@ -41,6 +41,17 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Single(target.Logs);
             Assert.Equal("Hi Earth. Welcome Earth People", target.Logs[0]);
             Assert.Equal("Earth People", scopeString);
+        }
+
+        [Fact]
+        public void TestNonSerializableSayNothing()
+        {
+            var runner = GetRunner<CustomBeginScopeTestRunner>();
+            var target = new NLog.Targets.MemoryTarget() { Layout = "${message}" };
+            NLog.Config.SimpleConfigurator.ConfigureForTargetLogging(target);
+            runner.SayNothing().Wait();
+            Assert.Single(target.Logs);
+            Assert.Equal("Nothing", target.Logs[0]);
         }
 
         public class CustomBeginScopeTestRunner
@@ -68,6 +79,15 @@ namespace NLog.Extensions.Logging.Tests
                     await Task.Yield();
                     _logger.LogInformation("Hi");
                     return scopeState.ToString();
+                }
+            }
+
+            public async Task SayNothing()
+            {
+                using (var scopeState = _logger.BeginScope(new Dictionary<string,string>()))
+                {
+                    await Task.Yield();
+                    _logger.LogInformation("Nothing");
                 }
             }
         }

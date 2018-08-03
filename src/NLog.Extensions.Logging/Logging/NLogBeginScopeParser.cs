@@ -99,31 +99,31 @@ namespace NLog.Extensions.Logging
 
             public static ScopeProperties CaptureScopeProperties(System.Collections.IEnumerable scopePropertyCollection, ConcurrentDictionary<Type, KeyValuePair<Func<object, object>, Func<object, object>>> stateExractor)
             {
-                ScopeProperties scope = null;
+                ScopeProperties scope = new ScopeProperties();
+
                 var keyValueExtractor = default(KeyValuePair<Func<object, object>, Func<object, object>>);
                 foreach (var property in scopePropertyCollection)
                 {
                     if (property == null)
-                        return null;
+                        break;
 
-                    if (scope == null)
+                    if (keyValueExtractor.Key == null)
                     {
                         if (!TryLookupExtractor(stateExractor, property.GetType(), out keyValueExtractor))
-                            return null;
-
-                        scope = new ScopeProperties();
+                            break;
                     }
 
                     AddKeyValueProperty(scope, keyValueExtractor, property);
                 }
+
                 scope.AddDispose(CreateDiagnosticLogicalContext(scopePropertyCollection));
                 return scope;
             }
 
-            public static ScopeProperties CaptureScopeProperty<TState>(TState scopeProperty, ConcurrentDictionary<Type, KeyValuePair<Func<object, object>, Func<object, object>>> stateExractor)
+            public static IDisposable CaptureScopeProperty<TState>(TState scopeProperty, ConcurrentDictionary<Type, KeyValuePair<Func<object, object>, Func<object, object>>> stateExractor)
             {
                 if (!TryLookupExtractor(stateExractor, scopeProperty.GetType(), out var keyValueExtractor))
-                    return null;
+                    return CreateDiagnosticLogicalContext(scopeProperty);
 
                 var scope = new ScopeProperties();
                 AddKeyValueProperty(scope, keyValueExtractor, scopeProperty);
