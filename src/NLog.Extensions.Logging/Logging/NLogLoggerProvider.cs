@@ -58,7 +58,20 @@ namespace NLog.Extensions.Logging
         /// </summary>
         public void Dispose()
         {
-            LogManager.Flush();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Cleanup
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                LogManager.Flush();
+            }
         }
 
         /// <summary>
