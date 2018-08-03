@@ -28,18 +28,25 @@ namespace NLog.Extensions.Logging
             _provider = new NLogLoggerProvider(options);
         }
 
-
-        #region Implementation of IDisposable
-
         /// <summary>
-        /// Dispose
+        /// Cleanup
         /// </summary>
         public void Dispose()
         {
-            LogManager.Flush();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        #endregion
+        /// <summary>
+        /// Cleanup
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                LogManager.Flush();
+            }
+        }
 
         #region Implementation of ILoggerFactory
 

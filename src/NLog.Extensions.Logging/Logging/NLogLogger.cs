@@ -465,6 +465,7 @@ namespace NLog.Extensions.Logging
             /// <inheritdoc />
             public void Dispose()
             {
+                // Nothing to do
             }
         }
     }
