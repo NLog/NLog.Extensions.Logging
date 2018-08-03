@@ -44,23 +44,23 @@ namespace NLog.Extensions.Logging
         /// </remarks>
         public static NLogMessageParameterList TryParse(IReadOnlyList<KeyValuePair<string, object>> parameterList)
         {
-            if (parameterList != null)
+            if (parameterList.Count > 1 || parameterList[0].Key != NLogLogger.OriginalFormatPropertyName)
             {
-                if (parameterList.Count > 1 || parameterList[0].Key != NLogLogger.OriginalFormatPropertyName)
-                {
-                    return new NLogMessageParameterList(parameterList);
-                }
-                else if (parameterList.Count == 1)
-                {
-                    return OriginalMessageList; // Skip allocation
-                }
-                else if (parameterList.Count == 0)
-                {
-                    return EmptyList;           // Skip allocation
-                }
+                return new NLogMessageParameterList(parameterList);
             }
+            else if (parameterList.Count == 1)
+            {
+                return OriginalMessageList; // Skip allocation
+            }
+            else
+            {
+                return EmptyList;           // Skip allocation
+            }
+        }
 
-            return null;
+        public bool HasMessageTemplateSyntax(bool parseMessageTemplates)
+        {
+            return HasOriginalMessage && (HasComplexParameters || (parseMessageTemplates && Count > 0));
         }
 
         public string GetOriginalMessage(IReadOnlyList<KeyValuePair<string, object>> messageProperties)

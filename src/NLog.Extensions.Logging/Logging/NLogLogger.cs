@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Reflection;
 using Microsoft.Extensions.Logging;
-using NLog.Common;
 using NLog.MessageTemplates;
 
 namespace NLog.Extensions.Logging
@@ -87,13 +84,10 @@ namespace NLog.Extensions.Logging
         /// </remarks>
         private LogEventInfo TryParseMessageTemplate(LogLevel nLogLogLevel, IReadOnlyList<KeyValuePair<string, object>> messageProperties, out NLogMessageParameterList messageParameters)
         {
-            messageParameters = (messageProperties != null && _options.CaptureMessageTemplates)
-                ? NLogMessageParameterList.TryParse(messageProperties)
-                : null;
+            messageParameters = TryParseMessageParameterList(messageProperties);
 
-            if ((messageParameters?.HasOriginalMessage ?? false) && (messageParameters.HasComplexParameters || (_options.ParseMessageTemplates && messageParameters.Count > 0)))
+            if (messageParameters?.HasMessageTemplateSyntax(_options.ParseMessageTemplates)==true)
             {
-                // NLog MessageTemplate Parser must be used
                 var originalMessage = messageParameters.GetOriginalMessage(messageProperties);
                 var eventInfo = new LogEventInfo(nLogLogLevel, _logger.Name, null, originalMessage, _singleItemArray);
                 var messagetTemplateParameters = eventInfo.MessageTemplateParameters;   // Forces parsing of OriginalMessage
@@ -101,12 +95,7 @@ namespace NLog.Extensions.Logging
                 {
                     // We have parsed the message and found parameters, now we need to do the parameter mapping
                     eventInfo.Parameters = CreateLogEventInfoParameters(messageParameters, messagetTemplateParameters, out var extraProperties);
-                    if (extraProperties?.Count > 0)
-                    {
-                        // Need to harvest additional parameters
-                        foreach (var property in extraProperties)
-                            eventInfo.Properties[property.Name] = property.Value;
-                    }
+                    AddExtraPropertiesToLogEvent(eventInfo, extraProperties);
                     return eventInfo;
                 }
 
@@ -114,6 +103,31 @@ namespace NLog.Extensions.Logging
             }
 
             return null;    // Parsing not needed
+        }
+
+        /// <summary>
+        /// Convert IReadOnlyList to <see cref="NLogMessageParameterList"/>
+        /// </summary>
+        /// <param name="messageProperties"></param>
+        /// <returns></returns>
+        private NLogMessageParameterList TryParseMessageParameterList(IReadOnlyList<KeyValuePair<string, object>> messageProperties)
+        {
+            return (messageProperties != null && _options.CaptureMessageTemplates)
+                ? NLogMessageParameterList.TryParse(messageProperties)
+                : null;
+        }
+
+        /// <summary>
+        /// Append extra property on <paramref name="eventInfo"/>
+        /// </summary>
+        private static void AddExtraPropertiesToLogEvent(LogEventInfo eventInfo, List<MessageTemplateParameter> extraProperties)
+        {
+            if (extraProperties?.Count > 0)
+            {
+                // Need to harvest additional parameters
+                foreach (var property in extraProperties)
+                    eventInfo.Properties[property.Name] = property.Value;
+            }
         }
 
         private LogEventInfo TryCaptureMessageTemplate(LogLevel nLogLogLevel, string message, IReadOnlyList<KeyValuePair<string, object>> messageProperties, NLogMessageParameterList messageParameters)
@@ -233,8 +247,7 @@ namespace NLog.Extensions.Logging
 
                 if (extraProperty)
                 {
-                    extraProperties = extraProperties ?? new List<MessageTemplateParameter>();
-                    extraProperties.Add(messageParameters[i]);
+                    extraProperties = AddExtraProperty(extraProperties, messageParameters[i]);
                 }
             }
 
@@ -262,12 +275,24 @@ namespace NLog.Extensions.Logging
                 }
                 else
                 {
-                    extraProperties = extraProperties ?? new List<MessageTemplateParameter>();
-                    extraProperties.Add(messageParameters[i]);
+                    extraProperties = AddExtraProperty(extraProperties, messageParameters[i]);
                 }
             }
 
             return paramsArray ?? new object[maxIndex + 1];
+        }
+
+        /// <summary>
+        /// Add Property and init list if needed
+        /// </summary>
+        /// <param name="extraProperties"></param>
+        /// <param name="item"></param>
+        /// <returns>list with at least one item</returns>
+        private static List<MessageTemplateParameter> AddExtraProperty(List<MessageTemplateParameter> extraProperties, MessageTemplateParameter item)
+        {
+            extraProperties = extraProperties ?? new List<MessageTemplateParameter>();
+            extraProperties.Add(item);
+            return extraProperties;
         }
 
         /// <summary>
