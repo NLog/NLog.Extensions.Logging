@@ -9,7 +9,7 @@ namespace NLog.Extensions.Logging
     /// </summary>
     public class NLogLoggerFactory : ILoggerFactory
     {
-        private NLogLoggerProvider _provider;
+        private readonly NLogLoggerProvider _provider;
 
         /// <summary>
         /// New factory with default options

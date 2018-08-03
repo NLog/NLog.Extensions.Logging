@@ -19,6 +19,7 @@ namespace NLog.Extensions.Logging
         /// NLog options
         /// </summary>
         public NLogProviderOptions Options { get; set; }
+        private NLogBeginScopeParser _beginScopeParser;
 
         /// <summary>
         /// New provider with default options, see <see cref="Options"/>
@@ -35,6 +36,7 @@ namespace NLog.Extensions.Logging
         public NLogLoggerProvider(NLogProviderOptions options)
         {
             Options = options;
+            _beginScopeParser = new NLogBeginScopeParser(options);
             RegisterHiddenAssembliesForCallSite();
         }
 
@@ -45,7 +47,10 @@ namespace NLog.Extensions.Logging
         /// <returns>New Logger</returns>
         public Microsoft.Extensions.Logging.ILogger CreateLogger(string name)
         {
-            return new NLogLogger(LogManager.GetLogger(name), Options);
+            var beginScopeParser = ((Options?.CaptureMessageProperties ?? true) && (Options?.IncludeScopes ?? true))
+                ? (_beginScopeParser ?? System.Threading.Interlocked.CompareExchange(ref _beginScopeParser, new NLogBeginScopeParser(Options), null))
+                : null;
+            return new NLogLogger(LogManager.GetLogger(name), Options, beginScopeParser);
         }
 
         /// <summary>
@@ -53,6 +58,7 @@ namespace NLog.Extensions.Logging
         /// </summary>
         public void Dispose()
         {
+            LogManager.Flush();
         }
 
         /// <summary>

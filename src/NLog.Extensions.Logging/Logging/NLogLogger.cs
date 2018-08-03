@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Reflection;
 using Microsoft.Extensions.Logging;
-using NLog.Common;
 using NLog.MessageTemplates;
 
 namespace NLog.Extensions.Logging
@@ -13,83 +10,69 @@ namespace NLog.Extensions.Logging
     /// </summary>
     internal class NLogLogger : Microsoft.Extensions.Logging.ILogger
     {
-        private readonly ConcurrentDictionary<Type, KeyValuePair<Func<object, object>, Func<object, object>>> _scopeStateExtractors = new ConcurrentDictionary<Type, KeyValuePair<Func<object, object>, Func<object, object>>>();
-
         private readonly Logger _logger;
         private readonly NLogProviderOptions _options;
+        private readonly NLogBeginScopeParser _beginScopeParser;
 
         internal const string OriginalFormatPropertyName = "{OriginalFormat}";
         private static readonly object EmptyEventId = default(EventId);    // Cache boxing of empty EventId-struct
         private static readonly object ZeroEventId = default(EventId).Id;  // Cache boxing of zero EventId-Value
         private Tuple<string, string, string> _eventIdPropertyNames;
 
-        public NLogLogger(Logger logger, NLogProviderOptions options)
+        public NLogLogger(Logger logger, NLogProviderOptions options, NLogBeginScopeParser beginScopeParser)
         {
             _logger = logger;
             _options = options ?? NLogProviderOptions.Default;
+            _beginScopeParser = beginScopeParser;
         }
 
         public void Log<TState>(Microsoft.Extensions.Logging.LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
             var nLogLogLevel = ConvertLogLevel(logLevel);
-            if (!IsEnabled(nLogLogLevel))
+            if (!_logger.IsEnabled(nLogLogLevel))
             {
                 return;
             }
+
             if (formatter == null)
             {
                 throw new ArgumentNullException(nameof(formatter));
             }
 
-            var messageParameters = NLogMessageParameterList.TryParse(_options.CaptureMessageTemplates ? state as IReadOnlyList<KeyValuePair<string, object>> : null);
+            LogEventInfo eventInfo = CreateLogEventInfo(nLogLogLevel, state, exception, formatter);
 
-            LogEventInfo eventInfo =
-                TryParseLogEventInfo(nLogLogLevel, messageParameters) ??
-                CreateLogEventInfo(nLogLogLevel, formatter(state, exception), messageParameters);
+            CaptureEventId(eventInfo, eventId);
 
             if (exception != null)
             {
                 eventInfo.Exception = exception;
             }
 
-            CaptureEventId(eventInfo, eventId);
-
-            if (messageParameters == null)
-            {
-                CaptureMessageProperties(eventInfo, state);
-            }
-
             _logger.Log(typeof(Microsoft.Extensions.Logging.ILogger), eventInfo);
         }
 
-
-        private LogEventInfo CreateLogEventInfo(LogLevel nLogLogLevel, string message, NLogMessageParameterList messageParameters)
+        private LogEventInfo CreateLogEventInfo<TState>(LogLevel nLogLogLevel, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
-            if (messageParameters?.HasComplexParameters == false)
+            var messageProperties = (_options.CaptureMessageTemplates || _options.CaptureMessageProperties)
+                ? state as IReadOnlyList<KeyValuePair<string, object>>
+                : null;
+
+            LogEventInfo eventInfo =
+                TryParseMessageTemplate(nLogLogLevel, messageProperties, out var messageParameters) ??
+                CreateLogEventInfo(nLogLogLevel, formatter(state, exception), messageProperties, messageParameters);
+
+            if (messageParameters == null && messageProperties == null && _options.CaptureMessageProperties)
             {
-                // Parsing not needed, we take the fast route 
-                var originalMessage = messageParameters.OriginalMessage as string;
-                var eventInfo = new LogEventInfo(nLogLogLevel, _logger.Name, originalMessage ?? message, messageParameters.IsPositional ? _emptyParameterArray : messageParameters);
-                if (originalMessage != null)
-                {
-                    SetLogEventMessageFormatter(eventInfo, messageParameters, message);
-                }
-                return eventInfo;
+                CaptureMessageProperties(eventInfo, state as IEnumerable<KeyValuePair<string, object>>);
             }
-            else
-            {
-                // Parsing failed or no messageParameters
-                var eventInfo = LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
-                if (messageParameters?.Count > 0)
-                {
-                    for (int i = 0; i < messageParameters.Count; ++i)
-                    {
-                        var property = messageParameters[i];
-                        eventInfo.Properties[property.Name] = property.Value;
-                    }
-                }
-                return eventInfo;
-            }
+
+            return eventInfo;
+        }
+
+        private LogEventInfo CreateLogEventInfo(LogLevel nLogLogLevel, string formattedMessage, IReadOnlyList<KeyValuePair<string, object>> messageProperties, NLogMessageParameterList messageParameters)
+        {
+            return TryCaptureMessageTemplate(nLogLogLevel, formattedMessage, messageProperties, messageParameters) ??
+                CreateSimpleLogEventInfo(nLogLogLevel, formattedMessage, messageProperties, messageParameters);
         }
 
         /// <summary>
@@ -99,23 +82,20 @@ namespace NLog.Extensions.Logging
         /// <remarks>
         /// Using the NLog MesageTemplate Parser will hurt performance: 1 x Microsoft Parser - 2 x NLog Parser - 1 x NLog Formatter
         /// </remarks>
-        private LogEventInfo TryParseLogEventInfo(LogLevel nLogLogLevel, NLogMessageParameterList messageParameters)
+        private LogEventInfo TryParseMessageTemplate(LogLevel nLogLogLevel, IReadOnlyList<KeyValuePair<string, object>> messageProperties, out NLogMessageParameterList messageParameters)
         {
-            if (messageParameters?.OriginalMessage != null && (messageParameters.HasComplexParameters || (_options.ParseMessageTemplates && messageParameters.Count > 0)))
+            messageParameters = TryParseMessageParameterList(messageProperties);
+
+            if (messageParameters?.HasMessageTemplateSyntax(_options.ParseMessageTemplates)==true)
             {
-                // NLog MessageTemplate Parser must be used
-                var eventInfo = new LogEventInfo(nLogLogLevel, _logger.Name, null, messageParameters.OriginalMessage as string, _singleItemArray);
+                var originalMessage = messageParameters.GetOriginalMessage(messageProperties);
+                var eventInfo = new LogEventInfo(nLogLogLevel, _logger.Name, null, originalMessage, _singleItemArray);
                 var messagetTemplateParameters = eventInfo.MessageTemplateParameters;   // Forces parsing of OriginalMessage
                 if (messagetTemplateParameters.Count > 0)
                 {
                     // We have parsed the message and found parameters, now we need to do the parameter mapping
                     eventInfo.Parameters = CreateLogEventInfoParameters(messageParameters, messagetTemplateParameters, out var extraProperties);
-                    if (extraProperties?.Count > 0)
-                    {
-                        // Need to harvest additional parameters
-                        foreach (var property in extraProperties)
-                            eventInfo.Properties[property.Name] = property.Value;
-                    }
+                    AddExtraPropertiesToLogEvent(eventInfo, extraProperties);
                     return eventInfo;
                 }
 
@@ -123,6 +103,66 @@ namespace NLog.Extensions.Logging
             }
 
             return null;    // Parsing not needed
+        }
+
+        /// <summary>
+        /// Convert IReadOnlyList to <see cref="NLogMessageParameterList"/>
+        /// </summary>
+        /// <param name="messageProperties"></param>
+        /// <returns></returns>
+        private NLogMessageParameterList TryParseMessageParameterList(IReadOnlyList<KeyValuePair<string, object>> messageProperties)
+        {
+            return (messageProperties != null && _options.CaptureMessageTemplates)
+                ? NLogMessageParameterList.TryParse(messageProperties)
+                : null;
+        }
+
+        /// <summary>
+        /// Append extra property on <paramref name="eventInfo"/>
+        /// </summary>
+        private static void AddExtraPropertiesToLogEvent(LogEventInfo eventInfo, List<MessageTemplateParameter> extraProperties)
+        {
+            if (extraProperties?.Count > 0)
+            {
+                // Need to harvest additional parameters
+                foreach (var property in extraProperties)
+                    eventInfo.Properties[property.Name] = property.Value;
+            }
+        }
+
+        private LogEventInfo TryCaptureMessageTemplate(LogLevel nLogLogLevel, string message, IReadOnlyList<KeyValuePair<string, object>> messageProperties, NLogMessageParameterList messageParameters)
+        {
+            if (messageParameters?.HasComplexParameters == false)
+            {
+                // Parsing not needed, we take the fast route 
+                var originalMessage = messageParameters.GetOriginalMessage(messageProperties);
+                var eventInfo = new LogEventInfo(nLogLogLevel, _logger.Name, originalMessage ?? message, messageParameters.IsPositional ? _emptyParameterArray : messageParameters);
+                if (originalMessage != null)
+                {
+                    SetLogEventMessageFormatter(eventInfo, messageParameters, message);
+                }
+                return eventInfo;
+            }
+            return null;
+        }
+
+        private LogEventInfo CreateSimpleLogEventInfo(LogLevel nLogLogLevel, string message, IReadOnlyList<KeyValuePair<string, object>> messageProperties, NLogMessageParameterList messageParameters)
+        {
+            // Parsing failed or no messageParameters
+            var eventInfo = LogEventInfo.Create(nLogLogLevel, _logger.Name, message);
+            if (messageParameters != null)
+            {
+                for (int i = 0; i < messageParameters.Count; ++i)
+                {
+                    var property = messageParameters[i];
+                    eventInfo.Properties[property.Name] = property.Value;
+                }
+            }
+            else if (messageProperties != null && _options.CaptureMessageProperties)
+            {
+                CaptureMessagePropertiesList(eventInfo, messageProperties);
+            }
+            return eventInfo;
         }
 
         /// <summary>
@@ -207,8 +247,7 @@ namespace NLog.Extensions.Logging
 
                 if (extraProperty)
                 {
-                    extraProperties = extraProperties ?? new List<MessageTemplateParameter>();
-                    extraProperties.Add(messageParameters[i]);
+                    extraProperties = AddExtraProperty(extraProperties, messageParameters[i]);
                 }
             }
 
@@ -236,12 +275,24 @@ namespace NLog.Extensions.Logging
                 }
                 else
                 {
-                    extraProperties = extraProperties ?? new List<MessageTemplateParameter>();
-                    extraProperties.Add(messageParameters[i]);
+                    extraProperties = AddExtraProperty(extraProperties, messageParameters[i]);
                 }
             }
 
             return paramsArray ?? new object[maxIndex + 1];
+        }
+
+        /// <summary>
+        /// Add Property and init list if needed
+        /// </summary>
+        /// <param name="extraProperties"></param>
+        /// <param name="item"></param>
+        /// <returns>list with at least one item</returns>
+        private static List<MessageTemplateParameter> AddExtraProperty(List<MessageTemplateParameter> extraProperties, MessageTemplateParameter item)
+        {
+            extraProperties = extraProperties ?? new List<MessageTemplateParameter>();
+            extraProperties.Add(item);
+            return extraProperties;
         }
 
         /// <summary>
@@ -302,9 +353,9 @@ namespace NLog.Extensions.Logging
             return eventIdPropertyNames;
         }
 
-        private void CaptureMessageProperties<TState>(LogEventInfo eventInfo, TState state)
+        private void CaptureMessageProperties(LogEventInfo eventInfo, IEnumerable<KeyValuePair<string, object>> messageProperties)
         {
-            if (_options.CaptureMessageProperties && state is IEnumerable<KeyValuePair<string, object>> messageProperties)
+            if (messageProperties != null)
             {
                 foreach (var property in messageProperties)
                 {
@@ -313,6 +364,21 @@ namespace NLog.Extensions.Logging
 
                     eventInfo.Properties[property.Key] = property.Value;
                 }
+            }
+        }
+
+        private void CaptureMessagePropertiesList(LogEventInfo eventInfo, IReadOnlyList<KeyValuePair<string, object>> messageProperties)
+        {
+            for (int i = 0; i < messageProperties.Count; ++i)
+            {
+                var property = messageProperties[i];
+                if (String.IsNullOrEmpty(property.Key))
+                    continue;
+
+                if (i == messageProperties.Count - 1 && property.Key == OriginalFormatPropertyName)
+                    continue;
+
+                eventInfo.Properties[property.Key] = property.Value;
             }
         }
 
@@ -363,169 +429,6 @@ namespace NLog.Extensions.Logging
             }
         }
 
-        private class ScopeProperties : IDisposable
-        {
-            List<IDisposable> _properties;
-
-            /// <summary>
-            /// Properties, never null and lazy init
-            /// </summary>
-            List<IDisposable> Properties => _properties ?? (_properties = new List<IDisposable>());
-
-            public static ScopeProperties CreateFromState(IList<KeyValuePair<string, object>> messageProperties)
-            {
-                ScopeProperties scope = new ScopeProperties();
-
-                for (int i = 0; i < messageProperties.Count; ++i)
-                {
-                    var property = messageProperties[i];
-                    scope.AddProperty(property.Key, property.Value);
-                }
-
-                scope.AddDispose(NestedDiagnosticsLogicalContext.Push(messageProperties));
-                return scope;
-            }
-
-            public static bool TryCreateExtractor<T>(ConcurrentDictionary<Type, KeyValuePair<Func<object, object>, Func<object, object>>> stateExractor, T property, out KeyValuePair<Func<object, object>, Func<object, object>> keyValueExtractor)
-            {
-                Type propertyType = property.GetType();
-
-                if (!stateExractor.TryGetValue(propertyType, out keyValueExtractor))
-                {
-                    try
-                    {
-                        var itemType = propertyType.GetTypeInfo();
-                        if (!itemType.IsGenericType || itemType.GetGenericTypeDefinition() != typeof(KeyValuePair<,>))
-                            return false;
-
-                        var keyPropertyInfo = itemType.GetDeclaredProperty("Key");
-                        var valuePropertyInfo = itemType.GetDeclaredProperty("Value");
-                        if (valuePropertyInfo == null || keyPropertyInfo == null)
-                            return false;
-
-                        var keyValuePairObjParam = System.Linq.Expressions.Expression.Parameter(typeof(object), "pair");
-                        var keyValuePairTypeParam = System.Linq.Expressions.Expression.Convert(keyValuePairObjParam, propertyType);
-
-                        var propertyKeyAccess = System.Linq.Expressions.Expression.Property(keyValuePairTypeParam, keyPropertyInfo);
-                        var propertyKeyAccessObj = System.Linq.Expressions.Expression.Convert(propertyKeyAccess, typeof(object));
-                        var propertyKeyLambda = System.Linq.Expressions.Expression.Lambda<Func<object, object>>(propertyKeyAccessObj, keyValuePairObjParam).Compile();
-
-                        var propertyValueAccess = System.Linq.Expressions.Expression.Property(keyValuePairTypeParam, valuePropertyInfo);
-                        var propertyValueLambda = System.Linq.Expressions.Expression.Lambda<Func<object, object>>(propertyValueAccess, keyValuePairObjParam).Compile();
-
-                        keyValueExtractor = new KeyValuePair<Func<object, object>, Func<object, object>>(propertyKeyLambda, propertyValueLambda);
-                    }
-                    catch (Exception ex)
-                    {
-                        InternalLogger.Debug(ex, "Exception in creating scope property extractor");
-                    }
-                    finally
-                    {
-                        stateExractor[propertyType] = keyValueExtractor;
-                    }
-                }
-
-                return keyValueExtractor.Key != null;
-            }
-
-            public static IDisposable CreateFromStateExtractor<TState>(TState state, ConcurrentDictionary<Type, KeyValuePair<Func<object, object>, Func<object, object>>> stateExractor)
-            {
-                ScopeProperties scope = null;
-                var keyValueExtractor = default(KeyValuePair<Func<object, object>, Func<object, object>>);
-                if (state is System.Collections.IEnumerable messageProperties)
-                {
-                    foreach (var property in messageProperties)
-                    {
-                        if (property == null)
-                            return null;
-
-                        if (scope == null)
-                        {
-                            if (!TryCreateExtractor<object>(stateExractor, property, out keyValueExtractor))
-                                return null;
-
-                            scope = new ScopeProperties();
-                        }
-
-                        AddKeyValueProperty(scope, keyValueExtractor, property);
-                    }
-                }
-                else
-                {
-                    if (!TryCreateExtractor(stateExractor, state, out keyValueExtractor))
-                        return null;
-
-                    scope = new ScopeProperties();
-                    AddKeyValueProperty(scope, keyValueExtractor, state);
-                }
-
-                if (scope != null)
-                    scope.AddDispose(NestedDiagnosticsLogicalContext.Push(state));
-                return scope;
-            }
-
-            private static void AddKeyValueProperty(ScopeProperties scope, KeyValuePair<Func<object, object>, Func<object, object>> keyValueExtractor, object property)
-            {
-                try
-                {
-                    var propertyKey = keyValueExtractor.Key.Invoke(property);
-                    var propertyValue = keyValueExtractor.Value.Invoke(property);
-                    scope.AddProperty(propertyKey?.ToString() ?? string.Empty, propertyValue);
-                }
-                catch (Exception ex)
-                {
-                    InternalLogger.Trace(ex, "Exception in adding scope property");
-                }
-            }
-
-            public void AddDispose(IDisposable disposable)
-            {
-                Properties.Add(disposable);
-            }
-
-            public void AddProperty(string key, object value)
-            {
-                AddDispose(new ScopeProperty(key, value));
-            }
-
-            public void Dispose()
-            {
-                var properties = _properties;
-                if (properties != null)
-                {
-                    _properties = null;
-                    foreach (var property in properties)
-                    {
-                        try
-                        {
-                            property.Dispose();
-                        }
-                        catch (Exception ex)
-                        {
-                            InternalLogger.Trace(ex, "Exception in Dispose property {0}", property);
-                        }
-                    }
-                }
-            }
-
-            class ScopeProperty : IDisposable
-            {
-                string _key;
-
-                public ScopeProperty(string key, object value)
-                {
-                    _key = key;
-                    MappedDiagnosticsLogicalContext.Set(key, value);
-                }
-
-                public void Dispose()
-                {
-                    MappedDiagnosticsLogicalContext.Remove(_key);
-                }
-            }
-
-        }
-
         /// <summary>
         /// Begin a scope. Use in config with ${ndlc} 
         /// </summary>
@@ -533,26 +436,36 @@ namespace NLog.Extensions.Logging
         /// <returns></returns>
         public IDisposable BeginScope<TState>(TState state)
         {
+            if (!_options.IncludeScopes)
+            {
+                return NullScope.Instance;
+            }
+
             if (state == null)
             {
                 throw new ArgumentNullException(nameof(state));
             }
 
-            if (_options.CaptureMessageProperties)
+            if (_beginScopeParser != null)
             {
-                if (state is IList<KeyValuePair<string, object>> contextProperties)
-                {
-                    return ScopeProperties.CreateFromState(contextProperties);
-                }
-                else if (!(state is string))
-                {
-                    var scope = ScopeProperties.CreateFromStateExtractor(state, _scopeStateExtractors);
-                    if (scope != null)
-                        return scope;
-                }
+                return _beginScopeParser.ParseBeginScope(state);
             }
 
-            return NestedDiagnosticsLogicalContext.Push(state);
+            return NLogBeginScopeParser.CreateDiagnosticLogicalContext(state);
+        }
+
+        private class NullScope : IDisposable
+        {
+            public static NullScope Instance { get; } = new NullScope();
+
+            private NullScope()
+            {
+            }
+
+            /// <inheritdoc />
+            public void Dispose()
+            {
+            }
         }
     }
 }
