@@ -2,6 +2,12 @@
 
 Date format: (year/month/day)
 
+
+### v1.2.1 (2018/08/05)
+- [#233](https://github.com/NLog/NLog.Extensions.Logging/pull/233) Fixed null-reference-exception when parsing empty scope-property collection (@snakefoot)
+- [#232](https://github.com/NLog/NLog.Extensions.Logging/pull/232) BeginScope: support for non-serializable objects + performance improvement (20-50% cpu, 35% times less allocations) (#232) (@snakefoot)
+- [#229](https://github.com/NLog/NLog.Extensions.Logging/pull/229) BeginScope should accept any type of KeyValuePair (Swallow exceptions) (@snakefoot)
+
 ### v1.2 (2018/07/20)
 - [#223](https://github.com/NLog/NLog.Extensions.Logging/pull/223) BeginScope accepts any type of KeyValuePair and Dictionary  (@snakefoot)
 
