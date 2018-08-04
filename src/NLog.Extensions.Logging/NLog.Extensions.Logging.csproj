@@ -54,7 +54,7 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
     <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NLog" Version="[4.5.7,5.0.0-beta01)" />
+    <PackageReference Include="NLog" Version="[4.5.8,5.0.0-beta01)" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.0.2" />
