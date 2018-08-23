@@ -436,22 +436,17 @@ namespace NLog.Extensions.Logging
         /// <returns></returns>
         public IDisposable BeginScope<TState>(TState state)
         {
-            if (!_options.IncludeScopes)
+            if (!_options.IncludeScopes || state == null)
             {
                 return NullScope.Instance;
             }
 
-            if (state == null)
-            {
-                throw new ArgumentNullException(nameof(state));
-            }
-
             if (_beginScopeParser != null)
             {
-                return _beginScopeParser.ParseBeginScope(state);
+                return _beginScopeParser.ParseBeginScope(state) ?? NullScope.Instance;
             }
 
-            return NLogBeginScopeParser.CreateDiagnosticLogicalContext(state);
+            return NLogBeginScopeParser.CreateDiagnosticLogicalContext(state) ?? NullScope.Instance;
         }
 
         private class NullScope : IDisposable
