@@ -58,6 +58,5 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Equal(new MessageTemplateParameter("b", 2, null, CaptureType.Stringify), list[1]);
             Assert.Equal(new MessageTemplateParameter("c", 3, null, CaptureType.Serialize), list[2]);
         }
-
     }
 }

@@ -3,11 +3,14 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
 
     <TargetFrameworks>net451;net461;netstandard1.3;netstandard1.5;netstandard2.0</TargetFrameworks>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    
+   
     <Product>NLog.Extensions.Logging v$(ProductVersion)</Product>
     <InformationalVersion>$(ProductVersion)</InformationalVersion>
+    
     <Authors>Microsoft;Julian Verdurmen</Authors>
     <Company>NLog</Company>
     <Description>NLog provider for Microsoft.Extensions.Logging for usage in .NET Standard libraries and console applicaties.
@@ -24,15 +27,16 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
 
     </PackageReleaseNotes>
-    <PackageIconUrl>https://nlog-project.org/NConfig.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/NLog/NLog.Extensions.Logging</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/NLog/NLog.Extensions.Logging/blob/master/LICENSE</PackageLicenseUrl>
-    <RepositoryType>git</RepositoryType>
+    <PackageIconUrl>https://nlog-project.org/NConfig.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/NLog/NLog.Extensions.Logging.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    
     <ProjectGuid>{6A236D76-C9D9-4B1D-8DDE-F6978D110288}</ProjectGuid> <!--Project guid for Sonar-->
     <SignAssembly>true</SignAssembly>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <AssemblyOriginatorKeyFile>NLog.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\NLog.snk</AssemblyOriginatorKeyFile>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">
@@ -83,12 +87,5 @@ Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHAN
 
   <PropertyGroup>
     <AssemblyTitle>$(Title)</AssemblyTitle>
-  </PropertyGroup>
-
- 
-
-  <PropertyGroup>
-    <DebugType>full</DebugType>
-    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 </Project>

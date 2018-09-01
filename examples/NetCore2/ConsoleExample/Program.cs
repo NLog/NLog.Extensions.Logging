@@ -9,10 +9,11 @@ namespace ConsoleExample
     {
         static void Main(string[] args)
         {
-            var logger = NLog.LogManager.LoadConfiguration("nlog.config").GetCurrentClassLogger();
+            var logger = NLog.LogManager.GetCurrentClassLogger();
             try
             {
-                using (var servicesProvider = BuildDi())
+				var servicesProvider = BuildDi();
+				using (servicesProvider as IDisposable)
                 {
                     var runner = servicesProvider.GetRequiredService<Runner>();
                     runner.DoAction("Action1");
@@ -35,7 +36,7 @@ namespace ConsoleExample
         }
 
 
-        private static ServiceProvider BuildDi()
+        private static IServiceProvider BuildDi()
         {
             var services = new ServiceCollection();
 

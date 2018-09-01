@@ -17,8 +17,11 @@ install:
 
   # Restore dependencies
   - dotnet restore src/NLog.Extensions.Logging
-  - dotnet restore test
+  - dotnet restore src/NLog.Extensions.Hosting
+  - dotnet restore test/NLog.Extensions.Hosting.Tests
+  - dotnet restore test/NLog.Extensions.Logging.Tests
 
 script:
  # Run tests
-  - dotnet test test --configuration Release --framework netcoreapp2.0
+  - dotnet test test/NLog.Extensions.Hosting.Tests --configuration Release --framework netcoreapp2.0
+  - dotnet test test/NLog.Extensions.Logging.Tests --configuration Release --framework netcoreapp2.0

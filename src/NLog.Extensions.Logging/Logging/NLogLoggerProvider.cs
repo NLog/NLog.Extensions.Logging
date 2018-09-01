@@ -35,7 +35,7 @@ namespace NLog.Extensions.Logging
         /// <param name="options"></param>
         public NLogLoggerProvider(NLogProviderOptions options)
         {
-            Options = options;
+            Options = options ?? NLogProviderOptions.Default;
             _beginScopeParser = new NLogBeginScopeParser(options);
             RegisterHiddenAssembliesForCallSite();
         }
