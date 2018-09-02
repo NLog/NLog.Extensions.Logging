@@ -21,13 +21,17 @@ namespace NLog.Extensions.Logging
         private readonly bool _hasMessageTemplateCapture;
         private readonly bool _isMixedPositional;
 
-        public bool IsPositional => _isPositional;
-        private readonly bool _isPositional;
+        public bool IsPositional { get; }
 
         public NLogMessageParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList)
         {
-            if (IsValidParameterList(parameterList, out _originalMessageIndex, out _hasMessageTemplateCapture, out _isMixedPositional, out _isPositional))
+            var result = IsValidParameterList(parameterList);
+            if (result.HasValue )
             {
+                _originalMessageIndex = result.Value.OriginalMessageIndex;
+                _hasMessageTemplateCapture = result.Value.HasMessageTemplateCapture;
+                _isMixedPositional = result.Value.IsMixedPositional;
+                IsPositional = result.Value.IsPositional;
                 _parameterList = parameterList;
             }
             else
@@ -73,22 +77,22 @@ namespace NLog.Extensions.Logging
         }
 
         /// <summary>
-        /// Verify that the input parameterList contains non-empty key-values and the orignal-format-property at the end
+        /// Verify that the input parameterList contains non-empty key-values and the original-format-property at the end
         /// </summary>
-        private static bool IsValidParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList, out int? originalMessageIndex, out bool hasMessageTemplateCapture, out bool isMixedPositional, out bool isPositional)
+        /// <returns>null if not valid parameter list</returns>
+        private static ParameterListAnalyisResult? IsValidParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList)
         {
-            hasMessageTemplateCapture = false;
-            isMixedPositional = false;
-            isPositional = false;
-            originalMessageIndex = null;
+            var hasMessageTemplateCapture = false;
+            var isMixedPositional = false;
+            var isPositional = false;
+            int? originalMessageIndex = null;
             bool? firstParameterIsPositional = null;
             for (int i = 0; i < parameterList.Count; ++i)
             {
                 var paramPair = parameterList[i];
                 if (string.IsNullOrEmpty(paramPair.Key))
                 {
-                    originalMessageIndex = null;
-                    return false;
+                    return null;
                 }
 
                 char firstChar = paramPair.Key[0];
@@ -100,8 +104,7 @@ namespace NLog.Extensions.Logging
                 {
                     if (originalMessageIndex.HasValue)
                     {
-                        originalMessageIndex = null;
-                        return false;
+                        return null;
                     }
 
                     originalMessageIndex = i;
@@ -118,7 +121,7 @@ namespace NLog.Extensions.Logging
             if (firstParameterIsPositional == true && !isMixedPositional)
                 isPositional = true;
 
-            return true;
+            return new ParameterListAnalyisResult(originalMessageIndex, hasMessageTemplateCapture, isMixedPositional, isPositional);
         }
 
         /// <summary>
@@ -169,7 +172,6 @@ namespace NLog.Extensions.Logging
             else
                 return CaptureType.Normal;
         }
-
 
         public int Count => _parameterList.Count - (_originalMessageIndex.HasValue ? 1 : 0);
 
@@ -225,6 +227,22 @@ namespace NLog.Extensions.Logging
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        private struct ParameterListAnalyisResult 
+        {
+            public int? OriginalMessageIndex { get; }
+            public bool HasMessageTemplateCapture { get; }
+            public bool IsMixedPositional { get; }
+            public bool IsPositional { get; }
+
+            public ParameterListAnalyisResult(int? originalMessageIndex, bool hasMessageTemplateCapture, bool isMixedPositional, bool isPositional)
+            {
+                OriginalMessageIndex = originalMessageIndex;
+                HasMessageTemplateCapture = hasMessageTemplateCapture;
+                IsMixedPositional = isMixedPositional;
+                IsPositional = isPositional;
+            }
         }
     }
 }
