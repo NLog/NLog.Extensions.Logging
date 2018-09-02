@@ -68,6 +68,5 @@ namespace NLog.Extensions.Logging.Tests
                 _logger.LogInformation("Hello");
             }
         }
-
     }
 }

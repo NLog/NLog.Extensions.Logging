@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <Product>NLog.Extensions.Hosting v$(ProductVersion)</Product>
+    <InformationalVersion>$(ProductVersion)</InformationalVersion>
+
+    <Company>NLog</Company>
+    <Authors>Julian Verdurmen;Bryan Gonzalez</Authors>
+    <Description>NLog extension for Microsoft.Extensions.Hosting for usage in .NET Standard libraries and net core applications making use of the generic Host class introduced in netcore 2.1</Description>
+    <PackageProjectUrl>https://github.com/NLog/NLog.Extensions.Logging</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/NLog/NLog.Extensions.Logging/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageIconUrl>https://nlog-project.org/NConfig.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/NLog/NLog.Extensions.Logging.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>NLog;Microsoft.Extensions.Hosting;log;logfiles;netcore</PackageTags>
+    <PackageReleaseNotes>1.0: Initial release</PackageReleaseNotes>
+
+    <!-- SonarQube needs this -->
+    <ProjectGuid>{548E65CE-0378-4812-AE00-B173F1251D3C}</ProjectGuid>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <AssemblyOriginatorKeyFile>..\NLog.snk</AssemblyOriginatorKeyFile>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+  </PropertyGroup>
+ 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NLog.Extensions.Logging\NLog.Extensions.Logging.csproj" />
+  </ItemGroup>
+
+</Project>
