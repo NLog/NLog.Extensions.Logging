@@ -109,11 +109,12 @@ namespace NLog.Extensions.Logging
 
                     originalMessageIndex = i;
                 }
-                else 
+                else
                 {
+                    var currentParameterIsPositional = char.IsDigit(firstChar);
                     if (!firstParameterIsPositional.HasValue)
-                        firstParameterIsPositional = char.IsDigit(firstChar);
-                    else if (char.IsDigit(firstChar) != firstParameterIsPositional)
+                        firstParameterIsPositional = currentParameterIsPositional;
+                    else if (currentParameterIsPositional != firstParameterIsPositional)
                         isMixedPositional = true;
                 }
             }
