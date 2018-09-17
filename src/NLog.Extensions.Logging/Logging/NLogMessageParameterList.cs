@@ -44,7 +44,7 @@ namespace NLog.Extensions.Logging
         /// </remarks>
         public static NLogMessageParameterList TryParse(IReadOnlyList<KeyValuePair<string, object>> parameterList)
         {
-            if (parameterList.Count > 1 || parameterList[0].Key != NLogLogger.OriginalFormatPropertyName)
+            if (parameterList.Count > 1 || (parameterList.Count == 1 && parameterList[0].Key != NLogLogger.OriginalFormatPropertyName))
             {
                 return new NLogMessageParameterList(parameterList);
             }
