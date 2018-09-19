@@ -39,7 +39,7 @@ Please check [platform support](https://github.com/NLog/NLog/wiki/platform-suppo
 
 Known issues
 ---
-- auto load of NLog extensions won't work yet. Use `<extensions>` (see below)
+- auto load of NLog extensions won't work yet. Use `<extensions>` (see [docs](https://github.com/NLog/NLog/wiki/Configuration-file#extensions))
 
 
 ### How to run the example (aspnet-core-example)
