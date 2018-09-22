@@ -3,6 +3,12 @@
 Date format: (year/month/day)
 
 
+### v1.3 (2018/09/22)
+- [#245](https://github.com/NLog/NLog.Extensions.Logging/pull/245) Added ${configsetting} for appsettings.json and others (@snakefoot)
+- [#246](https://github.com/NLog/NLog.Extensions.Logging/pull/246) Fixing bug throwing ArgumentOutOfRangeException if input is empty list (@thorhalvor)
+- [#236](https://github.com/NLog/NLog.Extensions.Logging/pull/236) BeginScope always return scope-object even on error (@snakefoot)
+- [#243](https://github.com/NLog/NLog.Extensions.Logging/pull/243) Enhancements for .NET Core 2 examples (@bryan5989)
+
 ### v1.2.1 (2018/08/05)
 - [#233](https://github.com/NLog/NLog.Extensions.Logging/pull/233) Fixed null-reference-exception when parsing empty scope-property collection (@snakefoot)
 - [#232](https://github.com/NLog/NLog.Extensions.Logging/pull/232) BeginScope: support for non-serializable objects + performance improvement (20-50% cpu, 35% times less allocations) (#232) (@snakefoot)
