@@ -23,8 +23,9 @@ artifacts:
 test_script:
   - nuget.exe install OpenCover -ExcludeVersion -DependencyVersion Ignore
   - OpenCover\tools\OpenCover.Console.exe -register:user -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test -f netcoreapp1.1 NLog.Extensions.Logging.Tests" -filter:"+[NLog.Extensions.Logging]* +[NLog.Extensions.Hosting]* -[NLog.Extensions.Logging.Tests]* -[NLog.Extensions.Hosting.Tests]*" -output:"coverage.xml" -oldstyle -targetdir:"test"
-  - OpenCover\tools\OpenCover.Console.exe -register:user -mergeoutput -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test -f netcoreapp2.0 NLog.Extensions.Logging.Tests" -filter:"+[NLog.Extensions.Logging]* +[NLog.Extensions.Hosting]* -[NLog.Extensions.Logging.Tests]* -[NLog.Extensions.Hosting.Tests]*" -output:"coverage.xml" -oldstyle -targetdir:"test"
+  - OpenCover\tools\OpenCover.Console.exe -register:user -mergeoutput -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test -f netcoreapp2.0 NLog.Extensions.Logging.Tests" -filter:"+[NLog.Extensions.Logging]* -[NLog.Extensions.Logging.Tests]*" -output:"coverage.xml" -oldstyle -targetdir:"test"
   - OpenCover\tools\OpenCover.Console.exe -register:user -mergeoutput -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test -f netcoreapp2.0 NLog.Extensions.Hosting.Tests" -filter:"+[NLog.Extensions.Logging]* +[NLog.Extensions.Hosting]* -[NLog.Extensions.Logging.Tests]* -[NLog.Extensions.Hosting.Tests]*" -output:"coverage.xml" -oldstyle -targetdir:"test"
+  - OpenCover\tools\OpenCover.Console.exe -register:user -mergeoutput -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test -f netcoreapp2.0 NLog.Extensions.Configuration.Tests" -filter:"+[NLog.Extensions.Logging]* +[NLog.Extensions.Hosting]* +[NLog.Extensions.Configuration]* -[NLog.Extensions.Logging.Tests]* -[NLog.Extensions.Hosting.Tests]* -[NLog.Extensions.Configuration.Tests]*" -output:"coverage.xml" -oldstyle -targetdir:"test"
   - pip install codecov
   - codecov -f "coverage.xml"
   - ps: .\run-sonar.ps1
