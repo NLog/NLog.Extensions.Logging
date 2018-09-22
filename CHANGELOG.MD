@@ -4,7 +4,7 @@ Date format: (year/month/day)
 
 
 ### v1.3 (2018/09/22)
-- [#245](https://github.com/NLog/NLog.Extensions.Logging/pull/245) Added ${configsetting} for appsettings.json and others (@snakefoot)
+- [#245](https://github.com/NLog/NLog.Extensions.Logging/pull/245) Added ${configsetting} for appsettings.json and others (@snakefoot, @linmasaki)
 - [#246](https://github.com/NLog/NLog.Extensions.Logging/pull/246) Fixing bug throwing ArgumentOutOfRangeException if input is empty list (@thorhalvor)
 - [#236](https://github.com/NLog/NLog.Extensions.Logging/pull/236) BeginScope always return scope-object even on error (@snakefoot)
 - [#243](https://github.com/NLog/NLog.Extensions.Logging/pull/243) Enhancements for .NET Core 2 examples (@bryan5989)
