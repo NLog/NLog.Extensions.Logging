@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NLog.Common;
 
@@ -9,13 +10,15 @@ namespace NLog.Extensions.Logging
     /// </summary>
     public class NLogLoggerFactory : ILoggerFactory
     {
+        private readonly IConfiguration _configuration; //todo use
         private readonly NLogLoggerProvider _provider;
 
         /// <summary>
         /// New factory with default options
         /// </summary>
-        public NLogLoggerFactory()
+        public NLogLoggerFactory(IConfiguration configuration)
         {
+            _configuration = configuration;
             _provider = new NLogLoggerProvider();
         }
 

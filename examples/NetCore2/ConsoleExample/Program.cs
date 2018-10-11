@@ -44,20 +44,18 @@ namespace ConsoleExample
             // Runner is the custom class
             services.AddTransient<Runner>();
 
-            services.AddSingleton<ILoggerFactory, LoggerFactory>();
-            services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
-            services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Trace));
-
-            var serviceProvider = services.BuildServiceProvider();
-
-            var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-
-            // configure NLog
-            loggerFactory.AddNLog(new NLogProviderOptions
+            // Use Configure NLog and add NLog Factory
+            services.AddSingleton(new NLogProviderOptions
             {
                 CaptureMessageTemplates = true,
                 CaptureMessageProperties = true
             });
+            services.AddSingleton<ILoggerFactory, NLogLoggerFactory>();
+
+            services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
+            services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Trace));
+
+            var serviceProvider = services.BuildServiceProvider();
 
             return serviceProvider;
         }
