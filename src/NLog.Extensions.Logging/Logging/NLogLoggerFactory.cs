@@ -25,8 +25,7 @@ namespace NLog.Extensions.Logging
         /// <summary>
         /// New factory with options. 
         /// </summary>
-        /// <param name="options"></param>
-        public NLogLoggerFactory(NLogProviderOptions options)
+        public NLogLoggerFactory(NLogProviderOptions options, IConfiguration configuration)
         {
             _provider = new NLogLoggerProvider(options);
         }

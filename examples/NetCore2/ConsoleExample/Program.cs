@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Extensions.Logging;
 using System;
+using Microsoft.Extensions.Configuration;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace ConsoleExample
@@ -41,6 +42,13 @@ namespace ConsoleExample
         {
             var services = new ServiceCollection();
 
+            var config = new ConfigurationBuilder()
+                    .SetBasePath(System.IO.Directory.GetCurrentDirectory())
+                       .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+              .Build();
+
+
+            services.AddSingleton<IConfiguration>(config);
             // Runner is the custom class
             services.AddTransient<Runner>();
 
