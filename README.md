@@ -18,8 +18,6 @@
 [NLog](https://github.com/NLog/NLog) provider for [Microsoft.Extensions.Logging](https://github.com/aspnet/Logging); .NET Core. 
 **ASP.NET Core** users should install  [NLog.Web.AspNetCore](https://www.nuget.org/packages/NLog.web.aspnetcore). 
 
-Routes .NET Core log messages to NLog.
-
 
 **Note**: Microsoft haven't ported all their classes to .NET standard, so not every target/layout renderer is available. 
 Please check [platform support](https://github.com/NLog/NLog/wiki/platform-support)
@@ -42,11 +40,3 @@ Please check [platform support](https://github.com/NLog/NLog/wiki/platform-suppo
 Known issues
 ---
 - auto load of NLog extensions won't work yet. Use `<extensions>` (see [docs](https://github.com/NLog/NLog/wiki/Configuration-file#extensions))
-
-
-### How to run the example (aspnet-core-example)
-How to run the [aspnet-core-examples](https://github.com/NLog/NLog.Extensions.Logging/tree/master/examples):
-
-1. Install dotnet: http://dot.net 
-2. From source: `dotnet run`
-3. or, after publish: `dotnet aspnet-core-example.dll`
