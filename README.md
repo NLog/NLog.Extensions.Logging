@@ -24,6 +24,8 @@ Routes .NET Core log messages to NLog.
 **Note**: Microsoft haven't ported all their classes to .NET standard, so not every target/layout renderer is available. 
 Please check [platform support](https://github.com/NLog/NLog/wiki/platform-support)
 
+**Note**: You don't actually have to use Dependency Injection to use NLog in a .NET Core Console application, as described below in "Getting started with .NET Core 2 Console application".  If you don't want to use DI, you can just add the NLog NuGet package to your project, manually add a `NLog.config` file, and follow the [tutorial](https://github.com/NLog/NLog/wiki/Tutorial#configure-nlog-targets-for-output) to `GetCurrentClassLogger()` and use that for logging.
+
 
 ## Getting started
 
