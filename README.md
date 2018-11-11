@@ -50,4 +50,3 @@ How to run the [dotnet-core-examples](https://github.com/NLog/NLog.Extensions.Lo
 
 1. Install dotnet: http://dot.net 
 2. From source: `dotnet run`
-3. or, after publish: `dotnet aspnet-core-example.dll`
