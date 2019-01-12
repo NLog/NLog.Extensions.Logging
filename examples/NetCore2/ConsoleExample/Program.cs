@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Extensions.Logging;
-using System;
-using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace ConsoleExample
 {
@@ -44,21 +44,20 @@ namespace ConsoleExample
             // Runner is the custom class
             services.AddTransient<Runner>();
 
-            services.AddSingleton<ILoggerFactory, LoggerFactory>();
-            services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
-            services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Trace));
+            var config = new ConfigurationBuilder()
+                .SetBasePath(System.IO.Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .Build();
 
-            var serviceProvider = services.BuildServiceProvider();
-
-            var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-
-            // configure NLog
-            loggerFactory.AddNLog(new NLogProviderOptions
+            // configure Logging with NLog
+            services.AddLogging(loggingBuilder =>
             {
-                CaptureMessageTemplates = true,
-                CaptureMessageProperties = true
+                loggingBuilder.ClearProviders();
+                loggingBuilder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+                loggingBuilder.AddNLog(config);
             });
 
+            var serviceProvider = services.BuildServiceProvider();
             return serviceProvider;
         }
     }
@@ -75,6 +74,10 @@ namespace ConsoleExample
         public void DoAction(string name)
         {
             _logger.LogDebug(20, "Doing hard work! {Action}", name);
+            _logger.LogInformation(21, "Doing hard work! {Action}", name);
+            _logger.LogWarning(22, "Doing hard work! {Action}", name);
+            _logger.LogError(23, "Doing hard work! {Action}", name);
+            _logger.LogCritical(24, "Doing hard work! {Action}", name);
         }
     }
 }

@@ -41,7 +41,17 @@ namespace NLog.Extensions.Hosting
                 ConfigurationItemFactory.Default.RegisterItemsFromAssembly(typeof(ConfigureExtensions).GetTypeInfo()
                     .Assembly);
 
-                services.AddSingleton(new LoggerFactory().AddNLog(options));
+                services.AddSingleton<ILoggerProvider>(serviceProvider =>
+                {
+                    var provider = new NLogLoggerProvider(options ?? new NLogProviderOptions());
+                    if (hostbuilder.Configuration != null)
+                    {
+                        // TODO ConfigSettingLayoutRenderer.DefaultConfiguration = hostbuilder.Configuration;
+                        if (options == null)
+                            provider.ConfigureNLogProvider(hostbuilder.Configuration?.GetSection("Logging:NLog"));
+                    }
+                    return provider;
+                });
             });
 
             return builder;

@@ -1,5 +1,7 @@
 using System;
+using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NLog.Common;
 using NLog.Config;
@@ -7,22 +9,22 @@ using NLog.Config;
 namespace NLog.Extensions.Logging
 {
     /// <summary>
-    /// Helpers for .NET Core
+    /// Helpers for configuring NLog for Microsoft Extension Logging (MEL)
     /// </summary>
     public static class ConfigureExtensions
     {
         /// <summary>
-        /// Enable NLog as logging provider in .NET Core.
+        /// Enable NLog as logging provider for Microsoft Extension Logging
         /// </summary>
         /// <param name="factory"></param>
         /// <returns>ILoggerFactory for chaining</returns>
         public static ILoggerFactory AddNLog(this ILoggerFactory factory)
         {
-            return AddNLog(factory, null);
+            return factory.AddNLog(NLogProviderOptions.Default);
         }
 
         /// <summary>
-        /// Enable NLog as logging provider in .NET Core.
+        /// Enable NLog as logging provider for Microsoft Extension Logging
         /// </summary>
         /// <param name="factory"></param>
         /// <param name="options">NLog options</param>
@@ -33,19 +35,45 @@ namespace NLog.Extensions.Logging
             return factory;
         }
 
+        /// <summary>
+        /// Enable NLog as logging provider for Microsoft Extension Logging
+        /// </summary>
+        /// <param name="factory"></param>
+        /// <param name="configuration"></param>
+        /// <returns>ILoggerFactory for chaining</returns>
+        public static ILoggerFactory AddNLog(this ILoggerFactory factory, IConfiguration configuration)
+        {
+            var provider = CreateNLogProvider(configuration);
+            factory.AddProvider(provider);
+            return factory;
+        }
+
 #if !NETCORE1_0
         /// <summary>
-        /// Enable NLog as logging provider in .NET Core.
+        /// Enable NLog as logging provider for Microsoft Extension Logging
         /// </summary>
         /// <param name="factory"></param>
         /// <returns>ILoggerFactory for chaining</returns>
         public static ILoggingBuilder AddNLog(this ILoggingBuilder factory)
         {
-            return AddNLog(factory, null);
+            return factory.AddNLog(NLogProviderOptions.Default);
         }
 
         /// <summary>
-        /// Enable NLog as logging provider in .NET Core.
+        /// Enable NLog as logging provider for Microsoft Extension Logging
+        /// </summary>
+        /// <param name="factory"></param>
+        /// <param name="configuration">Configuration</param>
+        /// <returns>ILoggerFactory for chaining</returns>
+        public static ILoggingBuilder AddNLog(this ILoggingBuilder factory, IConfiguration configuration)
+        {
+            var provider = CreateNLogProvider(configuration);
+            factory.AddProvider(provider);
+            return factory;
+        }
+
+        /// <summary>
+        /// Enable NLog as logging provider for Microsoft Extension Logging
         /// </summary>
         /// <param name="factory"></param>
         /// <param name="options">NLog options</param>
@@ -82,6 +110,49 @@ namespace NLog.Extensions.Logging
             LogManager.AddHiddenAssembly(typeof(NLogLoggerProvider).GetTypeInfo().Assembly);
             LogManager.Configuration = config;
             return config;
+        }
+
+        /// <summary>
+        /// Factory method for <see cref="NLogLoggerProvider"/>
+        /// </summary>
+        /// <param name="nlogProvider"></param>
+        /// <param name="configurationSection">Microsoft Extension Configuration</param>
+        /// <returns></returns>
+        public static NLogLoggerProvider ConfigureNLogProvider(this NLogLoggerProvider nlogProvider, IConfigurationSection configurationSection)
+        {
+            if (configurationSection == null)
+                return nlogProvider;
+
+            var configProps = nlogProvider.Options.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(p => p.SetMethod?.IsPublic == true).ToDictionary(p => p.Name, StringComparer.OrdinalIgnoreCase);
+            foreach (var configValue in configurationSection.GetChildren())
+            {
+                if (configProps.TryGetValue(configValue.Key, out var propertyInfo))
+                {
+                    try
+                    {
+                        var result = Convert.ChangeType(configValue.Value, propertyInfo.PropertyType);
+                        propertyInfo.SetMethod.Invoke(nlogProvider.Options, new[] { result });
+                    }
+                    catch (Exception ex)
+                    {
+                        InternalLogger.Warn(ex, "NLogProviderOptions: Property {0} could not be assigned value: {1}", configValue.Key, configValue.Value);
+                    }
+                }
+            }
+
+            return nlogProvider;
+        }
+
+        private static NLogLoggerProvider CreateNLogProvider(IConfiguration configuration)
+        {
+            var provider = new NLogLoggerProvider(new NLogProviderOptions());
+            if (configuration != null)
+            {
+                // TODO ConfigSettingLayoutRenderer.DefaultConfiguration = configuration;
+                provider.ConfigureNLogProvider(configuration.GetSection("Logging:NLog"));
+            }
+
+            return provider;
         }
     }
 }
