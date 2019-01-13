@@ -148,7 +148,7 @@ namespace NLog.Extensions.Logging
             var provider = new NLogLoggerProvider(new NLogProviderOptions());
             if (configuration != null)
             {
-                // TODO ConfigSettingLayoutRenderer.DefaultConfiguration = configuration;
+                ConfigSettingLayoutRenderer.DefaultConfiguration = configuration;
                 provider.Configure(configuration.GetSection("Logging:NLog"));
             }
 

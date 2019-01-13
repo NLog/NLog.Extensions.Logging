@@ -46,7 +46,7 @@ namespace NLog.Extensions.Hosting
                     var provider = new NLogLoggerProvider(options ?? new NLogProviderOptions());
                     if (hostbuilder.Configuration != null)
                     {
-                        // TODO ConfigSettingLayoutRenderer.DefaultConfiguration = hostbuilder.Configuration;
+                        ConfigSettingLayoutRenderer.DefaultConfiguration = hostbuilder.Configuration;
                         if (options == null)
                             provider.Configure(hostbuilder.Configuration?.GetSection("Logging:NLog"));
                     }
