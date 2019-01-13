@@ -15,11 +15,17 @@ namespace NLog.Extensions.Logging
 #endif
     public class NLogLoggerProvider : Microsoft.Extensions.Logging.ILoggerProvider
     {
+        private NLogBeginScopeParser _beginScopeParser;
+
         /// <summary>
         /// NLog options
         /// </summary>
         public NLogProviderOptions Options { get; set; }
-        private NLogBeginScopeParser _beginScopeParser;
+
+        /// <summary>
+        /// NLog Factory
+        /// </summary>
+        public LogFactory LogFactory { get; }
 
         /// <summary>
         /// New provider with default options, see <see cref="Options"/>
@@ -34,7 +40,18 @@ namespace NLog.Extensions.Logging
         /// </summary>
         /// <param name="options"></param>
         public NLogLoggerProvider(NLogProviderOptions options)
+            :this(options, null)
         {
+        }
+
+        /// <summary>
+        /// New provider with options
+        /// </summary>
+        /// <param name="options"></param>
+        /// <param name="logFactory">Optional isolated NLog LogFactory</param>
+        public NLogLoggerProvider(NLogProviderOptions options, LogFactory logFactory)
+        {
+            LogFactory = logFactory ?? LogManager.LogFactory;
             Options = options ?? NLogProviderOptions.Default;
             _beginScopeParser = new NLogBeginScopeParser(options);
             RegisterHiddenAssembliesForCallSite();
@@ -50,7 +67,7 @@ namespace NLog.Extensions.Logging
             var beginScopeParser = ((Options?.CaptureMessageProperties ?? true) && (Options?.IncludeScopes ?? true))
                 ? (_beginScopeParser ?? System.Threading.Interlocked.CompareExchange(ref _beginScopeParser, new NLogBeginScopeParser(Options), null))
                 : null;
-            return new NLogLogger(LogManager.GetLogger(name), Options, beginScopeParser);
+            return new NLogLogger(LogFactory.GetLogger(name), Options, beginScopeParser);
         }
 
         /// <summary>
@@ -70,7 +87,7 @@ namespace NLog.Extensions.Logging
         {
             if (disposing)
             {
-                LogManager.Flush();
+                LogFactory.Flush();
             }
         }
 
