@@ -118,7 +118,7 @@ namespace NLog.Extensions.Logging
         /// <param name="nlogProvider"></param>
         /// <param name="configurationSection">Microsoft Extension Configuration</param>
         /// <returns></returns>
-        public static NLogLoggerProvider ConfigureNLogProvider(this NLogLoggerProvider nlogProvider, IConfigurationSection configurationSection)
+        public static NLogLoggerProvider Configure(this NLogLoggerProvider nlogProvider, IConfigurationSection configurationSection)
         {
             if (configurationSection == null)
                 return nlogProvider;
@@ -149,7 +149,7 @@ namespace NLog.Extensions.Logging
             if (configuration != null)
             {
                 // TODO ConfigSettingLayoutRenderer.DefaultConfiguration = configuration;
-                provider.ConfigureNLogProvider(configuration.GetSection("Logging:NLog"));
+                provider.Configure(configuration.GetSection("Logging:NLog"));
             }
 
             return provider;

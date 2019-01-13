@@ -48,7 +48,7 @@ namespace NLog.Extensions.Hosting
                     {
                         // TODO ConfigSettingLayoutRenderer.DefaultConfiguration = hostbuilder.Configuration;
                         if (options == null)
-                            provider.ConfigureNLogProvider(hostbuilder.Configuration?.GetSection("Logging:NLog"));
+                            provider.Configure(hostbuilder.Configuration?.GetSection("Logging:NLog"));
                     }
                     return provider;
                 });
