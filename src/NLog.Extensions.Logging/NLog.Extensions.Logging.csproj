@@ -18,11 +18,10 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
     </Description>
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
-
--  Added ${configsetting} for appsettings.json and others (@snakefoot)
--  Fixing bug throwing ArgumentOutOfRangeException if input is empty list (@thorhalvor)
--  BeginScope always return scope-object even on error (@snakefoot)
--  Enhancements for .NET Core 2 examples (@bryan5989)
+-  Updated to Microsoft.Extensions.Logging ver. 2.1.0
+-  ${configsetting} layout renderer now depends on AddNLog-call to provide IConfiguration-interface
+-  NLogLoggerProvider options now binds to IConfiguration (Using section Logging:NLog)
+-  Now builds snupkg packages
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
 
