@@ -2,6 +2,10 @@
 
 Date format: (year/month/day)
 
+### v1.4 (2019/01/17)
+- [#257](https://github.com/NLog/NLog.Extensions.Logging/pull/257) Updated to Microsoft.Extensions.Logging ver. 2.1.0 with support for ${configsetting}
+- [#248](https://github.com/NLog/NLog.Extensions.Logging/pull/248) Configure NLogProviderOptions from appsettings.json
+- [#257](https://github.com/NLog/NLog.Extensions.Logging/pull/258) Create snupkg packages
 
 ### v1.3 (2018/09/22)
 - [#245](https://github.com/NLog/NLog.Extensions.Logging/pull/245) Added ${configsetting} for appsettings.json and others (@snakefoot, @linmasaki)
