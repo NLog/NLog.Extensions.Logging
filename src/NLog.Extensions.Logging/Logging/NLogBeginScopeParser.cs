@@ -48,15 +48,7 @@ namespace NLog.Extensions.Logging
         {
             try
             {
-#if NETSTANDARD
                 return NestedDiagnosticsLogicalContext.Push(state); // AsyncLocal has no requirement to be Serializable
-#else
-                // TODO Add support for Net46 in NLog (AsyncLocal), then we only have to do this check for legacy Net451 (CallContext)
-                if (state?.GetType().IsSerializable ?? true)
-                    return NestedDiagnosticsLogicalContext.Push(state);
-                else
-                    return NestedDiagnosticsLogicalContext.Push(state.ToString());  // Support HostingLogScope, ActionLogScope, FormattedLogValues and others
-#endif
             }
             catch (Exception ex)
             {
@@ -67,39 +59,47 @@ namespace NLog.Extensions.Logging
 
         private class ScopeProperties : IDisposable
         {
-            Stack<IDisposable> _properties;
+            private readonly IDisposable _ndlcScope;
+            private readonly IDisposable _mldcScope;
 
-            /// <summary>
-            /// Properties, never null and lazy init
-            /// </summary>
-            Stack<IDisposable> Properties => _properties ?? (_properties = new Stack<IDisposable>());
-
-            public ScopeProperties(int initialCapacity = 0)
+            public ScopeProperties(IDisposable ndlcScope, IDisposable mldcScope)
             {
-                if (initialCapacity > 0)
-                    _properties = new Stack<IDisposable>(initialCapacity);
+                _ndlcScope = ndlcScope;
+                _mldcScope = mldcScope;
             }
 
-            public static ScopeProperties CaptureScopeProperties(IReadOnlyList<KeyValuePair<string, object>> scopePropertyList)
+            private static IDisposable CreateScopeProperties(object scopeObject, IReadOnlyList<KeyValuePair<string, object>> propertyList)
             {
-                ScopeProperties scope = new ScopeProperties(scopePropertyList.Count + 1);
+                if (propertyList?.Count > 0)
+                    return new ScopeProperties(CreateDiagnosticLogicalContext(scopeObject), MappedDiagnosticsLogicalContext.SetScoped(propertyList));
+                else
+                    return CreateDiagnosticLogicalContext(scopeObject);
+            }
 
-                for (int i = 0; i < scopePropertyList.Count; ++i)
+            public static IDisposable CaptureScopeProperties(IReadOnlyList<KeyValuePair<string, object>> scopePropertyList)
+            {
+                if (scopePropertyList.Count == 0 || scopePropertyList[scopePropertyList.Count - 1].Key != NLogLogger.OriginalFormatPropertyName)
                 {
-                    var property = scopePropertyList[i];
-                    if (i == scopePropertyList.Count - 1 && i > 0 && property.Key == NLogLogger.OriginalFormatPropertyName)
-                        continue;   // Handle BeginScope("Hello {World}", "Earth")
-
-                    scope.AddProperty(property.Key, property.Value);
+                    return CreateScopeProperties(scopePropertyList, scopePropertyList);
                 }
+                else
+                {
+                    List<KeyValuePair<string, object>> propertyList = new List<KeyValuePair<string, object>>(scopePropertyList.Count - 1);
+                    for (int i = 0; i < scopePropertyList.Count; ++i)
+                    {
+                        var property = scopePropertyList[i];
+                        if (i == scopePropertyList.Count - 1 && i > 0 && property.Key == NLogLogger.OriginalFormatPropertyName)
+                            continue;   // Handle BeginScope("Hello {World}", "Earth")
 
-                scope.AddDispose(CreateDiagnosticLogicalContext(scopePropertyList));
-                return scope;
+                        propertyList.Add(property);
+                    }
+                    return CreateScopeProperties(scopePropertyList, propertyList);
+                }
             }
 
-            public static ScopeProperties CaptureScopeProperties(System.Collections.IEnumerable scopePropertyCollection, ConcurrentDictionary<Type, KeyValuePair<Func<object, object>, Func<object, object>>> stateExractor)
+            public static IDisposable CaptureScopeProperties(System.Collections.IEnumerable scopePropertyCollection, ConcurrentDictionary<Type, KeyValuePair<Func<object, object>, Func<object, object>>> stateExractor)
             {
-                ScopeProperties scope = new ScopeProperties();
+                List<KeyValuePair<string, object>> propertyList = null;
 
                 var keyValueExtractor = default(KeyValuePair<Func<object, object>, Func<object, object>>);
                 foreach (var property in scopePropertyCollection)
@@ -113,11 +113,15 @@ namespace NLog.Extensions.Logging
                             break;
                     }
 
-                    AddKeyValueProperty(scope, keyValueExtractor, property);
+                    var propertyValue = TryParseKeyValueProperty(keyValueExtractor, property);
+                    if (!propertyValue.HasValue)
+                        continue;
+
+                    propertyList = propertyList ?? new List<KeyValuePair<string, object>>();
+                    propertyList.Add(propertyValue.Value);
                 }
 
-                scope.AddDispose(CreateDiagnosticLogicalContext(scopePropertyCollection));
-                return scope;
+                return CreateScopeProperties(scopePropertyCollection, propertyList);
             }
 
             public static IDisposable CaptureScopeProperty<TState>(TState scopeProperty, ConcurrentDictionary<Type, KeyValuePair<Func<object, object>, Func<object, object>>> stateExractor)
@@ -125,23 +129,28 @@ namespace NLog.Extensions.Logging
                 if (!TryLookupExtractor(stateExractor, scopeProperty.GetType(), out var keyValueExtractor))
                     return CreateDiagnosticLogicalContext(scopeProperty);
 
-                var scope = new ScopeProperties();
-                AddKeyValueProperty(scope, keyValueExtractor, scopeProperty);
-                scope.AddDispose(CreateDiagnosticLogicalContext(scopeProperty));
-                return scope;
+                var propertyValue = TryParseKeyValueProperty(keyValueExtractor, scopeProperty);
+                if (!propertyValue.HasValue)
+                    return CreateDiagnosticLogicalContext(scopeProperty);
+
+                return new ScopeProperties(CreateDiagnosticLogicalContext(scopeProperty), MappedDiagnosticsLogicalContext.SetScoped(propertyValue.Value.Key, propertyValue.Value.Value));
             }
 
-            private static void AddKeyValueProperty(ScopeProperties scope, KeyValuePair<Func<object, object>, Func<object, object>> keyValueExtractor, object property)
+            private static KeyValuePair<string,object>? TryParseKeyValueProperty(KeyValuePair<Func<object, object>, Func<object, object>> keyValueExtractor, object property)
             {
+                string propertyName = null;
+
                 try
                 {
                     var propertyKey = keyValueExtractor.Key.Invoke(property);
+                    propertyName = propertyKey?.ToString() ?? string.Empty;
                     var propertyValue = keyValueExtractor.Value.Invoke(property);
-                    scope.AddProperty(propertyKey?.ToString() ?? string.Empty, propertyValue);
+                    return new KeyValuePair<string, object>(propertyName, propertyValue);
                 }
                 catch (Exception ex)
                 {
-                    InternalLogger.Debug(ex, "Exception in BeginScope add property");
+                    InternalLogger.Debug(ex, "Exception in BeginScope add property {0}", propertyName);
+                    return null;
                 }
             }
 
@@ -193,41 +202,29 @@ namespace NLog.Extensions.Logging
                 return true;
             }
 
-            public void AddDispose(IDisposable disposable)
-            {
-                if (disposable != null)
-                    Properties.Push(disposable);
-            }
-
-            public void AddProperty(string key, object value)
-            {
-                AddDispose(MappedDiagnosticsLogicalContext.SetScoped(key, value));
-            }
-
             public void Dispose()
             {
-                var properties = _properties;
-                if (properties != null)
+                try
                 {
-                    IDisposable property = null;
-                    while (properties.Count > 0)
-                    {
-                        try
-                        {
-                            property = properties.Pop();
-                            property.Dispose();
-                        }
-                        catch (Exception ex)
-                        {
-                            InternalLogger.Debug(ex, "Exception in BeginScope dispose property {0}", property);
-                        }
-                    }
+                    _mldcScope?.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    InternalLogger.Debug(ex, "Exception in BeginScope dispose MappedDiagnosticsLogicalContext");
+                }
+                try
+                {
+                    _ndlcScope?.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    InternalLogger.Debug(ex, "Exception in BeginScope dispose NestedDiagnosticsLogicalContext");
                 }
             }
 
             public override string ToString()
             {
-                return (_properties?.Count > 0 ? _properties.Peek()?.ToString() : null) ?? base.ToString();
+                return _ndlcScope?.ToString() ?? base.ToString();
             }
         }
     }

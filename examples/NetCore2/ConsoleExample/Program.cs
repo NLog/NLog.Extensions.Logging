@@ -12,12 +12,15 @@ namespace ConsoleExample
         private static void Main()
         {
             var logger = LogManager.GetCurrentClassLogger();
+
             try
             {
                 var config = new ConfigurationBuilder()
                     .SetBasePath(System.IO.Directory.GetCurrentDirectory())
                     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                     .Build();
+
+                LogManager.Configuration = new NLogLoggingConfiguration(config.GetSection("NLog"));
 
                 var servicesProvider = BuildDi(config);
                 using (servicesProvider as IDisposable)

@@ -15,7 +15,7 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Equal("MyTableName", result);
         }
 
-#if NETSTANDARD2_0 || NET461
+#if !NETCORE1_0
         [Fact]
         public void ConfigSettingGlobalConfigLookup()
         {
