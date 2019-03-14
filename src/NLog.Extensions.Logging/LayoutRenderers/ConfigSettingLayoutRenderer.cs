@@ -40,21 +40,27 @@ namespace NLog.Extensions.Logging
         public static IConfiguration DefaultConfiguration { get; set; }
 
         ///<summary>
-        /// Name of the setting
+        /// Item in the setting container
         ///</summary>
         [RequiredParameter]
         [DefaultParameter]
-        public string Name
+        public string Item
         {
-            get { return _name; }
+            get { return _item; }
             set
             {
-                _name = value;
-                _nameLookup = value?.Replace(".", ":");
+                _item = value;
+                _itemLookup = value?.Replace(".", ":");
             }
         }
-        private string _name;
-        private string _nameLookup;
+        private string _item;
+        private string _itemLookup;
+
+        /// <summary>
+        /// Name of the Item
+        /// </summary>
+        [Obsolete("Replaced by Item-property")]
+        public string Name { get => Item; set => Item = value; }
 
         ///<summary>
         /// The default value to render if the setting value is null.
@@ -64,14 +70,14 @@ namespace NLog.Extensions.Logging
         /// <inheritdoc/>
         protected override void Append(StringBuilder builder, LogEventInfo logEvent)
         {
-            if (string.IsNullOrEmpty(_nameLookup))
+            if (string.IsNullOrEmpty(_itemLookup))
                 return;
 
             string value = null;
             var configurationRoot = DefaultConfiguration;
             if (configurationRoot != null)
             {
-                value = configurationRoot[_nameLookup];
+                value = configurationRoot[_itemLookup];
             }
             else
             {
