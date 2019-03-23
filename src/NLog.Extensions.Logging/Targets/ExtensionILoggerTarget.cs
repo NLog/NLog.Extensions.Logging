@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NLog.Layouts;
 using NLog.Targets;
+using EventId = Microsoft.Extensions.Logging.EventId;
 
 namespace NLog.Extensions.Logging
 {
@@ -32,7 +33,7 @@ namespace NLog.Extensions.Logging
         public ExtensionILoggerTarget(Microsoft.Extensions.Logging.ILogger logger)
         {
             _logger = logger;
-            Layout = "${longdate}|${level:uppercase=true}|${logger}|${message:withException=true:exceptionSeparator=|}";
+            Layout = "${message}";
             OptimizeBufferReuse = true;
         }
 
@@ -46,18 +47,18 @@ namespace NLog.Extensions.Logging
             if (!_logger.IsEnabled(logLevel))
                 return;
 
-            var eventId = default(Microsoft.Extensions.Logging.EventId);
+            var eventId = default(EventId);
             if (EventId != null)
             {
                 var eventIdValue = RenderLogEvent(EventId, logEvent);
                 if (!string.IsNullOrEmpty(eventIdValue) && int.TryParse(eventIdValue, out int eventIdParsed) && eventIdParsed != 0)
-                    eventId = new Microsoft.Extensions.Logging.EventId(eventIdParsed);
+                    eventId = new EventId(eventIdParsed);
             }
             if (EventName != null)
             {
                 var eventNameValue = RenderLogEvent(EventName, logEvent);
                 if (!string.IsNullOrEmpty(eventNameValue))
-                    eventId = new Microsoft.Extensions.Logging.EventId(eventId.Id, eventNameValue);
+                    eventId = new EventId(eventId.Id, eventNameValue);
             }
 
             var layoutMessage = RenderLogEvent(Layout, logEvent);
@@ -74,6 +75,10 @@ namespace NLog.Extensions.Logging
 
         struct LogState : IReadOnlyList<KeyValuePair<string, object>>
         {
+            public readonly LogEventInfo LogEvent;
+            public readonly string LayoutMessage;
+            public readonly IDictionary<string, object> ContextProperties;
+
             public int Count => (LogEvent.HasProperties ? LogEvent.Properties.Count : 0) + (ContextProperties?.Count ?? 0) + 1;
 
             public KeyValuePair<string, object> this[int index]
@@ -82,48 +87,19 @@ namespace NLog.Extensions.Logging
                 {
                     if (LogEvent.HasProperties)
                     {
-                        if (index < LogEvent.Properties.Count)
-                        {
-                            foreach (var prop in LogEvent.Properties)
-                            {
-                                if (index-- == 0)
-                                    return new KeyValuePair<string, object>(prop.Key.ToString(), prop.Value);
-                            }
-                        }
-                        else
-                        {
-                            index -= LogEvent.Properties.Count;
-                        }
+                        if (TryGetPropertyFromIndex(LogEvent.Properties, CreateLogEventProperty, ref index, out var property))
+                            return property;
                     }
                     if (ContextProperties != null)
                     {
-                        if (index < ContextProperties.Count)
-                        {
-                            foreach (var prop in ContextProperties)
-                            {
-                                if (index-- == 0)
-                                    return new KeyValuePair<string, object>(prop.Key, prop.Value);
-                            }
-                        }
-                        else
-                        {
-                            index -= ContextProperties.Count;
-                        }
+                        if (TryGetPropertyFromIndex(ContextProperties, p => p, ref index, out var property))
+                            return property;
                     }
                     if (index != 0)
                         throw new ArgumentOutOfRangeException(nameof(index));
                     return CreateOriginalFormatProperty();
                 }
             }
-
-            private KeyValuePair<string, object> CreateOriginalFormatProperty()
-            {
-                return new KeyValuePair<string, object>(NLogLogger.OriginalFormatPropertyName, LogEvent.Message);
-            }
-
-            public readonly LogEventInfo LogEvent;
-            public readonly string LayoutMessage;
-            public readonly IDictionary<string, object> ContextProperties;
 
             public LogState(LogEventInfo logEvent, string layoutMessage, IDictionary<string, object> contextProperties)
             {
@@ -138,7 +114,7 @@ namespace NLog.Extensions.Logging
                 IEnumerable<KeyValuePair<string, object>> allProperties = ContextProperties?.Concat(originalMessage) ?? originalMessage;
                 if (LogEvent.HasProperties)
                 {
-                    allProperties = LogEvent.Properties.Select(prop => new KeyValuePair<string, object>(prop.Key.ToString(), prop.Value)).Concat(allProperties);
+                    allProperties = LogEvent.Properties.Select(prop => CreateLogEventProperty(prop)).Concat(allProperties);
                 }
                 return allProperties.GetEnumerator();
             }
@@ -146,6 +122,38 @@ namespace NLog.Extensions.Logging
             IEnumerator IEnumerable.GetEnumerator()
             {
                 return GetEnumerator();
+            }
+
+            private static bool TryGetPropertyFromIndex<TKey, TValue>(ICollection<KeyValuePair<TKey, TValue>> properties, Func<KeyValuePair<TKey, TValue>, KeyValuePair<string, object>> converter, ref int index, out KeyValuePair<string, object> property)
+            {
+                if (index < properties.Count)
+                {
+                    foreach (var prop in properties)
+                    {
+                        if (index-- == 0)
+                        {
+                            property = converter(prop);
+                            return true;
+                        }
+                    }
+                }
+                else
+                {
+                    index -= properties.Count;
+                }
+
+                property = default(KeyValuePair<string, object>);
+                return false;
+            }
+
+            private static KeyValuePair<string, object> CreateLogEventProperty(KeyValuePair<object, object> prop)
+            {
+                return new KeyValuePair<string, object>(prop.Key.ToString(), prop.Value);
+            }
+
+            private KeyValuePair<string, object> CreateOriginalFormatProperty()
+            {
+                return new KeyValuePair<string, object>(NLogLogger.OriginalFormatPropertyName, LogEvent.Message);
             }
         }
 
