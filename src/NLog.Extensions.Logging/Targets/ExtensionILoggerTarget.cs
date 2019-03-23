@@ -43,7 +43,7 @@ namespace NLog.Extensions.Logging
         /// <param name="logEvent"></param>
         protected override void Write(LogEventInfo logEvent)
         {
-            var logLevel = LookupLogLevel(logEvent.Level);
+            var logLevel = ConvertToLogLevel(logEvent.Level);
             if (!_logger.IsEnabled(logLevel))
                 return;
 
@@ -70,7 +70,7 @@ namespace NLog.Extensions.Logging
                     contextProperties = null;
             }
 
-            _logger.Log(LookupLogLevel(logEvent.Level), eventId, new LogState(logEvent, layoutMessage, contextProperties), logEvent.Exception, LogStateFormatter);
+            _logger.Log(ConvertToLogLevel(logEvent.Level), eventId, new LogState(logEvent, layoutMessage, contextProperties), logEvent.Exception, LogStateFormatter);
         }
 
         struct LogState : IReadOnlyList<KeyValuePair<string, object>>
@@ -162,7 +162,7 @@ namespace NLog.Extensions.Logging
             return logState.LayoutMessage;
         }
 
-        static Microsoft.Extensions.Logging.LogLevel LookupLogLevel(NLog.LogLevel logLevel)
+        static Microsoft.Extensions.Logging.LogLevel ConvertToLogLevel(NLog.LogLevel logLevel)
         {
             if (logLevel == NLog.LogLevel.Trace)
                 return Microsoft.Extensions.Logging.LogLevel.Trace;
