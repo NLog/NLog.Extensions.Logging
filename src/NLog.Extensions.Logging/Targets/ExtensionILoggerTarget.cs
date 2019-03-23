@@ -162,7 +162,7 @@ namespace NLog.Extensions.Logging
             return logState.LayoutMessage;
         }
 
-        Microsoft.Extensions.Logging.LogLevel LookupLogLevel(NLog.LogLevel logLevel)
+        static Microsoft.Extensions.Logging.LogLevel LookupLogLevel(NLog.LogLevel logLevel)
         {
             if (logLevel == NLog.LogLevel.Trace)
                 return Microsoft.Extensions.Logging.LogLevel.Trace;
