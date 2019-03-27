@@ -84,19 +84,27 @@ namespace NLog.Extensions.Logging
             bool? firstParameterIsPositional = null;
             for (int i = 0; i < parameterList.Count; ++i)
             {
-                var paramPair = parameterList[i];
-                if (string.IsNullOrEmpty(paramPair.Key))
+                string parameterKey;
+                try
+                {
+                    parameterKey = parameterList[i].Key;
+                }
+                catch (IndexOutOfRangeException ex)
+                {
+                    throw new FormatException($"Invalid format string. Expected {parameterList.Count - 1} format parameters, but failed to lookup parameter index {i}", ex);
+                }
+                if (string.IsNullOrEmpty(parameterKey))
                 {
                     originalMessageIndex = null;
                     return false;
                 }
 
-                char firstChar = paramPair.Key[0];
+                char firstChar = parameterKey[0];
                 if (GetCaptureType(firstChar) != CaptureType.Normal)
                 {
                     hasMessageTemplateCapture = true;
                 }
-                else if (paramPair.Key == NLogLogger.OriginalFormatPropertyName)
+                else if (parameterKey == NLogLogger.OriginalFormatPropertyName)
                 {
                     if (originalMessageIndex.HasValue)
                     {

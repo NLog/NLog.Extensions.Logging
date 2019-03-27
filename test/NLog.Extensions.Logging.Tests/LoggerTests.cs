@@ -115,6 +115,22 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters |Hello", target.Logs.LastOrDefault());
         }
 
+        [Fact]
+        public void TestInvalidFormatString()
+        {
+            var runner = GetRunner<Runner>();
+            var ex = Assert.Throws<AggregateException>(() => runner.Log(Microsoft.Extensions.Logging.LogLevel.Information, 0, null, "{0}{1}", "Test"));
+            Assert.IsType<FormatException>(ex.InnerException);
+        }
+
+        [Fact]
+        public void TestInvalidFormatString2()
+        {
+            var runner = GetRunner<Runner>(new NLogProviderOptions() { CaptureMessageTemplates = false });
+            var ex = Assert.Throws<AggregateException>(() => runner.Log(Microsoft.Extensions.Logging.LogLevel.Information, 0, null, "{0}{1}", "Test"));
+            Assert.IsType<FormatException>(ex.InnerException);
+        }
+
         [Theory]
         [InlineData(Microsoft.Extensions.Logging.LogLevel.Critical, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|FATAL|message Exception of type 'System.Exception' was thrown.|20")]
         [InlineData(Microsoft.Extensions.Logging.LogLevel.Debug, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message Exception of type 'System.Exception' was thrown.|20")]
@@ -231,27 +247,27 @@ namespace NLog.Extensions.Logging.Tests
                 _logger.LogDebug(20, "message with id");
             }
 
-            public void Log(Microsoft.Extensions.Logging.LogLevel logLevel, int eventId, Exception exception, string message)
+            public void Log(Microsoft.Extensions.Logging.LogLevel logLevel, int eventId, Exception exception, string message, params object[] args)
             {
                 switch (logLevel)
                 {
                     case Microsoft.Extensions.Logging.LogLevel.Trace:
-                        _logger.LogTrace(eventId, exception, message);
+                        _logger.LogTrace(eventId, exception, message, args);
                         break;
                     case Microsoft.Extensions.Logging.LogLevel.Debug:
-                        _logger.LogDebug(eventId, exception, message);
+                        _logger.LogDebug(eventId, exception, message, args);
                         break;
                     case Microsoft.Extensions.Logging.LogLevel.Information:
-                        _logger.LogInformation(eventId, exception, message);
+                        _logger.LogInformation(eventId, exception, message, args);
                         break;
                     case Microsoft.Extensions.Logging.LogLevel.Warning:
-                        _logger.LogWarning(eventId, exception, message);
+                        _logger.LogWarning(eventId, exception, message, args);
                         break;
                     case Microsoft.Extensions.Logging.LogLevel.Error:
-                        _logger.LogError(eventId, exception, message);
+                        _logger.LogError(eventId, exception, message, args);
                         break;
                     case Microsoft.Extensions.Logging.LogLevel.Critical:
-                        _logger.LogCritical(eventId, exception, message);
+                        _logger.LogCritical(eventId, exception, message, args);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(logLevel), logLevel, null);
