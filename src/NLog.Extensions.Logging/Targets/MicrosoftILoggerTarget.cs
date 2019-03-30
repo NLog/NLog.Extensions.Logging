@@ -12,7 +12,7 @@ namespace NLog.Extensions.Logging
     /// Forwards NLog LogEvents to Microsoft ILogger-interface with support for NLog Layout-features
     /// </summary>
     [Target("ExtensionILogger")]
-    public class ExtensionILoggerTarget : TargetWithContext
+    public class MicrosoftILoggerTarget : TargetWithContext
     {
         private readonly Microsoft.Extensions.Logging.ILogger _logger;
 
@@ -27,10 +27,10 @@ namespace NLog.Extensions.Logging
         public Layout EventName { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ExtensionILoggerTarget" /> class.
+        /// Initializes a new instance of the <see cref="MicrosoftILoggerTarget" /> class.
         /// </summary>
         /// <param name="logger">Microsoft ILogger instance</param>
-        public ExtensionILoggerTarget(Microsoft.Extensions.Logging.ILogger logger)
+        public MicrosoftILoggerTarget(Microsoft.Extensions.Logging.ILogger logger)
         {
             _logger = logger;
             Layout = "${message}";

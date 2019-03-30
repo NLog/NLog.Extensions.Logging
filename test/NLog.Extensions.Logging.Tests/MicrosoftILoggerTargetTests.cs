@@ -6,7 +6,7 @@ using Xunit;
 
 namespace NLog.Extensions.Logging.Tests
 {
-    public class ExtensionILoggerTargetTests
+    public class MicrosoftILoggerTargetTests
     {
         [Fact]
         public void SimpleILoggerMessageTest()
@@ -14,7 +14,7 @@ namespace NLog.Extensions.Logging.Tests
             var logFactory = new NLog.LogFactory();
             var logConfig = new NLog.Config.LoggingConfiguration();
             var ilogger = new TestLogger();
-            logConfig.AddRuleForAllLevels(new ExtensionILoggerTarget(ilogger) { Layout = "${message}" });
+            logConfig.AddRuleForAllLevels(new MicrosoftILoggerTarget(ilogger) { Layout = "${message}" });
             logFactory.Configuration = logConfig;
             var logger = logFactory.GetCurrentClassLogger();
             logger.Info("Hello World");
@@ -29,7 +29,7 @@ namespace NLog.Extensions.Logging.Tests
             var logFactory = new NLog.LogFactory();
             var logConfig = new NLog.Config.LoggingConfiguration();
             var ilogger = new TestLogger();
-            logConfig.AddRuleForAllLevels(new ExtensionILoggerTarget(ilogger) { Layout = "${message}" });
+            logConfig.AddRuleForAllLevels(new MicrosoftILoggerTarget(ilogger) { Layout = "${message}" });
             logFactory.Configuration = logConfig;
             var logger = logFactory.GetCurrentClassLogger();
             logger.Debug("Hello World");
@@ -42,7 +42,7 @@ namespace NLog.Extensions.Logging.Tests
             var logFactory = new NLog.LogFactory();
             var logConfig = new NLog.Config.LoggingConfiguration();
             var ilogger = new TestLogger();
-            logConfig.AddRuleForAllLevels(new ExtensionILoggerTarget(ilogger) { Layout = "${message}" });
+            logConfig.AddRuleForAllLevels(new MicrosoftILoggerTarget(ilogger) { Layout = "${message}" });
             logFactory.Configuration = logConfig;
             var logger = logFactory.GetCurrentClassLogger();
             logger.Info("Hello {Planet}", "Earth");
@@ -59,7 +59,7 @@ namespace NLog.Extensions.Logging.Tests
             var logFactory = new NLog.LogFactory();
             var logConfig = new NLog.Config.LoggingConfiguration();
             var ilogger = new TestLogger();
-            var target = new ExtensionILoggerTarget(ilogger) { Layout = "${message}" };
+            var target = new MicrosoftILoggerTarget(ilogger) { Layout = "${message}" };
             target.ContextProperties.Add(new Targets.TargetPropertyWithContext() { Name = "ThreadId", Layout = "${threadid}" });
             logConfig.AddRuleForAllLevels(target);
             logFactory.Configuration = logConfig;
