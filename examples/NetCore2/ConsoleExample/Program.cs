@@ -14,7 +14,12 @@ namespace ConsoleExample
             var logger = LogManager.GetCurrentClassLogger();
             try
             {
-                var servicesProvider = BuildDi();
+                var config = new ConfigurationBuilder()
+                    .SetBasePath(System.IO.Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                    .Build();
+
+                var servicesProvider = BuildDi(config);
                 using (servicesProvider as IDisposable)
                 {
                     var runner = servicesProvider.GetRequiredService<Runner>();
@@ -37,28 +42,18 @@ namespace ConsoleExample
             }
         }
 
-        private static IServiceProvider BuildDi()
+        private static IServiceProvider BuildDi(IConfiguration config)
         {
-            var services = new ServiceCollection();
-
-            // Runner is the custom class
-            services.AddTransient<Runner>();
-
-            var config = new ConfigurationBuilder()
-                .SetBasePath(System.IO.Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .Build();
-
-            // configure Logging with NLog
-            services.AddLogging(loggingBuilder =>
-            {
-                loggingBuilder.ClearProviders();
-                loggingBuilder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
-                loggingBuilder.AddNLog(config);
-            });
-
-            var serviceProvider = services.BuildServiceProvider();
-            return serviceProvider;
+            return new ServiceCollection()
+                .AddTransient<Runner>() // Runner is the custom class
+                .AddLogging(loggingBuilder =>
+                {
+                    // configure Logging with NLog
+                    loggingBuilder.ClearProviders();
+                    loggingBuilder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+                    loggingBuilder.AddNLog(config);
+                })
+                .BuildServiceProvider();
         }
     }
 
