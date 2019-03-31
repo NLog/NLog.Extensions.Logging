@@ -11,7 +11,7 @@ namespace NLog.Extensions.Logging
     /// <summary>
     /// Forwards NLog LogEvents to Microsoft ILogger-interface with support for NLog Layout-features
     /// </summary>
-    [Target("ExtensionILogger")]
+    [Target("MicrosoftILogger")]
     public class MicrosoftILoggerTarget : TargetWithContext
     {
         private readonly Microsoft.Extensions.Logging.ILogger _logger;
