@@ -2,6 +2,11 @@
 
 Date format: (year/month/day)
 
+### V1.5 RC
+
+See https://github.com/NLog/NLog.Extensions.Logging/milestone/24?closed=1
+
+
 ### v1.4 (2019/01/17)
 - [#257](https://github.com/NLog/NLog.Extensions.Logging/pull/257) Updated to Microsoft.Extensions.Logging ver. 2.1.0 with support for ${configsetting}
 - [#248](https://github.com/NLog/NLog.Extensions.Logging/pull/248) Configure NLogProviderOptions from appsettings.json
