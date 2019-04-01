@@ -441,7 +441,7 @@ namespace NLog.Extensions.Logging
                 return NullScope.Instance;
             }
 
-            if (_beginScopeParser != null)
+            if (_options.CaptureMessageProperties)
             {
                 return _beginScopeParser.ParseBeginScope(state) ?? NullScope.Instance;
             }
