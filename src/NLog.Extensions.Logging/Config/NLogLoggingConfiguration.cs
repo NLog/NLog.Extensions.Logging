@@ -11,20 +11,51 @@ namespace NLog.Extensions.Logging
     /// </summary>
     public class NLogLoggingConfiguration : LoggingConfigurationParser
     {
-        private readonly Action<Object> _reloadConfiguration;
+        private readonly Action<object> _reloadConfiguration;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NLogLoggingConfiguration"/> class. 
+        /// </summary>
+        /// <param name="nlogConfig">Configuration section to be read</param>
+        public NLogLoggingConfiguration(IConfigurationSection nlogConfig)
+            : this(nlogConfig, LogManager.LogFactory)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NLogLoggingConfiguration"/> class. 
+        /// </summary>
+        /// <param name="nlogConfig">Configuration section to be read</param>
+        /// <param name="logFactory">The <see cref="LogFactory"/> to which to apply any applicable configuration values.</param>
+        public NLogLoggingConfiguration(IConfigurationSection nlogConfig, LogFactory logFactory)
+            : base(logFactory)
+        {
+            _reloadConfiguration = (state) => LoadConfigurationSection((IConfigurationSection)state, true);
+            LoadConfigurationSection(nlogConfig, null);
+        }
+
+        private void LoadConfigurationSection(IConfigurationSection nlogConfig, bool? autoReload)
+        {
+            var configElement = new LoggingConfigurationElement(nlogConfig, true);
+            LoadConfig(configElement, null);
+            if (autoReload ?? configElement.AutoReload)
+            {
+                nlogConfig.GetReloadToken().RegisterChangeCallback(_reloadConfiguration, nlogConfig);
+            }
+        }
 
         private class LoggingConfigurationElement : ILoggingConfigurationElement
         {
             readonly IConfigurationSection _configurationSection;
             readonly string _nameOverride;
 
-            public bool AutoReload { get; private set; }
+            public bool AutoReload { get; }
 
             public LoggingConfigurationElement(IConfigurationSection configurationSection, bool topElement, string nameOverride = null)
             {
                 _configurationSection = configurationSection;
                 _nameOverride = nameOverride;
-                if (topElement && bool.TryParse(configurationSection["autoreload"], out bool autoreload))
+                if (topElement && bool.TryParse(configurationSection["autoreload"], out var autoreload))
                 {
                     AutoReload = autoreload;
                 }
@@ -55,53 +86,26 @@ namespace NLog.Extensions.Logging
                     foreach (var child in children)
                     {
                         var firstChildValue = child?.GetChildren()?.FirstOrDefault();
-                        if (firstChildValue != null)
+                        if (firstChildValue == null)
                         {
-                            if (_nameOverride == "target" && string.Equals(child.Key, "target", StringComparison.OrdinalIgnoreCase) && child.GetChildren().Count() == 1)
+                            continue;
+                        }
+
+                        if (_nameOverride == "target" && child.Key.EqualsOrdinalIgnoreCase("target") && child.GetChildren().Count() == 1)
+                        {
+                            yield return new LoggingConfigurationElement(firstChildValue, false, "target");
+                        }
+                        else
+                        {
+                            string nameOverride = null;
+                            if (_configurationSection.Key.EqualsOrdinalIgnoreCase("targets"))
                             {
-                                yield return new LoggingConfigurationElement(firstChildValue, false, "target");
+                                nameOverride = "target";
                             }
-                            else
-                            {
-                                string nameOverride = null;
-                                if (string.Equals(_configurationSection.Key, "targets", StringComparison.OrdinalIgnoreCase))
-                                    nameOverride = "target";
-                                yield return new LoggingConfigurationElement(child, false, nameOverride);
-                            }
+                            yield return new LoggingConfigurationElement(child, false, nameOverride);
                         }
                     }
                 }
-            }
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="NLogLoggingConfiguration"/> class. 
-        /// </summary>
-        /// <param name="nlogConfig">Configuration section to be read</param>
-        public NLogLoggingConfiguration(IConfigurationSection nlogConfig)
-            : this(nlogConfig, NLog.LogManager.LogFactory)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="NLogLoggingConfiguration"/> class. 
-        /// </summary>
-        /// <param name="nlogConfig">Configuration section to be read</param>
-        /// <param name="logFactory">The <see cref="LogFactory"/> to which to apply any applicable configuration values.</param>
-        public NLogLoggingConfiguration(IConfigurationSection nlogConfig, LogFactory logFactory)
-            : base(logFactory)
-        {
-            _reloadConfiguration = (state) => LoadConfigurationSection((IConfigurationSection)state, true);
-            LoadConfigurationSection(nlogConfig, null);
-        }
-
-        private void LoadConfigurationSection(IConfigurationSection nlogConfig, bool? autoReload)
-        {
-            var configElement = new LoggingConfigurationElement(nlogConfig, true);
-            LoadConfig(configElement, null);
-            if (autoReload ?? configElement.AutoReload)
-            {
-                nlogConfig.GetReloadToken().RegisterChangeCallback(_reloadConfiguration, nlogConfig);
             }
         }
     }
