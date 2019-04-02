@@ -33,7 +33,7 @@ namespace NLog.Extensions.Logging.Tests
             logFactory.Configuration = logConfig;
             var logger = logFactory.GetCurrentClassLogger();
             logger.Debug("Hello World");
-            Assert.Equal(null, ilogger.LastLogMessage);
+            Assert.Null(ilogger.LastLogMessage);
         }
 
         [Fact]

@@ -46,64 +46,80 @@ namespace NLog.Extensions.Logging
 
         private class LoggingConfigurationElement : ILoggingConfigurationElement
         {
-            readonly IConfigurationSection _configurationSection;
-            readonly string _nameOverride;
+            private const string VariablesKey = "Variables";
+            private const string VariableKey = "Variable";
+            private const string TargetKey = "target";
+            private readonly IConfigurationSection _configurationSection;
+            private readonly string _nameOverride;
+            private readonly bool _topElement;
 
+            public string Name => _nameOverride ?? _configurationSection.Key;
+            public IEnumerable<KeyValuePair<string, string>> Values => GetValues();
+            public IEnumerable<ILoggingConfigurationElement> Children => GetChildren();
             public bool AutoReload { get; }
 
             public LoggingConfigurationElement(IConfigurationSection configurationSection, bool topElement, string nameOverride = null)
             {
                 _configurationSection = configurationSection;
                 _nameOverride = nameOverride;
-                if (topElement && bool.TryParse(configurationSection["autoreload"], out var autoreload))
+                _topElement = topElement;
+                if (topElement)
                 {
-                    AutoReload = autoreload;
-                }
-            }
-
-            public string Name => _nameOverride ?? _configurationSection.Key;
-
-            public IEnumerable<KeyValuePair<string, string>> Values
-            {
-                get
-                {
-                    var children = _configurationSection.GetChildren();
-                    foreach (var child in children)
+                    if (bool.TryParse(configurationSection["autoreload"], out var autoreload))
                     {
-                        if (!child.GetChildren().Any())
-                            yield return new KeyValuePair<string, string>(child.Key, child.Value);
+                        AutoReload = autoreload;
                     }
-                    if (_nameOverride != null)
-                        yield return new KeyValuePair<string, string>("name", _configurationSection.Key);
                 }
             }
 
-            public IEnumerable<ILoggingConfigurationElement> Children
+            private IEnumerable<KeyValuePair<string, string>> GetValues()
             {
-                get
+                var children = _configurationSection.GetChildren();
+                foreach (var child in children)
                 {
-                    var children = _configurationSection.GetChildren();
-                    foreach (var child in children)
-                    {
-                        var firstChildValue = child?.GetChildren()?.FirstOrDefault();
-                        if (firstChildValue == null)
-                        {
-                            continue;
-                        }
+                    if (!child.GetChildren().Any())
+                        yield return new KeyValuePair<string, string>(child.Key, child.Value);
+                }
+                if (_nameOverride != null)
+                {
+                    yield return new KeyValuePair<string, string>("name", _configurationSection.Key);
+                    if (ReferenceEquals(_nameOverride, VariableKey))
+                        yield return new KeyValuePair<string, string>("value", _configurationSection.Value);
+                }
+            }
 
-                        if (_nameOverride == "target" && child.Key.EqualsOrdinalIgnoreCase("target") && child.GetChildren().Count() == 1)
+            private IEnumerable<ILoggingConfigurationElement> GetChildren()
+            {
+                var variables = _topElement ? _configurationSection.GetSection(VariablesKey) : null;
+                if (variables != null)
+                {
+                    foreach (var variable in variables.GetChildren())
+                        yield return new LoggingConfigurationElement(variable, false, VariableKey);
+                }
+
+                var children = _configurationSection.GetChildren();
+                foreach (var child in children)
+                {
+                    var firstChildValue = child?.GetChildren()?.FirstOrDefault();
+                    if (firstChildValue == null)
+                        continue;   // Simple value without children
+
+                    if (_nameOverride == TargetKey && child.Key.EqualsOrdinalIgnoreCase(TargetKey) && child.GetChildren().Count() == 1)
+                    {
+                        // Target-config inside Wrapper-Target
+                        yield return new LoggingConfigurationElement(firstChildValue, false, TargetKey);
+                    }
+                    else
+                    {
+                        if (variables != null && string.Equals(child.Key, VariablesKey, StringComparison.OrdinalIgnoreCase))
+                            continue;
+
+                        string nameOverride = null;
+                        if (_configurationSection.Key.EqualsOrdinalIgnoreCase("targets"))
                         {
-                            yield return new LoggingConfigurationElement(firstChildValue, false, "target");
+                            nameOverride = TargetKey;
                         }
-                        else
-                        {
-                            string nameOverride = null;
-                            if (_configurationSection.Key.EqualsOrdinalIgnoreCase("targets"))
-                            {
-                                nameOverride = "target";
-                            }
-                            yield return new LoggingConfigurationElement(child, false, nameOverride);
-                        }
+                        yield return new LoggingConfigurationElement(child, false, nameOverride);
                     }
                 }
             }
