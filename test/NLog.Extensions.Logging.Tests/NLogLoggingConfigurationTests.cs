@@ -14,10 +14,8 @@ namespace NLog.Extensions.Logging.Tests
         public void LoadSimpleConfig()
         {
             var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
-
             memoryConfig["NLog:Targets:file:type"] = "File";
             memoryConfig["NLog:Targets:file:fileName"] = "hello.txt";
-            memoryConfig["NLog:Targets:console:type"] = "Console";
            
             var logConfig = CreateNLogLoggingConfigurationWithNLogSection(memoryConfig);
 
@@ -26,6 +24,7 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Equal(2, logConfig.AllTargets.Count);
             Assert.Single(logConfig.AllTargets.Where(t => t is FileTarget));
             Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
+            Assert.Equal("hello.txt", (logConfig.FindTargetByName("File") as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
         }
         
         [Fact]
@@ -44,6 +43,25 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Single(logConfig.AllTargets.Where(t => t is AsyncTargetWrapper));
             Assert.Single(logConfig.AllTargets.Where(t => t is FileTarget));
             Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
+            Assert.Equal("hello.txt", (logConfig.FindTargetByName("wrappedFile") as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
+        }
+
+        [Fact]
+        public void LoadVariablesConfig()
+        {
+            var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
+            memoryConfig["NLog:Targets:file:type"] = "File";
+            memoryConfig["NLog:Targets:file:fileName"] = "${var_filename}";
+            memoryConfig["NLog:Variables:var_filename"] = "hello.txt";
+
+            var logConfig = CreateNLogLoggingConfigurationWithNLogSection(memoryConfig);
+
+            Assert.Single(logConfig.LoggingRules);
+            Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
+            Assert.Equal(2, logConfig.AllTargets.Count);
+            Assert.Single(logConfig.AllTargets.Where(t => t is FileTarget));
+            Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
+            Assert.Equal("hello.txt", (logConfig.FindTargetByName("File") as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
         }
 
         private static NLogLoggingConfiguration CreateNLogLoggingConfigurationWithNLogSection(IDictionary<string, string> memoryConfig)
