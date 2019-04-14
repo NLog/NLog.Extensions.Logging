@@ -127,6 +127,28 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Equal(3, ((logConfig.FindTargetByName("file") as FileTarget)?.Layout as NLog.Layouts.JsonLayout)?.Attributes?.Count);
         }
 
+        [Fact]
+        private void ReloadLogFactoryConfiguration()
+        {
+            var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
+            memoryConfig["NLog:Targets:file:type"] = "File";
+            memoryConfig["NLog:Targets:file:fileName"] = "hello.txt";
+            memoryConfig["NLog:AutoReload"] = "true";
+            var configuration = new ConfigurationBuilder().AddInMemoryCollection(memoryConfig).Build();
+            var logFactory = new LogFactory();
+            var logConfig = new NLogLoggingConfiguration(configuration.GetSection("NLog"), logFactory);
+            logFactory.Configuration = logConfig;
+            Assert.Equal(2, logFactory.Configuration.LoggingRules[0].Targets.Count);
+            configuration["NLog:Rules:0:writeTo"] = "Console";
+            logFactory.Configuration = logConfig.Reload();  // Manual Reload
+            Assert.Equal(1, logFactory.Configuration.LoggingRules[0].Targets.Count);
+            configuration["NLog:Rules:0:writeTo"] = "File,Console";
+            configuration.Reload(); // Automatic Reload
+            Assert.Equal(2, logFactory.Configuration.LoggingRules[0].Targets.Count);
+            logFactory.Dispose();
+            configuration.Reload(); // Nothing should happen
+        }
+
         private static NLogLoggingConfiguration CreateNLogLoggingConfigurationWithNLogSection(IDictionary<string, string> memoryConfig)
         {
             var configuration = new ConfigurationBuilder().AddInMemoryCollection(memoryConfig).Build();

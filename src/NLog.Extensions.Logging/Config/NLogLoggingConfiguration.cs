@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
+using NLog.Common;
 using NLog.Config;
 
 namespace NLog.Extensions.Logging
@@ -11,7 +12,26 @@ namespace NLog.Extensions.Logging
     /// </summary>
     public class NLogLoggingConfiguration : LoggingConfigurationParser
     {
-        private readonly Action<object> _reloadConfiguration;
+        private readonly IConfigurationSection _originalConfigSection;
+        private bool _autoReload;
+        private Action<object> _reloadConfiguration;
+
+        /// <summary>
+        /// Gets the collection of file names which should be watched for changes by NLog.
+        /// </summary>
+        public override IEnumerable<string> FileNamesToWatch
+        {
+            get
+            {
+                if (_autoReload && _reloadConfiguration == null)
+                {
+                    // Prepare for setting up reload notification handling
+                    _reloadConfiguration = (state) => ReloadConfigurationSection((IConfigurationSection)state);
+                    LogFactory.ConfigurationChanged += LogFactory_ConfigurationChanged;
+                }
+                return Enumerable.Empty<string>();
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NLogLoggingConfiguration"/> class. 
@@ -30,18 +50,68 @@ namespace NLog.Extensions.Logging
         public NLogLoggingConfiguration(IConfigurationSection nlogConfig, LogFactory logFactory)
             : base(logFactory)
         {
-            _reloadConfiguration = (state) => LoadConfigurationSection((IConfigurationSection)state, true);
-            LoadConfigurationSection(nlogConfig, null);
+            _originalConfigSection = nlogConfig;
+            _autoReload = LoadConfigurationSection(nlogConfig);
         }
 
-        private void LoadConfigurationSection(IConfigurationSection nlogConfig, bool? autoReload)
+        /// <inheritdoc />
+        public override LoggingConfiguration Reload()
+        {
+            return new NLogLoggingConfiguration(_originalConfigSection, LogFactory);
+        }
+
+        private bool LoadConfigurationSection(IConfigurationSection nlogConfig)
         {
             var configElement = new LoggingConfigurationElement(nlogConfig, true);
             LoadConfig(configElement, null);
-            if (autoReload ?? configElement.AutoReload)
+            return configElement.AutoReload;
+        }
+
+        private void LogFactory_ConfigurationChanged(object sender, LoggingConfigurationChangedEventArgs e)
+        {
+            if (ReferenceEquals(e.DeactivatedConfiguration, this))
             {
-                nlogConfig.GetReloadToken().RegisterChangeCallback(_reloadConfiguration, nlogConfig);
+                if (_autoReload)
+                {
+                    _autoReload = false;    // Cannot unsubscribe to reload event, but we can stop reacting to it
+                    LogFactory.ConfigurationChanged -= LogFactory_ConfigurationChanged;
+                }
             }
+            else if (ReferenceEquals(e.ActivatedConfiguration, this))
+            {
+                if (_autoReload && _reloadConfiguration != null)
+                {
+                    // Setup reload notification
+                    LogFactory.ConfigurationChanged += LogFactory_ConfigurationChanged;
+                    MonitorForReload(_originalConfigSection);
+                }
+            }
+        }
+
+        private void ReloadConfigurationSection(IConfigurationSection nlogConfig)
+        {
+            try
+            {
+                if (!_autoReload)
+                    return; // Should no longer react to reload events
+
+                Common.InternalLogger.Info("Reloading NLogLoggingConfiguration...");
+                NLogLoggingConfiguration newConfig = new NLogLoggingConfiguration(nlogConfig, LogFactory);
+                if (LogFactory.Configuration != null)
+                {
+                    LogFactory.Configuration = newConfig;
+                }
+            }
+            catch (Exception ex)
+            {
+                InternalLogger.Warn(ex, "NLogLoggingConfiguration failed to reload");
+                MonitorForReload(nlogConfig);   // Continue watching this file
+            }
+        }
+
+        private void MonitorForReload(IConfigurationSection nlogConfig)
+        {
+            nlogConfig.GetReloadToken().RegisterChangeCallback(_reloadConfiguration, nlogConfig);
         }
 
         private class LoggingConfigurationElement : ILoggingConfigurationElement
@@ -103,7 +173,7 @@ namespace NLog.Extensions.Logging
 
                 bool targetsSection = !_topElement && _nameOverride == null && _configurationSection.Key.EqualsOrdinalIgnoreCase("targets");
                 var defaultWrapper = targetsSection ? _configurationSection.GetSection("default-wrapper") : null;
-                if (defaultWrapper != null)
+                if (defaultWrapper?.GetChildren().Any()==true)
                 {
                     yield return new LoggingConfigurationElement(defaultWrapper, false);
                 }
