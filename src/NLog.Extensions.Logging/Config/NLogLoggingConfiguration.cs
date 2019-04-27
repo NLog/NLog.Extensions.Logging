@@ -190,9 +190,17 @@ namespace NLog.Extensions.Logging
                 }
 
                 var targetsSection = !_topElement && _nameOverride == null && _configurationSection.Key.EqualsOrdinalIgnoreCase("targets");
-                var defaultWrapper = _context.DefaultWrapperSection = GetDefaultWrapperSection();
+                var defaultWrapper = GetDefaultWrapperSection();
+                if (defaultWrapper != null)
+                {
+                    _context.DefaultWrapperSection = defaultWrapper;
+                }
 
-                var defaultTargetParameters = _context.DefaultTargetParametersSection = GetDefaultTargetParametersSection();
+                var defaultTargetParameters = GetDefaultTargetParametersSection();
+                if (defaultTargetParameters != null)
+                {
+                    _context.DefaultTargetParametersSection = defaultTargetParameters;
+                }
                 if (targetsSection)
                 {
                     foreach (var loggingConfigurationElement in YieldCapturedContextSections())
