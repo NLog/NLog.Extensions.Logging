@@ -299,7 +299,7 @@ namespace NLog.Extensions.Logging
             private IConfigurationSection GetDefaultWrapperSection()
             {
                 var defaultWrapper = _topElement ? _configurationSection.GetSection(DefaultWrapper) : null;
-                if (defaultWrapper?.GetChildren().Any() == true)
+                if (defaultWrapper != null && defaultWrapper.GetChildren().Any())
                 {
                     return defaultWrapper;
                 }
