@@ -52,7 +52,7 @@ namespace NLog.Extensions.Logging.Tests
         {
             var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
             memoryConfig["NLog:Targets:file:type"] = "File";
-            memoryConfig["NLog:Targets:file:fileName"] = "${var_filename}";
+            memoryConfig["NLog:targets:file:fileName"] = "${var_filename}";
             memoryConfig["NLog:Variables:var_filename"] = "hello.txt";
 
             var logConfig = CreateNLogLoggingConfigurationWithNLogSection(memoryConfig);
@@ -71,7 +71,7 @@ namespace NLog.Extensions.Logging.Tests
             var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
             memoryConfig["NLog:Targets:file:type"] = "File";
             memoryConfig["NLog:Targets:file:fileName"] = "hello.txt";
-            memoryConfig["NLog:Default-wrapper:type"] = "AsyncWrapper";
+            memoryConfig["NLog:default-wrapper:type"] = "AsyncWrapper";
             memoryConfig["NLog:Default-wrapper:batchSize"] = "1";
 
             var logConfig = CreateNLogLoggingConfigurationWithNLogSection(memoryConfig);
@@ -108,7 +108,7 @@ namespace NLog.Extensions.Logging.Tests
         {
             var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
             memoryConfig["NLog:Targets:file:type"] = "File";
-            memoryConfig["NLog:Default-target-parameters:file:filename"] = "hello.txt";
+            memoryConfig["NLog:default-target-parameters:file:filename"] = "hello.txt";
             memoryConfig["NLog:Default-target-parameters:file:layout:type"] = "JsonLayout";
             memoryConfig["NLog:Default-target-parameters:file:layout:Attributes:0:name"] = "timestamp";
             memoryConfig["NLog:Default-target-parameters:file:layout:Attributes:0:layout"] = "${date:format=o}";
@@ -160,7 +160,7 @@ namespace NLog.Extensions.Logging.Tests
 
         private static Dictionary<string, string> CreateMemoryConfigConsoleTargetAndRule()
         {
-            var memoryConfig = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
+            var memoryConfig = new Dictionary<string, string>();
             memoryConfig["NLog:Rules:0:logger"] = "*";
             memoryConfig["NLog:Rules:0:minLevel"] = "Trace";
             memoryConfig["NLog:Rules:0:writeTo"] = "File,Console";
