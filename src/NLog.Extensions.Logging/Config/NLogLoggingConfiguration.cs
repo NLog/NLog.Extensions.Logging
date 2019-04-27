@@ -29,6 +29,7 @@ namespace NLog.Extensions.Logging
                     _reloadConfiguration = (state) => ReloadConfigurationSection((IConfigurationSection)state);
                     LogFactory.ConfigurationChanged += LogFactory_ConfigurationChanged;
                 }
+
                 return Enumerable.Empty<string>();
             }
         }
@@ -62,7 +63,7 @@ namespace NLog.Extensions.Logging
 
         private bool LoadConfigurationSection(IConfigurationSection nlogConfig)
         {
-            var configElement = new LoggingConfigurationElement(nlogConfig, true);
+            var configElement = new LoggingConfigurationElement(nlogConfig, new LoggingConfigurationElementContext(), true);
             LoadConfig(configElement, null);
             return configElement.AutoReload;
         }
@@ -73,7 +74,7 @@ namespace NLog.Extensions.Logging
             {
                 if (_autoReload)
                 {
-                    _autoReload = false;    // Cannot unsubscribe to reload event, but we can stop reacting to it
+                    _autoReload = false; // Cannot unsubscribe to reload event, but we can stop reacting to it
                     LogFactory.ConfigurationChanged -= LogFactory_ConfigurationChanged;
                 }
             }
@@ -105,7 +106,7 @@ namespace NLog.Extensions.Logging
             catch (Exception ex)
             {
                 InternalLogger.Warn(ex, "NLogLoggingConfiguration failed to reload");
-                MonitorForReload(nlogConfig);   // Continue watching this file
+                MonitorForReload(nlogConfig); // Continue watching this file
             }
         }
 
@@ -114,8 +115,11 @@ namespace NLog.Extensions.Logging
             nlogConfig.GetReloadToken().RegisterChangeCallback(_reloadConfiguration, nlogConfig);
         }
 
-        private static IConfigurationSection _defaultWrapper;
-        private static IConfigurationSection _defaultTargetParameters;
+        private class LoggingConfigurationElementContext
+        {
+            public IConfigurationSection DefaultWrapperSection;
+            public IConfigurationSection DefaultTargetParametersSection;
+        }
 
         private class LoggingConfigurationElement : ILoggingConfigurationElement
         {
@@ -124,18 +128,20 @@ namespace NLog.Extensions.Logging
             private const string VariableKey = "Variable";
             private const string DefaultWrapper = "Default-wrapper";
             private readonly IConfigurationSection _configurationSection;
+            private readonly LoggingConfigurationElementContext _context;
             private readonly string _nameOverride;
             private readonly bool _topElement;
-           
+
 
             public string Name => _nameOverride ?? _configurationSection.Key;
             public IEnumerable<KeyValuePair<string, string>> Values => GetValues();
             public IEnumerable<ILoggingConfigurationElement> Children => GetChildren();
             public bool AutoReload { get; }
 
-            public LoggingConfigurationElement(IConfigurationSection configurationSection, bool topElement, string nameOverride = null)
+            public LoggingConfigurationElement(IConfigurationSection configurationSection, LoggingConfigurationElementContext context, bool topElement, string nameOverride = null)
             {
                 _configurationSection = configurationSection;
+                _context = context;
                 _nameOverride = nameOverride;
                 _topElement = topElement;
                 if (topElement)
@@ -167,7 +173,7 @@ namespace NLog.Extensions.Logging
                 }
             }
 
-            
+
 
             private IEnumerable<ILoggingConfigurationElement> GetChildren()
             {
@@ -175,39 +181,39 @@ namespace NLog.Extensions.Logging
                 if (variables != null)
                 {
                     foreach (var variable in variables.GetChildren())
-                        yield return new LoggingConfigurationElement(variable, false, VariableKey);
+                        yield return new LoggingConfigurationElement(variable, _context, false, VariableKey);
                 }
 
                 bool targetsSection = !_topElement && _nameOverride == null && _configurationSection.Key.EqualsOrdinalIgnoreCase("targets");
                 var defaultWrapper = _topElement ? _configurationSection.GetSection(DefaultWrapper) : null;
-                if (defaultWrapper?.GetChildren().Any()==true)
+                if (defaultWrapper?.GetChildren().Any() == true)
                 {
-                    _defaultWrapper = defaultWrapper;
-                    
+                    _context.DefaultWrapperSection = defaultWrapper;
+
                 }
 
-             
+
                 var defaultTargetParameters = _topElement ? _configurationSection.GetSection(DefaultTargetParameters) : null;
                 if (defaultTargetParameters != null)
                 {
-                    _defaultTargetParameters = defaultTargetParameters;
+                    _context.DefaultTargetParametersSection = defaultTargetParameters;
 
-                  
+
                 }
                 if (targetsSection)
                 {
-                    if (_defaultWrapper != null)
+                    if (_context.DefaultWrapperSection != null)
                     {
-                        yield return new LoggingConfigurationElement(_defaultWrapper, true, DefaultWrapper);
-                        _defaultWrapper = null;
+                        yield return new LoggingConfigurationElement(_context.DefaultWrapperSection, _context, true, DefaultWrapper);
+                        _context.DefaultWrapperSection = null;
                     }
 
-                    if (_defaultTargetParameters != null)
+                    if (_context.DefaultTargetParametersSection != null)
                     {
-                        foreach (var targetParameters in _defaultTargetParameters.GetChildren())
-                            yield return new LoggingConfigurationElement(targetParameters, true, DefaultTargetParameters);
+                        foreach (var targetParameters in _context.DefaultTargetParametersSection.GetChildren())
+                            yield return new LoggingConfigurationElement(targetParameters, _context, true, DefaultTargetParameters);
 
-                        _defaultTargetParameters = null;
+                        _context.DefaultTargetParametersSection = null;
                     }
                 }
 
@@ -221,7 +227,7 @@ namespace NLog.Extensions.Logging
                     if (_nameOverride == TargetKey && child.Key.EqualsOrdinalIgnoreCase(TargetKey) && child.GetChildren().Count() == 1)
                     {
                         // Target-config inside Wrapper-Target
-                        yield return new LoggingConfigurationElement(firstChildValue, false, TargetKey);
+                        yield return new LoggingConfigurationElement(firstChildValue, _context, false, TargetKey);
                     }
                     else
                     {
@@ -236,7 +242,7 @@ namespace NLog.Extensions.Logging
                             if (defaultTargetParameters != null && child.Key.EqualsOrdinalIgnoreCase(defaultTargetParameters.Key))
                                 continue;
 
-                           
+
                         }
 
                         if (targetsSection)
@@ -246,7 +252,7 @@ namespace NLog.Extensions.Logging
 
 
 
-                        yield return new LoggingConfigurationElement(child, false, nameOverride);
+                        yield return new LoggingConfigurationElement(child, _context, false, nameOverride);
                     }
                 }
             }
