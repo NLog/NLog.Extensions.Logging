@@ -7,7 +7,7 @@ using NLog.Extensions.Logging;
 
 namespace ConsoleExample
 {
-    internal class Program
+    internal static class Program
     {
         private static void Main()
         {
