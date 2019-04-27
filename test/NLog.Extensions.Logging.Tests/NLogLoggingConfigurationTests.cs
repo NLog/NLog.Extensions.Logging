@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using NLog.Targets;
@@ -159,7 +160,7 @@ namespace NLog.Extensions.Logging.Tests
 
         private static Dictionary<string, string> CreateMemoryConfigConsoleTargetAndRule()
         {
-            var memoryConfig = new Dictionary<string, string>();
+            var memoryConfig = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
             memoryConfig["NLog:Rules:0:logger"] = "*";
             memoryConfig["NLog:Rules:0:minLevel"] = "Trace";
             memoryConfig["NLog:Rules:0:writeTo"] = "File,Console";
