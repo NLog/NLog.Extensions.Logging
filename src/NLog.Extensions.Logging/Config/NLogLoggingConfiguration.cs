@@ -195,20 +195,9 @@ namespace NLog.Extensions.Logging
                 var defaultTargetParameters = _context.DefaultTargetParametersSection = GetDefaultTargetParametersSection();
                 if (targetsSection)
                 {
-                    if (_context.DefaultWrapperSection != null)
+                    foreach (var loggingConfigurationElement in YieldCapturedContextSections())
                     {
-                        yield return new LoggingConfigurationElement(_context.DefaultWrapperSection, _context, true, DefaultWrapper);
-                        _context.DefaultWrapperSection = null;
-                    }
-
-                    if (_context.DefaultTargetParametersSection != null)
-                    {
-                        foreach (var targetParameters in _context.DefaultTargetParametersSection.GetChildren())
-                        {
-                            yield return new LoggingConfigurationElement(targetParameters, _context, true, DefaultTargetParameters);
-                        }
-
-                        _context.DefaultTargetParametersSection = null;
+                        yield return loggingConfigurationElement;
                     }
                 }
 
@@ -240,6 +229,25 @@ namespace NLog.Extensions.Logging
 
                         yield return new LoggingConfigurationElement(child, _context, false, nameOverride);
                     }
+                }
+            }
+
+            private IEnumerable<ILoggingConfigurationElement> YieldCapturedContextSections()
+            {
+                if (_context.DefaultWrapperSection != null)
+                {
+                    yield return new LoggingConfigurationElement(_context.DefaultWrapperSection, _context, true, DefaultWrapper);
+                    _context.DefaultWrapperSection = null;
+                }
+
+                if (_context.DefaultTargetParametersSection != null)
+                {
+                    foreach (var targetParameters in _context.DefaultTargetParametersSection.GetChildren())
+                    {
+                        yield return new LoggingConfigurationElement(targetParameters, _context, true, DefaultTargetParameters);
+                    }
+
+                    _context.DefaultTargetParametersSection = null;
                 }
             }
 
