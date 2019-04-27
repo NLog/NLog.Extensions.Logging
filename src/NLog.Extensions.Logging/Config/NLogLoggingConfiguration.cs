@@ -114,14 +114,19 @@ namespace NLog.Extensions.Logging
             nlogConfig.GetReloadToken().RegisterChangeCallback(_reloadConfiguration, nlogConfig);
         }
 
+        private static IConfigurationSection _defaultWrapper;
+        private static IConfigurationSection _defaultTargetParameters;
+
         private class LoggingConfigurationElement : ILoggingConfigurationElement
         {
             private const string TargetKey = "target";
-            private const string DefaultTargetParameters = "default-target-parameters";
+            private const string DefaultTargetParameters = "Default-target-parameters";
             private const string VariableKey = "Variable";
+            private const string DefaultWrapper = "Default-wrapper";
             private readonly IConfigurationSection _configurationSection;
             private readonly string _nameOverride;
             private readonly bool _topElement;
+           
 
             public string Name => _nameOverride ?? _configurationSection.Key;
             public IEnumerable<KeyValuePair<string, string>> Values => GetValues();
@@ -162,6 +167,8 @@ namespace NLog.Extensions.Logging
                 }
             }
 
+            
+
             private IEnumerable<ILoggingConfigurationElement> GetChildren()
             {
                 var variables = _topElement ? _configurationSection.GetSection("Variables") : null;
@@ -172,17 +179,36 @@ namespace NLog.Extensions.Logging
                 }
 
                 bool targetsSection = !_topElement && _nameOverride == null && _configurationSection.Key.EqualsOrdinalIgnoreCase("targets");
-                var defaultWrapper = targetsSection ? _configurationSection.GetSection("default-wrapper") : null;
+                var defaultWrapper = _topElement ? _configurationSection.GetSection(DefaultWrapper) : null;
                 if (defaultWrapper?.GetChildren().Any()==true)
                 {
-                    yield return new LoggingConfigurationElement(defaultWrapper, false);
+                    _defaultWrapper = defaultWrapper;
+                    
                 }
 
-                var defaultTargetParameters = targetsSection ? _configurationSection.GetSection(DefaultTargetParameters) : null;
+             
+                var defaultTargetParameters = _topElement ? _configurationSection.GetSection(DefaultTargetParameters) : null;
                 if (defaultTargetParameters != null)
                 {
-                    foreach (var targetParameters in defaultTargetParameters.GetChildren())
-                        yield return new LoggingConfigurationElement(targetParameters, false, DefaultTargetParameters);
+                    _defaultTargetParameters = defaultTargetParameters;
+
+                  
+                }
+                if (targetsSection)
+                {
+                    if (_defaultWrapper != null)
+                    {
+                        yield return new LoggingConfigurationElement(_defaultWrapper, true, DefaultWrapper);
+                        _defaultWrapper = null;
+                    }
+
+                    if (_defaultTargetParameters != null)
+                    {
+                        foreach (var targetParameters in _defaultTargetParameters.GetChildren())
+                            yield return new LoggingConfigurationElement(targetParameters, true, DefaultTargetParameters);
+
+                        _defaultTargetParameters = null;
+                    }
                 }
 
                 var children = _configurationSection.GetChildren();
@@ -203,15 +229,23 @@ namespace NLog.Extensions.Logging
                             continue;
 
                         string nameOverride = null;
-                        if (targetsSection)
+                        if (_topElement)
                         {
                             if (defaultWrapper != null && child.Key.EqualsOrdinalIgnoreCase(defaultWrapper.Key))
                                 continue;
                             if (defaultTargetParameters != null && child.Key.EqualsOrdinalIgnoreCase(defaultTargetParameters.Key))
                                 continue;
 
+                           
+                        }
+
+                        if (targetsSection)
+                        {
                             nameOverride = TargetKey;
                         }
+
+
+
                         yield return new LoggingConfigurationElement(child, false, nameOverride);
                     }
                 }
