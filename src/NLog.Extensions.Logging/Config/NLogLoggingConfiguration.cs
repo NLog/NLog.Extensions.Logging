@@ -97,8 +97,14 @@ namespace NLog.Extensions.Logging
 
                 InternalLogger.Info("Reloading NLogLoggingConfiguration...");
                 var newConfig = new NLogLoggingConfiguration(nlogConfig, LogFactory);
-                if (LogFactory.Configuration != null)
+                var oldConfig = LogFactory.Configuration;
+                if (oldConfig != null)
                 {
+                    if (LogFactory.KeepVariablesOnReload)
+                    {
+                        foreach (var variable in oldConfig.Variables)
+                            newConfig.Variables[variable.Key] = variable.Value;
+                    }
                     LogFactory.Configuration = newConfig;
                 }
             }

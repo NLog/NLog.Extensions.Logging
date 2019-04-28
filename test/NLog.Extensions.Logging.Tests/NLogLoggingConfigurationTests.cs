@@ -108,14 +108,14 @@ namespace NLog.Extensions.Logging.Tests
         {
             var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
             memoryConfig["NLog:Targets:file:type"] = "File";
-            memoryConfig["NLog:Default-target-parameters:file:filename"] = "hello.txt";
-            memoryConfig["NLog:Default-target-parameters:file:layout:type"] = "JsonLayout";
-            memoryConfig["NLog:Default-target-parameters:file:layout:Attributes:0:name"] = "timestamp";
-            memoryConfig["NLog:Default-target-parameters:file:layout:Attributes:0:layout"] = "${date:format=o}";
-            memoryConfig["NLog:Default-target-parameters:file:layout:Attributes:1:name"] = "level";
-            memoryConfig["NLog:Default-target-parameters:file:layout:Attributes:1:layout"] = "${level}";
-            memoryConfig["NLog:Default-target-parameters:file:layout:Attributes:2:name"] = "message";
-            memoryConfig["NLog:Default-target-parameters:file:layout:Attributes:2:layout"] = "${message}";
+            memoryConfig["NLog:default-target-parameters:file:filename"] = "hello.txt";
+            memoryConfig["NLog:default-target-parameters:file:layout:type"] = "JsonLayout";
+            memoryConfig["NLog:default-target-parameters:file:layout:Attributes:0:name"] = "timestamp";
+            memoryConfig["NLog:default-target-parameters:file:layout:Attributes:0:layout"] = "${date:format=o}";
+            memoryConfig["NLog:default-target-parameters:file:layout:Attributes:1:name"] = "level";
+            memoryConfig["NLog:default-target-parameters:file:layout:Attributes:1:layout"] = "${level}";
+            memoryConfig["NLog:default-target-parameters:file:layout:Attributes:2:name"] = "message";
+            memoryConfig["NLog:default-target-parameters:file:layout:Attributes:2:layout"] = "${message}";
 
             var logConfig = CreateNLogLoggingConfigurationWithNLogSection(memoryConfig);
 
@@ -148,6 +148,26 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Equal(2, logFactory.Configuration.LoggingRules[0].Targets.Count);
             logFactory.Dispose();
             configuration.Reload(); // Nothing should happen
+        }
+
+        [Fact]
+        private void ReloadLogFactoryConfigurationKeepVariables()
+        {
+            var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
+            memoryConfig["NLog:Targets:file:type"] = "File";
+            memoryConfig["NLog:Targets:file:fileName"] = "${var:var_filename}";
+            memoryConfig["NLog:autoreload"] = "true";
+            memoryConfig["NLog:KeepVariablesOnReload"] = "true";
+            memoryConfig["NLog:variables:var_filename"] = "hello.txt";
+            var configuration = new ConfigurationBuilder().AddInMemoryCollection(memoryConfig).Build();
+            var logFactory = new LogFactory();
+            var logConfig = new NLogLoggingConfiguration(configuration.GetSection("NLog"), logFactory);
+            logFactory.Configuration = logConfig;
+            Assert.Equal("hello.txt", (logFactory.Configuration.FindTargetByName("file") as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
+            logFactory.Configuration.Variables["var_filename"] = "updated.txt";
+            Assert.Equal("updated.txt", (logFactory.Configuration.FindTargetByName("file") as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
+            configuration.Reload(); // Automatic Reload
+            Assert.Equal("updated.txt", (logFactory.Configuration.FindTargetByName("file") as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
         }
 
         private static NLogLoggingConfiguration CreateNLogLoggingConfigurationWithNLogSection(IDictionary<string, string> memoryConfig)
