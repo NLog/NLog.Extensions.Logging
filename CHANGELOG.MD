@@ -2,8 +2,8 @@
 
 Date format: (year/month/day)
 
-### V1.5
-- [#263](https://github.com/NLog/NLog.Extensions.Logging/pull/263) Support for loading NLog config from appsettings.json
+### V1.5 (2019/04/30)
+- [#263](https://github.com/NLog/NLog.Extensions.Logging/pull/263) Support for loading NLog config from appsettings.json using NLogLoggingConfiguration
 - [#263](https://github.com/NLog/NLog.Extensions.Logging/pull/263) Improved performance and reduced allocation for ILogger.BeginScope
 - [#260](https://github.com/NLog/NLog.Extensions.Logging/pull/260) Introduced MicrosoftILoggerTarget for logging in Azure Lambda
 - [#272](https://github.com/NLog/NLog.Extensions.Logging/pull/272) Better handling of IndexOutOfRangeException when invalid log-message format
