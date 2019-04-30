@@ -19,8 +19,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>NLog;Microsoft.Extensions.Hosting;log;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
-- ${configsetting} layout renderer now uses IHostBuilder.Configuration
-- NLogLoggerProvider options now binds to IHostBuilder.Configuration (Using section Logging:NLog)
+Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
     </PackageReleaseNotes>
 
     <!-- SonarQube needs this -->
