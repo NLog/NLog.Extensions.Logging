@@ -2,10 +2,15 @@
 
 Date format: (year/month/day)
 
+### V1.5
+- [#263](https://github.com/NLog/NLog.Extensions.Logging/pull/263) Support for loading NLog config from appsettings.json
+- [#263](https://github.com/NLog/NLog.Extensions.Logging/pull/263) Improved performance and reduced allocation for ILogger.BeginScope
+- [#260](https://github.com/NLog/NLog.Extensions.Logging/pull/260) Introduced MicrosoftILoggerTarget for logging in Azure Lambda
+- [#272](https://github.com/NLog/NLog.Extensions.Logging/pull/272) Better handling of IndexOutOfRangeException when invalid log-message format
+
 ### V1.5 RC
 
 See https://github.com/NLog/NLog.Extensions.Logging/milestone/24?closed=1
-
 
 ### v1.4 (2019/01/17)
 - [#257](https://github.com/NLog/NLog.Extensions.Logging/pull/257) Updated to Microsoft.Extensions.Logging ver. 2.1.0 with support for ${configsetting}
