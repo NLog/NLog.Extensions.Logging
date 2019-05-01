@@ -441,15 +441,18 @@ namespace NLog.Extensions.Logging
                 return NullScope.Instance;
             }
 
-            if (_options.CaptureMessageProperties)
+            try
             {
                 return _beginScopeParser.ParseBeginScope(state) ?? NullScope.Instance;
             }
-
-            return NLogBeginScopeParser.CreateDiagnosticLogicalContext(state) ?? NullScope.Instance;
+            catch (Exception ex)
+            {
+                Common.InternalLogger.Debug(ex, "Exception in BeginScope");
+                return NullScope.Instance;
+            }
         }
 
-        private class NullScope : IDisposable
+        private sealed class NullScope : IDisposable
         {
             public static NullScope Instance { get; } = new NullScope();
 
