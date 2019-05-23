@@ -16,7 +16,7 @@ build_script:
 
 nuget:
   disable_publish_on_pr: true
-  
+
 artifacts:
   - path: 'artifacts\*.nupkg'
   - path: 'artifacts\*.snupkg'
