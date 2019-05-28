@@ -18,11 +18,6 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
     </Description>
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
-- Support for loading NLog config from appsettings.json
-- Improved performance and reduced allocation for ILogger.BeginScope
-- Introduced MicrosoftILoggerTarget for logging in Azure Lambda
-- Better handling of IndexOutOfRangeException when invalid log-message format
-
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
     </PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/NLog/NLog.Extensions.Logging</PackageProjectUrl>
