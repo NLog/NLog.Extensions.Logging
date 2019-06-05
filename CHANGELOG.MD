@@ -2,6 +2,10 @@
 
 Date format: (year/month/day)
 
+### V1.5.1 (2019/06/05)
+- [#289](https://github.com/NLog/NLog.Extensions.Logging/pull/289) NLogBeginScopeParser - Improved exception handling (@snakefoot)
+- [#299](https://github.com/NLog/NLog.Extensions.Logging/pull/299) Update dependency NLog ver. 4.6.4 (@snakefoot)
+
 ### V1.5 (2019/04/30)
 - [#263](https://github.com/NLog/NLog.Extensions.Logging/pull/263) Support for loading NLog config from appsettings.json using NLogLoggingConfiguration
 - [#263](https://github.com/NLog/NLog.Extensions.Logging/pull/263) Improved performance and reduced allocation for ILogger.BeginScope
