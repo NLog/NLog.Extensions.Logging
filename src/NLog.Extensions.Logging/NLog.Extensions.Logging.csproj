@@ -87,6 +87,7 @@ Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHAN
 
   <PropertyGroup>
     <AssemblyTitle>$(Title)</AssemblyTitle>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 </Project>
 

@@ -47,7 +47,7 @@ namespace NLog.Extensions.Logging
                 if (_autoReload && _reloadConfiguration == null)
                 {
                     // Prepare for setting up reload notification handling
-                    _reloadConfiguration = state => ReloadConfigurationSection((IConfigurationSection) state);
+                    _reloadConfiguration = state => ReloadConfigurationSection((IConfigurationSection)state);
                     LogFactory.ConfigurationChanged += LogFactory_ConfigurationChanged;
                 }
 
@@ -128,8 +128,8 @@ namespace NLog.Extensions.Logging
             private const string VariableKey = "Variable";
             private const string DefaultWrapper = "Default-wrapper";
             private readonly IConfigurationSection _configurationSection;
-            public IConfigurationSection DefaultTargetParametersSection { get; set; }
-            public IConfigurationSection DefaultTargetWrapperSection { get; set; }
+            private IConfigurationSection DefaultTargetParametersSection { get; set; }
+            private IConfigurationSection DefaultTargetWrapperSection { get; set; }
             private readonly string _nameOverride;
             private readonly bool _topElement;
 
@@ -138,9 +138,9 @@ namespace NLog.Extensions.Logging
                 _configurationSection = configurationSection;
                 _nameOverride = nameOverride;
                 _topElement = topElement;
-                if (topElement && bool.TryParse(configurationSection["autoreload"], out var autoreload))
+                if (topElement && bool.TryParse(configurationSection["autoreload"], out var autoReload))
                 {
-                    AutoReload = autoreload;
+                    AutoReload = autoReload;
                 }
             }
 
@@ -191,8 +191,6 @@ namespace NLog.Extensions.Logging
                 }
 
                 var isTargetsSection = IsTargetsSection();
-                var defaultTargetWrapper = GetDefaultWrapperSection();
-                var defaultTargetParameters = GetDefaultTargetParametersSection();
 
                 if (isTargetsSection)
                 {
@@ -203,9 +201,19 @@ namespace NLog.Extensions.Logging
                 }
 
                 var children = _configurationSection.GetChildren();
+                foreach (var loggingConfigurationElement in GetChildren(children, variables, isTargetsSection))
+                {
+                    yield return loggingConfigurationElement;
+                }
+            }
+
+            private IEnumerable<ILoggingConfigurationElement> GetChildren(IEnumerable<IConfigurationSection> children, IConfigurationSection variables, bool isTargetsSection)
+            {
+                var defaultTargetWrapper = GetDefaultWrapperSection();
+                var defaultTargetParameters = GetDefaultTargetParametersSection();
                 foreach (var child in children)
                 {
-                    if (AlreadReadChild(child, variables, defaultTargetWrapper, defaultTargetParameters))
+                    if (AlreadyReadChild(child, variables, defaultTargetWrapper, defaultTargetParameters))
                     {
                         continue;
                     }
@@ -222,10 +230,11 @@ namespace NLog.Extensions.Logging
                     }
                     else
                     {
+                        var isTargetKey = child.Key.EqualsOrdinalIgnoreCase(TargetsKey);
                         yield return new LoggingConfigurationElement(child, false, isTargetsSection ? TargetKey : null)
                         {
-                            DefaultTargetParametersSection = (defaultTargetParameters != null && child.Key.EqualsOrdinalIgnoreCase(TargetsKey)) ? defaultTargetParameters : null,
-                            DefaultTargetWrapperSection = (defaultTargetWrapper != null && child.Key.EqualsOrdinalIgnoreCase(TargetsKey)) ? defaultTargetWrapper : null,
+                            DefaultTargetParametersSection = (defaultTargetParameters != null && isTargetKey) ? defaultTargetParameters : null,
+                            DefaultTargetWrapperSection = (defaultTargetWrapper != null && isTargetKey) ? defaultTargetWrapper : null,
                         };
                     }
                 }
@@ -260,7 +269,7 @@ namespace NLog.Extensions.Logging
                 }
             }
 
-            private bool AlreadReadChild(IConfigurationSection child, IConfigurationSection variables, IConfigurationSection defaultWrapper, IConfigurationSection defaultTargetParameters)
+            private bool AlreadyReadChild(IConfigurationSection child, IConfigurationSection variables, IConfigurationSection defaultWrapper, IConfigurationSection defaultTargetParameters)
             {
                 if (_topElement)
                 {

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using NLog.Common;
 using NLog.Config;
@@ -46,7 +45,7 @@ namespace NLog.Extensions.Logging
         [DefaultParameter]
         public string Item
         {
-            get { return _item; }
+            get => _item;
             set
             {
                 _item = value;

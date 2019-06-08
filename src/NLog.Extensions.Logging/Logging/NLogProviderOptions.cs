@@ -26,7 +26,7 @@ namespace NLog.Extensions.Logging
         public bool CaptureMessageTemplates { get; set; }
 
         /// <summary>
-        /// Enable capture of properties from the ILogger-State-object, both in <see cref="Microsoft.Extensions.Logging.ILogger.Log"/> and <see cref="Microsoft.Extensions.Logging.ILogger.BeginScope"/>
+        /// Enable capture of properties from the ILogger-State-object, both in <see cref="Microsoft.Extensions.Logging.ILogger.Log{TState}"/> and <see cref="Microsoft.Extensions.Logging.ILogger.BeginScope{TState}"/>
         /// </summary>
         public bool CaptureMessageProperties { get; set; }
 

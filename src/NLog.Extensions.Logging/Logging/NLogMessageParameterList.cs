@@ -73,7 +73,7 @@ namespace NLog.Extensions.Logging
         }
 
         /// <summary>
-        /// Verify that the input parameterList contains non-empty key-values and the orignal-format-property at the end
+        /// Verify that the input parameterList contains non-empty key-values and the original-format-property at the end
         /// </summary>
         private static bool IsValidParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList, out int? originalMessageIndex, out bool hasMessageTemplateCapture, out bool isMixedPositional, out bool isPositional)
         {
@@ -84,18 +84,8 @@ namespace NLog.Extensions.Logging
             bool? firstParameterIsPositional = null;
             for (int i = 0; i < parameterList.Count; ++i)
             {
-                string parameterKey;
-                try
+                if (!TryGetKey(parameterList, ref originalMessageIndex, i, out var parameterKey))
                 {
-                    parameterKey = parameterList[i].Key;
-                }
-                catch (IndexOutOfRangeException ex)
-                {
-                    throw new FormatException($"Invalid format string. Expected {parameterList.Count - 1} format parameters, but failed to lookup parameter index {i}", ex);
-                }
-                if (string.IsNullOrEmpty(parameterKey))
-                {
-                    originalMessageIndex = null;
                     return false;
                 }
 
@@ -125,6 +115,27 @@ namespace NLog.Extensions.Logging
 
             if (firstParameterIsPositional == true && !isMixedPositional)
                 isPositional = true;
+
+            return true;
+        }
+
+        private static bool TryGetKey(IReadOnlyList<KeyValuePair<string, object>> parameterList, ref int? originalMessageIndex, int i, out string parameterKey)
+        {
+            try
+            {
+                parameterKey = parameterList[i].Key;
+            }
+            catch (IndexOutOfRangeException ex)
+            {
+                // Catch a issue in MEL
+                throw new FormatException($"Invalid format string. Expected {parameterList.Count - 1} format parameters, but failed to lookup parameter index {i}", ex);
+            }
+
+            if (string.IsNullOrEmpty(parameterKey))
+            {
+                originalMessageIndex = null;
+                return false;
+            }
 
             return true;
         }

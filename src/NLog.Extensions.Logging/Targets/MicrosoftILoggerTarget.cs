@@ -73,27 +73,25 @@ namespace NLog.Extensions.Logging
             _logger.Log(ConvertToLogLevel(logEvent.Level), eventId, new LogState(logEvent, layoutMessage, contextProperties), logEvent.Exception, LogStateFormatter);
         }
 
-        struct LogState : IReadOnlyList<KeyValuePair<string, object>>
+        private struct LogState : IReadOnlyList<KeyValuePair<string, object>>
         {
-            public readonly LogEventInfo LogEvent;
+            private readonly LogEventInfo _logEvent;
             public readonly string LayoutMessage;
-            public readonly IDictionary<string, object> ContextProperties;
+            private readonly IDictionary<string, object> _contextProperties;
 
-            public int Count => (LogEvent.HasProperties ? LogEvent.Properties.Count : 0) + (ContextProperties?.Count ?? 0) + 1;
+            public int Count => (_logEvent.HasProperties ? _logEvent.Properties.Count : 0) + (_contextProperties?.Count ?? 0) + 1;
 
             public KeyValuePair<string, object> this[int index]
             {
                 get
                 {
-                    if (LogEvent.HasProperties)
+                    if (_logEvent.HasProperties && TryGetPropertyFromIndex(_logEvent.Properties, CreateLogEventProperty, ref index, out var property))
                     {
-                        if (TryGetPropertyFromIndex(LogEvent.Properties, CreateLogEventProperty, ref index, out var property))
-                            return property;
+                        return property;
                     }
-                    if (ContextProperties != null)
+                    if (_contextProperties != null && TryGetPropertyFromIndex(_contextProperties, p => p, ref index, out var contextProperty))
                     {
-                        if (TryGetPropertyFromIndex(ContextProperties, p => p, ref index, out var property))
-                            return property;
+                        return contextProperty;
                     }
                     if (index != 0)
                         throw new ArgumentOutOfRangeException(nameof(index));
@@ -103,18 +101,18 @@ namespace NLog.Extensions.Logging
 
             public LogState(LogEventInfo logEvent, string layoutMessage, IDictionary<string, object> contextProperties)
             {
-                LogEvent = logEvent;
+                _logEvent = logEvent;
                 LayoutMessage = layoutMessage;
-                ContextProperties = contextProperties;
+                _contextProperties = contextProperties;
             }
 
             public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
             {
                 IList<KeyValuePair<string, object>> originalMessage = new[] { CreateOriginalFormatProperty() };
-                IEnumerable<KeyValuePair<string, object>> allProperties = ContextProperties?.Concat(originalMessage) ?? originalMessage;
-                if (LogEvent.HasProperties)
+                IEnumerable<KeyValuePair<string, object>> allProperties = _contextProperties?.Concat(originalMessage) ?? originalMessage;
+                if (_logEvent.HasProperties)
                 {
-                    allProperties = LogEvent.Properties.Select(prop => CreateLogEventProperty(prop)).Concat(allProperties);
+                    allProperties = _logEvent.Properties.Select(CreateLogEventProperty).Concat(allProperties);
                 }
                 return allProperties.GetEnumerator();
             }
@@ -142,7 +140,7 @@ namespace NLog.Extensions.Logging
                     index -= properties.Count;
                 }
 
-                property = default(KeyValuePair<string, object>);
+                property = default;
                 return false;
             }
 
@@ -153,29 +151,28 @@ namespace NLog.Extensions.Logging
 
             private KeyValuePair<string, object> CreateOriginalFormatProperty()
             {
-                return new KeyValuePair<string, object>(NLogLogger.OriginalFormatPropertyName, LogEvent.Message);
+                return new KeyValuePair<string, object>(NLogLogger.OriginalFormatPropertyName, _logEvent.Message);
             }
         }
 
-        static string LogStateFormatter(LogState logState, Exception _)
+        private static string LogStateFormatter(LogState logState, Exception _)
         {
             return logState.LayoutMessage;
         }
 
-        static Microsoft.Extensions.Logging.LogLevel ConvertToLogLevel(NLog.LogLevel logLevel)
+        private static Microsoft.Extensions.Logging.LogLevel ConvertToLogLevel(LogLevel logLevel)
         {
-            if (logLevel == NLog.LogLevel.Trace)
+            if (logLevel == LogLevel.Trace)
                 return Microsoft.Extensions.Logging.LogLevel.Trace;
-            else if (logLevel == NLog.LogLevel.Debug)
+            if (logLevel == LogLevel.Debug)
                 return Microsoft.Extensions.Logging.LogLevel.Debug;
-            else if (logLevel == NLog.LogLevel.Info)
+            if (logLevel == LogLevel.Info)
                 return Microsoft.Extensions.Logging.LogLevel.Information;
-            else if (logLevel == NLog.LogLevel.Warn)
+            if (logLevel == LogLevel.Warn)
                 return Microsoft.Extensions.Logging.LogLevel.Warning;
-            else if (logLevel == NLog.LogLevel.Error)
+            if (logLevel == LogLevel.Error)
                 return Microsoft.Extensions.Logging.LogLevel.Error;
-            else // if (logLevel == NLog.LogLevel.Fatal)
-                return Microsoft.Extensions.Logging.LogLevel.Critical;
+            return Microsoft.Extensions.Logging.LogLevel.Critical;
         }
     }
 }
