@@ -113,7 +113,7 @@ namespace NLog.Extensions.Logging
                 return CreateScopeProperties(scopeObject, scopePropertyList);
             }
 
-            public static IDisposable CaptureScopeProperties(IEnumerable scopePropertyCollection, ExtractorDictionary stateExractor)
+            public static IDisposable CaptureScopeProperties(IEnumerable scopePropertyCollection, ExtractorDictionary stateExtractor)
             {
                 List<KeyValuePair<string, object>> propertyList = null;
 
@@ -125,7 +125,7 @@ namespace NLog.Extensions.Logging
                         break;
                     }
 
-                    if (keyValueExtractor.Key == null && !TryLookupExtractor(stateExractor, property.GetType(), out keyValueExtractor))
+                    if (keyValueExtractor.Key == null && !TryLookupExtractor(stateExtractor, property.GetType(), out keyValueExtractor))
                     {
                         break;
                     }
@@ -143,9 +143,9 @@ namespace NLog.Extensions.Logging
                 return CreateScopeProperties(scopePropertyCollection, propertyList);
             }
 
-            public static IDisposable CaptureScopeProperty<TState>(TState scopeProperty, ExtractorDictionary stateExractor)
+            public static IDisposable CaptureScopeProperty<TState>(TState scopeProperty, ExtractorDictionary stateExtractor)
             {
-                if (!TryLookupExtractor(stateExractor, scopeProperty.GetType(), out var keyValueExtractor))
+                if (!TryLookupExtractor(stateExtractor, scopeProperty.GetType(), out var keyValueExtractor))
                 {
                     return NestedDiagnosticsLogicalContext.Push(scopeProperty);
                 }
@@ -177,10 +177,10 @@ namespace NLog.Extensions.Logging
                 }
             }
 
-            private static bool TryLookupExtractor(ExtractorDictionary stateExractor, Type propertyType,
+            private static bool TryLookupExtractor(ExtractorDictionary stateExtractor, Type propertyType,
                 out KeyValuePair<Func<object, object>, Func<object, object>> keyValueExtractor)
             {
-                if (!stateExractor.TryGetValue(propertyType, out keyValueExtractor))
+                if (!stateExtractor.TryGetValue(propertyType, out keyValueExtractor))
                 {
                     try
                     {
@@ -192,7 +192,7 @@ namespace NLog.Extensions.Logging
                     }
                     finally
                     {
-                        stateExractor[propertyType] = keyValueExtractor;
+                        stateExtractor[propertyType] = keyValueExtractor;
                     }
                 }
 
@@ -201,7 +201,7 @@ namespace NLog.Extensions.Logging
 
             private static bool TryBuildExtractor(Type propertyType, out KeyValuePair<Func<object, object>, Func<object, object>> keyValueExtractor)
             {
-                keyValueExtractor = default(KeyValuePair<Func<object, object>, Func<object, object>>);
+                keyValueExtractor = default;
 
                 var itemType = propertyType.GetTypeInfo();
                 if (!itemType.IsGenericType || itemType.GetGenericTypeDefinition() != typeof(KeyValuePair<,>))
