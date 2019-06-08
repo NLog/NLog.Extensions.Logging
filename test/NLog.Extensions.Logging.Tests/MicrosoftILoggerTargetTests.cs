@@ -11,70 +11,88 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void SimpleILoggerMessageTest()
         {
-            var logFactory = new NLog.LogFactory();
-            var logConfig = new NLog.Config.LoggingConfiguration();
-            var ilogger = new TestLogger();
-            logConfig.AddRuleForAllLevels(new MicrosoftILoggerTarget(ilogger) { Layout = "${message}" });
-            logFactory.Configuration = logConfig;
-            var logger = logFactory.GetCurrentClassLogger();
+            // Arrange
+            var (logger, mock) = CreateLoggerMock();
+
+            // Act
             logger.Info("Hello World");
-            Assert.Equal("Hello World", ilogger.LastLogMessage);
-            Assert.Single(ilogger.LastLogProperties);
-            Assert.Equal("Hello World", ilogger.LastLogProperties[0].Value);
+
+            // Assert
+            Assert.Equal("Hello World", mock.LastLogMessage);
+            Assert.Single(mock.LastLogProperties);
+            Assert.Equal("Hello World", mock.LastLogProperties[0].Value);
         }
 
         [Fact]
         public void FilterILoggerMessageTest()
         {
-            var logFactory = new NLog.LogFactory();
-            var logConfig = new NLog.Config.LoggingConfiguration();
-            var ilogger = new TestLogger();
-            logConfig.AddRuleForAllLevels(new MicrosoftILoggerTarget(ilogger) { Layout = "${message}" });
-            logFactory.Configuration = logConfig;
-            var logger = logFactory.GetCurrentClassLogger();
+            // Arrange
+            var (logger, mock) = CreateLoggerMock();
+
+            // Act
             logger.Debug("Hello World");
-            Assert.Null(ilogger.LastLogMessage);
+
+            // Assert
+            Assert.Null(mock.LastLogMessage);
         }
 
         [Fact]
         public void StructuredILoggerMessageTest()
         {
-            var logFactory = new NLog.LogFactory();
-            var logConfig = new NLog.Config.LoggingConfiguration();
-            var ilogger = new TestLogger();
-            logConfig.AddRuleForAllLevels(new MicrosoftILoggerTarget(ilogger) { Layout = "${message}" });
-            logFactory.Configuration = logConfig;
-            var logger = logFactory.GetCurrentClassLogger();
+            // Arrange
+            var (logger, mock) = CreateLoggerMock();
+
+            // Act
             logger.Info("Hello {Planet}", "Earth");
-            Assert.Equal("Hello \"Earth\"", ilogger.LastLogMessage);
-            Assert.Equal(2, ilogger.LastLogProperties.Count);
-            Assert.Equal("Planet", ilogger.LastLogProperties[0].Key);
-            Assert.Equal("Earth", ilogger.LastLogProperties[0].Value);
-            Assert.Equal("Hello {Planet}", ilogger.LastLogProperties[1].Value);
+
+            // Assert
+            Assert.Equal("Hello \"Earth\"", mock.LastLogMessage);
+            Assert.Equal(2, mock.LastLogProperties.Count);
+            Assert.Equal("Planet", mock.LastLogProperties[0].Key);
+            Assert.Equal("Earth", mock.LastLogProperties[0].Value);
+            Assert.Equal("Hello {Planet}", mock.LastLogProperties[1].Value);
         }
 
         [Fact]
         public void ContextPropertiesILoggerTest()
         {
+            // Arrange
+            var (logger, mock) = CreateLoggerMock(out var target);
+            target.ContextProperties.Add(new Targets.TargetPropertyWithContext
+                { Name = "ThreadId", Layout = "${threadid}" }
+            );
+
+            // Act
+            logger.Info("Hello {Planet}", "Earth");
+
+            // Assert
+            Assert.Equal("Hello \"Earth\"", mock.LastLogMessage);
+            Assert.Equal(3, mock.LastLogProperties.Count);
+            Assert.Equal("Planet", mock.LastLogProperties[0].Key);
+            Assert.Equal("Earth", mock.LastLogProperties[0].Value);
+            Assert.Equal("ThreadId", mock.LastLogProperties[1].Key);
+            Assert.Equal(System.Threading.Thread.CurrentThread.ManagedThreadId.ToString(), mock.LastLogProperties[1].Value);
+            Assert.Equal("Hello {Planet}", mock.LastLogProperties[2].Value);
+        }
+
+        private static (Logger, LoggerMock) CreateLoggerMock()
+        {
+            return CreateLoggerMock(out _);
+        }
+
+        private static (Logger, LoggerMock) CreateLoggerMock(out MicrosoftILoggerTarget target)
+        {
             var logFactory = new NLog.LogFactory();
             var logConfig = new NLog.Config.LoggingConfiguration();
-            var ilogger = new TestLogger();
-            var target = new MicrosoftILoggerTarget(ilogger) { Layout = "${message}" };
-            target.ContextProperties.Add(new Targets.TargetPropertyWithContext() { Name = "ThreadId", Layout = "${threadid}" });
+            var loggerMock = new LoggerMock();
+            target = new MicrosoftILoggerTarget(loggerMock) { Layout = "${message}" };
             logConfig.AddRuleForAllLevels(target);
             logFactory.Configuration = logConfig;
             var logger = logFactory.GetCurrentClassLogger();
-            logger.Info("Hello {Planet}", "Earth");
-            Assert.Equal("Hello \"Earth\"", ilogger.LastLogMessage);
-            Assert.Equal(3, ilogger.LastLogProperties.Count);
-            Assert.Equal("Planet", ilogger.LastLogProperties[0].Key);
-            Assert.Equal("Earth", ilogger.LastLogProperties[0].Value);
-            Assert.Equal("ThreadId", ilogger.LastLogProperties[1].Key);
-            Assert.Equal(System.Threading.Thread.CurrentThread.ManagedThreadId.ToString(), ilogger.LastLogProperties[1].Value);
-            Assert.Equal("Hello {Planet}", ilogger.LastLogProperties[2].Value);
+            return (logger, loggerMock);
         }
 
-        class TestLogger : Microsoft.Extensions.Logging.ILogger
+        class LoggerMock : Microsoft.Extensions.Logging.ILogger
         {
             public Microsoft.Extensions.Logging.LogLevel LastLogLevel;
             public string LastLogMessage;
