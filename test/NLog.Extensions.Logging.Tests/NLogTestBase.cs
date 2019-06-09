@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NLog.Common;
 
 namespace NLog.Extensions.Logging.Tests
 {
@@ -34,6 +36,20 @@ namespace NLog.Extensions.Logging.Tests
             // Start program
             var runner = ConfigureServiceProvider<T>(null, options).GetRequiredService<T>();
             return runner;
+        }
+
+        protected static StringWriter CaptureInternalLog()
+        {
+            var stringWriter = new StringWriter();
+            InternalLogger.LogLevel = LogLevel.Trace;
+            InternalLogger.LogWriter = stringWriter;
+            return stringWriter;
+        }
+
+        ~NLogTestBase()
+        {
+            InternalLogger.LogLevel = LogLevel.Off;
+            InternalLogger.LogWriter = null;
         }
     }
 }
