@@ -13,6 +13,7 @@ namespace NLog.Extensions.Logging
         private readonly Logger _logger;
         private readonly NLogProviderOptions _options;
         private readonly NLogBeginScopeParser _beginScopeParser;
+        internal string LoggerName => _logger?.Name;
 
         internal const string OriginalFormatPropertyName = "{OriginalFormat}";
         private static readonly object EmptyEventId = default(EventId);    // Cache boxing of empty EventId-struct
