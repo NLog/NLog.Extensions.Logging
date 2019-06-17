@@ -26,10 +26,7 @@ namespace NLog.Extensions.Logging.Tests.Extensions
             logger.LogInformation("test message with {0} arg", 1);
 
             // Assert
-            Assert.Equal(1, memoryTarget.Logs.Count);
-            var log = memoryTarget.Logs.Single();
-            Assert.Equal("Info|test message with 1 arg", log);
-
+            AssertSingleMessage(memoryTarget, "Info|test message with 1 arg");
         }
 
         [Theory]
@@ -43,16 +40,13 @@ namespace NLog.Extensions.Logging.Tests.Extensions
             var config = CreateConfigWithMemoryTarget(out var memoryTarget, $"${{event-properties:{eventPropery}}} - ${{message}}");
 
             // Act
-            loggerFactory.AddNLog(new NLogProviderOptions() { EventIdSeparator = "_" });
+            loggerFactory.AddNLog(new NLogProviderOptions { EventIdSeparator = "_" });
             LogManager.Configuration = config;
             var logger = loggerFactory.CreateLogger("logger1");
             logger.LogInformation(new EventId(2, "eventId2"), "test message with {0} arg", 1);
 
             // Assert
-            Assert.Equal(1, memoryTarget.Logs.Count);
-            var log = memoryTarget.Logs.Single();
-            Assert.Equal($"{expectedEventInLog} - test message with 1 arg", log);
-
+            AssertSingleMessage(memoryTarget, $"{expectedEventInLog} - test message with 1 arg");
         }
 
 #if !NETCOREAPP1_1 && !NET452
@@ -67,17 +61,21 @@ namespace NLog.Extensions.Logging.Tests.Extensions
             // Act
             builder.AddNLog();
             LogManager.Configuration = config;
-            var services = builder.Services;
-            var serviceProvider = services.BuildServiceProvider();
-            var provider = serviceProvider.GetRequiredService<ILoggerProvider>();
+            var provider = GetLoggerProvider(builder);
             var logger = provider.CreateLogger("logger1");
 
             logger.LogInformation("test message with {0} arg", 1);
 
             // Assert
-            Assert.Equal(1, memoryTarget.Logs.Count);
-            var log = memoryTarget.Logs.Single();
-            Assert.Equal("Info|test message with 1 arg", log);
+            AssertSingleMessage(memoryTarget, "Info|test message with 1 arg");
+        }
+
+        private static ILoggerProvider GetLoggerProvider(ILoggingBuilder builder)
+        {
+            var services = builder.Services;
+            var serviceProvider = services.BuildServiceProvider();
+            var provider = serviceProvider.GetRequiredService<ILoggerProvider>();
+            return provider;
         }
 
         internal class LoggingBuilderStub : ILoggingBuilder
@@ -85,6 +83,13 @@ namespace NLog.Extensions.Logging.Tests.Extensions
             public IServiceCollection Services { get; set; } = new ServiceCollection();
         }
 #endif
+        
+        private static void AssertSingleMessage(MemoryTarget memoryTarget, string expectedMessage)
+        {
+            Assert.Equal(1, memoryTarget.Logs.Count);
+            var log = memoryTarget.Logs.Single();
+            Assert.Equal(expectedMessage, log);
+        }
 
         private static LoggingConfiguration CreateConfigWithMemoryTarget(out MemoryTarget memoryTarget, string levelMessage = "${level}|${message}")
         {
@@ -93,6 +98,5 @@ namespace NLog.Extensions.Logging.Tests.Extensions
             config.AddRuleForAllLevels(memoryTarget);
             return config;
         }
-
     }
 }
