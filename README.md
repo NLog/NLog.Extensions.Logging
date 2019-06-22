@@ -1,4 +1,6 @@
-# NLog.Extensions.Logging
+![NLog](https://nlog-project.org/images/NLog.png)
+
+# NLog.Extensions.Logging 
 
 
 
