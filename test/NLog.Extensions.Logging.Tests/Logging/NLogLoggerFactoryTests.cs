@@ -6,6 +6,7 @@ using Xunit;
 
 namespace NLog.Extensions.Logging.Tests.Logging
 {
+    [Collection(TestsWithInternalLog)]
     public class NLogLoggerFactoryTests : NLogTestBase
     {
         [Fact]
