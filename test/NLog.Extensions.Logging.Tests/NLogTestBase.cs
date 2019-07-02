@@ -12,6 +12,13 @@ namespace NLog.Extensions.Logging.Tests
     {
         IServiceProvider _serviceProvider;
 
+        /// <summary>
+        /// Don't run tests with internal log in parallel
+        ///
+        /// usage:  [Collection(TestsWithInternalLog)]
+        /// </summary>
+        public const string TestsWithInternalLog = "Test-with-internal-log";
+
         protected IServiceProvider ConfigureServiceProvider<T>(Action<ServiceCollection> configureServices = null, NLogProviderOptions options = null) where T : class
         {
             if (_serviceProvider == null)
@@ -38,6 +45,12 @@ namespace NLog.Extensions.Logging.Tests
             return runner;
         }
 
+        /// <summary>
+        /// Capture internal log.
+        ///
+        /// Important: mark test class with  [Collection(TestsWithInternalLog)]
+        /// </summary>
+        /// <returns></returns>
         protected static StringWriter CaptureInternalLog()
         {
             var stringWriter = new StringWriter();
