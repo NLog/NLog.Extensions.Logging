@@ -82,7 +82,14 @@ namespace NLog.Extensions.Logging
         {
             if (disposing)
             {
-                LogFactory.Flush();
+                if (Options.ShutdownOnDispose)
+                {
+                    LogManager.Shutdown();
+                }
+                else
+                {
+                    LogFactory.Flush();
+                }
             }
         }
 
