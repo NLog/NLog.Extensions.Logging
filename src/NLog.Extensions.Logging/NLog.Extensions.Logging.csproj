@@ -60,7 +60,7 @@ Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHAN
     <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NLog" Version="[4.6.4,5.0.0-beta01)" />
+    <PackageReference Include="NLog" Version="[4.6.5,5.0.0-beta01)" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="1.0.0" />
