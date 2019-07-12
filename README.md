@@ -8,7 +8,7 @@
 [![Build status Windows](https://ci.appveyor.com/api/projects/status/0nrg8cksp4b6tab1/branch/dev?svg=true)](https://ci.appveyor.com/project/nlog/nlog-framework-logging/branch/dev)
 [![Build Status Linux](https://travis-ci.org/NLog/NLog.Extensions.Logging.svg?branch=master)](https://travis-ci.org/NLog/NLog.Extensions.Logging)
 
-[![BCH compliance](https://bettercodehub.com/edge/badge/NLog/NLog.Extensions.Logging?branch=components)](https://bettercodehub.com/results/NLog/NLog.Extensions.Logging)
+[
 [![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=dev&metric=ncloc)](https://sonarcloud.io/dashboard/?id=nlog.extensions.logging&branch=dev) 
 [![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=dev&metric=bugs)](https://sonarcloud.io/dashboard/?id=nlog.extensions.logging&branch=dev) 
 [![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=dev&metric=vulnerabilities)](https://sonarcloud.io/dashboard/?id=nlog.extensions.logging&branch=dev) 
