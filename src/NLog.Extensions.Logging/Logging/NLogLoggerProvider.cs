@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Reflection;
-#if !NETCORE1_0
 using Microsoft.Extensions.Logging;
-#endif
 using NLog.Common;
 
 namespace NLog.Extensions.Logging
@@ -10,10 +8,10 @@ namespace NLog.Extensions.Logging
     /// <summary>
     /// Provider logger for NLog + Microsoft.Extensions.Logging
     /// </summary>
- #if !NETCORE1_0
+#if !NETCORE1_0
     [ProviderAlias("NLog")]
 #endif
-    public class NLogLoggerProvider : Microsoft.Extensions.Logging.ILoggerProvider
+    public class NLogLoggerProvider : ILoggerProvider
     {
         private readonly NLogBeginScopeParser _beginScopeParser;
 
@@ -31,7 +29,7 @@ namespace NLog.Extensions.Logging
         /// New provider with default options, see <see cref="Options"/>
         /// </summary>
         public NLogLoggerProvider()
-            :this(null)
+            : this(null)
         {
         }
 
@@ -40,7 +38,7 @@ namespace NLog.Extensions.Logging
         /// </summary>
         /// <param name="options"></param>
         public NLogLoggerProvider(NLogProviderOptions options)
-            :this(options, null)
+            : this(options, null)
         {
         }
 
@@ -84,7 +82,14 @@ namespace NLog.Extensions.Logging
         {
             if (disposing)
             {
-                LogFactory.Flush();
+                if (Options.ShutdownOnDispose)
+                {
+                    LogManager.Shutdown();
+                }
+                else
+                {
+                    LogFactory.Flush();
+                }
             }
         }
 
@@ -95,7 +100,7 @@ namespace NLog.Extensions.Logging
         {
             InternalLogger.Debug("Hide assemblies for callsite");
             LogManager.AddHiddenAssembly(typeof(NLogLoggerProvider).GetTypeInfo().Assembly);
-            NLog.Config.ConfigurationItemFactory.Default.RegisterItemsFromAssembly(typeof(NLogLoggerProvider).GetTypeInfo().Assembly);
+            Config.ConfigurationItemFactory.Default.RegisterItemsFromAssembly(typeof(NLogLoggerProvider).GetTypeInfo().Assembly);
 
 #if !NETCORE1_0
             var allAssemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -135,7 +140,7 @@ namespace NLog.Extensions.Logging
             {
                 if (logOnException)
                 {
-                    InternalLogger.Debug(ex, "Hiding assembly {0} failed. This could influence the ${callsite}", assemblyName);
+                    InternalLogger.Debug(ex, "Hiding assembly {0} failed. This could influence the ${{callsite}}", assemblyName);
                 }
             }
         }

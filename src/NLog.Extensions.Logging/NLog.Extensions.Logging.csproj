@@ -19,8 +19,8 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
 
-- NLogBeginScopeParser - Improved exception handling (@snakefoot)
-- Update dependency NLog ver. 4.6.4 (@snakefoot)
+- Added NLogProviderOptions.ShutdownOnDispose (#314) (@304NotModified)
+- Update NLog to 4.6.5 (#315) (@304NotModified)
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
     </PackageReleaseNotes>
@@ -60,7 +60,7 @@ Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHAN
     <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NLog" Version="[4.6.4,5.0.0-beta01)" />
+    <PackageReference Include="NLog" Version="[4.6.5,5.0.0-beta01)" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="1.0.0" />
@@ -87,6 +87,7 @@ Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHAN
 
   <PropertyGroup>
     <AssemblyTitle>$(Title)</AssemblyTitle>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 </Project>
 

@@ -26,7 +26,7 @@ namespace NLog.Extensions.Logging
         public bool CaptureMessageTemplates { get; set; }
 
         /// <summary>
-        /// Enable capture of properties from the ILogger-State-object, both in <see cref="Microsoft.Extensions.Logging.ILogger.Log"/> and <see cref="Microsoft.Extensions.Logging.ILogger.BeginScope"/>
+        /// Enable capture of properties from the ILogger-State-object, both in <see cref="Microsoft.Extensions.Logging.ILogger.Log{TState}"/> and <see cref="Microsoft.Extensions.Logging.ILogger.BeginScope{TState}"/>
         /// </summary>
         public bool CaptureMessageProperties { get; set; }
 
@@ -39,6 +39,11 @@ namespace NLog.Extensions.Logging
         /// Enable capture of scope information and inject into <see cref="NestedDiagnosticsLogicalContext" /> and <see cref="MappedDiagnosticsLogicalContext" />
         /// </summary>
         public bool IncludeScopes { get; set; }
+        
+        /// <summary>
+        /// Shutdown NLog on dispose of the <see cref="NLogLoggerProvider"/>
+        /// </summary>
+        public bool ShutdownOnDispose { get; set; } 
 
         /// <summary>Initializes a new instance of the <see cref="T:System.Object" /> class.</summary>
         public NLogProviderOptions()
