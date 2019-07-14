@@ -5,16 +5,16 @@
 
 
 [![NuGet Pre Release](https://img.shields.io/nuget/vpre/NLog.Extensions.Logging.svg)](https://www.nuget.org/packages/NLog.Extensions.Logging)
-[![Build status Windows](https://ci.appveyor.com/api/projects/status/0nrg8cksp4b6tab1/branch/dev?svg=true)](https://ci.appveyor.com/project/nlog/nlog-framework-logging/branch/dev)
+[![Build status Windows](https://ci.appveyor.com/api/projects/status/0nrg8cksp4b6tab1/branch/master?svg=true)](https://ci.appveyor.com/project/nlog/nlog-framework-logging/branch/master)
 [![Build Status Linux](https://travis-ci.org/NLog/NLog.Extensions.Logging.svg?branch=master)](https://travis-ci.org/NLog/NLog.Extensions.Logging)
 
-[![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=dev&metric=ncloc)](https://sonarcloud.io/dashboard/?id=nlog.extensions.logging&branch=dev) 
-[![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=dev&metric=bugs)](https://sonarcloud.io/dashboard/?id=nlog.extensions.logging&branch=dev) 
-[![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=dev&metric=vulnerabilities)](https://sonarcloud.io/dashboard/?id=nlog.extensions.logging&branch=dev) 
-[![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=dev&metric=code_smells)](https://sonarcloud.io/project/issues?id=nlog.extensions.logging&branch=dev&resolved=false&types=CODE_SMELL) 
-[![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=dev&metric=duplicated_lines_density)](https://sonarcloud.io/component_measures/domain/Duplications?id=nlog.extensions.logging&branch=dev) 
-[![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=dev&metric=sqale_debt_ratio)](https://sonarcloud.io/dashboard/?id=nlog.extensions.logging&branch=dev) 
-[![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=dev&metric=coverage)](https://sonarcloud.io/component_measures?id=nlog.extensions.logging&branch=dev&metric=coverage) 
+[![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=ncloc)](https://sonarcloud.io/dashboard/?id=nlog.extensions.logging&branch=master) 
+[![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=bugs)](https://sonarcloud.io/dashboard/?id=nlog.extensions.logging&branch=master) 
+[![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=vulnerabilities)](https://sonarcloud.io/dashboard/?id=nlog.extensions.logging&branch=master) 
+[![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=code_smells)](https://sonarcloud.io/project/issues?id=nlog.extensions.logging&branch=master&resolved=false&types=CODE_SMELL) 
+[![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=duplicated_lines_density)](https://sonarcloud.io/component_measures/domain/Duplications?id=nlog.extensions.logging&branch=master) 
+[![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=sqale_debt_ratio)](https://sonarcloud.io/dashboard/?id=nlog.extensions.logging&branch=master) 
+[![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=coverage)](https://sonarcloud.io/component_measures?id=nlog.extensions.logging&branch=master&metric=coverage) 
 
 [NLog](https://github.com/NLog/NLog) provider for [Microsoft.Extensions.Logging](https://github.com/aspnet/Logging); .NET Core. 
 **ASP.NET Core** users should install  [NLog.Web.AspNetCore](https://www.nuget.org/packages/NLog.web.aspnetcore). 
