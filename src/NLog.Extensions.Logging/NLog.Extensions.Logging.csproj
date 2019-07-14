@@ -19,8 +19,8 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
 
-- NLogBeginScopeParser - Improved exception handling (@snakefoot)
-- Update dependency NLog ver. 4.6.4 (@snakefoot)
+- Added NLogProviderOptions.ShutdownOnDispose (#314) (@304NotModified)
+- Update NLog to 4.6.5 (#315) (@304NotModified)
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
     </PackageReleaseNotes>

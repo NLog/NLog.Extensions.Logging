@@ -2,6 +2,10 @@
 
 Date format: (year/month/day)
 
+### v1.5.2 (2019/07/14)
+- [#314](https://github.com/NLog/NLog.Extensions.Logging/pull/314) Added NLogProviderOptions.ShutdownOnDispose (#314) (@304NotModified)
+- [#315](https://github.com/NLog/NLog.Extensions.Logging/pull/315) Update NLog to 4.6.5 (#315) (@304NotModified)
+
 ### V1.5.1 (2019/06/05)
 - [#289](https://github.com/NLog/NLog.Extensions.Logging/pull/289) NLogBeginScopeParser - Improved exception handling (@snakefoot)
 - [#299](https://github.com/NLog/NLog.Extensions.Logging/pull/299) Update dependency NLog ver. 4.6.4 (@snakefoot)
