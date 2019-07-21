@@ -34,7 +34,7 @@ namespace NLog.Extensions.Logging
             : base(logFactory)
         {
             _originalConfigSection = nlogConfig;
-            _autoReload = LoadConfigurationSection(nlogConfig);
+            _autoReload = Initialize(nlogConfig);
         }
 
         /// <summary>
@@ -55,17 +55,69 @@ namespace NLog.Extensions.Logging
             }
         }
 
+        /// <summary>
+        /// Did the <see cref="Initialize"/> Succeeded? <c>true</c>= success, <c>false</c>= error, <c>null</c> = initialize not started yet.
+        /// </summary>
+        public bool? InitializeSucceeded { get; private set; }
+
         /// <inheritdoc />
         public override LoggingConfiguration Reload()
         {
-            return new NLogLoggingConfiguration(_originalConfigSection, LogFactory);
+            try
+            {
+                var newConfig = new NLogLoggingConfiguration(_originalConfigSection, LogFactory);
+                if (newConfig.InitializeSucceeded == true)
+                    return newConfig;
+                else
+                    return this;
+            }
+            catch (Exception ex)
+            {
+                if (MustBeRethrown(ex, LogFactory))
+                    throw;
+
+                return this;
+            }
         }
 
-        private bool LoadConfigurationSection(IConfigurationSection nlogConfig)
+        private bool Initialize(IConfigurationSection nlogConfig)
         {
-            var configElement = new LoggingConfigurationElement(nlogConfig, true);
-            LoadConfig(configElement, null);
-            return configElement.AutoReload;
+            LoggingConfigurationElement configElement = null;
+
+            try
+            {
+                InitializeSucceeded = null;
+                configElement = new LoggingConfigurationElement(nlogConfig, true);
+                LoadConfig(configElement, null);
+                InitializeSucceeded = true;
+                return configElement.AutoReload;
+            }
+            catch (Exception ex)
+            {
+                InitializeSucceeded = false;
+
+                if (MustBeRethrown(ex, LogFactory))
+                    throw;
+
+                return configElement?.AutoReload ?? false;
+            }
+        }
+
+        private static bool MustBeRethrown(Exception ex, LogFactory logFactory)
+        {
+            if (ex is OutOfMemoryException)
+                return true;
+#if !NETCORE1_0
+            if (ex is StackOverflowException)
+                return true;
+#endif
+            if (logFactory.ThrowConfigExceptions ?? logFactory.ThrowExceptions)
+                return true;
+
+            if (LogManager.ThrowConfigExceptions ?? LogManager.ThrowExceptions)
+                return true;
+
+            return false;
         }
 
         private void LogFactory_ConfigurationChanged(object sender, LoggingConfigurationChangedEventArgs e)
@@ -98,7 +150,7 @@ namespace NLog.Extensions.Logging
                 InternalLogger.Info("Reloading NLogLoggingConfiguration...");
                 var newConfig = new NLogLoggingConfiguration(nlogConfig, LogFactory);
                 var oldConfig = LogFactory.Configuration;
-                if (oldConfig != null)
+                if (oldConfig != null && newConfig.InitializeSucceeded == true)
                 {
                     if (LogFactory.KeepVariablesOnReload)
                     {
