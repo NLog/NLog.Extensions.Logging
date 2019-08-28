@@ -12,15 +12,13 @@
     
     <Authors>Microsoft;Julian Verdurmen</Authors>
     <Company>NLog</Company>
-    <Description>NLog provider for Microsoft.Extensions.Logging for usage in .NET Standard libraries and console applicaties.
+    <Description>NLog LoggerProvider for Microsoft.Extensions.Logging for logging in .NET Standard libraries and .NET Core applications.
 
 For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.Web.AspNetCore
     </Description>
-    <PackageTags>NLog;Microsoft.Extensions.Logging;log;logfiles;netcore</PackageTags>
+    <PackageTags>NLog;Microsoft.Extensions.Logging;log;logging;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
-
-- Added NLogProviderOptions.ShutdownOnDispose (#314) (@304NotModified)
-- Update NLog to 4.6.5 (#315) (@304NotModified)
+- Fixed memory leak in NLogLoggingConfiguration for autoreload #322 (@snakefoot)
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
     </PackageReleaseNotes>

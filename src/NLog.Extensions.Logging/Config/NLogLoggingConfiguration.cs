@@ -15,6 +15,7 @@ namespace NLog.Extensions.Logging
         private readonly IConfigurationSection _originalConfigSection;
         private bool _autoReload;
         private Action<object> _reloadConfiguration;
+        private IDisposable _registerChangeCallback;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NLogLoggingConfiguration" /> class.
@@ -76,6 +77,8 @@ namespace NLog.Extensions.Logging
                 {
                     _autoReload = false; // Cannot unsubscribe to reload event, but we can stop reacting to it
                     LogFactory.ConfigurationChanged -= LogFactory_ConfigurationChanged;
+                    _registerChangeCallback?.Dispose();
+                    _registerChangeCallback = null;
                 }
             }
             else if (ReferenceEquals(e.ActivatedConfiguration, this) && _autoReload && _reloadConfiguration != null)
@@ -117,7 +120,9 @@ namespace NLog.Extensions.Logging
 
         private void MonitorForReload(IConfigurationSection nlogConfig)
         {
-            nlogConfig.GetReloadToken().RegisterChangeCallback(_reloadConfiguration, nlogConfig);
+            _registerChangeCallback?.Dispose();
+            _registerChangeCallback = null;
+            _registerChangeCallback = nlogConfig.GetReloadToken().RegisterChangeCallback(_reloadConfiguration, nlogConfig);
         }
 
         private class LoggingConfigurationElement : ILoggingConfigurationElement
@@ -191,7 +196,6 @@ namespace NLog.Extensions.Logging
                 }
 
                 var isTargetsSection = IsTargetsSection();
-
                 if (isTargetsSection)
                 {
                     foreach (var targetDefaultConfig in GetTargetsDefaultConfigElements())

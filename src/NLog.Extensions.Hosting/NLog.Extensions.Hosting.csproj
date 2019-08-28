@@ -11,13 +11,15 @@
 
     <Company>NLog</Company>
     <Authors>Julian Verdurmen;Bryan Gonzalez</Authors>
-    <Description>NLog extension for Microsoft.Extensions.Hosting for usage in .NET Standard libraries and net core applications making use of the generic Host class introduced in netcore 2.1</Description>
+    <Description>NLog extension for Microsoft.Extensions.Hosting for logging in .NET Standard libraries and .NET Core applications using IHostBuilder.
+    
+For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.Web.AspNetCore </Description>
     <PackageProjectUrl>https://github.com/NLog/NLog.Extensions.Logging</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/NLog/NLog.Extensions.Logging/blob/master/LICENSE</PackageLicenseUrl>
     <PackageIconUrl>https://nlog-project.org/NConfig.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/NLog/NLog.Extensions.Logging.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>NLog;Microsoft.Extensions.Hosting;log;logfiles;netcore</PackageTags>
+    <PackageTags>NLog;Microsoft.Extensions.Hosting;log;logging;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
     </PackageReleaseNotes>

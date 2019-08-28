@@ -2,6 +2,9 @@
 
 Date format: (year/month/day)
 
+### v1.5.3 (2019/08/28)
+- [#322](https://github.com/NLog/NLog.Extensions.Logging/pull/322) Fixed memory leak in NLogLoggingConfiguration for autoreload
+
 ### v1.5.2 (2019/07/14)
 - [#314](https://github.com/NLog/NLog.Extensions.Logging/pull/314) Added NLogProviderOptions.ShutdownOnDispose (#314) (@304NotModified)
 - [#315](https://github.com/NLog/NLog.Extensions.Logging/pull/315) Update NLog to 4.6.5 (#315) (@304NotModified)
