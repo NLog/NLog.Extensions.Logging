@@ -16,6 +16,14 @@ steps:
   inputs:
     restoreSolution: '$(solution)'
 
+- task: SonarCloudPrepare@1
+  inputs:
+    SonarCloud: 'Sonar NLog'
+    organization: 'nlog'
+    scannerMode: 'MSBuild'
+    projectKey: 'nlog.extensions.logging'
+    projectVersion: 
+
 - task: VSBuild@1
   inputs:
     solution: '$(solution)'
@@ -36,3 +44,9 @@ steps:
     testResultsFiles: '**/TEST-*.xml'
     mergeTestResults: true
     failTaskOnFailedTests: true
+
+- task: SonarCloudAnalyze@1
+
+- task: SonarCloudPublish@1
+  inputs:
+    pollingTimeoutSec: '300'
