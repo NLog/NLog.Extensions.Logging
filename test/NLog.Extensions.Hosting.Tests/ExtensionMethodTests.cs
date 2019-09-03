@@ -14,7 +14,7 @@ namespace NLog.Extensions.Hosting.Tests
         public void UseNLog_noParams_WorksWithNLog()
         {
             var actual = new HostBuilder().UseNLog().Build();
-            TestHostingResult(actual);
+            TestHostingResult(actual, true);
         }
 
         [Fact]
@@ -22,7 +22,7 @@ namespace NLog.Extensions.Hosting.Tests
         {
             var someParam = new NLogProviderOptions {CaptureMessageProperties = false, CaptureMessageTemplates = false};
             var actual = new HostBuilder().UseNLog(someParam).Build();
-            TestHostingResult(actual);
+            TestHostingResult(actual, true);
         }
 
         [Fact]
@@ -35,26 +35,51 @@ namespace NLog.Extensions.Hosting.Tests
 
             var someParam = new NLogProviderOptions { CaptureMessageProperties = false, CaptureMessageTemplates = false };
             var actual = new HostBuilder().ConfigureHostConfiguration(config => config.AddInMemoryCollection(memoryConfig)).UseNLog(someParam).Build();
-            TestHostingResult(actual);
+            TestHostingResult(actual, true);
         }
 
-        private static void TestHostingResult(IHost host)
+        [Fact]
+        public void AddNLog_withShutdownOnDispose_worksWithNLog()
+        {
+            var someParam = new NLogProviderOptions { ShutdownOnDispose = true };
+            var actual = new HostBuilder().ConfigureLogging(l => l.AddNLog(someParam)).Build();
+            try
+            {
+                TestHostingResult(actual, false);
+                Assert.NotNull(LogManager.Configuration);
+            }
+            finally
+            {
+                actual.Dispose();
+                Assert.Null(LogManager.Configuration);
+            }
+        }
+
+        [Fact]
+        public void UseNLog_withAddNLog_worksWithNLog()
+        {
+            var actual = new HostBuilder().UseNLog().ConfigureServices((h,s) => s.AddLogging(l => l.AddNLog())).Build();
+            TestHostingResult(actual, true);
+        }
+
+        private static void TestHostingResult(IHost host, bool resetConfiguration)
         {
             try
             {
                 var nlogTarget = new Targets.MemoryTarget() { Name = "Output" };
-                Config.SimpleConfigurator.ConfigureForTargetLogging(nlogTarget);
+                Config.SimpleConfigurator.ConfigureForTargetLogging(nlogTarget, LogLevel.Fatal);
 
                 var loggerFactory = host.Services.GetService<ILoggerFactory>();
                 Assert.NotNull(loggerFactory);
 
                 var logger = loggerFactory.CreateLogger("Hello");
-                logger.LogError("World");
-                Assert.NotEmpty(nlogTarget.Logs);
+                logger.LogCritical("World");
+                Assert.Single(nlogTarget.Logs);
             }
             finally
             {
-                LogManager.Configuration = null;
+                if (resetConfiguration)
+                    LogManager.Configuration = null;
             }
         }
     }

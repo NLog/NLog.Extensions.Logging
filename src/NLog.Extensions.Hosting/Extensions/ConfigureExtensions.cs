@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Config;
@@ -41,7 +42,11 @@ namespace NLog.Extensions.Hosting
                 ConfigurationItemFactory.Default.RegisterItemsFromAssembly(typeof(ConfigureExtensions).GetTypeInfo()
                     .Assembly);
 
-                services.AddSingleton<ILoggerProvider>(serviceProvider =>
+                if (hostbuilder.Configuration != null)
+                    ConfigSettingLayoutRenderer.DefaultConfiguration = hostbuilder.Configuration;
+
+                // Try adding Singleton-implementation if not already exists
+                services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, NLogLoggerProvider>(serviceProvider =>
                 {
                     var provider = new NLogLoggerProvider(options ?? new NLogProviderOptions());
                     if (hostbuilder.Configuration != null)
@@ -51,7 +56,7 @@ namespace NLog.Extensions.Hosting
                             provider.Configure(hostbuilder.Configuration.GetSection("Logging:NLog"));
                     }
                     return provider;
-                });
+                }));
             });
 
             return builder;
