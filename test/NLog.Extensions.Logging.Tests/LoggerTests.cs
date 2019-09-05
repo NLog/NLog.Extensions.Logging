@@ -221,15 +221,15 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Equal(expectedLogMessage, target.Logs.FirstOrDefault());
         }
 
-        private static MemoryTarget GetTarget()
+        private MemoryTarget GetTarget()
         {
-            var target = LogManager.Configuration.FindTargetByName<MemoryTarget>("target1");
+            var target = _nlogProvider?.LogFactory?.Configuration?.FindTargetByName<MemoryTarget>("target1");
             return target;
         }
 
         private Runner GetRunner()
         {
-            base.ConfigureServiceProvider<Runner>((s) => LogManager.LoadConfiguration("nlog.config"));
+            base.ConfigureTransientService<Runner>((s) => _nlogProvider.LogFactory.LoadConfiguration("nlog.config"));
             return base.GetRunner<Runner>();
         }
 

@@ -14,7 +14,7 @@ namespace NLog.Extensions.Logging.Tests
         {
             var runner = GetRunner<CustomBeginScopeTestRunner>();
             var target = new NLog.Targets.MemoryTarget() { Layout = "${message} ${mdlc:World}. Welcome ${ndlc}" };
-            NLog.Config.SimpleConfigurator.ConfigureForTargetLogging(target);
+            ConfigureNLog(target);
             runner.SayHello().Wait();
             Assert.Single(target.Logs);
             Assert.Equal("Hello Earth. Welcome Earth People", target.Logs[0]);
@@ -25,7 +25,7 @@ namespace NLog.Extensions.Logging.Tests
         {
             var runner = GetRunner<CustomBeginScopeTestRunner>(new NLogProviderOptions() { IncludeScopes = false });
             var target = new NLog.Targets.MemoryTarget() { Layout = "${message} ${mdlc:World}. Welcome ${ndlc}" };
-            NLog.Config.SimpleConfigurator.ConfigureForTargetLogging(target);
+            ConfigureNLog(target);
             runner.SayHello().Wait();
             Assert.Single(target.Logs);
             Assert.Equal("Hello . Welcome ", target.Logs[0]);
@@ -36,7 +36,7 @@ namespace NLog.Extensions.Logging.Tests
         {
             var runner = GetRunner<CustomBeginScopeTestRunner>();
             var target = new NLog.Targets.MemoryTarget() { Layout = "${message} ${mdlc:World}. Welcome ${ndlc}" };
-            NLog.Config.SimpleConfigurator.ConfigureForTargetLogging(target);
+            ConfigureNLog(target);
             var scopeString = runner.SayHi().Result;
             Assert.Single(target.Logs);
             Assert.Equal("Hi Earth. Welcome Earth People", target.Logs[0]);
@@ -48,7 +48,7 @@ namespace NLog.Extensions.Logging.Tests
         {
             var runner = GetRunner<CustomBeginScopeTestRunner>();
             var target = new NLog.Targets.MemoryTarget() { Layout = "${message}" };
-            NLog.Config.SimpleConfigurator.ConfigureForTargetLogging(target);
+            ConfigureNLog(target);
             runner.SayNothing().Wait();
             Assert.Single(target.Logs);
             Assert.Equal("Nothing", target.Logs[0]);

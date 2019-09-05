@@ -1,68 +1,53 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using NLog.Common;
 
 namespace NLog.Extensions.Logging.Tests
 {
     public class NLogTestBase
     {
         IServiceProvider _serviceProvider;
+        protected NLogLoggerProvider _nlogProvider;
 
-        /// <summary>
-        /// Don't run tests with internal log in parallel
-        ///
-        /// usage:  [Collection(TestsWithInternalLog)]
-        /// </summary>
-        public const string TestsWithInternalLog = "Test-with-internal-log";
-
-        protected IServiceProvider ConfigureServiceProvider<T>(Action<ServiceCollection> configureServices = null, NLogProviderOptions options = null) where T : class
+        protected NLogLoggerProvider ConfigureLoggerProvider(NLogProviderOptions options = null, Action<ServiceCollection> configureServices = null)
         {
             if (_serviceProvider == null)
             {
+                var logFactory = new LogFactory();
+                _nlogProvider = new NLogLoggerProvider(options ?? new NLogProviderOptions() { CaptureMessageTemplates = true, CaptureMessageProperties = true }, logFactory);
                 var services = new ServiceCollection();
-
-                services.AddTransient<T>();
                 services.AddSingleton<ILoggerFactory, LoggerFactory>();
                 services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
                 configureServices?.Invoke(services);
-
                 _serviceProvider = services.BuildServiceProvider();
-
                 var loggerFactory = _serviceProvider.GetRequiredService<ILoggerFactory>();
-                loggerFactory.AddNLog(options ?? new NLogProviderOptions() { CaptureMessageTemplates = true, CaptureMessageProperties = true });
+                loggerFactory.AddProvider(_nlogProvider);
             }
+            return _nlogProvider;
+        }
+
+        protected IServiceProvider ConfigureTransientService<T>(Action<ServiceCollection> configureServices = null, NLogProviderOptions options = null) where T : class
+        {
+            if (_serviceProvider == null)
+                ConfigureLoggerProvider(options, s => { s.AddTransient<T>(); configureServices?.Invoke(s); });
             return _serviceProvider;
+        }
+
+        protected void ConfigureNLog(NLog.Targets.Target nlogTarget = null)
+        {
+            nlogTarget = nlogTarget ?? new NLog.Targets.MemoryTarget("output") { Layout = "${message}" };
+            var nlogConfig = new NLog.Config.LoggingConfiguration(_nlogProvider.LogFactory);
+            nlogConfig.AddRuleForAllLevels(nlogTarget);
+            if (nlogTarget is NLog.Targets.Wrappers.WrapperTargetBase wrapperTarget)
+                nlogConfig.AddTarget(wrapperTarget.WrappedTarget);
+            _nlogProvider.LogFactory.Configuration = nlogConfig;
         }
 
         protected T GetRunner<T>(NLogProviderOptions options = null) where T : class
         {
             // Start program
-            var runner = ConfigureServiceProvider<T>(null, options).GetRequiredService<T>();
+            var runner = ConfigureTransientService<T>(null, options).GetRequiredService<T>();
             return runner;
-        }
-
-        /// <summary>
-        /// Capture internal log.
-        ///
-        /// Important: mark test class with  [Collection(TestsWithInternalLog)]
-        /// </summary>
-        /// <returns></returns>
-        protected static StringWriter CaptureInternalLog()
-        {
-            var stringWriter = new StringWriter();
-            InternalLogger.LogLevel = LogLevel.Trace;
-            InternalLogger.LogWriter = stringWriter;
-            return stringWriter;
-        }
-
-        ~NLogTestBase()
-        {
-            InternalLogger.LogLevel = LogLevel.Off;
-            InternalLogger.LogWriter = null;
         }
     }
 }

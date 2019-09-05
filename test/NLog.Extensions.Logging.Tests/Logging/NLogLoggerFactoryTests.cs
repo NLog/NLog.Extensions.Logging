@@ -1,28 +1,24 @@
-using System;
-using System.IO;
 using Microsoft.Extensions.Logging;
-using NLog.Common;
 using Xunit;
 
 namespace NLog.Extensions.Logging.Tests.Logging
 {
-    [Collection(TestsWithInternalLog)]
     public class NLogLoggerFactoryTests : NLogTestBase
     {
         [Fact]
         public void Dispose_HappyPath_FlushLogFactory()
         {
             // Arrange
-            var loggerFactory = new NLogLoggerFactory();
-
-            var internalLogWriter = CaptureInternalLog();
+            ConfigureLoggerProvider();
+            ConfigureNLog(new NLog.Targets.Wrappers.BufferingTargetWrapper("buffer", new NLog.Targets.MemoryTarget("output")));
+            var loggerFactory = new NLogLoggerFactory(_nlogProvider);
 
             // Act
+            loggerFactory.CreateLogger("test").LogInformation("Hello");
             loggerFactory.Dispose();
 
             // Assert
-            var internalLog = internalLogWriter.ToString();
-            Assert.Contains("LogFactory.Flush", internalLog, StringComparison.OrdinalIgnoreCase);
+            Assert.Single(_nlogProvider.LogFactory.Configuration.FindTargetByName<NLog.Targets.MemoryTarget>("output").Logs);
         }
 
         [Fact]
@@ -45,17 +41,20 @@ namespace NLog.Extensions.Logging.Tests.Logging
         public void AddProvider_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            var unitUnderTest = new NLogLoggerFactory();
-            ILoggerProvider provider = new NLogLoggerProvider();
-
-            var internalLogWriter = CaptureInternalLog();
+            var logFactory = new LogFactory();
+            var logConfig = new NLog.Config.LoggingConfiguration(logFactory);
+            logConfig.AddRuleForAllLevels(new NLog.Targets.MemoryTarget("output"));
+            logFactory.Configuration = logConfig;
+            var provider = new NLogLoggerProvider(null, logFactory);
+            var loggerFactory = new NLogLoggerFactory(provider);
 
             // Act
-            unitUnderTest.AddProvider(provider);
+            ILoggerProvider newProvider = new NLogLoggerProvider();
+            loggerFactory.AddProvider(newProvider);
+            loggerFactory.CreateLogger("test").LogInformation("Hello");
 
             // Assert
-            var internalLog = internalLogWriter.ToString();
-            Assert.Contains("AddProvider will be ignored", internalLog, StringComparison.OrdinalIgnoreCase);
+            Assert.Single(logFactory.Configuration.FindTargetByName<NLog.Targets.MemoryTarget>("output").Logs);
         }
     }
 }

@@ -1,10 +1,8 @@
-using NLog.Extensions.Logging;
-using System;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace NLog.Extensions.Logging.Tests.Logging
 {
-    [Collection(TestsWithInternalLog)]
     public class NLogLoggerProviderTests : NLogTestBase
     {
         [Fact]
@@ -27,16 +25,19 @@ namespace NLog.Extensions.Logging.Tests.Logging
         public void Dispose_HappyPath_FlushLogFactory()
         {
             // Arrange
-            var provider = new NLogLoggerProvider();
-
-            var internalLogWriter = CaptureInternalLog();
+            var logFactory = new LogFactory();
+            var logConfig = new NLog.Config.LoggingConfiguration(logFactory);
+            logConfig.AddTarget(new NLog.Targets.MemoryTarget("output"));
+            logConfig.AddRuleForAllLevels(new NLog.Targets.Wrappers.BufferingTargetWrapper("buffer", logConfig.FindTargetByName("output")));
+            logFactory.Configuration = logConfig;
+            var provider = new NLogLoggerProvider(null, logFactory);
 
             // Act
+            provider.CreateLogger("test").LogInformation("Hello");
             provider.Dispose();
 
             // Assert
-            var internalLog = internalLogWriter.ToString();
-            Assert.Contains("LogFactory.Flush", internalLog, StringComparison.OrdinalIgnoreCase);
+            Assert.Single(logFactory.Configuration.FindTargetByName<NLog.Targets.MemoryTarget>("output").Logs);
         }
     }
 }
