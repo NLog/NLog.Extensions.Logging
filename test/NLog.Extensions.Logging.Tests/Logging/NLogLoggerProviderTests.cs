@@ -26,9 +26,9 @@ namespace NLog.Extensions.Logging.Tests.Logging
         {
             // Arrange
             var logFactory = new LogFactory();
-            var logConfig = new NLog.Config.LoggingConfiguration(logFactory);
-            logConfig.AddTarget(new NLog.Targets.MemoryTarget("output"));
-            logConfig.AddRuleForAllLevels(new NLog.Targets.Wrappers.BufferingTargetWrapper("buffer", logConfig.FindTargetByName("output")));
+            var logConfig = new Config.LoggingConfiguration(logFactory);
+            logConfig.AddTarget(new Targets.MemoryTarget("output"));
+            logConfig.AddRuleForAllLevels(new Targets.Wrappers.BufferingTargetWrapper("buffer", logConfig.FindTargetByName("output")));
             logFactory.Configuration = logConfig;
             var provider = new NLogLoggerProvider(null, logFactory);
 
@@ -37,7 +37,7 @@ namespace NLog.Extensions.Logging.Tests.Logging
             provider.Dispose();
 
             // Assert
-            Assert.Single(logFactory.Configuration.FindTargetByName<NLog.Targets.MemoryTarget>("output").Logs);
+            Assert.Single(logFactory.Configuration.FindTargetByName<Targets.MemoryTarget>("output").Logs);
         }
     }
 }

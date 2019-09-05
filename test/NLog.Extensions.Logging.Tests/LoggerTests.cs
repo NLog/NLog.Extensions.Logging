@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog.Targets;
 using Xunit;
@@ -126,7 +125,7 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void TestInvalidFormatString2()
         {
-            var runner = GetRunner<Runner>(new NLogProviderOptions() { CaptureMessageTemplates = false });
+            var runner = GetRunner<Runner>(new NLogProviderOptions { CaptureMessageTemplates = false });
             var ex = Assert.Throws<AggregateException>(() => runner.Log(Microsoft.Extensions.Logging.LogLevel.Information, 0, null, "{0}{1}", "Test"));
             Assert.IsType<FormatException>(ex.InnerException);
         }
@@ -223,13 +222,13 @@ namespace NLog.Extensions.Logging.Tests
 
         private MemoryTarget GetTarget()
         {
-            var target = _nlogProvider?.LogFactory?.Configuration?.FindTargetByName<MemoryTarget>("target1");
+            var target = LoggerProvider?.LogFactory?.Configuration?.FindTargetByName<MemoryTarget>("target1");
             return target;
         }
 
         private Runner GetRunner()
         {
-            base.ConfigureTransientService<Runner>((s) => _nlogProvider.LogFactory.LoadConfiguration("nlog.config"));
+            ConfigureTransientService<Runner>((s) => LoggerProvider.LogFactory.LoadConfiguration("nlog.config"));
             return base.GetRunner<Runner>();
         }
 
@@ -330,7 +329,7 @@ namespace NLog.Extensions.Logging.Tests
 
             public void LogWithScopeParameterDictionary()
             {
-                using (_logger.BeginScope(new Dictionary<string, string>() { ["scope1"] = "Hello" }))
+                using (_logger.BeginScope(new Dictionary<string, string> { ["scope1"] = "Hello" }))
                 {
                     _logger.LogDebug("message with id and {0} parameters", 1);
                 }
