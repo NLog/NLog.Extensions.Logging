@@ -2,6 +2,10 @@ using System;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
+#if !NETCORE1_0
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+#endif
 using Microsoft.Extensions.Logging;
 using NLog.Common;
 using NLog.Config;
@@ -67,8 +71,8 @@ namespace NLog.Extensions.Logging
         /// <returns>ILoggerFactory for chaining</returns>
         public static ILoggingBuilder AddNLog(this ILoggingBuilder factory, IConfiguration configuration)
         {
-            var provider = CreateNLogProvider(configuration);
-            factory.AddProvider(provider);
+            // Try adding Singleton-implementation if not already exists
+            factory.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, NLogLoggerProvider>(s => CreateNLogProvider(configuration)));
             return factory;
         }
 
@@ -80,7 +84,8 @@ namespace NLog.Extensions.Logging
         /// <returns>ILoggerFactory for chaining</returns>
         public static ILoggingBuilder AddNLog(this ILoggingBuilder factory, NLogProviderOptions options)
         {
-            factory.AddProvider(new NLogLoggerProvider(options));
+            // Try adding Singleton-implementation if not already exists
+            factory.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, NLogLoggerProvider>(s => new NLogLoggerProvider(options)));
             return factory;
         }
 #endif
