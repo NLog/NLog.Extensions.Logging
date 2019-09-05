@@ -10,7 +10,7 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void TestCallSiteSayHello()
         {
-            ConfigureServiceProvider<CustomLoggerCallSiteTestRunner>((s) => s.AddSingleton(typeof(ILogger<>), typeof(SameAssemblyLogger<>)));
+            ConfigureTransientService<CustomLoggerCallSiteTestRunner>((s) => s.AddSingleton(typeof(ILogger<>), typeof(SameAssemblyLogger<>)));
             var target = new NLog.Targets.MemoryTarget() { Layout = "${callsite}|${message}" };
             ConfigureNLog(target);
             var runner = GetRunner<CustomLoggerCallSiteTestRunner>();

@@ -229,7 +229,7 @@ namespace NLog.Extensions.Logging.Tests
 
         private Runner GetRunner()
         {
-            base.ConfigureServiceProvider<Runner>((s) => _nlogProvider.LogFactory.LoadConfiguration("nlog.config"));
+            base.ConfigureTransientService<Runner>((s) => _nlogProvider.LogFactory.LoadConfiguration("nlog.config"));
             return base.GetRunner<Runner>();
         }
 

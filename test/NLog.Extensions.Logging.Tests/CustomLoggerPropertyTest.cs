@@ -12,7 +12,7 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void TestExtraMessageTemplatePropertySayHello()
         {
-            ConfigureServiceProvider<CustomLoggerPropertyTestRunner>((s) => s.AddSingleton(typeof(ILogger<>), typeof(SameAssemblyLogger<>)));
+            ConfigureTransientService<CustomLoggerPropertyTestRunner>((s) => s.AddSingleton(typeof(ILogger<>), typeof(SameAssemblyLogger<>)));
             var runner = GetRunner<CustomLoggerPropertyTestRunner>();
 
             var target = new NLog.Targets.MemoryTarget() { Layout = "${message}|${all-event-properties}"};
@@ -25,7 +25,7 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void TestExtraMessageTemplatePropertySayHigh5()
         {
-            ConfigureServiceProvider<CustomLoggerPropertyTestRunner>((s) => s.AddSingleton(typeof(ILogger<>), typeof(SameAssemblyLogger<>)));
+            ConfigureTransientService<CustomLoggerPropertyTestRunner>((s) => s.AddSingleton(typeof(ILogger<>), typeof(SameAssemblyLogger<>)));
             var runner = GetRunner<CustomLoggerPropertyTestRunner>();
 
             var target = new NLog.Targets.MemoryTarget() { Layout = "${message}|${all-event-properties}" };
@@ -38,7 +38,7 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void TestExtraMessagePropertySayHi()
         {
-            ConfigureServiceProvider<CustomLoggerPropertyTestRunner>((s) => s.AddSingleton(typeof(ILogger<>), typeof(SameAssemblyLogger<>)), new NLogProviderOptions() { CaptureMessageTemplates = false });
+            ConfigureTransientService<CustomLoggerPropertyTestRunner>((s) => s.AddSingleton(typeof(ILogger<>), typeof(SameAssemblyLogger<>)), new NLogProviderOptions() { CaptureMessageTemplates = false });
             var runner = GetRunner<CustomLoggerPropertyTestRunner>();
 
             var target = new NLog.Targets.MemoryTarget() { Layout = "${message}|${all-event-properties}" };

@@ -9,20 +9,16 @@ namespace NLog.Extensions.Logging.Tests.Logging
         public void Dispose_HappyPath_FlushLogFactory()
         {
             // Arrange
-            var logFactory = new LogFactory();
-            var logConfig = new NLog.Config.LoggingConfiguration(logFactory);
-            logConfig.AddTarget(new NLog.Targets.MemoryTarget("output"));
-            logConfig.AddRuleForAllLevels(new NLog.Targets.Wrappers.BufferingTargetWrapper("buffer", logConfig.FindTargetByName("output")));
-            logFactory.Configuration = logConfig;
-            var provider = new NLogLoggerProvider(null, logFactory);
-            var loggerFactory = new NLogLoggerFactory(provider);
+            ConfigureLoggerProvider();
+            ConfigureNLog(new NLog.Targets.Wrappers.BufferingTargetWrapper("buffer", new NLog.Targets.MemoryTarget("output")));
+            var loggerFactory = new NLogLoggerFactory(_nlogProvider);
 
             // Act
             loggerFactory.CreateLogger("test").LogInformation("Hello");
             loggerFactory.Dispose();
 
             // Assert
-            Assert.Single(logFactory.Configuration.FindTargetByName<NLog.Targets.MemoryTarget>("output").Logs);
+            Assert.Single(_nlogProvider.LogFactory.Configuration.FindTargetByName<NLog.Targets.MemoryTarget>("output").Logs);
         }
 
         [Fact]
