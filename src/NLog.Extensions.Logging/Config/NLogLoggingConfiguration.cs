@@ -234,14 +234,19 @@ namespace NLog.Extensions.Logging
                     }
                     else
                     {
-                        var isTargetKey = child.Key.EqualsOrdinalIgnoreCase(TargetsKey);
-                        yield return new LoggingConfigurationElement(child, false, isTargetsSection ? TargetKey : null)
-                        {
-                            DefaultTargetParametersSection = (defaultTargetParameters != null && isTargetKey) ? defaultTargetParameters : null,
-                            DefaultTargetWrapperSection = (defaultTargetWrapper != null && isTargetKey) ? defaultTargetWrapper : null,
-                        };
+                        yield return CreateLoggingConfigurationElement(isTargetsSection, child, defaultTargetParameters, defaultTargetWrapper);
                     }
                 }
+            }
+
+            private static LoggingConfigurationElement CreateLoggingConfigurationElement(bool isTargetsSection, IConfigurationSection child, IConfigurationSection defaultTargetParameters, IConfigurationSection defaultTargetWrapper)
+            {
+                var isTargetKey = child.Key.EqualsOrdinalIgnoreCase(TargetsKey);
+                return new LoggingConfigurationElement(child, false, isTargetsSection ? TargetKey : null)
+                {
+                    DefaultTargetParametersSection = defaultTargetParameters != null && isTargetKey ? defaultTargetParameters : null,
+                    DefaultTargetWrapperSection = defaultTargetWrapper != null && isTargetKey ? defaultTargetWrapper : null,
+                };
             }
 
             private bool IsTargetsSection()
