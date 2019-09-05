@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Xunit;
 
@@ -10,12 +9,13 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void TestCallSiteSayHello()
         {
-            ConfigureTransientService<CustomLoggerCallSiteTestRunner>((s) => s.AddSingleton(typeof(ILogger<>), typeof(SameAssemblyLogger<>)));
-            var target = new NLog.Targets.MemoryTarget() { Layout = "${callsite}|${message}" };
+            SetupTestRunner<CustomLoggerCallSiteTestRunner>(typeof(SameAssemblyLogger<>));
+            var target = new Targets.MemoryTarget { Layout = "${callsite}|${message}" };
             ConfigureNLog(target);
             var runner = GetRunner<CustomLoggerCallSiteTestRunner>();
 
             runner.SayHello();
+            
             Assert.Single(target.Logs);
             Assert.Contains("SayHello", target.Logs[0]);
             Assert.Contains("stuff", target.Logs[0]);

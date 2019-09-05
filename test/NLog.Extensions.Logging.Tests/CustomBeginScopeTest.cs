@@ -13,7 +13,7 @@ namespace NLog.Extensions.Logging.Tests
         public void TestNonSerializableSayHello()
         {
             var runner = GetRunner<CustomBeginScopeTestRunner>();
-            var target = new NLog.Targets.MemoryTarget() { Layout = "${message} ${mdlc:World}. Welcome ${ndlc}" };
+            var target = new Targets.MemoryTarget { Layout = "${message} ${mdlc:World}. Welcome ${ndlc}" };
             ConfigureNLog(target);
             runner.SayHello().Wait();
             Assert.Single(target.Logs);
@@ -23,8 +23,8 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void TestNonSerializableSayHelloWithScope()
         {
-            var runner = GetRunner<CustomBeginScopeTestRunner>(new NLogProviderOptions() { IncludeScopes = false });
-            var target = new NLog.Targets.MemoryTarget() { Layout = "${message} ${mdlc:World}. Welcome ${ndlc}" };
+            var runner = GetRunner<CustomBeginScopeTestRunner>(new NLogProviderOptions { IncludeScopes = false });
+            var target = new Targets.MemoryTarget { Layout = "${message} ${mdlc:World}. Welcome ${ndlc}" };
             ConfigureNLog(target);
             runner.SayHello().Wait();
             Assert.Single(target.Logs);
@@ -35,7 +35,7 @@ namespace NLog.Extensions.Logging.Tests
         public void TestNonSerializableSayHi()
         {
             var runner = GetRunner<CustomBeginScopeTestRunner>();
-            var target = new NLog.Targets.MemoryTarget() { Layout = "${message} ${mdlc:World}. Welcome ${ndlc}" };
+            var target = new Targets.MemoryTarget { Layout = "${message} ${mdlc:World}. Welcome ${ndlc}" };
             ConfigureNLog(target);
             var scopeString = runner.SayHi().Result;
             Assert.Single(target.Logs);
@@ -47,7 +47,7 @@ namespace NLog.Extensions.Logging.Tests
         public void TestNonSerializableSayNothing()
         {
             var runner = GetRunner<CustomBeginScopeTestRunner>();
-            var target = new NLog.Targets.MemoryTarget() { Layout = "${message}" };
+            var target = new Targets.MemoryTarget { Layout = "${message}" };
             ConfigureNLog(target);
             runner.SayNothing().Wait();
             Assert.Single(target.Logs);

@@ -4,26 +4,26 @@ using Microsoft.Extensions.Logging;
 
 namespace NLog.Extensions.Logging.Tests
 {
-    public class NLogTestBase
+    public abstract class NLogTestBase
     {
-        IServiceProvider _serviceProvider;
-        protected NLogLoggerProvider _nlogProvider;
+        private IServiceProvider _serviceProvider;
+        protected NLogLoggerProvider LoggerProvider { get; private set; }
 
         protected NLogLoggerProvider ConfigureLoggerProvider(NLogProviderOptions options = null, Action<ServiceCollection> configureServices = null)
         {
             if (_serviceProvider == null)
             {
                 var logFactory = new LogFactory();
-                _nlogProvider = new NLogLoggerProvider(options ?? new NLogProviderOptions() { CaptureMessageTemplates = true, CaptureMessageProperties = true }, logFactory);
+                LoggerProvider = new NLogLoggerProvider(options ?? new NLogProviderOptions { CaptureMessageTemplates = true, CaptureMessageProperties = true }, logFactory);
                 var services = new ServiceCollection();
                 services.AddSingleton<ILoggerFactory, LoggerFactory>();
                 services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
                 configureServices?.Invoke(services);
                 _serviceProvider = services.BuildServiceProvider();
                 var loggerFactory = _serviceProvider.GetRequiredService<ILoggerFactory>();
-                loggerFactory.AddProvider(_nlogProvider);
+                loggerFactory.AddProvider(LoggerProvider);
             }
-            return _nlogProvider;
+            return LoggerProvider;
         }
 
         protected IServiceProvider ConfigureTransientService<T>(Action<ServiceCollection> configureServices = null, NLogProviderOptions options = null) where T : class
@@ -33,14 +33,14 @@ namespace NLog.Extensions.Logging.Tests
             return _serviceProvider;
         }
 
-        protected void ConfigureNLog(NLog.Targets.Target nlogTarget = null)
+        protected void ConfigureNLog(Targets.Target target = null)
         {
-            nlogTarget = nlogTarget ?? new NLog.Targets.MemoryTarget("output") { Layout = "${message}" };
-            var nlogConfig = new NLog.Config.LoggingConfiguration(_nlogProvider.LogFactory);
-            nlogConfig.AddRuleForAllLevels(nlogTarget);
-            if (nlogTarget is NLog.Targets.Wrappers.WrapperTargetBase wrapperTarget)
+            target = target ?? new Targets.MemoryTarget("output") { Layout = "${message}" };
+            var nlogConfig = new Config.LoggingConfiguration(LoggerProvider.LogFactory);
+            nlogConfig.AddRuleForAllLevels(target);
+            if (target is Targets.Wrappers.WrapperTargetBase wrapperTarget)
                 nlogConfig.AddTarget(wrapperTarget.WrappedTarget);
-            _nlogProvider.LogFactory.Configuration = nlogConfig;
+            LoggerProvider.LogFactory.Configuration = nlogConfig;
         }
 
         protected T GetRunner<T>(NLogProviderOptions options = null) where T : class
@@ -48,6 +48,11 @@ namespace NLog.Extensions.Logging.Tests
             // Start program
             var runner = ConfigureTransientService<T>(null, options).GetRequiredService<T>();
             return runner;
+        }
+
+        protected void SetupTestRunner<TRunner>(Type implType, NLogProviderOptions options = null) where TRunner : class
+        {
+            ConfigureTransientService<TRunner>(s => s.AddSingleton(typeof(ILogger<>), implType), options);
         }
     }
 }

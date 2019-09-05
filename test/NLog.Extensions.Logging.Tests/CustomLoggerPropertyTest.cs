@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NLog.Targets;
 using Xunit;
 
 namespace NLog.Extensions.Logging.Tests
@@ -12,12 +12,12 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void TestExtraMessageTemplatePropertySayHello()
         {
-            ConfigureTransientService<CustomLoggerPropertyTestRunner>((s) => s.AddSingleton(typeof(ILogger<>), typeof(SameAssemblyLogger<>)));
-            var runner = GetRunner<CustomLoggerPropertyTestRunner>();
-
-            var target = new NLog.Targets.MemoryTarget() { Layout = "${message}|${all-event-properties}"};
+            var runner = GetRunner();
+            var target = CreateMemoryTarget();
             ConfigureNLog(target);
+
             runner.SayHello();
+
             Assert.Single(target.Logs);
             Assert.Equal(@"Hello ""World""|userid=World, ActivityId=42", target.Logs[0]);
         }
@@ -25,12 +25,12 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void TestExtraMessageTemplatePropertySayHigh5()
         {
-            ConfigureTransientService<CustomLoggerPropertyTestRunner>((s) => s.AddSingleton(typeof(ILogger<>), typeof(SameAssemblyLogger<>)));
-            var runner = GetRunner<CustomLoggerPropertyTestRunner>();
-
-            var target = new NLog.Targets.MemoryTarget() { Layout = "${message}|${all-event-properties}" };
+            var runner = GetRunner();
+            var target = CreateMemoryTarget();
             ConfigureNLog(target);
+
             runner.SayHigh5();
+
             Assert.Single(target.Logs);
             Assert.Equal(@"Hi 5|ActivityId=42", target.Logs[0]);
         }
@@ -38,14 +38,28 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void TestExtraMessagePropertySayHi()
         {
-            ConfigureTransientService<CustomLoggerPropertyTestRunner>((s) => s.AddSingleton(typeof(ILogger<>), typeof(SameAssemblyLogger<>)), new NLogProviderOptions() { CaptureMessageTemplates = false });
-            var runner = GetRunner<CustomLoggerPropertyTestRunner>();
-
-            var target = new NLog.Targets.MemoryTarget() { Layout = "${message}|${all-event-properties}" };
+            var options = new NLogProviderOptions { CaptureMessageTemplates = false };
+            var runner = GetRunner(options);
+            var target = CreateMemoryTarget();
             ConfigureNLog(target);
+
             runner.SayHigh5();
+
             Assert.Single(target.Logs);
             Assert.Equal(@"Hi 5|ActivityId=42, 0=5", target.Logs[0]);
+        }
+
+        private static MemoryTarget CreateMemoryTarget()
+        {
+            var target = new Targets.MemoryTarget { Layout = "${message}|${all-event-properties}" };
+            return target;
+        }
+
+        private CustomLoggerPropertyTestRunner GetRunner(NLogProviderOptions options = null)
+        {
+            SetupTestRunner<CustomLoggerPropertyTestRunner>(typeof(SameAssemblyLogger<>), options);
+            var runner = GetRunner<CustomLoggerPropertyTestRunner>();
+            return runner;
         }
 
         public class SameAssemblyLogger<T> : ILogger<T>
@@ -104,7 +118,7 @@ namespace NLog.Extensions.Logging.Tests
             {
                 _originalState = state;
                 _originalFormattter = formatter;
-                if (_originalState is IReadOnlyList<KeyValuePair<string,object>> customProperties)
+                if (_originalState is IReadOnlyList<KeyValuePair<string, object>> customProperties)
                 {
                     _properties.AddRange(customProperties);
                 }
