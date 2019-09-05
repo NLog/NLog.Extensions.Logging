@@ -15,8 +15,8 @@ namespace NLog.Extensions.Logging
         /// New factory with default options
         /// </summary>
         public NLogLoggerFactory()
+            :this(new NLogLoggerProvider())
         {
-            _provider = new NLogLoggerProvider();
         }
 
         /// <summary>
@@ -24,8 +24,17 @@ namespace NLog.Extensions.Logging
         /// </summary>
         /// <param name="options"></param>
         public NLogLoggerFactory(NLogProviderOptions options)
+            :this(new NLogLoggerProvider(options))
         {
-            _provider = new NLogLoggerProvider(options);
+        }
+
+        /// <summary>
+        /// New factory with provider. 
+        /// </summary>
+        /// <param name="provider"></param>
+        public NLogLoggerFactory(NLogLoggerProvider provider)
+        {
+            _provider = provider;
         }
 
         /// <summary>
@@ -44,7 +53,7 @@ namespace NLog.Extensions.Logging
         {
             if (disposing)
             {
-                LogManager.Flush();
+                _provider.Dispose();
             }
         }
 

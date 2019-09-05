@@ -11,10 +11,10 @@ namespace NLog.Extensions.Logging.Tests
         public void TestCallSiteSayHello()
         {
             ConfigureServiceProvider<CustomLoggerCallSiteTestRunner>((s) => s.AddSingleton(typeof(ILogger<>), typeof(SameAssemblyLogger<>)));
+            var target = new NLog.Targets.MemoryTarget() { Layout = "${callsite}|${message}" };
+            ConfigureNLog(target);
             var runner = GetRunner<CustomLoggerCallSiteTestRunner>();
 
-            var target = new NLog.Targets.MemoryTarget() { Layout = "${callsite}|${message}" };
-            NLog.Config.SimpleConfigurator.ConfigureForTargetLogging(target);
             runner.SayHello();
             Assert.Single(target.Logs);
             Assert.Contains("SayHello", target.Logs[0]);

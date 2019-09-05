@@ -16,7 +16,7 @@ namespace NLog.Extensions.Logging.Tests
             var runner = GetRunner<CustomLoggerPropertyTestRunner>();
 
             var target = new NLog.Targets.MemoryTarget() { Layout = "${message}|${all-event-properties}"};
-            NLog.Config.SimpleConfigurator.ConfigureForTargetLogging(target);
+            ConfigureNLog(target);
             runner.SayHello();
             Assert.Single(target.Logs);
             Assert.Equal(@"Hello ""World""|userid=World, ActivityId=42", target.Logs[0]);
@@ -29,7 +29,7 @@ namespace NLog.Extensions.Logging.Tests
             var runner = GetRunner<CustomLoggerPropertyTestRunner>();
 
             var target = new NLog.Targets.MemoryTarget() { Layout = "${message}|${all-event-properties}" };
-            NLog.Config.SimpleConfigurator.ConfigureForTargetLogging(target);
+            ConfigureNLog(target);
             runner.SayHigh5();
             Assert.Single(target.Logs);
             Assert.Equal(@"Hi 5|ActivityId=42", target.Logs[0]);
@@ -42,7 +42,7 @@ namespace NLog.Extensions.Logging.Tests
             var runner = GetRunner<CustomLoggerPropertyTestRunner>();
 
             var target = new NLog.Targets.MemoryTarget() { Layout = "${message}|${all-event-properties}" };
-            NLog.Config.SimpleConfigurator.ConfigureForTargetLogging(target);
+            ConfigureNLog(target);
             runner.SayHigh5();
             Assert.Single(target.Logs);
             Assert.Equal(@"Hi 5|ActivityId=42, 0=5", target.Logs[0]);
