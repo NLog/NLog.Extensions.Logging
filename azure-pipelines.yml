@@ -1,5 +1,5 @@
 trigger:
-- master
+- '*'
 
 pool:
   vmImage: 'windows-latest'
@@ -22,7 +22,7 @@ steps:
     organization: 'nlog'
     scannerMode: 'MSBuild'
     projectKey: 'nlog.extensions.logging'
-    projectVersion: 
+    projectVersion: '$(Build.BuildId)'
 
 - task: VSBuild@1
   inputs:
@@ -37,13 +37,6 @@ steps:
     configuration: '$(buildConfiguration)'
     codeCoverageEnabled: true
     runInParallel: true
-
-- task: PublishTestResults@2
-  inputs:
-    testResultsFormat: 'VSTest'
-    testResultsFiles: '**/TEST-*.xml'
-    mergeTestResults: true
-    failTaskOnFailedTests: true
 
 - task: SonarCloudAnalyze@1
 
