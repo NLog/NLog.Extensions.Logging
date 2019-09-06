@@ -6,7 +6,6 @@ labels:
     action: close
     delay: 7 days
     comment: "Please add the requested info, so we could help you better! (This issue will be closed in 7 days)"
-labels:
   duplicate: close
   wontfix: close
   invalid: close
