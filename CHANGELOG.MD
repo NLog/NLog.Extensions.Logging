@@ -2,6 +2,9 @@
 
 Date format: (year/month/day)
 
+### v1.5.4 (2019/09/06)
+- [#325](https://github.com/NLog/NLog.Extensions.Logging/pull/325) Fix dispose for AddNLog (on ILoggingBuilder) and no double logging when also using UseNLog (@snakefoot)
+
 ### v1.5.3 (2019/08/28)
 - [#322](https://github.com/NLog/NLog.Extensions.Logging/pull/322) Fixed memory leak in NLogLoggingConfiguration for autoreload
 
