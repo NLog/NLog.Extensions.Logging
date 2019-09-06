@@ -18,7 +18,7 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
     </Description>
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logging;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
-- Fixed memory leak in NLogLoggingConfiguration for autoreload #322 (@snakefoot)
+- Fix dispose for AddNLog (on ILoggingBuilder) and no double logging when also using UseNLog (@snakefoot)
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
     </PackageReleaseNotes>
