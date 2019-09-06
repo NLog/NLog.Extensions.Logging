@@ -1,0 +1,18 @@
+merges:
+  - action: delete_branch
+  - action: tag  
+labels:
+  'needs info':
+    action: close
+    delay: 7 days
+    comment: "Please add the requested info, so we could help you better! (This issue will be closed in 7 days)"
+labels:
+  duplicate: close
+  wontfix: close
+  invalid: close
+  "squash when passing": merge
+  "rebase when passing": merge
+  "merge when passing": merge
+comments:
+  - action: delete_comment
+    pattern: "+1" # can also be a regular expression
