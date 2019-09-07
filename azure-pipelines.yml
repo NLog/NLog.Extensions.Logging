@@ -51,8 +51,8 @@ jobs:
     inputs:
       pollingTimeoutSec: '300'
 
-- job: logging
-  displayName: 'NLog.Extensions.Logging'
+- job: hosting
+  displayName: 'NLog.Extensions.Hosting'
   pool:
     vmImage: 'windows-latest'
   steps:
