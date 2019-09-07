@@ -30,6 +30,7 @@ jobs:
       platform: '$(buildPlatform)'
       configuration: '$(buildConfiguration)'
       maximumCpuCount: true
+  - task: SonarCloudAnalyze@1      
   - task: VSTest@2
     displayName: 'test logging 1'
     inputs:
@@ -46,7 +47,22 @@ jobs:
       configuration: '$(buildConfiguration)'
       codeCoverageEnabled: true
       runInParallel: true
-  - task: SonarCloudAnalyze@1
+  - task: VSTest@2
+    displayName: 'test logging 3'
+    inputs:
+      testAssemblyVer2: "**/bin/Release/net452/NLog.Extensions.Logging.Tests.dll"
+      platform: '$(buildPlatform)'
+      configuration: '$(buildConfiguration)'
+      codeCoverageEnabled: true
+      runInParallel: true
+  - task: VSTest@2
+    displayName: 'test logging 4'
+    inputs:
+      testAssemblyVer2: "**/bin/Release/net461/NLog.Extensions.Logging.Tests.dll"
+      platform: '$(buildPlatform)'
+      configuration: '$(buildConfiguration)'
+      codeCoverageEnabled: true
+      runInParallel: true
   - task: SonarCloudPublish@1
     inputs:
       pollingTimeoutSec: '300'
@@ -74,6 +90,8 @@ jobs:
       platform: '$(buildPlatform)'
       configuration: '$(buildConfiguration)'
       maximumCpuCount: true
+
+  - task: SonarCloudAnalyze@1
   - task: VSTest@2
     displayName: 'test hosting'
     inputs:
@@ -82,7 +100,7 @@ jobs:
       configuration: '$(buildConfiguration)'
       codeCoverageEnabled: true
       runInParallel: true
-  - task: SonarCloudAnalyze@1
+
   - task: SonarCloudPublish@1
     inputs:
       pollingTimeoutSec: '300'
