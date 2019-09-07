@@ -30,7 +30,7 @@ jobs:
       platform: '$(buildPlatform)'
       configuration: '$(buildConfiguration)'
       maximumCpuCount: true
-  - task: SonarCloudAnalyze@1      
+     
   - task: VSTest@2
     displayName: 'test logging 1'
     inputs:
@@ -63,6 +63,9 @@ jobs:
       configuration: '$(buildConfiguration)'
       codeCoverageEnabled: true
       runInParallel: true
+
+  - task: SonarCloudAnalyze@1   
+
   - task: SonarCloudPublish@1
     inputs:
       pollingTimeoutSec: '300'
@@ -90,8 +93,6 @@ jobs:
       platform: '$(buildPlatform)'
       configuration: '$(buildConfiguration)'
       maximumCpuCount: true
-
-  - task: SonarCloudAnalyze@1
   - task: VSTest@2
     displayName: 'test hosting'
     inputs:
@@ -100,6 +101,7 @@ jobs:
       configuration: '$(buildConfiguration)'
       codeCoverageEnabled: true
       runInParallel: true
+  - task: SonarCloudAnalyze@1
 
   - task: SonarCloudPublish@1
     inputs:
