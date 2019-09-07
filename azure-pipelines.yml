@@ -32,12 +32,38 @@ steps:
     configuration: '$(buildConfiguration)'
     maximumCpuCount: true
 
+
+
 - task: VSTest@2
+  displayName: 'test logging 1'
   inputs:
+    testAssemblyVer2: "**/bin/Release/netcoreapp1.1/NLog.Extensions.Logging.Tests.dll"
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
     codeCoverageEnabled: true
     runInParallel: true
+    
+- task: VSTest@2
+  displayName: 'test logging 2'
+  inputs:
+    testAssemblyVer2: "**/bin/Release/netcoreapp2.0/NLog.Extensions.Logging.Tests.dll"
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    codeCoverageEnabled: true
+    runInParallel: true
+    
+    
+
+- task: VSTest@2
+  displayName: 'test hosting'
+  inputs:
+    testAssemblyVer2: "**/bin/Release/netcoreapp2.0/NLog.Extensions.Hosting.Tests.dll"
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    codeCoverageEnabled: true
+    runInParallel: true
+        
+
 
 - task: SonarCloudAnalyze@1
 
