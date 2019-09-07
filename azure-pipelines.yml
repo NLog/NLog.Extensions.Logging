@@ -1,72 +1,88 @@
 trigger:
 - '*'
 
-pool:
-  vmImage: 'windows-latest'
-
 variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
 
-steps:
-- task: NuGetToolInstaller@1
+jobs:
+- job: logging
+  displayName: 'NLog.Extensions.Logging'
+  pool:
+    vmImage: 'windows-latest'
+  steps:
+  - task: NuGetToolInstaller@1
+  - task: NuGetCommand@2
+    inputs:
+      restoreSolution: '$(solution)'
+  - task: SonarCloudPrepare@1
+    inputs:
+      SonarCloud: 'Sonar NLog'
+      organization: 'nlog'
+      scannerMode: 'MSBuild'
+      projectKey: 'nlog.extensions.logging'
+      projectVersion: '$(Build.BuildId)'
+  - task: VSBuild@1
+    inputs:
+      solution: '$(solution)'
+      platform: '$(buildPlatform)'
+      configuration: '$(buildConfiguration)'
+      maximumCpuCount: true
+  - task: VSTest@2
+    displayName: 'test logging 1'
+    inputs:
+      testAssemblyVer2: "**/bin/Release/netcoreapp1.1/NLog.Extensions.Logging.Tests.dll"
+      platform: '$(buildPlatform)'
+      configuration: '$(buildConfiguration)'
+      codeCoverageEnabled: true
+      runInParallel: true
+  - task: VSTest@2
+    displayName: 'test logging 2'
+    inputs:
+      testAssemblyVer2: "**/bin/Release/netcoreapp2.0/NLog.Extensions.Logging.Tests.dll"
+      platform: '$(buildPlatform)'
+      configuration: '$(buildConfiguration)'
+      codeCoverageEnabled: true
+      runInParallel: true
+  - task: SonarCloudAnalyze@1
+  - task: SonarCloudPublish@1
+    inputs:
+      pollingTimeoutSec: '300'
 
-- task: NuGetCommand@2
-  inputs:
-    restoreSolution: '$(solution)'
-
-- task: SonarCloudPrepare@1
-  inputs:
-    SonarCloud: 'Sonar NLog'
-    organization: 'nlog'
-    scannerMode: 'MSBuild'
-    projectKey: 'nlog.extensions.logging'
-    projectVersion: '$(Build.BuildId)'
-
-- task: VSBuild@1
-  inputs:
-    solution: '$(solution)'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    maximumCpuCount: true
-
-
-
-- task: VSTest@2
-  displayName: 'test logging 1'
-  inputs:
-    testAssemblyVer2: "**/bin/Release/netcoreapp1.1/NLog.Extensions.Logging.Tests.dll"
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    codeCoverageEnabled: true
-    runInParallel: true
-    
-- task: VSTest@2
-  displayName: 'test logging 2'
-  inputs:
-    testAssemblyVer2: "**/bin/Release/netcoreapp2.0/NLog.Extensions.Logging.Tests.dll"
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    codeCoverageEnabled: true
-    runInParallel: true
-    
-    
-
-- task: VSTest@2
-  displayName: 'test hosting'
-  inputs:
-    testAssemblyVer2: "**/bin/Release/netcoreapp2.0/NLog.Extensions.Hosting.Tests.dll"
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    codeCoverageEnabled: true
-    runInParallel: true
-        
-
-
-- task: SonarCloudAnalyze@1
-
-- task: SonarCloudPublish@1
-  inputs:
-    pollingTimeoutSec: '300'
+- job: logging
+  displayName: 'NLog.Extensions.Logging'
+  pool:
+    vmImage: 'windows-latest'
+  steps:
+  - task: NuGetToolInstaller@1
+  - task: NuGetCommand@2
+    inputs:
+      restoreSolution: '$(solution)'
+  - task: SonarCloudPrepare@1
+    inputs:
+      SonarCloud: 'Sonar NLog'
+      organization: 'nlog'
+      scannerMode: 'MSBuild'
+      projectKey: 'nlog.extensions.hosting'
+      projectName: 'NLog.Extensions.Hosting'
+      projectVersion: '$(Build.BuildId)'
+  - task: VSBuild@1
+    inputs:
+      solution: '$(solution)'
+      platform: '$(buildPlatform)'
+      configuration: '$(buildConfiguration)'
+      maximumCpuCount: true
+  - task: VSTest@2
+    displayName: 'test hosting'
+    inputs:
+      testAssemblyVer2: "**/bin/Release/netcoreapp2.0/NLog.Extensions.Hosting.Tests.dll"
+      platform: '$(buildPlatform)'
+      configuration: '$(buildConfiguration)'
+      codeCoverageEnabled: true
+      runInParallel: true
+  - task: SonarCloudAnalyze@1
+  - task: SonarCloudPublish@1
+    inputs:
+      pollingTimeoutSec: '300'
