@@ -12,6 +12,6 @@ labels:
   "squash when passing": merge
   "rebase when passing": merge
   "merge when passing": merge
-comments:
-  - action: delete_comment
-    pattern: "+1" # can also be a regular expression
+#comments:
+#  - action: delete_comment
+#    pattern: "+1" # can also be a regular expression
