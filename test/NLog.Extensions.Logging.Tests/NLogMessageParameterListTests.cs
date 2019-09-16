@@ -14,7 +14,8 @@ namespace NLog.Extensions.Logging.Tests
             {
                 new KeyValuePair<string, object>("", 1),
                 new KeyValuePair<string, object>("a", 2),
-                new KeyValuePair<string, object>("b", 3)
+                new KeyValuePair<string, object>("b", 3),
+                new KeyValuePair<string, object>("{OriginalFormat}", "{0}{1}{2}"),
             };
             var list = new NLogMessageParameterList(items);
 
