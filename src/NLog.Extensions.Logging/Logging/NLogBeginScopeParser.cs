@@ -94,13 +94,13 @@ namespace NLog.Extensions.Logging
             {
                 object scopeObject = scopePropertyList;
 
-                if (scopePropertyList.Count > 0 && scopePropertyList[scopePropertyList.Count - 1].Key == NLogLogger.OriginalFormatPropertyName)
+                if (scopePropertyList.Count > 0 && NLogLogger.OriginalFormatPropertyName.Equals(scopePropertyList[scopePropertyList.Count - 1].Key))
                 {
                     var propertyList = new List<KeyValuePair<string, object>>(scopePropertyList.Count - 1);
                     for (var i = 0; i < scopePropertyList.Count; ++i)
                     {
                         var property = scopePropertyList[i];
-                        if (i == scopePropertyList.Count - 1 && i > 0 && property.Key == NLogLogger.OriginalFormatPropertyName)
+                        if (i == scopePropertyList.Count - 1 && i > 0 && NLogLogger.OriginalFormatPropertyName.Equals(property.Key))
                         {
                             continue; // Handle BeginScope("Hello {World}", "Earth")
                         }

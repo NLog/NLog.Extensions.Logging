@@ -11,7 +11,7 @@ namespace NLog.Extensions.Logging
     internal class NLogMessageParameterList : IList<MessageTemplateParameter>
     {
         private readonly IReadOnlyList<KeyValuePair<string, object>> _parameterList;
-        private static readonly NLogMessageParameterList  EmptyList = new NLogMessageParameterList(new KeyValuePair<string, object>[0]);
+        private static readonly NLogMessageParameterList EmptyList = new NLogMessageParameterList(new KeyValuePair<string, object>[0]);
         private static readonly NLogMessageParameterList OriginalMessageList = new NLogMessageParameterList(new[] { new KeyValuePair<string, object>(NLogLogger.OriginalFormatPropertyName, string.Empty) });
 
         public bool HasOriginalMessage => _originalMessageIndex.HasValue;
@@ -44,7 +44,7 @@ namespace NLog.Extensions.Logging
         /// </remarks>
         public static NLogMessageParameterList TryParse(IReadOnlyList<KeyValuePair<string, object>> parameterList)
         {
-            if (parameterList.Count > 1 || (parameterList.Count == 1 && parameterList[0].Key != NLogLogger.OriginalFormatPropertyName))
+            if (parameterList.Count > 1 || (parameterList.Count == 1 && !NLogLogger.OriginalFormatPropertyName.Equals(parameterList[0].Key)))
             {
                 return new NLogMessageParameterList(parameterList);
             }
@@ -79,47 +79,43 @@ namespace NLog.Extensions.Logging
         {
             hasMessageTemplateCapture = false;
             isMixedPositional = false;
-            isPositional = false;
             originalMessageIndex = null;
-            bool? firstParameterIsPositional = null;
+            isPositional = false;
+            string parameterName;
+
             for (int i = 0; i < parameterList.Count; ++i)
             {
-                if (!TryGetKey(parameterList, ref originalMessageIndex, i, out var parameterKey))
+                if (!TryGetParameterName(parameterList, i, ref originalMessageIndex, out parameterName))
                 {
                     return false;
                 }
 
-                char firstChar = parameterKey[0];
-                if (GetCaptureType(firstChar) != CaptureType.Normal)
+                char firstChar = parameterName[0];
+                if (firstChar >= '0' && firstChar <= '9')
                 {
-                    hasMessageTemplateCapture = true;
+                    if (!isPositional && i != 0)
+                        isMixedPositional = true;
+                    isPositional = true;
                 }
-                else if (parameterKey == NLogLogger.OriginalFormatPropertyName)
+                else
                 {
-                    if (originalMessageIndex.HasValue)
+                    if (isPositional)
                     {
-                        originalMessageIndex = null;
-                        return false;
+                        isMixedPositional = true;
                     }
 
-                    originalMessageIndex = i;
-                }
-                else 
-                {
-                    if (!firstParameterIsPositional.HasValue)
-                        firstParameterIsPositional = char.IsDigit(firstChar);
-                    else if (char.IsDigit(firstChar) != firstParameterIsPositional)
-                        isMixedPositional = true;
+                    if (GetCaptureType(firstChar) != CaptureType.Normal)
+                    {
+                        hasMessageTemplateCapture = true;
+                    }
                 }
             }
 
-            if (firstParameterIsPositional == true && !isMixedPositional)
-                isPositional = true;
-
+            isPositional = isPositional && !isMixedPositional;
             return true;
         }
 
-        private static bool TryGetKey(IReadOnlyList<KeyValuePair<string, object>> parameterList, ref int? originalMessageIndex, int i, out string parameterKey)
+        private static bool TryGetParameterName(IReadOnlyList<KeyValuePair<string, object>> parameterList, int i, ref int? originalMessageIndex, out string parameterKey)
         {
             try
             {
@@ -137,6 +133,17 @@ namespace NLog.Extensions.Logging
                 return false;
             }
 
+            if (NLogLogger.OriginalFormatPropertyName.Equals(parameterKey))
+            {
+                if (originalMessageIndex.HasValue)
+                {
+                    originalMessageIndex = null;
+                    return false;
+                }
+
+                originalMessageIndex = i;
+            }
+
             return true;
         }
 
@@ -152,7 +159,7 @@ namespace NLog.Extensions.Logging
                 if (string.IsNullOrEmpty(paramPair.Key))
                     continue;
 
-                if (paramPair.Key == NLogLogger.OriginalFormatPropertyName)
+                if (NLogLogger.OriginalFormatPropertyName.Equals(paramPair.Key))
                 {
                     continue;
                 }

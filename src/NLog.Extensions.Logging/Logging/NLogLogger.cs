@@ -376,7 +376,7 @@ namespace NLog.Extensions.Logging
                 if (String.IsNullOrEmpty(property.Key))
                     continue;
 
-                if (i == messageProperties.Count - 1 && property.Key == OriginalFormatPropertyName)
+                if (i == messageProperties.Count - 1 && OriginalFormatPropertyName.Equals(property.Key))
                     continue;
 
                 eventInfo.Properties[property.Key] = property.Value;
