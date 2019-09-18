@@ -63,6 +63,14 @@ jobs:
       configuration: '$(buildConfiguration)'
       codeCoverageEnabled: true
       runInParallel: true
+  - task: PowerShell@2
+    displayName: 'list coverage files'
+    inputs:
+      targetType: 'inline'
+      script: |
+        # list coverage
+        gci d:\a\_temp\TestResults
+      errorActionPreference: 'continue'
 
   - task: SonarCloudAnalyze@1   
 
