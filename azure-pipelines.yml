@@ -69,7 +69,7 @@ jobs:
       targetType: 'inline'
       script: |
         # list coverage
-        gci d:\a\_temp\TestResults
+        gci d:\a\_temp\TestResults -recurse
       errorActionPreference: 'continue'
 
   - task: SonarCloudAnalyze@1   
