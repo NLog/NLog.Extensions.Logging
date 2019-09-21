@@ -93,21 +93,14 @@ namespace NLog.Extensions.Logging
                 char firstChar = parameterName[0];
                 if (firstChar >= '0' && firstChar <= '9')
                 {
-                    if (!isPositional && i != 0)
-                        isMixedPositional = true;
+                    if (!isPositional)
+                        isMixedPositional = i != 0;
                     isPositional = true;
                 }
                 else
                 {
-                    if (isPositional)
-                    {
-                        isMixedPositional = true;
-                    }
-
-                    if (GetCaptureType(firstChar) != CaptureType.Normal)
-                    {
-                        hasMessageTemplateCapture = true;
-                    }
+                    isMixedPositional = isPositional;
+                    hasMessageTemplateCapture |= GetCaptureType(firstChar) != CaptureType.Normal;
                 }
             }
 
