@@ -18,7 +18,8 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
     </Description>
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logging;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
-- Fix dispose for AddNLog (on ILoggingBuilder) and no double logging when also using UseNLog (@snakefoot)
+- Marked ILoggerFactory extension methods as obsolete, since obsolete in NetCore3
+- Minor optimization in parsing of LogEvent property-names
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
     </PackageReleaseNotes>
