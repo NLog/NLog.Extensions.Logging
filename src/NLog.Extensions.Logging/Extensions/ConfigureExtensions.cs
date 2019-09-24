@@ -22,6 +22,9 @@ namespace NLog.Extensions.Logging
         /// </summary>
         /// <param name="factory"></param>
         /// <returns>ILoggerFactory for chaining</returns>
+#if !NETCORE1_0
+        [Obsolete("Instead use ILoggingBuilder.AddNLog() or IHostBuilder.UseNLog()")]
+#endif
         public static ILoggerFactory AddNLog(this ILoggerFactory factory)
         {
             return factory.AddNLog(NLogProviderOptions.Default);
@@ -33,6 +36,9 @@ namespace NLog.Extensions.Logging
         /// <param name="factory"></param>
         /// <param name="options">NLog options</param>
         /// <returns>ILoggerFactory for chaining</returns>
+#if !NETCORE1_0
+        [Obsolete("Instead use ILoggingBuilder.AddNLog() or IHostBuilder.UseNLog()")]
+#endif
         public static ILoggerFactory AddNLog(this ILoggerFactory factory, NLogProviderOptions options)
         {
             factory.AddProvider(new NLogLoggerProvider(options));
@@ -45,6 +51,9 @@ namespace NLog.Extensions.Logging
         /// <param name="factory"></param>
         /// <param name="configuration"></param>
         /// <returns>ILoggerFactory for chaining</returns>
+#if !NETCORE1_0
+        [Obsolete("Instead use ILoggingBuilder.AddNLog() or IHostBuilder.UseNLog()")]
+#endif
         public static ILoggerFactory AddNLog(this ILoggerFactory factory, IConfiguration configuration)
         {
             var provider = CreateNLogProvider(configuration);
