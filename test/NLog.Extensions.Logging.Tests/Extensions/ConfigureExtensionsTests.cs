@@ -12,6 +12,7 @@ namespace NLog.Extensions.Logging.Tests.Extensions
     public class ConfigureExtensionsTests
     {
         [Fact]
+        [Obsolete("Instead use ILoggingBuilder.AddNLog() or IHostBuilder.UseNLog()")]
         public void AddNLog_LoggerFactory_LogInfo_ShouldLogToNLog()
         {
             // Arrange
@@ -32,6 +33,7 @@ namespace NLog.Extensions.Logging.Tests.Extensions
         [InlineData("EventId", "eventId2")]
         [InlineData("EventId_Name", "eventId2")]
         [InlineData("EventId_Id", "2")]
+        [Obsolete("Instead use ILoggingBuilder.AddNLog() or IHostBuilder.UseNLog()")]
         public void AddNLog_LoggerFactory_LogInfoWithEventId_ShouldLogToNLogWithEventId(string eventPropery, string expectedEventInLog)
         {
             // Arrange

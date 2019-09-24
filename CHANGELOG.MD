@@ -2,6 +2,10 @@
 
 Date format: (year/month/day)
 
+### v1.6.0 (2019/09/24)
+- [#342](https://github.com/NLog/NLog.Extensions.Logging/pull/342) ILoggerFactory is obsolete in .NET Core 3. Instead use ILoggingBuilder.AddNLog
+- [#333](https://github.com/NLog/NLog.Extensions.Logging/pull/333) + [#334](https://github.com/NLog/NLog.Extensions.Logging/pull/334) Minor optimization in parsing of LogEvent property-names
+
 ### v1.5.4 (2019/09/06)
 - [#325](https://github.com/NLog/NLog.Extensions.Logging/pull/325) Fix dispose for AddNLog (on ILoggingBuilder) and no double logging when also using UseNLog (@snakefoot)
 
