@@ -1,6 +1,6 @@
 merges:
   - action: delete_branch
-  - action: tag  
+#  - action: tag  
 labels:
   'needs info':
     action: close
