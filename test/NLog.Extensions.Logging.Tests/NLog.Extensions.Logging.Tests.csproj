@@ -27,12 +27,12 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' or '$(TargetFramework)' == 'net452' ">
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="1.1.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.2" />
   </ItemGroup>
   
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' or '$(TargetFramework)' == 'net461' ">
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.0" />
   </ItemGroup>
 
   <ItemGroup>
