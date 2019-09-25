@@ -61,7 +61,7 @@ namespace NLog.Extensions.Logging.Tests.Extensions
 
             // Act
             builder.AddNLog();
-            LogManager.Configuration = config;
+            builder.AddNLog(config);
             var provider = GetLoggerProvider(builder);
             var logger = provider.CreateLogger("logger1");
 
@@ -84,7 +84,7 @@ namespace NLog.Extensions.Logging.Tests.Extensions
             public IServiceCollection Services { get; set; } = new ServiceCollection();
         }
 #endif
-        
+
         private static void AssertSingleMessage(MemoryTarget memoryTarget, string expectedMessage)
         {
             Assert.Equal(1, memoryTarget.Logs.Count);

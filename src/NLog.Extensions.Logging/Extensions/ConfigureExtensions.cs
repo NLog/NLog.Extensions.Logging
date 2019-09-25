@@ -97,6 +97,32 @@ namespace NLog.Extensions.Logging
             factory.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, NLogLoggerProvider>(s => new NLogLoggerProvider(options)));
             return factory;
         }
+
+        /// <summary>
+        /// Enable NLog as logging provider for Microsoft Extension Logging
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="config">New NLog config.</param>
+        /// <returns></returns>
+        public static ILoggingBuilder AddNLog(this ILoggingBuilder builder, LoggingConfiguration config)
+        {
+            builder.AddNLog();
+            LogManager.Configuration = config;
+            return builder;
+        }
+
+        /// <summary>
+        /// Enable NLog as logging provider for Microsoft Extension Logging
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="configFileRelativePath">relative path to NLog configuration file.</param>
+        /// <returns></returns>
+        public static ILoggingBuilder AddNLog(this ILoggingBuilder builder, string configFileRelativePath)
+        {
+            builder.AddNLog();
+            LogManager.LoadConfiguration(configFileRelativePath);
+            return builder;
+        }
 #endif
 
         /// <summary>
