@@ -56,7 +56,7 @@ namespace NLog.Extensions.Logging
 #endif
         public static ILoggerFactory AddNLog(this ILoggerFactory factory, IConfiguration configuration)
         {
-            var provider = CreateNLogProvider(configuration);
+            var provider = CreateNLogLoggerProvider(null, configuration, null);
             factory.AddProvider(provider);
             return factory;
         }
@@ -69,7 +69,7 @@ namespace NLog.Extensions.Logging
         /// <returns>ILoggerFactory for chaining</returns>
         public static ILoggingBuilder AddNLog(this ILoggingBuilder factory)
         {
-            return factory.AddNLog(NLogProviderOptions.Default);
+            return factory.AddNLog((NLogProviderOptions)null);
         }
 
         /// <summary>
@@ -80,8 +80,7 @@ namespace NLog.Extensions.Logging
         /// <returns>ILoggerFactory for chaining</returns>
         public static ILoggingBuilder AddNLog(this ILoggingBuilder factory, IConfiguration configuration)
         {
-            // Try adding Singleton-implementation if not already exists
-            factory.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, NLogLoggerProvider>(s => CreateNLogProvider(configuration)));
+            AddNLogLoggerProvider(factory.Services, configuration, null, CreateNLogLoggerProvider);
             return factory;
         }
 
@@ -93,8 +92,7 @@ namespace NLog.Extensions.Logging
         /// <returns>ILoggerFactory for chaining</returns>
         public static ILoggingBuilder AddNLog(this ILoggingBuilder factory, NLogProviderOptions options)
         {
-            // Try adding Singleton-implementation if not already exists
-            factory.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, NLogLoggerProvider>(s => new NLogLoggerProvider(options)));
+            AddNLogLoggerProvider(factory.Services, null, options, CreateNLogLoggerProvider);
             return factory;
         }
 
@@ -102,12 +100,17 @@ namespace NLog.Extensions.Logging
         /// Enable NLog as logging provider for Microsoft Extension Logging
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="config">New NLog config.</param>
+        /// <param name="configuration">New NLog config.</param>
         /// <returns></returns>
-        public static ILoggingBuilder AddNLog(this ILoggingBuilder builder, LoggingConfiguration config)
+        public static ILoggingBuilder AddNLog(this ILoggingBuilder builder, LoggingConfiguration configuration)
         {
-            builder.AddNLog();
-            LogManager.Configuration = config;
+            AddNLogLoggerProvider(builder.Services, null, null, (serviceProvider, config, options) =>
+            {
+                var provider = CreateNLogLoggerProvider(serviceProvider, config, options);
+                // Delay initialization of targets until we have loaded config-settings
+                LogManager.Configuration = configuration;
+                return provider;
+            });
             return builder;
         }
 
@@ -119,9 +122,19 @@ namespace NLog.Extensions.Logging
         /// <returns></returns>
         public static ILoggingBuilder AddNLog(this ILoggingBuilder builder, string configFileRelativePath)
         {
-            builder.AddNLog();
-            LogManager.LoadConfiguration(configFileRelativePath);
+            AddNLogLoggerProvider(builder.Services, null, null, (serviceProvider, config, options) =>
+            {
+                var provider = CreateNLogLoggerProvider(serviceProvider, config, options);
+                // Delay initialization of targets until we have loaded config-settings
+                LogManager.LoadConfiguration(configFileRelativePath);
+                return provider;
+            });
             return builder;
+        }
+
+        private static void AddNLogLoggerProvider(IServiceCollection services, IConfiguration configuration, NLogProviderOptions options, Func<IServiceProvider, IConfiguration, NLogProviderOptions, NLogLoggerProvider> factory)
+        {
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, NLogLoggerProvider>(serviceProvider => factory(serviceProvider, configuration, options)));
         }
 #endif
 
@@ -183,15 +196,18 @@ namespace NLog.Extensions.Logging
             return nlogProvider;
         }
 
-        private static NLogLoggerProvider CreateNLogProvider(IConfiguration configuration)
+        private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration configuration, NLogProviderOptions options)
         {
-            var provider = new NLogLoggerProvider(new NLogProviderOptions());
+            NLogLoggerProvider provider = new NLogLoggerProvider(options ?? NLogProviderOptions.Default);
+            configuration = configuration ?? (serviceProvider?.GetService(typeof(IConfiguration)) as IConfiguration);
             if (configuration != null)
             {
                 ConfigSettingLayoutRenderer.DefaultConfiguration = configuration;
-                provider.Configure(configuration.GetSection("Logging:NLog"));
+                if (options == null)
+                {
+                    provider.Configure(configuration.GetSection("Logging:NLog"));
+                }
             }
-
             return provider;
         }
     }

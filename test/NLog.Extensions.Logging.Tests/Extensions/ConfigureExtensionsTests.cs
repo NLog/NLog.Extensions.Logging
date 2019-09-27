@@ -60,7 +60,6 @@ namespace NLog.Extensions.Logging.Tests.Extensions
             var config = CreateConfigWithMemoryTarget(out var memoryTarget);
 
             // Act
-            builder.AddNLog();
             builder.AddNLog(config);
             var provider = GetLoggerProvider(builder);
             var logger = provider.CreateLogger("logger1");
