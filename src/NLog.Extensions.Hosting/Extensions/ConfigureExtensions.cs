@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
@@ -36,30 +37,28 @@ namespace NLog.Extensions.Hosting
         public static IHostBuilder UseNLog(this IHostBuilder builder, NLogProviderOptions options)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
-
-            builder.ConfigureServices((hostbuilder, services) =>
-            {
-                ConfigurationItemFactory.Default.RegisterItemsFromAssembly(typeof(ConfigureExtensions).GetTypeInfo()
-                    .Assembly);
-
-                if (hostbuilder.Configuration != null)
-                    ConfigSettingLayoutRenderer.DefaultConfiguration = hostbuilder.Configuration;
-
-                // Try adding Singleton-implementation if not already exists
-                services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, NLogLoggerProvider>(serviceProvider =>
-                {
-                    var provider = new NLogLoggerProvider(options ?? new NLogProviderOptions());
-                    if (hostbuilder.Configuration != null)
-                    {
-                        ConfigSettingLayoutRenderer.DefaultConfiguration = hostbuilder.Configuration;
-                        if (options == null)
-                            provider.Configure(hostbuilder.Configuration.GetSection("Logging:NLog"));
-                    }
-                    return provider;
-                }));
-            });
-
+            builder.ConfigureServices((builderContext, services) => AddNLogLoggerProvider(services, builderContext.Configuration, options, CreateNLogLoggerProvider));
             return builder;
+        }
+
+        private static void AddNLogLoggerProvider(IServiceCollection services, IConfiguration configuration, NLogProviderOptions options, Func<IServiceProvider, IConfiguration, NLogProviderOptions, NLogLoggerProvider> factory)
+        {
+            ConfigurationItemFactory.Default.RegisterItemsFromAssembly(typeof(ConfigureExtensions).GetTypeInfo().Assembly);
+            services.Replace(ServiceDescriptor.Singleton<ILoggerProvider, NLogLoggerProvider>(serviceProvider => factory(serviceProvider, configuration, options)));
+        }
+
+        private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration configuration, NLogProviderOptions options)
+        {
+            NLogLoggerProvider provider = new NLogLoggerProvider(options);
+            if (configuration != null)
+            {
+                ConfigSettingLayoutRenderer.DefaultConfiguration = configuration;
+                if (options == null)
+                {
+                    provider.Configure(configuration.GetSection("Logging:NLog"));
+                }
+            }
+            return provider;
         }
     }
 }
