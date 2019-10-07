@@ -18,9 +18,11 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
     </Description>
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logging;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
-- Marked ILoggerFactory extension methods as obsolete, since obsolete in NetCore3
-- Minor optimization in parsing of LogEvent property-names
-- Updated NLog dependency
+- Support .NET Core 3.0 (@304NotModified)
+- ILoggerFactory is obsolete in .NET Core 3. Instead use ILoggingBuilder.AddNLog (#342) (@snakefoot)
+- Added AddNLog with functor to create/initialize LogFactory for NLogLoggingProvider (@snakefoot)
+- Introduce AddNLog with NLog-config parameter (#344) (@snakefoot)
+- Minor optimizations in parsing of LogEvent property-names
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
     </PackageReleaseNotes>
