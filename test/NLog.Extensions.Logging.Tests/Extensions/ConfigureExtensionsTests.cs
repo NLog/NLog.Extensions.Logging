@@ -51,9 +51,8 @@ namespace NLog.Extensions.Logging.Tests.Extensions
         }
 
 #if !NETCOREAPP1_1 && !NET452
-
         [Fact]
-        public void AddNLog_LogginBuilder_LogInfo_ShouldLogToNLog()
+        public void AddNLog_LoggingBuilder_LogInfo_ShouldLogToNLog()
         {
             // Arrange
             ILoggingBuilder builder = new LoggingBuilderStub();
@@ -61,6 +60,24 @@ namespace NLog.Extensions.Logging.Tests.Extensions
 
             // Act
             builder.AddNLog(config);
+            var provider = GetLoggerProvider(builder);
+            var logger = provider.CreateLogger("logger1");
+
+            logger.LogInformation("test message with {0} arg", 1);
+
+            // Assert
+            AssertSingleMessage(memoryTarget, "Info|test message with 1 arg");
+        }
+
+        [Fact]
+        public void AddNLog_LogFactoryBuilder_LogInfo_ShouldLogToNLog()
+        {
+            // Arrange
+            ILoggingBuilder builder = new LoggingBuilderStub();
+
+            // Act
+            MemoryTarget memoryTarget = null;
+            builder.AddNLog(ServiceProvider => CreateConfigWithMemoryTarget(out memoryTarget, logFactory: new NLog.LogFactory()).LogFactory);
             var provider = GetLoggerProvider(builder);
             var logger = provider.CreateLogger("logger1");
 
@@ -91,11 +108,13 @@ namespace NLog.Extensions.Logging.Tests.Extensions
             Assert.Equal(expectedMessage, log);
         }
 
-        private static LoggingConfiguration CreateConfigWithMemoryTarget(out MemoryTarget memoryTarget, string levelMessage = "${level}|${message}")
+        private static LoggingConfiguration CreateConfigWithMemoryTarget(out MemoryTarget memoryTarget, string levelMessage = "${level}|${message}", LogFactory logFactory = null)
         {
-            var config = new LoggingConfiguration();
+            var config = new LoggingConfiguration(logFactory);
             memoryTarget = new MemoryTarget { Layout = levelMessage };
             config.AddRuleForAllLevels(memoryTarget);
+            if (logFactory != null)
+                logFactory.Configuration = config;
             return config;
         }
     }
