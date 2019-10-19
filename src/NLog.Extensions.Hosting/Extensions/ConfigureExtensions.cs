@@ -44,21 +44,28 @@ namespace NLog.Extensions.Hosting
         private static void AddNLogLoggerProvider(IServiceCollection services, IConfiguration configuration, NLogProviderOptions options, Func<IServiceProvider, IConfiguration, NLogProviderOptions, NLogLoggerProvider> factory)
         {
             ConfigurationItemFactory.Default.RegisterItemsFromAssembly(typeof(ConfigureExtensions).GetTypeInfo().Assembly);
-            services.Replace(ServiceDescriptor.Singleton<ILoggerProvider, NLogLoggerProvider>(serviceProvider => factory(serviceProvider, configuration, options)));
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, NLogLoggerProvider>(serviceProvider => factory(serviceProvider, configuration, options)));
         }
 
         private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration configuration, NLogProviderOptions options)
         {
+            configuration = SetupConfiguration(serviceProvider, configuration);
             NLogLoggerProvider provider = new NLogLoggerProvider(options);
+            if (configuration != null && options == null)
+            {
+                provider.Configure(configuration.GetSection("Logging:NLog"));
+            }
+            return provider;
+        }
+
+        private static IConfiguration SetupConfiguration(IServiceProvider serviceProvider, IConfiguration configuration)
+        {
+            configuration = configuration ?? (serviceProvider?.GetService(typeof(IConfiguration)) as IConfiguration);
             if (configuration != null)
             {
                 ConfigSettingLayoutRenderer.DefaultConfiguration = configuration;
-                if (options == null)
-                {
-                    provider.Configure(configuration.GetSection("Logging:NLog"));
-                }
             }
-            return provider;
+            return configuration;
         }
     }
 }
