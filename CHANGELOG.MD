@@ -2,6 +2,8 @@
 
 Date format: (year/month/day)
 
+### v1.6.1 (2019/10/19)
+- [#350](https://github.com/NLog/NLog.Extensions.Logging/pull/350) Fixed conflict issue between UseNLog and default log providers (@snakefoot)
 
 ### v1.6.0 (2019/10/07)
 - [#332](https://github.com/NLog/NLog.Extensions.Logging/pull/332) Support .NET Core 3.0 (@304NotModified)
