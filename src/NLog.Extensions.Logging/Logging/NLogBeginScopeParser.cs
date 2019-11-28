@@ -84,7 +84,35 @@ namespace NLog.Extensions.Logging
             {
                 if (propertyList?.Count > 0)
                 {
-                    return new ScopeProperties(NestedDiagnosticsLogicalContext.Push(scopeObject), MappedDiagnosticsLogicalContext.SetScoped(propertyList));
+                    IDisposable ndlcScope = null, mldcScope = null;
+                    try
+                    {
+                        ndlcScope = NestedDiagnosticsLogicalContext.Push(scopeObject);
+                        mldcScope = MappedDiagnosticsLogicalContext.SetScoped(propertyList);
+                        return new ScopeProperties(ndlcScope, mldcScope);
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            ndlcScope?.Dispose();
+                        }
+                        catch (Exception ex)
+                        {
+                            InternalLogger.Debug(ex, $"Exception in {nameof(CreateScopeProperties)} after trying to clean up {nameof(ndlcScope)}");
+                        }
+
+                        try
+                        {
+                            mldcScope?.Dispose();
+                        }
+                        catch (Exception ex)
+                        {
+                            InternalLogger.Debug(ex, $"Exception in {nameof(CreateScopeProperties)} after trying to clean up {nameof(mldcScope)}");
+                        }
+
+                        throw;
+                    }
                 }
 
                 return NestedDiagnosticsLogicalContext.Push(scopeObject);
