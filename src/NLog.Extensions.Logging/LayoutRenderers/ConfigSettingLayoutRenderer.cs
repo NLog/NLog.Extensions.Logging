@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Text;
 using Microsoft.Extensions.Configuration;
 using NLog.Common;
 using NLog.Config;
 using NLog.LayoutRenderers;
-using System.Text;
 
 namespace NLog.Extensions.Logging
 {
