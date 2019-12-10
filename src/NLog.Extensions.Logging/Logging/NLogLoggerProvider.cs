@@ -106,13 +106,7 @@ namespace NLog.Extensions.Logging
             var allAssemblies = AppDomain.CurrentDomain.GetAssemblies();
             foreach (var assembly in allAssemblies)
             {
-                if (assembly.FullName.StartsWith("NLog.Extensions.Logging,", StringComparison.OrdinalIgnoreCase)
-                    || assembly.FullName.StartsWith("NLog.Web,", StringComparison.OrdinalIgnoreCase)
-                    || assembly.FullName.StartsWith("NLog.Web.AspNetCore,", StringComparison.OrdinalIgnoreCase)
-                    || assembly.FullName.StartsWith("Microsoft.Extensions.Logging,", StringComparison.OrdinalIgnoreCase)
-                    || assembly.FullName.StartsWith("Microsoft.Extensions.Logging.Abstractions,", StringComparison.OrdinalIgnoreCase)
-                    || assembly.FullName.StartsWith("Microsoft.Extensions.Logging.Filter,", StringComparison.OrdinalIgnoreCase)
-                    || assembly.FullName.StartsWith("Microsoft.Logging,", StringComparison.OrdinalIgnoreCase))
+                if (ShouldAddHiddenAssembly(assembly))
                 {
                     LogManager.AddHiddenAssembly(assembly);
                 }
@@ -127,7 +121,31 @@ namespace NLog.Extensions.Logging
 #endif
         }
 
-#if NETCORE1_0
+#if !NETCORE1_0
+        private static bool ShouldAddHiddenAssembly(Assembly assembly)
+        {
+            var assemblyFullName = assembly?.FullName;
+            if (string.IsNullOrEmpty(assemblyFullName))
+                return false;
+
+            foreach (var hiddenAssemblyPrefix in HiddenAssemblyPrefixes)
+                if (assemblyFullName.StartsWith(hiddenAssemblyPrefix, StringComparison.OrdinalIgnoreCase))
+                    return true;
+
+            return false;
+        }
+
+        private static readonly string[] HiddenAssemblyPrefixes = new[]
+        {
+            "NLog.Extensions.Logging,",
+            "NLog.Web,",
+            "NLog.Web.AspNetCore,",
+            "Microsoft.Extensions.Logging,",
+            "Microsoft.Extensions.Logging.Abstractions,",
+            "Microsoft.Extensions.Logging.Filter,",
+            "Microsoft.Logging,"
+        };
+#else
         private static void SafeAddHiddenAssembly(string assemblyName, bool logOnException = true)
         {
             try
@@ -145,7 +163,7 @@ namespace NLog.Extensions.Logging
             }
         }
 #endif
-    }
+        }
 }
 
 
