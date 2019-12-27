@@ -43,6 +43,7 @@ jobs:
       otherConsoleOptions: /Logger:trx;LogFileName=netcoreapp1.trx
       testRunTitle: netcoreapp1
   - task: CopyFiles@2
+    displayName: Copy to all
     inputs:
       SourceFolder: 'd:\a\_temp\TestResults'
       Contents: |
@@ -60,6 +61,7 @@ jobs:
       otherConsoleOptions: /Logger:trx;LogFileName=netcoreapp2.trx
       testRunTitle: netcoreapp2
   - task: CopyFiles@2
+    displayName: Copy to all
     inputs:
       SourceFolder: 'd:\a\_temp\TestResults'
       Contents: |
@@ -77,6 +79,7 @@ jobs:
       otherConsoleOptions: /Logger:trx;LogFileName=net452.trx
       testRunTitle: net452
   - task: CopyFiles@2
+    displayName: Copy to all
     inputs:
       SourceFolder: 'd:\a\_temp\TestResults'
       Contents: |
@@ -94,6 +97,15 @@ jobs:
       otherConsoleOptions: /Logger:trx;LogFileName=net461.trx
       testRunTitle: net461
   - task: CopyFiles@2
+    displayName: Copy to all
+    inputs:
+      SourceFolder: 'd:\a\_temp\TestResults'
+      Contents: |
+        **\*.coverage
+        **\*.trx
+      TargetFolder: 'd:\a\1\AllTestResults'
+  - task: CopyFiles@2
+    displayName: Copy all to TestResults
     inputs:
       SourceFolder: 'd:\a\1\AllTestResults'
       Contents: |
@@ -107,7 +119,7 @@ jobs:
       script: |
         # list coverage
         gci d:\a\_temp\TestResults -recurse
-        gci 'd:\a\1\TestResults -recurse
+        gci d:\a\1\TestResults -recurse
       errorActionPreference: 'continue'
 
   - task: SonarCloudAnalyze@1   
