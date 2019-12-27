@@ -33,7 +33,7 @@ jobs:
      
   - task: VSTest@2
     continueOnError: true
-    displayName: 'test logging 1'
+    displayName: 'test logging netcoreapp1'
     inputs:
       testAssemblyVer2: "**/bin/Release/netcoreapp1.1/NLog.Extensions.Logging.Tests.dll"
       platform: '$(buildPlatform)'
@@ -41,8 +41,16 @@ jobs:
       codeCoverageEnabled: true
       runInParallel: true
       otherConsoleOptions: /Logger:trx;LogFileName=netcoreapp1.trx
+      testRunTitle: netcoreapp1
+  - task: CopyFiles@2
+    inputs:
+      SourceFolder: 'd:\a\_temp\TestResults'
+      Contents: |
+        **\*.coverage
+        **\*.trx
+      TargetFolder: 'd:\a\1\AllTestResults'
   - task: VSTest@2
-    displayName: 'test logging 2'
+    displayName: 'test logging netcoreapp2'
     inputs:
       testAssemblyVer2: "**/bin/Release/netcoreapp2.0/NLog.Extensions.Logging.Tests.dll"
       platform: '$(buildPlatform)'
@@ -50,8 +58,16 @@ jobs:
       codeCoverageEnabled: true
       runInParallel: true
       otherConsoleOptions: /Logger:trx;LogFileName=netcoreapp2.trx
+      testRunTitle: netcoreapp2
+  - task: CopyFiles@2
+    inputs:
+      SourceFolder: 'd:\a\_temp\TestResults'
+      Contents: |
+        **\*.coverage
+        **\*.trx
+      TargetFolder: 'd:\a\1\AllTestResults'
   - task: VSTest@2
-    displayName: 'test logging 3'
+    displayName: 'test logging net452'
     inputs:
       testAssemblyVer2: "**/bin/Release/net452/NLog.Extensions.Logging.Tests.dll"
       platform: '$(buildPlatform)'
@@ -59,8 +75,16 @@ jobs:
       codeCoverageEnabled: true
       runInParallel: true
       otherConsoleOptions: /Logger:trx;LogFileName=net452.trx
+      testRunTitle: net452
+  - task: CopyFiles@2
+    inputs:
+      SourceFolder: 'd:\a\_temp\TestResults'
+      Contents: |
+        **\*.coverage
+        **\*.trx
+      TargetFolder: 'd:\a\1\AllTestResults'
   - task: VSTest@2
-    displayName: 'test logging 4'
+    displayName: 'test logging net461'
     inputs:
       testAssemblyVer2: "**/bin/Release/net461/NLog.Extensions.Logging.Tests.dll"
       platform: '$(buildPlatform)'
@@ -68,6 +92,14 @@ jobs:
       codeCoverageEnabled: true
       runInParallel: true
       otherConsoleOptions: /Logger:trx;LogFileName=net461.trx
+      testRunTitle: net461
+  - task: CopyFiles@2
+    inputs:
+      SourceFolder: 'd:\a\1\AllTestResults'
+      Contents: |
+        **\*.coverage
+        **\*.trx
+      TargetFolder: 'd:\a\1\TestResults'      
   - task: PowerShell@2
     displayName: 'list coverage files'
     inputs:
@@ -75,6 +107,7 @@ jobs:
       script: |
         # list coverage
         gci d:\a\_temp\TestResults -recurse
+        gci 'd:\a\1\TestResults -recurse
       errorActionPreference: 'continue'
 
   - task: SonarCloudAnalyze@1   
