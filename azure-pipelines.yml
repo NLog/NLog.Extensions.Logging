@@ -32,6 +32,7 @@ jobs:
       maximumCpuCount: true
      
   - task: VSTest@2
+    continueOnError: true
     displayName: 'test logging 1'
     inputs:
       testAssemblyVer2: "**/bin/Release/netcoreapp1.1/NLog.Extensions.Logging.Tests.dll"
