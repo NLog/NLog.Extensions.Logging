@@ -40,6 +40,7 @@ jobs:
       configuration: '$(buildConfiguration)'
       codeCoverageEnabled: true
       runInParallel: true
+      otherConsoleOptions: /Logger:trx;LogFileName=netcoreapp1.trx
   - task: VSTest@2
     displayName: 'test logging 2'
     inputs:
@@ -48,6 +49,7 @@ jobs:
       configuration: '$(buildConfiguration)'
       codeCoverageEnabled: true
       runInParallel: true
+      otherConsoleOptions: /Logger:trx;LogFileName=netcoreapp2.trx
   - task: VSTest@2
     displayName: 'test logging 3'
     inputs:
@@ -56,6 +58,7 @@ jobs:
       configuration: '$(buildConfiguration)'
       codeCoverageEnabled: true
       runInParallel: true
+      otherConsoleOptions: /Logger:trx;LogFileName=net452.trx
   - task: VSTest@2
     displayName: 'test logging 4'
     inputs:
@@ -64,6 +67,7 @@ jobs:
       configuration: '$(buildConfiguration)'
       codeCoverageEnabled: true
       runInParallel: true
+      otherConsoleOptions: /Logger:trx;LogFileName=net461.trx
   - task: PowerShell@2
     displayName: 'list coverage files'
     inputs:
@@ -118,5 +122,6 @@ jobs:
   - task: SonarCloudAnalyze@1
 
   - task: SonarCloudPublish@1
+    continueOnError: true
     inputs:
       pollingTimeoutSec: '300'
