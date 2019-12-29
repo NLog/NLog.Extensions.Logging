@@ -56,5 +56,22 @@ namespace NLog.Extensions.Logging.Tests.Logging
             // Assert
             Assert.Single(logFactory.Configuration.FindTargetByName<Targets.MemoryTarget>("output").Logs);
         }
+
+        [Fact]
+        public void CreateLogger_SameName_ReturnsSameInstanceTest()
+        {
+            // Arrange
+            var loggerFactory = new NLogLoggerFactory();
+            string loggerName = "namespace.class1";
+
+            // Act
+            var result1 = loggerFactory.CreateLogger(loggerName);
+            var result2 = loggerFactory.CreateLogger(loggerName);
+
+            // Assert
+            Assert.NotNull(result1);
+            Assert.Equal(loggerName, result1.ToString());
+            Assert.Same(result1, result2);
+        }
     }
 }

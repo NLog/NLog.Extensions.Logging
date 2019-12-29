@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using NLog.Common;
 
@@ -9,6 +10,8 @@ namespace NLog.Extensions.Logging
     /// </summary>
     public class NLogLoggerFactory : ILoggerFactory
     {
+        private readonly Dictionary<string, Microsoft.Extensions.Logging.ILogger> _loggers = new Dictionary<string, Microsoft.Extensions.Logging.ILogger>(StringComparer.Ordinal);
+
         private readonly NLogLoggerProvider _provider;
 
         /// <summary>
@@ -66,7 +69,15 @@ namespace NLog.Extensions.Logging
         /// <returns>The <see cref="T:Microsoft.Extensions.Logging.ILogger" />.</returns>
         public Microsoft.Extensions.Logging.ILogger CreateLogger(string categoryName)
         {
-            return _provider.CreateLogger(categoryName);
+            lock (_loggers)
+            {
+                if (!_loggers.TryGetValue(categoryName, out var logger))
+                {
+                    logger = _provider.CreateLogger(categoryName);
+                    _loggers[categoryName] = logger;
+                }
+                return logger;
+            }
         }
 
         /// <summary>
