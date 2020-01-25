@@ -18,6 +18,7 @@ namespace HostingExample
             {
                 var hostBuilder = new HostBuilder()
                     .UseNLog()
+                    .ConfigureLogging(builder => builder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace))
                     .ConfigureServices((hostContext, services) => services.AddHostedService<ConsoleHostedService>());
 
                 // Build and run the host in one go; .RCA is specialized for running it in a console.
@@ -53,8 +54,8 @@ namespace HostingExample
             protected override async Task ExecuteAsync(CancellationToken stoppingToken)
             {
                 _logger.LogInformation("Hello from your hosted service thread!");
-                _logger.LogInformation("I may or may not return for a long time depending on what I do.");
-                _logger.LogInformation("In this example, I return right away, but my host will continue to run until");
+                _logger.LogTrace("I may or may not return for a long time depending on what I do.");
+                _logger.LogDebug("In this example, I return right away, but my host will continue to run until");
                 _logger.LogInformation("its CancellationToken is Cancelled (SIGTERM(Ctrl-C) or a Lifetime Event )");
                 await Task.CompletedTask;
             }
