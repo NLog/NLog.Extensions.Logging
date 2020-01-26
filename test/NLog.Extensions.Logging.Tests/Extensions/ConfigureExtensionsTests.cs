@@ -69,6 +69,27 @@ namespace NLog.Extensions.Logging.Tests.Extensions
             AssertSingleMessage(memoryTarget, "Info|test message with 1 arg");
         }
 
+        [Theory]
+        [InlineData("EventId", "eventId2")]
+        [InlineData("EventId_Name", "eventId2")]
+        [InlineData("EventId_Id", "2")]
+        public void AddNLog_LoggingBuilder_LogInfoWithEventId_ShouldLogToNLogWithEventId(string eventPropery, string expectedEventInLog)
+        {
+            // Arrange
+            ILoggingBuilder builder = new LoggingBuilderStub();
+            var options = new NLogProviderOptions { EventIdSeparator = "_" };
+            var config = CreateConfigWithMemoryTarget(out var memoryTarget, $"${{event-properties:{eventPropery}}} - ${{message}}");
+
+            // Act
+            builder.AddNLog(options, config);
+            var provider = GetLoggerProvider(builder);
+            var logger = provider.CreateLogger("logger1");
+            logger.LogInformation(new EventId(2, "eventId2"), "test message with {0} arg", 1);
+
+            // Assert
+            AssertSingleMessage(memoryTarget, $"{expectedEventInLog} - test message with 1 arg");
+        }
+
         [Fact]
         public void AddNLog_LogFactoryBuilder_LogInfo_ShouldLogToNLog()
         {
