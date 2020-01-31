@@ -2,7 +2,7 @@
   <PropertyGroup>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
 
-    <TargetFrameworks>net451;net461;netstandard1.3;netstandard1.5;netstandard2.0;netcoreapp3.0</TargetFrameworks>
+    <TargetFrameworks>net451;net461;netstandard1.3;netstandard1.5;netstandard2.0;netcoreapp3.0;netcoreapp3.1</TargetFrameworks>
     <DebugType Condition=" '$(Configuration)' == 'Debug' ">Full</DebugType>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -65,6 +65,10 @@ Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHAN
     <Title>NLog.Extensions.Logging for .NET Core 3</Title>
     <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
+    <Title>NLog.Extensions.Logging for .NET Core 3.1</Title>
+    <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NLog" Version="[4.6.7,5.0.0-beta01)" />
   </ItemGroup>
@@ -93,6 +97,10 @@ Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHAN
   
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.0" />
   </ItemGroup>
 
   <PropertyGroup>

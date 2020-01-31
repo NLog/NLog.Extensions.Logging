@@ -17,11 +17,11 @@ dotnet restore .\src\NLog.Extensions.Hosting\
 if (-Not $LastExitCode -eq 0)
 	{ exit $LastExitCode }
 
-msbuild /t:Pack .\src\NLog.Extensions.Logging\ /p:targetFrameworks='"net451;net461;netstandard1.3;netstandard1.5;netstandard2.0;netcoreapp3.0"' /p:VersionPrefix=$versionPrefix /p:VersionSuffix=$versionSuffix /p:FileVersion=$versionFile /p:ProductVersion=$versionProduct /p:Configuration=Release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=..\..\artifacts /verbosity:minimal
+msbuild /t:Pack .\src\NLog.Extensions.Logging\ /p:targetFrameworks='"net451;net461;netstandard1.3;netstandard1.5;netstandard2.0;netcoreapp3.0;netcoreapp3.1"' /p:VersionPrefix=$versionPrefix /p:VersionSuffix=$versionSuffix /p:FileVersion=$versionFile /p:ProductVersion=$versionProduct /p:Configuration=Release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=..\..\artifacts /verbosity:minimal
 if (-Not $LastExitCode -eq 0)
 	{ exit $LastExitCode }
 
-msbuild /t:Pack .\src\NLog.Extensions.Hosting\ /p:targetFrameworks='"netstandard2.0;netcoreapp3.0"' /p:VersionPrefix=$versionPrefix /p:VersionSuffix=$versionSuffix /p:FileVersion=$versionFile /p:ProductVersion=$versionProduct /p:Configuration=Release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=..\..\artifacts /verbosity:minimal
+msbuild /t:Pack .\src\NLog.Extensions.Hosting\ /p:targetFrameworks='"netstandard2.0;netcoreapp3.0;netcoreapp3.1"' /p:VersionPrefix=$versionPrefix /p:VersionSuffix=$versionSuffix /p:FileVersion=$versionFile /p:ProductVersion=$versionProduct /p:Configuration=Release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=..\..\artifacts /verbosity:minimal
 if (-Not $LastExitCode -eq 0)
 	{ exit $LastExitCode }
 

@@ -2,7 +2,7 @@
   <PropertyGroup>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
     
-    <TargetFrameworks>netcoreapp2.0;netcoreapp3.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.0;netcoreapp3.0;netcoreapp3.1</TargetFrameworks>
     <OutputType>Library</OutputType>
     <IsPackable>false</IsPackable>
     <DebugType>full</DebugType>
@@ -21,6 +21,10 @@
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.0.0" />
+  </ItemGroup>
+  
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.0" />
   </ItemGroup>
 
   <ItemGroup>
