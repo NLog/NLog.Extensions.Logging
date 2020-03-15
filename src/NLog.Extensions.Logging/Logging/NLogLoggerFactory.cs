@@ -69,14 +69,21 @@ namespace NLog.Extensions.Logging
         /// <returns>The <see cref="T:Microsoft.Extensions.Logging.ILogger" />.</returns>
         public Microsoft.Extensions.Logging.ILogger CreateLogger(string categoryName)
         {
-            lock (_loggers)
+           if (_loggers.TryGetValue(categoryName, out var logger))
             {
-                if (!_loggers.TryGetValue(categoryName, out var logger))
-                {
-                    logger = _provider.CreateLogger(categoryName);
-                    _loggers[categoryName] = logger;
-                }
                 return logger;
+            }
+            else
+            {
+                lock (_loggers)
+                {
+                    if (!_loggers.TryGetValue(categoryName, out logger))
+                    {
+                        logger = _provider.CreateLogger(categoryName);
+                        _loggers[categoryName] = logger;
+                    }
+                    return logger;
+                }
             }
         }
 
