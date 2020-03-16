@@ -104,7 +104,19 @@ namespace NLog.Extensions.Logging
         /// <returns>ILoggingBuilder for chaining</returns>
         public static ILoggingBuilder AddNLog(this ILoggingBuilder builder, LoggingConfiguration configuration)
         {
-            AddNLogLoggerProvider(builder.Services, null, null, (serviceProvider, config, options) =>
+            return AddNLog(builder, configuration, null);
+        }
+
+        /// <summary>
+        /// Enable NLog as logging provider for Microsoft Extension Logging
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="configuration">New NLog config.</param>
+        /// <param name="options">NLog options</param>
+        /// <returns>ILoggingBuilder for chaining</returns>
+        public static ILoggingBuilder AddNLog(this ILoggingBuilder builder, LoggingConfiguration configuration, NLogProviderOptions options)
+        {
+            AddNLogLoggerProvider(builder.Services, null, options, (serviceProvider, config, options) =>
             {
                 var provider = CreateNLogLoggerProvider(serviceProvider, config, options);
                 // Delay initialization of targets until we have loaded config-settings
