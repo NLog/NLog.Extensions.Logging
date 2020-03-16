@@ -2,6 +2,12 @@
 
 Date format: (year/month/day)
 
+### v1.6.2 (2020/03/16)
+- [#380](https://github.com/NLog/NLog.Extensions.Logging/pull/380) NLogLoggerFactory - Emulate Microsoft LoggerFactory by returning same ILogger instance (#380) (@snakefoot)
+- [#393](https://github.com/NLog/NLog.Extensions.Logging/pull/393) AddNLog overload with NLogProviderOptions and LoggingConfiguration (#393) (@JeffreyMercado)
+- [#407](https://github.com/NLog/NLog.Extensions.Logging/pull/407) Improve AddNLog with LoggingConfiguration to handle custom LogFactory-instance (#407) (@snakefoot)
+- [#408](https://github.com/NLog/NLog.Extensions.Logging/pull/408) Update NLog dependency to 4.6.8 (#408) (@304NotModified)
+
 ### v1.6.1 (2019/10/19)
 - [#350](https://github.com/NLog/NLog.Extensions.Logging/pull/350) Fixed conflict issue between UseNLog and default log providers (@snakefoot)
 
