@@ -77,11 +77,11 @@ namespace NLog.Extensions.Logging.Tests.Extensions
         {
             // Arrange
             ILoggingBuilder builder = new LoggingBuilderStub();
-            var options = new NLogProviderOptions { EventIdSeparator = "_" };
             var config = CreateConfigWithMemoryTarget(out var memoryTarget, $"${{event-properties:{eventPropery}}} - ${{message}}");
+            var options = new NLogProviderOptions { EventIdSeparator = "_" };
 
             // Act
-            builder.AddNLog(options, config);
+            builder.AddNLog(config, options);
             var provider = GetLoggerProvider(builder);
             var logger = provider.CreateLogger("logger1");
             logger.LogInformation(new EventId(2, "eventId2"), "test message with {0} arg", 1);
