@@ -118,9 +118,10 @@ namespace NLog.Extensions.Logging
         {
             AddNLogLoggerProvider(builder.Services, null, options, (serviceProvider, config, options) =>
             {
-                var provider = CreateNLogLoggerProvider(serviceProvider, config, options);
+                var logFactory = configuration?.LogFactory ?? LogManager.LogFactory;
+                var provider = CreateNLogLoggerProvider(serviceProvider, config, options, logFactory);
                 // Delay initialization of targets until we have loaded config-settings
-                LogManager.Configuration = configuration;
+                logFactory.Configuration = configuration;
                 return provider;
             });
             return builder;
