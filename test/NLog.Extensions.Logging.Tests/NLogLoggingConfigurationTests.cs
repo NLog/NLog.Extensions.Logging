@@ -129,7 +129,7 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Fact]
-        private void ReloadLogFactoryConfiguration()
+        public void ReloadLogFactoryConfiguration()
         {
             var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
             memoryConfig["NLog:Targets:file:type"] = "File";
@@ -151,7 +151,7 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Fact]
-        private void ReloadLogFactoryConfigurationKeepVariables()
+        public void ReloadLogFactoryConfigurationKeepVariables()
         {
             var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
             memoryConfig["NLog:Targets:file:type"] = "File";
@@ -168,6 +168,23 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Equal("updated.txt", (logFactory.Configuration.FindTargetByName("file") as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
             configuration.Reload(); // Automatic Reload
             Assert.Equal("updated.txt", (logFactory.Configuration.FindTargetByName("file") as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
+        }
+
+        [Fact]
+        public void SetupBuilderNLogLoggingConfiguration()
+        {
+            var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
+            memoryConfig["NLog:Targets:file:type"] = "File";
+            memoryConfig["NLog:Targets:file:fileName"] = "hello.txt";
+            var configuration = new ConfigurationBuilder().AddInMemoryCollection(memoryConfig).Build();
+
+            var logFactory = new LogFactory();
+            logFactory.Setup()
+                .SetupExtensions(s => s.AutoLoadAssemblies(false))
+                .SetupExtensionLogging(s => s.LoadNLogLoggingConfiguration(configuration));
+
+            Assert.Single(logFactory.Configuration.LoggingRules);
+            Assert.Equal(2, logFactory.Configuration.LoggingRules[0].Targets.Count);
         }
 
         private static NLogLoggingConfiguration CreateNLogLoggingConfigurationWithNLogSection(IDictionary<string, string> memoryConfig)

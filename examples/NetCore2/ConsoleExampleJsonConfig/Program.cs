@@ -20,7 +20,9 @@ namespace ConsoleExample
                     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                     .Build();
 
-                LogManager.Configuration = new NLogLoggingConfiguration(config.GetSection("NLog"));
+                LogManager.Setup()
+                    .SetupExtensions(s => s.AutoLoadAssemblies(false))
+                    .SetupExtensionLogging(s => s.LoadNLogLoggingConfiguration(config));
 
                 var servicesProvider = BuildDi(config);
                 using (servicesProvider as IDisposable)
