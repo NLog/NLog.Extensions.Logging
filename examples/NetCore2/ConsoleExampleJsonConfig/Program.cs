@@ -22,7 +22,7 @@ namespace ConsoleExample
 
                 LogManager.Setup()
                     .SetupExtensions(s => s.AutoLoadAssemblies(false))
-                    .SetupExtensionLogging(s => s.LoadNLogLoggingConfiguration(config));
+                    .LoadNLogConfigFromSection(config);
 
                 var servicesProvider = BuildDi(config);
                 using (servicesProvider as IDisposable)
