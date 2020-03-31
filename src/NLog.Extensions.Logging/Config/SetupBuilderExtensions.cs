@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Linq;
 using NLog.Config;
 
 namespace NLog.Extensions.Logging
@@ -9,22 +9,17 @@ namespace NLog.Extensions.Logging
     public static class SetupBuilderExtensions
     {
         /// <summary>
-        /// Setup of LogFactory integration with Microsoft Extension Logging
+        /// Loads NLog LoggingConfiguration from appsettings.json from NLog-section
         /// </summary>
-        public static ISetupBuilder SetupExtensionLogging(this ISetupBuilder setupBuilder, Action<ISetupExtensionLoggingBuilder> extensionsBuilder)
+        public static ISetupBuilder LoadNLogConfigFromSection(this ISetupBuilder setupBuilder, Microsoft.Extensions.Configuration.IConfiguration configuration)
         {
-            extensionsBuilder(new SetupExtensionLoggingBuilder(setupBuilder.LogFactory));
-            return setupBuilder;
-        }
-
-        private class SetupExtensionLoggingBuilder : ISetupExtensionLoggingBuilder
-        {
-            public SetupExtensionLoggingBuilder(LogFactory logFactory)
+            setupBuilder.SetupExtensions(s => s.RegisterConfigSettings(configuration));
+            var nlogConfig = configuration.GetSection("NLog");
+            if (nlogConfig != null && nlogConfig.GetChildren().Any())
             {
-                LogFactory = logFactory;
+                setupBuilder.LogFactory.Configuration = new NLogLoggingConfiguration(nlogConfig, setupBuilder.LogFactory);
             }
-
-            public LogFactory LogFactory { get; }
+            return setupBuilder;
         }
     }
 }

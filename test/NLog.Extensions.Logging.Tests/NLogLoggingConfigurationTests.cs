@@ -181,7 +181,7 @@ namespace NLog.Extensions.Logging.Tests
             var logFactory = new LogFactory();
             logFactory.Setup()
                 .SetupExtensions(s => s.AutoLoadAssemblies(false))
-                .SetupExtensionLogging(s => s.LoadNLogLoggingConfiguration(configuration));
+                .LoadNLogConfigFromSection(configuration);
 
             Assert.Single(logFactory.Configuration.LoggingRules);
             Assert.Equal(2, logFactory.Configuration.LoggingRules[0].Targets.Count);
