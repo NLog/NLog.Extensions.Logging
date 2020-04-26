@@ -11,13 +11,16 @@ namespace NLog.Extensions.Logging
         /// <summary>
         /// Loads NLog LoggingConfiguration from appsettings.json from NLog-section
         /// </summary>
-        public static ISetupBuilder LoadNLogConfigFromSection(this ISetupBuilder setupBuilder, Microsoft.Extensions.Configuration.IConfiguration configuration)
+        public static ISetupBuilder LoadConfigurationFromSection(this ISetupBuilder setupBuilder, Microsoft.Extensions.Configuration.IConfiguration configuration, string configSection = "NLog")
         {
             setupBuilder.SetupExtensions(s => s.RegisterConfigSettings(configuration));
-            var nlogConfig = configuration.GetSection("NLog");
-            if (nlogConfig != null && nlogConfig.GetChildren().Any())
+            if (!string.IsNullOrEmpty(configSection))
             {
-                setupBuilder.LogFactory.Configuration = new NLogLoggingConfiguration(nlogConfig, setupBuilder.LogFactory);
+                var nlogConfig = configuration.GetSection(configSection);
+                if (nlogConfig != null && nlogConfig.GetChildren().Any())
+                {
+                    setupBuilder.LogFactory.Configuration = new NLogLoggingConfiguration(nlogConfig, setupBuilder.LogFactory);
+                }
             }
             return setupBuilder;
         }
