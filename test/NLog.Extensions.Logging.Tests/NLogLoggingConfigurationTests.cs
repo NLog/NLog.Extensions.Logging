@@ -188,7 +188,7 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Fact]
-        public void SetupBuilderNLogLoggingConfiguration()
+        public void SetupBuilderLoadConfigurationFromSection()
         {
             var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
             memoryConfig["NLog:Targets:file:type"] = "File";
@@ -198,7 +198,7 @@ namespace NLog.Extensions.Logging.Tests
             var logFactory = new LogFactory();
             logFactory.Setup()
                 .SetupExtensions(s => s.AutoLoadAssemblies(false))
-                .LoadNLogConfigFromSection(configuration);
+                .LoadConfigurationFromSection(configuration);
 
             Assert.Single(logFactory.Configuration.LoggingRules);
             Assert.Equal(2, logFactory.Configuration.LoggingRules[0].Targets.Count);
