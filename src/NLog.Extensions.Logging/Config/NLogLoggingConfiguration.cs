@@ -151,7 +151,7 @@ namespace NLog.Extensions.Logging
 
             public bool AutoReload { get; }
 
-            public string Name => _nameOverride ?? _configurationSection.Key;
+            public string Name => _nameOverride ?? GetConfigKey(_configurationSection);
             public IEnumerable<KeyValuePair<string, string>> Values => GetValues();
             public IEnumerable<ILoggingConfigurationElement> Children => GetChildren();
 
@@ -162,7 +162,7 @@ namespace NLog.Extensions.Logging
                 {
                     if (!child.GetChildren().Any())
                     {
-                        yield return new KeyValuePair<string, string>(child.Key, child.Value);
+                        yield return new KeyValuePair<string, string>(GetConfigKey(child), child.Value);
                     }
                 }
 
@@ -170,11 +170,11 @@ namespace NLog.Extensions.Logging
                 {
                     if (ReferenceEquals(_nameOverride, DefaultTargetParameters))
                     {
-                        yield return new KeyValuePair<string, string>("type", _configurationSection.Key);
+                        yield return new KeyValuePair<string, string>("type", GetConfigKey(_configurationSection));
                     }
                     else
                     {
-                        yield return new KeyValuePair<string, string>("name", _configurationSection.Key);
+                        yield return new KeyValuePair<string, string>("name", GetConfigKey(_configurationSection));
                     }
 
                     if (ReferenceEquals(_nameOverride, VariableKey))
@@ -241,17 +241,31 @@ namespace NLog.Extensions.Logging
 
             private static LoggingConfigurationElement CreateLoggingConfigurationElement(bool isTargetsSection, IConfigurationSection child, IConfigurationSection defaultTargetParameters, IConfigurationSection defaultTargetWrapper)
             {
-                var isTargetKey = child.Key.EqualsOrdinalIgnoreCase(TargetsKey);
+                IConfigurationSection defaultTargetParametersSection = null;
+                IConfigurationSection defaultTargetWrapperSection = null;
+
+                if (defaultTargetParameters != null || defaultTargetWrapper != null)
+                {
+                    var isTargetsKey = GetConfigKey(child).EqualsOrdinalIgnoreCase(TargetsKey);
+                    defaultTargetParametersSection = defaultTargetParameters != null && isTargetsKey ? defaultTargetParameters : null;
+                    defaultTargetWrapperSection = defaultTargetWrapper != null && isTargetsKey ? defaultTargetWrapper : null;
+                }
+
                 return new LoggingConfigurationElement(child, false, isTargetsSection ? TargetKey : null)
                 {
-                    DefaultTargetParametersSection = defaultTargetParameters != null && isTargetKey ? defaultTargetParameters : null,
-                    DefaultTargetWrapperSection = defaultTargetWrapper != null && isTargetKey ? defaultTargetWrapper : null,
+                    DefaultTargetParametersSection = defaultTargetParametersSection,
+                    DefaultTargetWrapperSection = defaultTargetWrapperSection,
                 };
+            }
+
+            private static string GetConfigKey(IConfigurationSection child)
+            {
+                return child.Key?.Trim() ?? string.Empty;
             }
 
             private bool IsTargetsSection()
             {
-                return !_topElement && _nameOverride == null && _configurationSection.Key.EqualsOrdinalIgnoreCase(TargetsKey);
+                return !_topElement && _nameOverride == null && GetConfigKey(_configurationSection).EqualsOrdinalIgnoreCase(TargetsKey);
             }
 
             /// <summary>
@@ -261,7 +275,7 @@ namespace NLog.Extensions.Logging
             /// <returns></returns>
             private bool IsTargetWithinWrapper(IConfigurationSection child)
             {
-                return _nameOverride == TargetKey && child.Key.EqualsOrdinalIgnoreCase(TargetKey) && child.GetChildren().Count() == 1;
+                return _nameOverride == TargetKey && GetConfigKey(child).EqualsOrdinalIgnoreCase(TargetKey) && child.GetChildren().Count() == 1;
             }
 
             private IEnumerable<LoggingConfigurationElement> GetTargetsDefaultConfigElements()
