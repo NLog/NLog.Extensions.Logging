@@ -18,11 +18,9 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
     </Description>
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logging;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
-- NLogLoggerFactory - Emulate Microsoft LoggerFactory by returning same ILogger instance (#380) (@snakefoot)
-- AddNLog overload with NLogProviderOptions and LoggingConfiguration (#393) (@JeffreyMercado)
-- Improve AddNLog with LoggingConfiguration to handle custom LogFactory-instance (#407) (@snakefoot)
-- Update NLog dependency to 4.6.8 (#408) (@304NotModified)
-
+- Reading JSON config - Trim keys as Json allows spaces in keys (#419) (@snakefoot)
+- Bump NLog to 4.7.0 (#411) (@dependabot-preview[bot])
+- Introduced LoadConfigurationFromSection extension method for LogFactory.Setup (#410, #412, #418) (@snakefoot)
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
     </PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/NLog/NLog.Extensions.Logging</PackageProjectUrl>

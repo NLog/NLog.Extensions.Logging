@@ -2,6 +2,12 @@
 
 Date format: (year/month/day)
 
+
+### v1.6.3 (2020/05/11)
+- [#419](https://github.com/NLog/NLog.Extensions.Logging/pull/419) Reading JSON config - Trim keys as Json allows spaces in keys (#419) (@snakefoot)
+- [#411](https://github.com/NLog/NLog.Extensions.Logging/pull/411) Bump NLog to 4.7.0 (#411) (@dependabot-preview[bot])
+- [#418](https://github.com/NLog/NLog.Extensions.Logging/pull/418) Introduced LoadConfigurationFromSection extension method for LogFactory.Setup (#410, #412, #418) (@snakefoot)
+
 ### v1.6.2 (2020/03/16)
 - [#380](https://github.com/NLog/NLog.Extensions.Logging/pull/380) NLogLoggerFactory - Emulate Microsoft LoggerFactory by returning same ILogger instance (#380) (@snakefoot)
 - [#393](https://github.com/NLog/NLog.Extensions.Logging/pull/393) AddNLog overload with NLogProviderOptions and LoggingConfiguration (#393) (@JeffreyMercado)
