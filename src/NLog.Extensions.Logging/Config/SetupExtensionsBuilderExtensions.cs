@@ -9,13 +9,12 @@ namespace NLog.Extensions.Logging
     public static class SetupExtensionsBuilderExtensions
     {
         /// <summary>
-        /// Replace with version from NLog.Extension.Logging when it has been released with NLog 4.7
+        /// Setup the MEL-configuration for the ${configsetting} layoutrenderer
         /// </summary>
-        internal static ISetupExtensionsBuilder RegisterConfigSettings(this ISetupExtensionsBuilder setupBuilder, IConfiguration configuration)
+        public static ISetupExtensionsBuilder RegisterConfigSettings(this ISetupExtensionsBuilder setupBuilder, IConfiguration configuration)
         {
             ConfigSettingLayoutRenderer.DefaultConfiguration = configuration;
-            ConfigurationItemFactory.Default.RegisterType(typeof(ConfigSettingLayoutRenderer), string.Empty);
-            return setupBuilder;
+            return setupBuilder.RegisterLayoutRenderer<ConfigSettingLayoutRenderer>("configsetting");
         }
     }
 }
