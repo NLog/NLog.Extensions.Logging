@@ -18,12 +18,9 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
     </Description>
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logging;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
-- Support .NET Core 3.0 (@304NotModified)
-- ILoggerFactory is obsolete in .NET Core 3. Instead use ILoggingBuilder.AddNLog (#342) (@snakefoot)
-- Added AddNLog with functor to create/initialize LogFactory for NLogLoggingProvider (@snakefoot)
-- Introduce AddNLog with NLog-config parameter (#344) (@snakefoot)
-- Minor optimizations in parsing of LogEvent property-names
-
+- Reading JSON config - Trim keys as Json allows spaces in keys (#419) (@snakefoot)
+- Bump NLog to 4.7.0 (#411) (@dependabot-preview[bot])
+- Introduced LoadConfigurationFromSection extension method for LogFactory.Setup (#410, #412, #418) (@snakefoot)
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
     </PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/NLog/NLog.Extensions.Logging</PackageProjectUrl>
@@ -57,7 +54,7 @@ Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHAN
     <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NLog" Version="[4.6.7,5.0.0-beta01)" />
+    <PackageReference Include="NLog" Version="4.7.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="1.0.0" />

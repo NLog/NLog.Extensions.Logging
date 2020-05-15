@@ -402,6 +402,12 @@ namespace NLog.Extensions.Logging
             return _logger.IsEnabled(logLevel);
         }
 
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return LoggerName;
+        }
+
         /// <summary>
         /// Convert log level to NLog variant.
         /// </summary>

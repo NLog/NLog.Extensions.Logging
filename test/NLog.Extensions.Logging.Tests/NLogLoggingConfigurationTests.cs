@@ -27,7 +27,24 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
             Assert.Equal("hello.txt", (logConfig.FindTargetByName("file") as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
         }
-        
+
+        [Fact]
+        public void LoadSimpleConfigAndTrimSpace()
+        {
+            var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
+            memoryConfig["NLog:Targets:file:type"] = "File";
+            memoryConfig["NLog:Targets:file:fileName "] = "hello.txt";
+
+            var logConfig = CreateNLogLoggingConfigurationWithNLogSection(memoryConfig);
+
+            Assert.Single(logConfig.LoggingRules);
+            Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
+            Assert.Equal(2, logConfig.AllTargets.Count);
+            Assert.Single(logConfig.AllTargets.Where(t => t is FileTarget));
+            Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
+            Assert.Equal("hello.txt", (logConfig.FindTargetByName("file") as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
+        }
+
         [Fact]
         public void LoadWrapperConfig()
         {
@@ -129,7 +146,7 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Fact]
-        private void ReloadLogFactoryConfiguration()
+        public void ReloadLogFactoryConfiguration()
         {
             var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
             memoryConfig["NLog:Targets:file:type"] = "File";
@@ -151,7 +168,7 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Fact]
-        private void ReloadLogFactoryConfigurationKeepVariables()
+        public void ReloadLogFactoryConfigurationKeepVariables()
         {
             var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
             memoryConfig["NLog:Targets:file:type"] = "File";
@@ -168,6 +185,23 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Equal("updated.txt", (logFactory.Configuration.FindTargetByName("file") as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
             configuration.Reload(); // Automatic Reload
             Assert.Equal("updated.txt", (logFactory.Configuration.FindTargetByName("file") as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
+        }
+
+        [Fact]
+        public void SetupBuilderLoadConfigurationFromSection()
+        {
+            var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
+            memoryConfig["NLog:Targets:file:type"] = "File";
+            memoryConfig["NLog:Targets:file:fileName"] = "hello.txt";
+            var configuration = new ConfigurationBuilder().AddInMemoryCollection(memoryConfig).Build();
+
+            var logFactory = new LogFactory();
+            logFactory.Setup()
+                .SetupExtensions(s => s.AutoLoadAssemblies(false))
+                .LoadConfigurationFromSection(configuration);
+
+            Assert.Single(logFactory.Configuration.LoggingRules);
+            Assert.Equal(2, logFactory.Configuration.LoggingRules[0].Targets.Count);
         }
 
         private static NLogLoggingConfiguration CreateNLogLoggingConfigurationWithNLogSection(IDictionary<string, string> memoryConfig)
