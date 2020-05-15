@@ -1,0 +1,34 @@
+{
+  "$schema": "../nlog.schema.json",
+  "NLog": {
+    "throwConfigExceptions": true,
+    "targets": {
+      "logfile": {
+        "type": "File",
+        "fileName": "c:/temp/nlog-${shortdate}.log"
+      },
+      "logconsole": {
+        "type": "Console"
+      }
+    },
+    "extensions": [
+      {
+      }
+    ],
+    "variables": {
+      "a": "b" 
+    },
+    "rules": [
+      {
+        "logger": "*",
+        "minLevel": "Info",
+        "writeTo": "logconsole"
+      },
+      {
+        "logger": "*",
+        "minLevel": "Debug",
+        "writeTo": "logfile"
+      }
+    ]
+  }
+}
