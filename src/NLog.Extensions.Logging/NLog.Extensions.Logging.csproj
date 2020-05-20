@@ -18,9 +18,9 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
     </Description>
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logging;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
-- Reading JSON config - Trim keys as Json allows spaces in keys (#419) (@snakefoot)
-- Bump NLog to 4.7.0 (#411) (@dependabot-preview[bot])
-- Introduced LoadConfigurationFromSection extension method for LogFactory.Setup (#410, #412, #418) (@snakefoot)
+- LogFactory.Setup - Make RegisterConfigSettings public (#423) (@snakefoot)
+- Bump NLog to 4.7.2 (#426) (@dependabot-preview[bot])
+
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
     </PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/NLog/NLog.Extensions.Logging</PackageProjectUrl>
