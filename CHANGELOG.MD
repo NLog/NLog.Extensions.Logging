@@ -3,6 +3,10 @@
 Date format: (year/month/day)
 
 
+### v1.6.5 (2020/05/20)
+- [#419](https://github.com/NLog/NLog.Extensions.Logging/pull/423) LogFactory.Setup - Make RegisterConfigSettings public (#423) (@snakefoot)
+- [#411](https://github.com/NLog/NLog.Extensions.Logging/pull/426) Bump NLog to 4.7.2 (#426) (@dependabot-preview[bot])
+
 ### v1.6.3 (2020/05/11)
 - [#419](https://github.com/NLog/NLog.Extensions.Logging/pull/419) Reading JSON config - Trim keys as Json allows spaces in keys (#419) (@snakefoot)
 - [#411](https://github.com/NLog/NLog.Extensions.Logging/pull/411) Bump NLog to 4.7.0 (#411) (@dependabot-preview[bot])
