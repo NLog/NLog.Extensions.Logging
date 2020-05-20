@@ -15,10 +15,11 @@ namespace HostingExample
     {
         private static async Task Main()
         {
-            var config = new ConfigurationBuilder()
-                .Build();
+            var config = new ConfigurationBuilder().Build();
 
-            var logger = LogManager.Setup().SetupExtensions(ext => ext.RegisterConfigSettings(config)).GetCurrentClassLogger();
+            var logger = LogManager.Setup()
+                                   .SetupExtensions(ext => ext.RegisterConfigSettings(config))
+                                   .GetCurrentClassLogger();
 
             try
             {
