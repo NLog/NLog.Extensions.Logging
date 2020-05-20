@@ -3,7 +3,7 @@
 Date format: (year/month/day)
 
 
-### v1.6.5 (2020/05/20)
+### v1.6.4 (2020/05/20)
 - [#419](https://github.com/NLog/NLog.Extensions.Logging/pull/423) LogFactory.Setup - Make RegisterConfigSettings public (#423) (@snakefoot)
 - [#411](https://github.com/NLog/NLog.Extensions.Logging/pull/426) Bump NLog to 4.7.2 (#426) (@dependabot-preview[bot])
 
