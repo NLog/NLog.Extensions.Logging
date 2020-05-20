@@ -11,19 +11,19 @@ namespace ConsoleExample
     {
         private static void Main()
         {
-            var logger = LogManager.GetCurrentClassLogger();
+            var config = new ConfigurationBuilder()
+                .SetBasePath(System.IO.Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .Build();
+
+            var logger = LogManager.Setup()
+                .SetupExtensions(s => s.AutoLoadAssemblies(false))
+                .SetupExtensions(s => s.RegisterConfigSettings(config))
+                .LoadConfigurationFromSection(config)
+                .GetCurrentClassLogger();
 
             try
             {
-                var config = new ConfigurationBuilder()
-                    .SetBasePath(System.IO.Directory.GetCurrentDirectory())
-                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                    .Build();
-
-                LogManager.Setup()
-                    .SetupExtensions(s => s.AutoLoadAssemblies(false))
-                    .LoadConfigurationFromSection(config);
-
                 var servicesProvider = BuildDi(config);
                 using (servicesProvider as IDisposable)
                 {

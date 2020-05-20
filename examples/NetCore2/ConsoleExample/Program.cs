@@ -11,15 +11,14 @@ namespace ConsoleExample
     {
         private static void Main()
         {
-            var logger = LogManager.GetCurrentClassLogger();
+            var config = new ConfigurationBuilder().Build();
+
+            var logger = LogManager.Setup()
+                                   .SetupExtensions(ext => ext.RegisterConfigSettings(config))
+                                   .GetCurrentClassLogger();
 
             try
             {
-                var config = new ConfigurationBuilder()
-                    .SetBasePath(System.IO.Directory.GetCurrentDirectory())
-                    .Build();
-
-
                 var servicesProvider = BuildDi(config);
                 using (servicesProvider as IDisposable)
                 {

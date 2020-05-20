@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog;
+using NLog.Extensions.Logging;
 using NLog.Extensions.Hosting;
 
 namespace HostingExample
@@ -13,13 +15,18 @@ namespace HostingExample
     {
         private static async Task Main()
         {
-            var logger = LogManager.GetCurrentClassLogger();
+            var config = new ConfigurationBuilder().Build();
+
+            var logger = LogManager.Setup()
+                                   .SetupExtensions(ext => ext.RegisterConfigSettings(config))
+                                   .GetCurrentClassLogger();
+
             try
             {
                 var hostBuilder = new HostBuilder()
-                    .UseNLog()
                     .ConfigureLogging(builder => builder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace))
-                    .ConfigureServices((hostContext, services) => services.AddHostedService<ConsoleHostedService>());
+                    .ConfigureServices((hostContext, services) => services.AddHostedService<ConsoleHostedService>())
+                    .UseNLog();
 
                 // Build and run the host in one go; .RCA is specialized for running it in a console.
                 // It registers SIGTERM(Ctrl-C) to the CancellationTokenSource that's shared with all services in the container.
