@@ -6,9 +6,9 @@
     public class NLogProviderOptions
     {
         /// <summary>
-        /// Separator between for EventId.Id and EventId.Name. Default to .
+        /// Separator between for EventId.Id and EventId.Name. Default to _
         /// </summary>
-        public string EventIdSeparator { get; set; }
+        public string EventIdSeparator { get; set; } = "_";
 
         /// <summary>
         /// Skip allocation of <see cref="LogEventInfo.Properties" />-dictionary
@@ -16,17 +16,17 @@
         /// <remarks>
         /// using
         ///     <c>default(EventId)</c></remarks>
-        public bool IgnoreEmptyEventId { get; set; }
+        public bool IgnoreEmptyEventId { get; set; } = true;
 
         /// <summary>
         /// Enable structured logging by capturing message template parameters and inject into the <see cref="LogEventInfo.Properties" />-dictionary
         /// </summary>
-        public bool CaptureMessageTemplates { get; set; }
+        public bool CaptureMessageTemplates { get; set; } = true;
 
         /// <summary>
         /// Enable capture of properties from the ILogger-State-object, both in <see cref="Microsoft.Extensions.Logging.ILogger.Log{TState}"/> and <see cref="Microsoft.Extensions.Logging.ILogger.BeginScope{TState}"/>
         /// </summary>
-        public bool CaptureMessageProperties { get; set; }
+        public bool CaptureMessageProperties { get; set; } = true;
 
         /// <summary>
         /// Use the NLog engine for parsing the message template (again) and format using the NLog formatter
@@ -36,22 +36,16 @@
         /// <summary>
         /// Enable capture of scope information and inject into <see cref="NestedDiagnosticsLogicalContext" /> and <see cref="MappedDiagnosticsLogicalContext" />
         /// </summary>
-        public bool IncludeScopes { get; set; }
+        public bool IncludeScopes { get; set; } = true;
 
         /// <summary>
         /// Shutdown NLog on dispose of the <see cref="NLogLoggerProvider"/>
         /// </summary>
         public bool ShutdownOnDispose { get; set; }
 
-        /// <summary>Initializes a new instance of the <see cref="T:System.Object" /> class.</summary>
+        /// <summary>Initializes a new instance NLogProviderOptions with default values.</summary>
         public NLogProviderOptions()
         {
-            EventIdSeparator = "_";
-            IgnoreEmptyEventId = true;
-            CaptureMessageTemplates = true;
-            CaptureMessageProperties = true;
-            ParseMessageTemplates = false;
-            IncludeScopes = true;
         }
 
         /// <summary>
