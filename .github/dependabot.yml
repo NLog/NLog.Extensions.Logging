@@ -1,0 +1,35 @@
+version: 2
+updates:
+- package-ecosystem: nuget
+  directory: "/"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: Microsoft.Extensions.Configuration.Abstractions
+    versions:
+    - ">= 3.a, < 4"
+  - dependency-name: Microsoft.Extensions.Configuration.Json
+    versions:
+    - "> 2.1.0"
+  - dependency-name: Microsoft.Extensions.Configuration.Json
+    versions:
+    - ">= 3.a, < 4"
+  - dependency-name: Microsoft.Extensions.DependencyInjection
+    versions:
+    - ">= 3.a, < 4"
+  - dependency-name: Microsoft.Extensions.Hosting
+    versions:
+    - ">= 3.a, < 4"
+  - dependency-name: Microsoft.Extensions.Hosting.Abstractions
+    versions:
+    - ">= 3.a, < 4"
+  - dependency-name: Microsoft.Extensions.Logging
+    versions:
+    - ">= 3.a, < 4"
+  - dependency-name: Microsoft.Extensions.Logging.Abstractions
+    versions:
+    - ">= 3.a, < 4"
+  - dependency-name: Microsoft.NET.Test.Sdk
+    versions:
+    - "> 16.2.0, < 17"
