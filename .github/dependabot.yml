@@ -16,3 +16,4 @@ updates:
   - dependency-name: Microsoft.NET.Test.Sdk
     versions:
     - "> 16.2.0, < 17"
+  - dependency-name: xunit.runner.visualstudio
