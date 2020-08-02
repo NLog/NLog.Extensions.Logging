@@ -84,7 +84,7 @@ namespace NLog.Extensions.Logging
             {
                 if (Options.ShutdownOnDispose)
                 {
-                    LogManager.Shutdown();  // TODO Fix global static. Instead use LogFactory-property
+                    LogFactory.Shutdown();
                 }
                 else
                 {
