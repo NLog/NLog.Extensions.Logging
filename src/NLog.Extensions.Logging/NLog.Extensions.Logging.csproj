@@ -18,8 +18,8 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
     </Description>
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logging;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
-- LogFactory.Setup - Make RegisterConfigSettings public (#423) (@snakefoot)
-- Bump NLog to 4.7.2 (#426) (@dependabot-preview[bot])
+- Fix ShutdownOnDispose to work with isolated LogFactory
+- Bump NLog to 4.7.3
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
     </PackageReleaseNotes>
@@ -63,7 +63,7 @@ Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHAN
     <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NLog" Version="4.7.2" />
+    <PackageReference Include="NLog" Version="4.7.3" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
