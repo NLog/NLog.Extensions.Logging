@@ -18,8 +18,11 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
     </Description>
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logging;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
-- Fix ShutdownOnDispose to work with isolated LogFactory
-- Bump NLog to 4.7.3
+
+- Fix ShutdownOnDispose to work with isolated LogFactory (#444) (@snakefoot)
+- Added SourceLink (#439) (@304NotModified)
+- Fix documentation of default (#429) (@304NotModified)
+- Bump NLog from 4.7.3 to 4.7.4 (#448) (@dependabot[bot])
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
     </PackageReleaseNotes>

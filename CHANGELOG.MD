@@ -2,6 +2,11 @@
 
 Date format: (year/month/day)
 
+### v1.6.5 (2020/08/27)
+- [#444](https://github.com/NLog/NLog.Extensions.Logging/pull/444) Fix ShutdownOnDispose to work with isolated LogFactory (#444) (@snakefoot)
+- [#439](https://github.com/NLog/NLog.Extensions.Logging/pull/439) Added SourceLink (#439) (@304NotModified)
+- [#429](https://github.com/NLog/NLog.Extensions.Logging/pull/429) Fix documentation of default (#429) (@304NotModified)
+- [#448](https://github.com/NLog/NLog.Extensions.Logging/pull/448) Bump NLog from 4.7.3 to 4.7.4 (#448) (@dependabot[bot])
 
 ### v1.6.4 (2020/05/20)
 - [#419](https://github.com/NLog/NLog.Extensions.Logging/pull/423) LogFactory.Setup - Make RegisterConfigSettings public (#423) (@snakefoot)
