@@ -96,6 +96,28 @@ namespace NLog.Extensions.Logging
 
                 if (scopePropertyList.Count > 0 && NLogLogger.OriginalFormatPropertyName.Equals(scopePropertyList[scopePropertyList.Count - 1].Key))
                 {
+                    scopePropertyList = ExcludeOriginalFormatProperty(scopePropertyList);
+                }
+
+                return CreateScopeProperties(scopeObject, scopePropertyList);
+            }
+
+            private static IReadOnlyList<KeyValuePair<string, object>> ExcludeOriginalFormatProperty(IReadOnlyList<KeyValuePair<string, object>> scopePropertyList)
+            {
+                if (scopePropertyList.Count == 2 && !NLogLogger.OriginalFormatPropertyName.Equals(scopePropertyList[0].Key))
+                {
+                    scopePropertyList = new[] { scopePropertyList[0] };
+                }
+                else if (scopePropertyList.Count <= 2)
+                {
+#if NET451
+                    scopePropertyList = new KeyValuePair<string, object>[0];
+#else
+                    scopePropertyList = Array.Empty<KeyValuePair<string, object>>();
+#endif
+                }
+                else
+                {
                     var propertyList = new List<KeyValuePair<string, object>>(scopePropertyList.Count - 1);
                     for (var i = 0; i < scopePropertyList.Count; ++i)
                     {
@@ -110,7 +132,7 @@ namespace NLog.Extensions.Logging
                     scopePropertyList = propertyList;
                 }
 
-                return CreateScopeProperties(scopeObject, scopePropertyList);
+                return scopePropertyList;
             }
 
             public static IDisposable CaptureScopeProperties(IEnumerable scopePropertyCollection, ExtractorDictionary stateExtractor)
