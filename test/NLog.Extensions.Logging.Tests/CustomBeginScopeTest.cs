@@ -44,6 +44,17 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Fact]
+        public void TestNonSerializableSayHiToEarth()
+        {
+            var runner = GetRunner<CustomBeginScopeTestRunner>();
+            var target = new Targets.MemoryTarget { Layout = "${message} ${mdlc:Planet}. Welcome to the ${mdlc:Galaxy}" };
+            ConfigureNLog(target);
+            var scopeString = runner.SayHiToEarth().Result;
+            Assert.Single(target.Logs);
+            Assert.Equal("Hi Earth. Welcome to the Milky Way", target.Logs[0]);
+        }
+
+        [Fact]
         public void TestNonSerializableSayNothing()
         {
             var runner = GetRunner<CustomBeginScopeTestRunner>();
@@ -75,6 +86,16 @@ namespace NLog.Extensions.Logging.Tests
             public async Task<string> SayHi()
             {
                 using (var scopeState = _logger.BeginScope("{World} People", "Earth"))
+                {
+                    await Task.Yield();
+                    _logger.LogInformation("Hi");
+                    return scopeState.ToString();
+                }
+            }
+
+            public async Task<string> SayHiToEarth()
+            {
+                using (var scopeState = _logger.BeginScope("{Planet} in {Galaxy}", "Earth", "Milky Way"))
                 {
                     await Task.Yield();
                     _logger.LogInformation("Hi");
