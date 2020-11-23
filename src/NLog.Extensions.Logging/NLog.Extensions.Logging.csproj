@@ -28,7 +28,7 @@ Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHAN
     </PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/NLog/NLog.Extensions.Logging</PackageProjectUrl>
     <PackageLicenseExpression>BSD-2-Clause</PackageLicenseExpression>
-    <PackageIconUrl>https://nlog-project.org/NConfig.png</PackageIconUrl>
+    <PackageIcon>N.png</PackageIcon>
     <RepositoryUrl>https://github.com/NLog/NLog.Extensions.Logging.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     
@@ -38,6 +38,15 @@ Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHAN
     <AssemblyOriginatorKeyFile>..\NLog.snk</AssemblyOriginatorKeyFile>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="N.png" Pack="true" PackagePath=""/>
+  </ItemGroup>
+    
+  <Target Name="DownloadMissingContent" BeforeTargets="GenerateNuspec">
+    <DownloadFile SourceUrl="https://nlog-project.org/N.png" DestinationFolder="$(MSBuildThisFileDirectory)" />
+  </Target>
+  
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Title>NLog.Extensions.Logging for .NET Framework 4.6.1</Title>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
