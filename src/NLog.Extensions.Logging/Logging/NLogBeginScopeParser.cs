@@ -31,7 +31,7 @@ namespace NLog.Extensions.Logging
             {
                 if (state is IReadOnlyList<KeyValuePair<string, object>> scopePropertyList)
                 {
-                    return ScopeProperties.CaptureScopeProperties(scopePropertyList);
+                    return ScopeProperties.CaptureScopeProperties(scopePropertyList, _options.IncludeActivtyIdsWithBeginScope);
                 }
 
                 if (!(state is string))
@@ -90,17 +90,88 @@ namespace NLog.Extensions.Logging
                 return NestedDiagnosticsLogicalContext.Push(scopeObject);
             }
 
-            public static IDisposable CaptureScopeProperties(IReadOnlyList<KeyValuePair<string, object>> scopePropertyList)
+            public static IDisposable CaptureScopeProperties(IReadOnlyList<KeyValuePair<string, object>> scopePropertyList, bool includeActivtyIdsWithBeginScope)
             {
                 object scopeObject = scopePropertyList;
 
-                if (scopePropertyList.Count > 0 && NLogLogger.OriginalFormatPropertyName.Equals(scopePropertyList[scopePropertyList.Count - 1].Key))
+                if (scopePropertyList.Count > 0)
                 {
-                    scopePropertyList = ExcludeOriginalFormatProperty(scopePropertyList);
+                    if (NLogLogger.OriginalFormatPropertyName.Equals(scopePropertyList[scopePropertyList.Count - 1].Key))
+                    {
+                        scopePropertyList = ExcludeOriginalFormatProperty(scopePropertyList);
+                    }
+                    else if (includeActivtyIdsWithBeginScope && "RequestId".Equals(scopePropertyList[0].Key))
+                    {
+                        scopePropertyList = IncludeActivityIdsProperties(scopePropertyList);
+                    }
                 }
 
                 return CreateScopeProperties(scopeObject, scopePropertyList);
             }
+
+#if !NET5_0
+            private static IReadOnlyList<KeyValuePair<string, object>> IncludeActivityIdsProperties(IReadOnlyList<KeyValuePair<string, object>> scopePropertyList)
+            {
+                return scopePropertyList;
+            }
+#else
+            private static IReadOnlyList<KeyValuePair<string, object>> IncludeActivityIdsProperties(IReadOnlyList<KeyValuePair<string, object>> scopePropertyList)
+            {
+                var activty = System.Diagnostics.Activity.Current;
+                if (activty != null)
+                    return new ScopePropertiesWithActivityIds(scopePropertyList, activty);
+                else
+                    return scopePropertyList;
+            }
+
+            private class ScopePropertiesWithActivityIds : IReadOnlyList<KeyValuePair<string, object>>
+            {
+                private readonly IReadOnlyList<KeyValuePair<string, object>> _originalPropertyList;
+                private readonly System.Diagnostics.Activity _currentActivity;
+
+                public ScopePropertiesWithActivityIds(IReadOnlyList<KeyValuePair<string, object>> originalPropertyList, System.Diagnostics.Activity currentActivity)
+                {
+                    _originalPropertyList = originalPropertyList;
+                    _currentActivity = currentActivity;
+                }
+
+                public KeyValuePair<string, object> this[int index]
+                {
+                    get
+                    {
+                        int offset = index - _originalPropertyList.Count;
+                        if (offset < 0)
+                        {
+                            return _originalPropertyList[index];
+                        }
+                        else
+                        {
+                            switch (offset)
+                            {
+                                case 0: return new KeyValuePair<string, object>(nameof(_currentActivity.SpanId), _currentActivity.GetSpanId());
+                                case 1: return new KeyValuePair<string, object>(nameof(_currentActivity.TraceId), _currentActivity.GetTraceId());
+                                case 2: return new KeyValuePair<string, object>(nameof(_currentActivity.ParentId), _currentActivity.GetParentId());
+                            }
+                        }
+
+                        throw new ArgumentOutOfRangeException(nameof(index));
+                    }
+                }
+
+                public int Count => _originalPropertyList.Count + 3;
+
+                public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
+                {
+                    for (int i = 0; i < Count; ++i)
+                        yield return this[i];
+                }
+
+                IEnumerator IEnumerable.GetEnumerator()
+                {
+                    return ((IEnumerable)_originalPropertyList).GetEnumerator();
+                }
+            }
+#endif
 
             private static IReadOnlyList<KeyValuePair<string, object>> ExcludeOriginalFormatProperty(IReadOnlyList<KeyValuePair<string, object>> scopePropertyList)
             {
