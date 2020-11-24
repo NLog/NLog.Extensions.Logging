@@ -88,6 +88,19 @@ namespace NLog.Extensions.Logging
         /// Enable NLog as logging provider for Microsoft Extension Logging
         /// </summary>
         /// <param name="factory"></param>
+        /// <param name="configuration">Configuration</param>
+        /// <param name="options">NLog options</param>
+        /// <returns>ILoggingBuilder for chaining</returns>
+        public static ILoggingBuilder AddNLog(this ILoggingBuilder factory, IConfiguration configuration, NLogProviderOptions options)
+        {
+            AddNLogLoggerProvider(factory.Services, configuration, options, CreateNLogLoggerProvider);
+            return factory;
+        }
+
+        /// <summary>
+        /// Enable NLog as logging provider for Microsoft Extension Logging
+        /// </summary>
+        /// <param name="factory"></param>
         /// <param name="options">NLog options</param>
         /// <returns>ILoggingBuilder for chaining</returns>
         public static ILoggingBuilder AddNLog(this ILoggingBuilder factory, NLogProviderOptions options)

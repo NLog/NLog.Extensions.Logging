@@ -117,11 +117,14 @@ namespace NLog.Extensions.Logging
 #else
             private static IReadOnlyList<KeyValuePair<string, object>> IncludeActivityIdsProperties(IReadOnlyList<KeyValuePair<string, object>> scopePropertyList)
             {
-                var activty = System.Diagnostics.Activity.Current;
-                if (activty != null)
-                    return new ScopePropertiesWithActivityIds(scopePropertyList, activty);
-                else
-                    return scopePropertyList;
+                if (scopePropertyList.Count > 1 && "RequestPath".Equals(scopePropertyList[1].Key))
+                {
+                    var activty = System.Diagnostics.Activity.Current;
+                    if (activty != null)
+                        return new ScopePropertiesWithActivityIds(scopePropertyList, activty);
+                }
+
+                return scopePropertyList;
             }
 
             private class ScopePropertiesWithActivityIds : IReadOnlyList<KeyValuePair<string, object>>
