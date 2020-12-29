@@ -33,14 +33,6 @@ Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHAN
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
-  <ItemGroup>
-    <None Include="N.png" Pack="true" PackagePath=""/>
-  </ItemGroup>
-
-  <Target Name="DownloadMissingContent" BeforeTargets="GenerateNuspec">
-    <DownloadFile SourceUrl="https://nlog-project.org/N.png" DestinationFolder="$(MSBuildThisFileDirectory)" />
-  </Target>
-
   <ItemGroup  Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="2.1.0" />
   </ItemGroup>
