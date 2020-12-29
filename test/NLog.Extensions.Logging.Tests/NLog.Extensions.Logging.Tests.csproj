@@ -3,7 +3,7 @@
   <PropertyGroup>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
 
-    <TargetFrameworks>netcoreapp1.1;netcoreapp2.0;netcoreapp3.0;net452;net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp1.1;netcoreapp2.1;netcoreapp3.1;net452;net461;net5.0</TargetFrameworks>
     <OutputType>Library</OutputType>
     <IsPackable>false</IsPackable>
     <DebugType>Full</DebugType>
@@ -31,11 +31,15 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.2" />
   </ItemGroup>
   
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' or '$(TargetFramework)' == 'net461' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1' or '$(TargetFramework)' == 'net461' ">
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.0" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.0" />
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.0" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>

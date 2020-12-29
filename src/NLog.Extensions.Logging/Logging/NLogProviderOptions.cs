@@ -43,6 +43,19 @@
         /// </summary>
         public bool ShutdownOnDispose { get; set; }
 
+#if NET5_0
+        /// <summary>
+        /// Automatically include <see cref="System.Diagnostics.Activity.SpanId"/>, <see cref="System.Diagnostics.Activity.TraceId"/> and <see cref="System.Diagnostics.Activity.ParentId"/>
+        /// </summary>
+        /// <remarks>For Net5.0 where these properties are no longer included by default for performance reasons</remarks>
+#else
+        /// <summary>
+        /// Automatically include Activity.SpanId, Activity.TraceId and Activity.ParentId.
+        /// </summary>
+        /// <remarks>For Net5.0 where these properties are no longer included by default for performance reasons</remarks>
+#endif
+        public bool IncludeActivtyIdsWithBeginScope { get; set; }
+
         /// <summary>Initializes a new instance NLogProviderOptions with default values.</summary>
         public NLogProviderOptions()
         {
