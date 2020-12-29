@@ -6,6 +6,7 @@ using System.Linq;
 using NLog.Targets;
 using Xunit;
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
 
 namespace NLog.Extensions.Logging.Tests.Extensions
 {
@@ -49,6 +50,30 @@ namespace NLog.Extensions.Logging.Tests.Extensions
             // Assert
             AssertSingleMessage(memoryTarget, $"{expectedEventInLog} - test message with 1 arg");
         }
+
+#if NET5_0
+        [Fact]
+        public void AddNLog_LoggerFactory_IncludeActivtyIdsWithBeginScope()
+        {
+            // Arrange
+            var loggerFactory = new LoggerFactory();
+            var config = CreateConfigWithMemoryTarget(out var memoryTarget, $"${{mdlc:ParentId}} - ${{message}}");
+
+            // Act
+            loggerFactory.AddNLog(new NLogProviderOptions { IncludeActivtyIdsWithBeginScope = true });
+            LogManager.Configuration = config;
+            var logger = loggerFactory.CreateLogger(nameof(AddNLog_LoggerFactory_IncludeActivtyIdsWithBeginScope));
+            var activity = new System.Diagnostics.Activity("TestActivity").SetParentId("42").Start();
+            var scopeProperties = new Dictionary<string, object> { { "RequestId", "123" }, { "RequestPath", "Unknown" } };
+            using (logger.BeginScope(scopeProperties.ToList()))
+            {
+                logger.LogInformation(default(EventId), "test message with {0} arg", 1);
+            }
+
+            // Assert
+            AssertSingleMessage(memoryTarget, "42 - test message with 1 arg");
+        }
+#endif
 
 #if !NETCOREAPP1_1 && !NET452
         [Fact]
