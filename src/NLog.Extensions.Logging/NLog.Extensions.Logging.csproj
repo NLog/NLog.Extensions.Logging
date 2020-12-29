@@ -19,10 +19,10 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logging;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
 
-- Fix ShutdownOnDispose to work with isolated LogFactory (#444) (@snakefoot)
-- Added SourceLink (#439) (@304NotModified)
-- Fix documentation of default (#429) (@304NotModified)
-- Bump NLog from 4.7.3 to 4.7.4 (#448) (@dependabot[bot])
+- Added NLogProviderOptions.IncludeActivtyIdsWithBeginScope, added .NET 5 build, move tests to .NET Core LTS (#456) (@snakefoot)
+- NLogBeginScopeParser - Reduce allocation for BeginScope with message template (#451) (@snakefoot)
+- Move to PackageIcon and PackageLicenseExpression for NuGet package (#461) (@snakefoot)
+- Bump NLog from 4.7.4 to 4.7.6 (#450, 458) (@dependabot[bot])
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
     </PackageReleaseNotes>
