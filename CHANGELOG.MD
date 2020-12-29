@@ -2,7 +2,7 @@
 
 Date format: (year/month/day)
 
-### v1.7.0 (2020/12/30)
+### v1.7.0 (2020/12/29)
 - [#456](https://github.com/NLog/NLog.Extensions.Logging/pull/456) Added NLogProviderOptions.IncludeActivtyIdsWithBeginScope and added .NET 5 build (#456) (@snakefoot)
 - [#451](https://github.com/NLog/NLog.Extensions.Logging/pull/451) NLogBeginScopeParser - Reduce allocation for BeginScope with message template (#451) (@snakefoot)
 - [#461](https://github.com/NLog/NLog.Extensions.Logging/pull/461) Move to PackageIcon and PackageLicenseExpression for NuGet package (#461) (@snakefoot)
