@@ -6,7 +6,7 @@ Date format: (year/month/day)
 - [#456](https://github.com/NLog/NLog.Extensions.Logging/pull/456) Added NLogProviderOptions.IncludeActivtyIdsWithBeginScope, added .NET 5 build, move tests to .NET Core LTS (#456) (@snakefoot)
 - [#451](https://github.com/NLog/NLog.Extensions.Logging/pull/451) NLogBeginScopeParser - Reduce allocation for BeginScope with message template (#451) (@snakefoot)
 - [#461](https://github.com/NLog/NLog.Extensions.Logging/pull/461) Move to PackageIcon and PackageLicenseExpression for NuGet package (#461) (@snakefoot)
-- [#450](https://github.com/NLog/NLog.Extensions.Logging/pull/450) Bump NLog from 4.7.4 to 4.7.6 (#450, 458) (@dependabot[bot])
+- [#450](https://github.com/NLog/NLog.Extensions.Logging/pull/458) Bump NLog from 4.7.4 to 4.7.6 (#450, #458) (@dependabot[bot])
 
 ### v1.6.5 (2020/08/27)
 - [#444](https://github.com/NLog/NLog.Extensions.Logging/pull/444) Fix ShutdownOnDispose to work with isolated LogFactory (#444) (@snakefoot)
