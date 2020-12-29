@@ -19,7 +19,7 @@ For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.W
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logging;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
 
-- Added NLogProviderOptions.IncludeActivtyIdsWithBeginScope, added .NET 5 build, move tests to .NET Core LTS (#456) (@snakefoot)
+- Added NLogProviderOptions.IncludeActivtyIdsWithBeginScope and added .NET 5 build (#456) (@snakefoot)
 - NLogBeginScopeParser - Reduce allocation for BeginScope with message template (#451) (@snakefoot)
 - Move to PackageIcon and PackageLicenseExpression for NuGet package (#461) (@snakefoot)
 - Bump NLog from 4.7.4 to 4.7.6 (#450, #458) (@dependabot[bot])
