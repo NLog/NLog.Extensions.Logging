@@ -160,15 +160,6 @@ namespace NLog.Extensions.Logging
 
             private IEnumerable<KeyValuePair<string, string>> GetValues()
             {
-                var children = _configurationSection.GetChildren();
-                foreach (var child in children)
-                {
-                    if (!child.GetChildren().Any())
-                    {
-                        yield return new KeyValuePair<string, string>(GetConfigKey(child), child.Value);
-                    }
-                }
-
                 if (_nameOverride != null)
                 {
                     if (ReferenceEquals(_nameOverride, DefaultTargetParameters))
@@ -182,7 +173,20 @@ namespace NLog.Extensions.Logging
 
                     if (ReferenceEquals(_nameOverride, VariableKey))
                     {
-                        yield return new KeyValuePair<string, string>("value", _configurationSection.Value);
+                        var value = _configurationSection.Value;
+                        if (value != null)
+                            yield return new KeyValuePair<string, string>("value", value);
+                        else
+                            yield break;    // Signal to NLog Config Parser to check GetChildren() for variable layout
+                    }
+                }
+
+                var children = _configurationSection.GetChildren();
+                foreach (var child in children)
+                {
+                    if (!child.GetChildren().Any())
+                    {
+                        yield return new KeyValuePair<string, string>(GetConfigKey(child), child.Value);
                     }
                 }
             }
@@ -207,10 +211,17 @@ namespace NLog.Extensions.Logging
                     }
                 }
 
-                var children = _configurationSection.GetChildren();
-                foreach (var loggingConfigurationElement in GetChildren(children, variables, isTargetsSection))
+                if (ReferenceEquals(_nameOverride, VariableKey) && _configurationSection.Value == null)
                 {
-                    yield return loggingConfigurationElement;
+                    yield return new LoggingConfigurationElement(_configurationSection);
+                }
+                else
+                {
+                    var children = _configurationSection.GetChildren();
+                    foreach (var loggingConfigurationElement in GetChildren(children, variables, isTargetsSection))
+                    {
+                        yield return loggingConfigurationElement;
+                    }
                 }
             }
 

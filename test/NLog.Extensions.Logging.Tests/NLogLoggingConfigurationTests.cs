@@ -103,6 +103,31 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Fact]
+        public void LoadVariableJsonLayoutConfig()
+        {
+            var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
+            memoryConfig["NLog:Targets:file:type"] = "File";
+            memoryConfig["NLog:Targets:file:fileName"] = "hello.txt";
+            memoryConfig["NLog:Targets:file:layout"] = "${my_json}";
+            memoryConfig["NLog:Targets:console:layout"] = "${my_json}";
+            memoryConfig["NLog:Variables:my_json:type"] = "JsonLayout";
+            memoryConfig["NLog:Variables:my_json:attributes:0:name"] = "message";
+            memoryConfig["NLog:Variables:my_json:attributes:0:layout"] = "${message}";
+            memoryConfig["NLog:Variables:my_json:attributes:1:name"] = "logger";
+            memoryConfig["NLog:Variables:my_json:attributes:1:layout"] = "${logger}";
+
+            var logConfig = CreateNLogLoggingConfigurationWithNLogSection(memoryConfig);
+
+            Assert.Single(logConfig.LoggingRules);
+            Assert.Equal(1, logConfig.Variables.Count);
+            Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
+            Assert.Equal(2, logConfig.AllTargets.Count);
+            Assert.Single(logConfig.AllTargets.Where(t => t is FileTarget));
+            Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
+            Assert.Equal(2, logConfig.AllTargets.Count(t => (t as TargetWithLayout)?.Layout is NLog.Layouts.JsonLayout));
+        }
+
+        [Fact]
         public void LoadDefaultWrapperConfig()
         {
             var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
