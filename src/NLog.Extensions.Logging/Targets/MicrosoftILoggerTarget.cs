@@ -14,6 +14,7 @@ namespace NLog.Extensions.Logging
     [Target("MicrosoftILogger")]
     public class MicrosoftILoggerTarget : TargetWithContext
     {
+        private readonly Microsoft.Extensions.Logging.ILoggerFactory _loggerFactory;
         private readonly Microsoft.Extensions.Logging.ILogger _logger;
 
         /// <summary>
@@ -29,10 +30,21 @@ namespace NLog.Extensions.Logging
         /// <summary>
         /// Initializes a new instance of the <see cref="MicrosoftILoggerTarget" /> class.
         /// </summary>
-        /// <param name="logger">Microsoft ILogger instance</param>
+        /// <param name="logger">Microsoft ILogger singleton instance</param>
         public MicrosoftILoggerTarget(Microsoft.Extensions.Logging.ILogger logger)
         {
             _logger = logger;
+            Layout = "${message}";
+            OptimizeBufferReuse = true;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MicrosoftILoggerTarget" /> class.
+        /// </summary>
+        /// <param name="loggerFactory">Microsoft ILoggerFactory instance</param>
+        public MicrosoftILoggerTarget(Microsoft.Extensions.Logging.ILoggerFactory loggerFactory)
+        {
+            _loggerFactory = loggerFactory;
             Layout = "${message}";
             OptimizeBufferReuse = true;
         }
@@ -43,8 +55,10 @@ namespace NLog.Extensions.Logging
         /// <param name="logEvent"></param>
         protected override void Write(LogEventInfo logEvent)
         {
+            var ilogger = _logger ?? (string.IsNullOrEmpty(logEvent.LoggerName) ? _loggerFactory.CreateLogger("NLog") : _loggerFactory.CreateLogger(logEvent.LoggerName));
+
             var logLevel = ConvertToLogLevel(logEvent.Level);
-            if (!_logger.IsEnabled(logLevel))
+            if (!ilogger.IsEnabled(logLevel))
                 return;
 
             var eventId = default(EventId);
@@ -70,10 +84,10 @@ namespace NLog.Extensions.Logging
                     contextProperties = null;
             }
 
-            _logger.Log(ConvertToLogLevel(logEvent.Level), eventId, new LogState(logEvent, layoutMessage, contextProperties), logEvent.Exception, LogStateFormatter);
+            ilogger.Log(ConvertToLogLevel(logEvent.Level), eventId, new LogState(logEvent, layoutMessage, contextProperties), logEvent.Exception, (s,ex) => LogStateFormatter(s));
         }
 
-        private struct LogState : IReadOnlyList<KeyValuePair<string, object>>
+        private struct LogState : IReadOnlyList<KeyValuePair<string, object>>, IEquatable<LogState>
         {
             private readonly LogEventInfo _logEvent;
             public readonly string LayoutMessage;
@@ -85,11 +99,11 @@ namespace NLog.Extensions.Logging
             {
                 get
                 {
-                    if (_logEvent.HasProperties && TryGetPropertyFromIndex(_logEvent.Properties, CreateLogEventProperty, ref index, out var property))
+                    if (_logEvent.HasProperties && TryGetLogEventProperty(_logEvent.Properties, ref index, out var property))
                     {
                         return property;
                     }
-                    if (_contextProperties != null && TryGetPropertyFromIndex(_contextProperties, p => p, ref index, out var contextProperty))
+                    if (_contextProperties != null && TryGetContextProperty(_contextProperties, ref index, out var contextProperty))
                     {
                         return contextProperty;
                     }
@@ -112,7 +126,7 @@ namespace NLog.Extensions.Logging
                 IEnumerable<KeyValuePair<string, object>> allProperties = _contextProperties?.Concat(originalMessage) ?? originalMessage;
                 if (_logEvent.HasProperties)
                 {
-                    allProperties = _logEvent.Properties.Select(CreateLogEventProperty).Concat(allProperties);
+                    allProperties = _logEvent.Properties.Select(p => CreateLogEventProperty(p)).Concat(allProperties);
                 }
                 return allProperties.GetEnumerator();
             }
@@ -122,40 +136,65 @@ namespace NLog.Extensions.Logging
                 return GetEnumerator();
             }
 
-            private static bool TryGetPropertyFromIndex<TKey, TValue>(ICollection<KeyValuePair<TKey, TValue>> properties, Func<KeyValuePair<TKey, TValue>, KeyValuePair<string, object>> converter, ref int index, out KeyValuePair<string, object> property)
-            {
-                if (index < properties.Count)
-                {
-                    foreach (var prop in properties)
-                    {
-                        if (index-- == 0)
-                        {
-                            property = converter(prop);
-                            return true;
-                        }
-                    }
-                }
-                else
-                {
-                    index -= properties.Count;
-                }
-
-                property = default;
-                return false;
-            }
-
-            private static KeyValuePair<string, object> CreateLogEventProperty(KeyValuePair<object, object> prop)
-            {
-                return new KeyValuePair<string, object>(prop.Key.ToString(), prop.Value);
-            }
-
             private KeyValuePair<string, object> CreateOriginalFormatProperty()
             {
                 return new KeyValuePair<string, object>(NLogLogger.OriginalFormatPropertyName, _logEvent.Message);
             }
+
+            public bool Equals(LogState other)
+            {
+                return ReferenceEquals(_logEvent, other._logEvent);
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is LogState other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                return _logEvent.GetHashCode();
+            }
         }
 
-        private static string LogStateFormatter(LogState logState, Exception _)
+        private static bool TryGetContextProperty(IDictionary<string, object> contextProperties, ref int index, out KeyValuePair<string, object> contextProperty)
+        {
+            return TryGetPropertyFromIndex(contextProperties, p => p, ref index, out contextProperty);
+        }
+
+        private static bool TryGetLogEventProperty(IDictionary<object, object> logEventProperties, ref int index, out KeyValuePair<string, object> logEventProperty)
+        {
+            return TryGetPropertyFromIndex(logEventProperties, p => CreateLogEventProperty(p), ref index, out logEventProperty);
+        }
+
+        private static bool TryGetPropertyFromIndex<TKey, TValue>(ICollection<KeyValuePair<TKey, TValue>> properties, Func<KeyValuePair<TKey, TValue>, KeyValuePair<string, object>> converter, ref int index, out KeyValuePair<string, object> property) where TKey : class
+        {
+            if (index < properties.Count)
+            {
+                foreach (var prop in properties)
+                {
+                    if (index-- == 0)
+                    {
+                        property = converter(prop);
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                index -= properties.Count;
+            }
+
+            property = default;
+            return false;
+        }
+
+        private static KeyValuePair<string, object> CreateLogEventProperty(KeyValuePair<object, object> prop)
+        {
+            return new KeyValuePair<string, object>(prop.Key.ToString(), prop.Value);
+        }
+
+        private static string LogStateFormatter(LogState logState)
         {
             return logState.LayoutMessage;
         }
