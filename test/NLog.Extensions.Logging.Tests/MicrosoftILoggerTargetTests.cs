@@ -24,6 +24,22 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Fact]
+        public void SimpleILoggerFactoryMessageTest()
+        {
+            // Arrange
+            var (logger, mock) = CreateLoggerFactoryMock(out _);
+
+            // Act
+            logger.Info("Hello World");
+
+            // Assert
+            Assert.Single(mock.Loggers);
+            Assert.Equal("Hello World", mock.Loggers.First().Value.LastLogMessage);
+            Assert.Single(mock.Loggers.First().Value.LastLogProperties);
+            Assert.Equal("Hello World", mock.Loggers.First().Value.LastLogProperties[0].Value);
+        }
+
+        [Fact]
         public void FilterILoggerMessageTest()
         {
             // Arrange
@@ -165,6 +181,7 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Equal("message1", mock.LastLogMessage);
             Assert.Equal(expectedLogLevel, mock.LastLogLevel);
         }
+
         [Fact]
         public void LogWitException()
         {
@@ -192,7 +209,7 @@ namespace NLog.Extensions.Logging.Tests
         {
             var logFactory = new LogFactory();
             var logConfig = new Config.LoggingConfiguration();
-            var loggerMock = new LoggerMock();
+            var loggerMock = new LoggerMock("NLog");
             target = new MicrosoftILoggerTarget(loggerMock) { Layout = "${message}" };
             logConfig.AddRuleForAllLevels(target);
             logFactory.Configuration = logConfig;
@@ -200,14 +217,57 @@ namespace NLog.Extensions.Logging.Tests
             return (logger, loggerMock);
         }
 
+        private static (Logger, LoggerFactoryMock) CreateLoggerFactoryMock(out MicrosoftILoggerTarget target)
+        {
+            var logFactory = new LogFactory();
+            var logConfig = new Config.LoggingConfiguration();
+            var loggerFactoryMock = new LoggerFactoryMock();
+            target = new MicrosoftILoggerTarget(loggerFactoryMock) { Layout = "${message}" };
+            logConfig.AddRuleForAllLevels(target);
+            logFactory.Configuration = logConfig;
+            var logger = logFactory.GetCurrentClassLogger();
+            return (logger, loggerFactoryMock);
+        }
+
+        class LoggerFactoryMock : Microsoft.Extensions.Logging.ILoggerFactory
+        {
+            public readonly Dictionary<string, LoggerMock> Loggers = new Dictionary<string, LoggerMock>();
+
+            public void AddProvider(ILoggerProvider provider)
+            {
+                // Nothing to do
+            }
+
+            public Microsoft.Extensions.Logging.ILogger CreateLogger(string categoryName)
+            {
+                if (!Loggers.TryGetValue(categoryName, out var logger))
+                {
+                    logger = new LoggerMock(categoryName);
+                    Loggers[categoryName] = logger;
+                }
+                return logger;
+            }
+
+            public void Dispose()
+            {
+                // Nothing to do
+            }
+        }
+
         class LoggerMock : Microsoft.Extensions.Logging.ILogger
         {
+            public readonly string CategoryName;
             public Microsoft.Extensions.Logging.LogLevel LastLogLevel;
             public string LastLogMessage;
             public Exception LastLogException;
             public IList<KeyValuePair<string, object>> LastLogProperties;
             public EventId LastLogEventId;
             public bool EnableAllLevels;
+
+            public LoggerMock(string categoryName)
+            {
+                CategoryName = categoryName;
+            }
 
             public IDisposable BeginScope<TState>(TState state)
             {
@@ -246,6 +306,11 @@ namespace NLog.Extensions.Logging.Tests
                     if (property.Value != LastLogProperties[i].Value)
                         throw new ArgumentException($"Property Value mismatch {LastLogProperties[i].Value} <-> {property.Value}");
                 }
+            }
+
+            public override string ToString()
+            {
+                return CategoryName;
             }
         }
     }
