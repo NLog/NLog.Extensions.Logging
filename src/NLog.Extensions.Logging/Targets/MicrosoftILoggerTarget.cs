@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using NLog.Common;
 using NLog.Layouts;
 using NLog.Targets;
 using EventId = Microsoft.Extensions.Logging.EventId;
@@ -16,6 +17,7 @@ namespace NLog.Extensions.Logging
     {
         private readonly Microsoft.Extensions.Logging.ILoggerFactory _loggerFactory;
         private readonly Microsoft.Extensions.Logging.ILogger _logger;
+        private readonly System.Collections.Concurrent.ConcurrentDictionary<string, Microsoft.Extensions.Logging.ILogger> _loggers = new System.Collections.Concurrent.ConcurrentDictionary<string, Microsoft.Extensions.Logging.ILogger>();
 
         /// <summary>
         /// EventId forwarded to ILogger
@@ -49,14 +51,34 @@ namespace NLog.Extensions.Logging
             OptimizeBufferReuse = true;
         }
 
+        /// <inheritdoc />
+        protected override void CloseTarget()
+        {
+            base.CloseTarget();
+            _loggers.Clear();
+        }
+
+        /// <inheritdoc />
+        protected override void WriteAsyncThreadSafe(AsyncLogEventInfo logEvent)
+        {
+            var ilogger = _logger ?? CreateFromLoggerFactory(logEvent.LogEvent);    // Create Logger without any protection from lock-object
+            var logLevel = ConvertToLogLevel(logEvent.LogEvent.Level);
+            if (ilogger.IsEnabled(logLevel))
+            {
+                base.WriteAsyncThreadSafe(logEvent);
+            }
+            else
+            {
+                logEvent.Continuation(null);
+            }
+        }
+
         /// <summary>
         /// Converts NLog-LogEvent into Microsoft Extension Logging LogState
         /// </summary>
-        /// <param name="logEvent"></param>
         protected override void Write(LogEventInfo logEvent)
         {
-            var ilogger = _logger ?? (string.IsNullOrEmpty(logEvent.LoggerName) ? _loggerFactory.CreateLogger("NLog") : _loggerFactory.CreateLogger(logEvent.LoggerName));
-
+            var ilogger = _logger ?? CreateFromLoggerFactory(logEvent);
             var logLevel = ConvertToLogLevel(logEvent.Level);
             if (!ilogger.IsEnabled(logLevel))
                 return;
@@ -84,7 +106,18 @@ namespace NLog.Extensions.Logging
                     contextProperties = null;
             }
 
-            ilogger.Log(ConvertToLogLevel(logEvent.Level), eventId, new LogState(logEvent, layoutMessage, contextProperties), logEvent.Exception, (s,ex) => LogStateFormatter(s));
+            ilogger.Log(ConvertToLogLevel(logEvent.Level), eventId, new LogState(logEvent, layoutMessage, contextProperties), logEvent.Exception, (s, ex) => LogStateFormatter(s));
+        }
+
+        private Microsoft.Extensions.Logging.ILogger CreateFromLoggerFactory(LogEventInfo logEvent)
+        {
+            var loggerName = string.IsNullOrEmpty(logEvent.LoggerName) ? "NLog" : logEvent.LoggerName;
+            if (!_loggers.TryGetValue(loggerName, out var logger))
+            {
+                logger = _loggerFactory.CreateLogger(loggerName);
+                _loggers.TryAdd(loggerName, logger);                // Local caching of Loggers to reduce chance of congestions and deadlock
+            }
+            return logger;
         }
 
         private struct LogState : IReadOnlyList<KeyValuePair<string, object>>, IEquatable<LogState>
