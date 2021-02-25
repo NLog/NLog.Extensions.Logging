@@ -30,6 +30,11 @@ namespace NLog.Extensions.Logging
         public Layout EventName { get; set; }
 
         /// <summary>
+        /// Override name of ILogger, when target has been initialized with <see cref="Microsoft.Extensions.Logging.ILoggerFactory"/>
+        /// </summary>
+        public Layout LoggerName { get; set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="MicrosoftILoggerTarget" /> class.
         /// </summary>
         /// <param name="logger">Microsoft ILogger singleton instance</param>
@@ -111,7 +116,12 @@ namespace NLog.Extensions.Logging
 
         private Microsoft.Extensions.Logging.ILogger CreateFromLoggerFactory(LogEventInfo logEvent)
         {
-            var loggerName = string.IsNullOrEmpty(logEvent.LoggerName) ? "NLog" : logEvent.LoggerName;
+            var loggerName = logEvent.LoggerName;
+            if (!ReferenceEquals(LoggerName, null))
+                loggerName = RenderLogEvent(LoggerName, logEvent);
+            if (string.IsNullOrEmpty(loggerName))
+                loggerName = "NLog";
+
             if (!_loggers.TryGetValue(loggerName, out var logger))
             {
                 logger = _loggerFactory.CreateLogger(loggerName);
