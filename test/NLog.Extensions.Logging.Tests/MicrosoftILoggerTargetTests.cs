@@ -34,6 +34,26 @@ namespace NLog.Extensions.Logging.Tests
 
             // Assert
             Assert.Single(mock.Loggers);
+            Assert.Equal(GetType().ToString(), mock.Loggers.First().Key);
+            Assert.Equal("Hello World", mock.Loggers.First().Value.LastLogMessage);
+            Assert.Single(mock.Loggers.First().Value.LastLogProperties);
+            Assert.Equal("Hello World", mock.Loggers.First().Value.LastLogProperties[0].Value);
+        }
+
+        [Fact]
+        public void OverrideLoggerNameILoggerFactoryMessageTest()
+        {
+            // Arrange
+            var (logger, mock) = CreateLoggerFactoryMock(out var microsoftTarget);
+            microsoftTarget.LoggerName = "${mdlc:FunctionName}";
+
+            // Act
+            using (NLog.MappedDiagnosticsLogicalContext.SetScoped("FunctionName", nameof(OverrideLoggerNameILoggerFactoryMessageTest)))
+                logger.Info("Hello World");
+
+            // Assert
+            Assert.Single(mock.Loggers);
+            Assert.Equal(nameof(OverrideLoggerNameILoggerFactoryMessageTest), mock.Loggers.First().Key);
             Assert.Equal("Hello World", mock.Loggers.First().Value.LastLogMessage);
             Assert.Single(mock.Loggers.First().Value.LastLogProperties);
             Assert.Equal("Hello World", mock.Loggers.First().Value.LastLogProperties[0].Value);
