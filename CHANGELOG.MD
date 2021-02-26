@@ -2,6 +2,16 @@
 
 Date format: (year/month/day)
 
+### v1.7.1 (2021/02/26)
+
+- [#476](https://github.com/NLog/NLog.Extensions.Logging/pull/476) MicrosoftILoggerTarget - Add support for override LoggerName when using ILoggerFactory (#476) (@snakefoot)
+- [#470](https://github.com/NLog/NLog.Extensions.Logging/pull/470) MicrosoftILoggerTarget - Reduce chance of deadlock in ILoggerFactory by caching created loggers (#470) (@snakefoot)
+- [#468](https://github.com/NLog/NLog.Extensions.Logging/pull/468) MicrosoftILoggerTarget - With ILoggerFactory as constructor parameter (#468) (@snakefoot)
+- [#463](https://github.com/NLog/NLog.Extensions.Logging/pull/463) Added unit-test for NLogProviderOptions.IncludeActivtyIdsWithBeginScope (#463) (@snakefoot)
+- [#469](https://github.com/NLog/NLog.Extensions.Logging/pull/469) Update Nuget package description with ASP.NET Core so it matches NLog Package (#469) (@snakefoot)
+- [#467](https://github.com/NLog/NLog.Extensions.Logging/pull/467) Bump NLog from 4.7.6 to 4.7.7 (#467) (@dependabot[bot])
+- [#477](https://github.com/NLog/NLog.Extensions.Logging/pull/477) Bump NLog from 4.7.7 to 4.7.8 (#477) (@dependabot[bot])
+
 ### v1.7.0 (2020/12/29)
 - [#456](https://github.com/NLog/NLog.Extensions.Logging/pull/456) Added NLogProviderOptions.IncludeActivtyIdsWithBeginScope and added .NET 5 build (#456) (@snakefoot)
 - [#451](https://github.com/NLog/NLog.Extensions.Logging/pull/451) NLogBeginScopeParser - Reduce allocation for BeginScope with message template (#451) (@snakefoot)

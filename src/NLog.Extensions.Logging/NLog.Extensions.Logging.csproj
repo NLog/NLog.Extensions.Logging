@@ -19,10 +19,13 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logging;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
 
-- Added NLogProviderOptions.IncludeActivtyIdsWithBeginScope and added .NET 5 build (#456) (@snakefoot)
-- NLogBeginScopeParser - Reduce allocation for BeginScope with message template (#451) (@snakefoot)
-- Move to PackageIcon and PackageLicenseExpression for NuGet package (#461) (@snakefoot)
-- Bump NLog from 4.7.4 to 4.7.6 (#450, #458) (@dependabot[bot])
+- MicrosoftILoggerTarget - Add support for override LoggerName when using ILoggerFactory (#476) (@snakefoot)
+- MicrosoftILoggerTarget - Reduce chance of deadlock in ILoggerFactory by caching created loggers (#470) (@snakefoot)
+- MicrosoftILoggerTarget - With ILoggerFactory as constructor parameter (#468) (@snakefoot)
+- Added unit-test for NLogProviderOptions.IncludeActivtyIdsWithBeginScope (#463) (@snakefoot)
+- Update Nuget package description with ASP.NET Core so it matches NLog Package (#469) (@snakefoot)
+- Bump NLog from 4.7.6 to 4.7.7 (#467) (@dependabot[bot])
+- Bump NLog from 4.7.7 to 4.7.8 (#477) (@dependabot[bot])
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
     </PackageReleaseNotes>
