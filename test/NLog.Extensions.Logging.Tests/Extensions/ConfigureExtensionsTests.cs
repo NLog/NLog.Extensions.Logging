@@ -133,6 +133,22 @@ namespace NLog.Extensions.Logging.Tests.Extensions
             AssertSingleMessage(memoryTarget, "Info|test message with 1 arg");
         }
 
+        [Fact]
+        public void AddNLog_ReplaceLoggerFactory()
+        {
+            // Arrange
+            ILoggingBuilder builder = new LoggingBuilderStub();
+
+            // Act
+            builder.AddNLog(new NLogProviderOptions() { ReplaceLoggerFactory = true, ResetLoggerProviderFilter = true });
+            var loggerFactory = builder.Services.BuildServiceProvider().GetService<ILoggerFactory>();
+            var loggerProvider = GetLoggerProvider(builder);
+
+            // Assert
+            Assert.Equal(typeof(NLogLoggerFactory), loggerFactory.GetType());
+            Assert.Equal(typeof(NLogLoggerProvider), loggerProvider.GetType());
+        }
+
         private static ILoggerProvider GetLoggerProvider(ILoggingBuilder builder)
         {
             var services = builder.Services;

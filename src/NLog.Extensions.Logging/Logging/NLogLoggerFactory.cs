@@ -60,8 +60,6 @@ namespace NLog.Extensions.Logging
             }
         }
 
-        #region Implementation of ILoggerFactory
-
         /// <summary>
         /// Creates a new <see cref="T:Microsoft.Extensions.Logging.ILogger" /> instance.
         /// </summary>
@@ -86,9 +84,7 @@ namespace NLog.Extensions.Logging
         /// <param name="provider">The <see cref="T:Microsoft.Extensions.Logging.ILoggerProvider" />.</param>
         public void AddProvider(ILoggerProvider provider)
         {
-            InternalLogger.Debug("AddProvider will be ignored");
+            InternalLogger.Debug("NLogLoggerFactory: AddProvider has been ignored {0}", provider?.GetType());
         }
-
-        #endregion
     }
 }
