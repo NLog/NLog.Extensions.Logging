@@ -184,11 +184,7 @@ namespace NLog.Extensions.Logging
                 }
                 else if (scopePropertyList.Count <= 2)
                 {
-#if NET451
-                    scopePropertyList = new KeyValuePair<string, object>[0];
-#else
                     scopePropertyList = Array.Empty<KeyValuePair<string, object>>();
-#endif
                 }
                 else
                 {
