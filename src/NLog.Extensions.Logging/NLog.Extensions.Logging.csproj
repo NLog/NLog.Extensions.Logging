@@ -6,10 +6,10 @@
     <DebugType Condition=" '$(Configuration)' == 'Debug' ">Full</DebugType>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-   
+
     <Product>NLog.Extensions.Logging v$(ProductVersion)</Product>
     <InformationalVersion>$(ProductVersion)</InformationalVersion>
-    
+
     <Authors>Microsoft;Julian Verdurmen</Authors>
     <Company>NLog</Company>
     <Description>NLog LoggerProvider for Microsoft.Extensions.Logging for logging in .NET Standard libraries and .NET Core applications.
@@ -34,18 +34,20 @@ Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHAN
     <PackageIcon>N.png</PackageIcon>
     <RepositoryUrl>https://github.com/NLog/NLog.Extensions.Logging.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    
-    <ProjectGuid>{6A236D76-C9D9-4B1D-8DDE-F6978D110288}</ProjectGuid> <!--Project guid for Sonar-->
+    <!-- SonarQube needs ProjectGuid -->
+    <ProjectGuid>{6A236D76-C9D9-4B1D-8DDE-F6978D110288}</ProjectGuid>
     <SignAssembly>true</SignAssembly>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <AssemblyOriginatorKeyFile>..\NLog.snk</AssemblyOriginatorKeyFile>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <!-- EmbedUntrackedSources for deterministic build -->
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
 
   <Target Name="DownloadMissingContent" BeforeTargets="GenerateNuspec">
     <DownloadFile SourceUrl="https://nlog-project.org/N.png" DestinationFolder="$(MSBuildThisFileDirectory)" />
   </Target>
-  
+
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Title>NLog.Extensions.Logging for .NET Framework 4.6.1</Title>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
@@ -68,7 +70,7 @@ Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHAN
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <Title>NLog.Extensions.Logging for .NET Standard 2.0</Title>
     <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
-  </PropertyGroup> 
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
     <Title>NLog.Extensions.Logging for .NET Core 3</Title>
     <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
