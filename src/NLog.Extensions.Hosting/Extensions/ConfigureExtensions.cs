@@ -44,25 +44,7 @@ namespace NLog.Extensions.Hosting
         private static void AddNLogLoggerProvider(IServiceCollection services, IConfiguration configuration, NLogProviderOptions options, Func<IServiceProvider, IConfiguration, NLogProviderOptions, NLogLoggerProvider> factory)
         {
             ConfigurationItemFactory.Default.RegisterItemsFromAssembly(typeof(ConfigureExtensions).GetTypeInfo().Assembly);
-
-            var sharedFactory = factory;
-
-            if (options?.ReplaceLoggerFactory == true)
-            {
-                NLogLoggerProvider singleInstance = null;   // Ensure that registration of ILoggerFactory and ILoggerProvider shares the same single instance
-                sharedFactory = (provider, cfg, opt) => singleInstance ?? (singleInstance = factory(provider, cfg, opt));
-
-                services.AddLogging(builder => builder.ClearProviders());   // Cleanup the existing LoggerFactory, before replacing it with NLogLoggerFactory
-                services.Replace(ServiceDescriptor.Singleton<ILoggerFactory, NLogLoggerFactory>(serviceProvider => new NLogLoggerFactory(sharedFactory(serviceProvider, configuration, options))));
-            }
-
-            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, NLogLoggerProvider>(serviceProvider => sharedFactory(serviceProvider, configuration, options)));
-
-            if (options?.RemoveLoggerFactoryFilter == true)
-            {
-                // Will forward all messages to NLog if not specifically overridden by user
-                services.AddLogging(builder => builder.AddFilter<NLogLoggerProvider>(null, Microsoft.Extensions.Logging.LogLevel.Trace));
-            }
+            RegisterNLogLoggingProvider.TryAddNLogLoggingProvider(services, (svc, addlogging) => svc.AddLogging(addlogging), configuration, options, factory);
         }
 
         private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration configuration, NLogProviderOptions options)
