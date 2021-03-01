@@ -9,7 +9,7 @@
 
     internal static class RegisterNLogLoggingProvider
     {
-        internal static void TryAddNLogLoggingProvider(IServiceCollection services, Action<IServiceCollection, Action<ILoggingBuilder>> addLogging, IConfiguration configuration, NLogProviderOptions options, Func<IServiceProvider, IConfiguration, NLogProviderOptions, NLogLoggerProvider> factory)
+        internal static void TryAddNLogLoggingProvider(this IServiceCollection services, Action<IServiceCollection, Action<ILoggingBuilder>> addLogging, IConfiguration configuration, NLogProviderOptions options, Func<IServiceProvider, IConfiguration, NLogProviderOptions, NLogLoggerProvider> factory)
         {
             var sharedFactory = factory;
 

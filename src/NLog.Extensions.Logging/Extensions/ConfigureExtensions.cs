@@ -179,7 +179,7 @@ namespace NLog.Extensions.Logging
 
         private static void AddNLogLoggerProvider(ILoggingBuilder builder, IConfiguration configuration, NLogProviderOptions options, Func<IServiceProvider, IConfiguration, NLogProviderOptions, NLogLoggerProvider> factory)
         {
-            RegisterNLogLoggingProvider.TryAddNLogLoggingProvider(builder.Services, (svc, addlogging) => addlogging(builder), configuration, options ?? NLogProviderOptions.Default, factory);
+            builder.Services.TryAddNLogLoggingProvider((svc, addlogging) => addlogging(builder), configuration, options ?? NLogProviderOptions.Default, factory);
         }
 #endif
 
