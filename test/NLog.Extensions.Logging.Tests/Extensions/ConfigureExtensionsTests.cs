@@ -140,7 +140,7 @@ namespace NLog.Extensions.Logging.Tests.Extensions
             ILoggingBuilder builder = new LoggingBuilderStub();
 
             // Act
-            builder.AddNLog(new NLogProviderOptions() { ReplaceLoggerFactory = true, ResetLoggerProviderFilter = true });
+            builder.AddNLog(new NLogProviderOptions() { ReplaceLoggerFactory = true, RemoveLoggerFactoryFilter = true });
             var loggerFactory = builder.Services.BuildServiceProvider().GetService<ILoggerFactory>();
             var loggerProvider = GetLoggerProvider(builder);
 

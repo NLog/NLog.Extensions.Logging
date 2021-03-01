@@ -57,13 +57,13 @@
         public bool IncludeActivtyIdsWithBeginScope { get; set; }
 
         /// <summary>
-        /// Reset the default Microsoft Logger Filter Options for the <see cref="NLogLoggerProvider"/>
+        /// Resets the default Microsoft LoggerFactory Filter for the <see cref="NLogLoggerProvider"/>
         /// </summary>
         /// <remarks>This option affects the building of service configuration, so assigning it from appsettings.json has no effect (loaded after).</remarks>
-        public bool ResetLoggerProviderFilter { get; set; }
+        public bool RemoveLoggerFactoryFilter { get; set; }
 
         /// <summary>
-        /// Replace Microsoft ILoggerFactory with a pure <see cref="NLogLoggerFactory" />
+        /// Replace Microsoft LoggerFactory with a pure <see cref="NLogLoggerFactory" />
         /// </summary>
         /// <remarks>This option affects the building of service configuration, so assigning it from appsettings.json has no effect (loaded after).</remarks>
         public bool ReplaceLoggerFactory { get; set; }

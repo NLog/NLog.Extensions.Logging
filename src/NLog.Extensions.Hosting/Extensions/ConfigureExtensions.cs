@@ -58,7 +58,7 @@ namespace NLog.Extensions.Hosting
 
             services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, NLogLoggerProvider>(serviceProvider => sharedFactory(serviceProvider, configuration, options)));
 
-            if (options?.ResetLoggerProviderFilter == true)
+            if (options?.RemoveLoggerFactoryFilter == true)
             {
                 // Will forward all messages to NLog if not specifically overridden by user
                 services.AddLogging(builder => builder.AddFilter<NLogLoggerProvider>(null, Microsoft.Extensions.Logging.LogLevel.Trace));

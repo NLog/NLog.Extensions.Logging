@@ -86,7 +86,7 @@ namespace NLog.Extensions.Hosting.Tests
         [Fact]
         public void UseNLog_ReplaceLoggerFactory()
         {
-            var actual = new HostBuilder().ConfigureServices(svc => svc.AddLogging()).UseNLog(new NLogProviderOptions() { ReplaceLoggerFactory = true, ResetLoggerProviderFilter = true }).Build();
+            var actual = new HostBuilder().ConfigureServices(svc => svc.AddLogging()).UseNLog(new NLogProviderOptions() { ReplaceLoggerFactory = true, RemoveLoggerFactoryFilter = true }).Build();
 
             var loggerFactory = actual.Services.GetService<ILoggerFactory>();
 
