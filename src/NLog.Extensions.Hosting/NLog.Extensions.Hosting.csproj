@@ -49,7 +49,7 @@ Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHAN
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\NLog.Extensions.Logging\Extensions\RegisterNLogLoggingProvider.cs" Link="Extensions\RegisterNLogLoggingProvider.cs" />
+    <Compile Include="..\NLog.Extensions.Logging\Internal\RegisterNLogLoggingProvider.cs" Link="Internal\RegisterNLogLoggingProvider.cs" />
   </ItemGroup>
 
   <ItemGroup>
