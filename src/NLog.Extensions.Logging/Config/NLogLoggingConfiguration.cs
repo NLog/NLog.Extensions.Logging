@@ -16,6 +16,7 @@ namespace NLog.Extensions.Logging
         private bool _autoReload;
         private Action<object> _reloadConfiguration;
         private IDisposable _registerChangeCallback;
+        private const string RootSectionKey = "NLog";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NLogLoggingConfiguration" /> class.
@@ -64,7 +65,7 @@ namespace NLog.Extensions.Logging
 
         private bool LoadConfigurationSection(IConfigurationSection nlogConfig)
         {
-            var configElement = new LoggingConfigurationElement(nlogConfig, true);
+            var configElement = new LoggingConfigurationElement(nlogConfig, true, RootSectionKey);
             LoadConfig(configElement, null);
             return configElement.AutoReload;
         }
