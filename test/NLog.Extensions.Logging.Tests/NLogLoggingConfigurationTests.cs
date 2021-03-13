@@ -10,6 +10,9 @@ namespace NLog.Extensions.Logging.Tests
 {
     public class NLogLoggingConfigurationTests
     {
+        const string DefaultSectionName = "NLog";
+        const string CustomSectionName = "MyCustomSection";
+
 #if !NETCORE1_0
         [Fact]
         public void LoadSimpleConfig()
@@ -19,6 +22,23 @@ namespace NLog.Extensions.Logging.Tests
             memoryConfig["NLog:Targets:file:fileName"] = "hello.txt";
            
             var logConfig = CreateNLogLoggingConfigurationWithNLogSection(memoryConfig);
+
+            Assert.Single(logConfig.LoggingRules);
+            Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
+            Assert.Equal(2, logConfig.AllTargets.Count);
+            Assert.Single(logConfig.AllTargets.Where(t => t is FileTarget));
+            Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
+            Assert.Equal("hello.txt", (logConfig.FindTargetByName("file") as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
+        }
+
+        [Fact]
+        public void LoadSimpleConfigWithCustomKey()
+        {
+            var memoryConfig = CreateMemoryConfigConsoleTargetAndRule(CustomSectionName);
+            memoryConfig[$"{CustomSectionName}:Targets:file:type"] = "File";
+            memoryConfig[$"{CustomSectionName}:Targets:file:fileName"] = "hello.txt";
+
+            var logConfig = CreateNLogLoggingConfigurationWithNLogSection(memoryConfig, CustomSectionName);
 
             Assert.Single(logConfig.LoggingRules);
             Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
@@ -204,21 +224,21 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Equal(2, logFactory.Configuration.LoggingRules[0].Targets.Count);
         }
 
-        private static NLogLoggingConfiguration CreateNLogLoggingConfigurationWithNLogSection(IDictionary<string, string> memoryConfig)
+        private static NLogLoggingConfiguration CreateNLogLoggingConfigurationWithNLogSection(IDictionary<string, string> memoryConfig, string sectionName = DefaultSectionName)
         {
             var configuration = new ConfigurationBuilder().AddInMemoryCollection(memoryConfig).Build();
             var logFactory = new LogFactory();
-            var logConfig = new NLogLoggingConfiguration(configuration.GetSection("NLog"), logFactory);
+            var logConfig = new NLogLoggingConfiguration(configuration.GetSection(sectionName), logFactory);
             return logConfig;
         }
 
-        private static Dictionary<string, string> CreateMemoryConfigConsoleTargetAndRule()
+        private static Dictionary<string, string> CreateMemoryConfigConsoleTargetAndRule(string sectionName = DefaultSectionName)
         {
             var memoryConfig = new Dictionary<string, string>();
-            memoryConfig["NLog:Rules:0:logger"] = "*";
-            memoryConfig["NLog:Rules:0:minLevel"] = "Trace";
-            memoryConfig["NLog:Rules:0:writeTo"] = "File,Console";
-            memoryConfig["NLog:Targets:console:type"] = "Console";
+            memoryConfig[$"{sectionName}:Rules:0:logger"] = "*";
+            memoryConfig[$"{sectionName}:Rules:0:minLevel"] = "Trace";
+            memoryConfig[$"{sectionName}:Rules:0:writeTo"] = "File,Console";
+            memoryConfig[$"{sectionName}:Targets:console:type"] = "Console";
 
             return memoryConfig;
         }
