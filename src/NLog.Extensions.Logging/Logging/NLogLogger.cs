@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using NLog.MessageTemplates;
 
@@ -18,6 +19,7 @@ namespace NLog.Extensions.Logging
         internal const string OriginalFormatPropertyName = "{OriginalFormat}";
         private static readonly object EmptyEventId = default(EventId);    // Cache boxing of empty EventId-struct
         private static readonly object ZeroEventId = default(EventId).Id;  // Cache boxing of zero EventId-Value
+        private static readonly object[] EventIdBoxing = Enumerable.Range(0, 50).Select(v => (object)v).ToArray();  // Most EventIds in the ASP.NET Core Engine is below 50
         private Tuple<string, string, string> _eventIdPropertyNames;
 
         public NLogLogger(Logger logger, NLogProviderOptions options, NLogBeginScopeParser beginScopeParser)
@@ -327,7 +329,7 @@ namespace NLog.Extensions.Logging
 
         private void CaptureEventId(LogEventInfo eventInfo, EventId eventId)
         {
-            if (!_options.IgnoreEmptyEventId || eventId.Id != 0 || !String.IsNullOrEmpty(eventId.Name))
+            if (_options.CaptureMessageProperties && (!_options.IgnoreEmptyEventId || eventId.Id != 0 || !String.IsNullOrEmpty(eventId.Name)))
             {
                 // Attempt to reuse the same string-allocations based on the current <see cref="NLogProviderOptions.EventIdSeparator"/>
                 var eventIdPropertyNames = _eventIdPropertyNames ?? new Tuple<string, string, string>(null, null, null);
@@ -339,10 +341,26 @@ namespace NLog.Extensions.Logging
                 }
 
                 var idIsZero = eventId.Id == 0;
-                eventInfo.Properties[eventIdPropertyNames.Item2] = idIsZero ? ZeroEventId : eventId.Id;
-                eventInfo.Properties[eventIdPropertyNames.Item3] = eventId.Name;
-                eventInfo.Properties["EventId"] = idIsZero && eventId.Name == null ? EmptyEventId : eventId;
+                var eventIdObj = idIsZero ? ZeroEventId : GetEventId(eventId.Id);
+                eventInfo.Properties[eventIdPropertyNames.Item2] = eventIdObj;
+                if (_options.CaptureEntireEventId)
+                {
+                    eventInfo.Properties[eventIdPropertyNames.Item3] = eventId.Name;
+                    eventInfo.Properties["EventId"] = idIsZero && eventId.Name == null ? EmptyEventId : eventId;
+                }
+                else if (!string.IsNullOrEmpty(eventId.Name))
+                {
+                    eventInfo.Properties[eventIdPropertyNames.Item3] = eventId.Name;
+                }
             }
+        }
+
+        private static object GetEventId(int eventId)
+        {
+            if (eventId >= 0 && eventId < EventIdBoxing.Length)
+                return EventIdBoxing[eventId];
+            else
+                return eventId;
         }
 
         private static Tuple<string, string, string> CreateEventIdPropertyNames(string eventIdSeparator)
