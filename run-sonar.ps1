@@ -29,7 +29,7 @@ if ($env:APPVEYOR_REPO_NAME -eq $github) {
         Write-Output "Sonar: on branch $env:APPVEYOR_REPO_BRANCH"
     }
 
-    choco install "msbuild-sonarqube-runner" -y
+    choco install "sonarscanner-msbuild-netcoreapp2.0" -y
 
     $sonarUrl = "https://sonarcloud.io"
     $sonarToken = $env:sonar_token
