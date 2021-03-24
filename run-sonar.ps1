@@ -30,16 +30,28 @@ if ($env:APPVEYOR_REPO_NAME -eq $github) {
     }
 
     dotnet tool install --global dotnet-sonarscanner
+    if (-Not $LastExitCode -eq 0) {
+        exit $LastExitCode 
+    }
 
     $sonarUrl = "https://sonarcloud.io"
     $sonarToken = $env:sonar_token
     $buildVersion = $env:APPVEYOR_BUILD_VERSION
 
     dotnet-sonarscanner begin /o:"$sonarOrg" /k:"$sonarQubeId" /d:"sonar.host.url=$sonarUrl" /d:"sonar.login=$sonarToken" /v:"$buildVersion" /d:"sonar.cs.opencover.reportsPaths=coverage.xml" /d:"sonar.github.repository=$github" /d:"sonar.github.oauth=$env:github_auth_token"
+    if (-Not $LastExitCode -eq 0) {
+        exit $LastExitCode 
+    }
 
     msbuild /t:Rebuild $projectFile /p:targetFrameworks=$framework /verbosity:minimal
+    if (-Not $LastExitCode -eq 0) {
+        exit $LastExitCode 
+    }
 
     dotnet-sonarscanner end /d:"sonar.login=$env:sonar_token"
+    if (-Not $LastExitCode -eq 0) {
+        exit $LastExitCode 
+    }
 }
 else {
     Write-Output "Sonar: not running as we're on '$env:APPVEYOR_REPO_NAME'"
