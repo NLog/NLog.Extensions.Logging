@@ -19,14 +19,12 @@ if ($env:APPVEYOR_REPO_NAME -eq $github) {
     if ($env:APPVEYOR_PULL_REQUEST_NUMBER) { 
         # first check PR as that is on the base branch
         $prMode = $true;
-        Write-Output "Sonar: on PR $env:APPVEYOR_PULL_REQUEST_NUMBER"
     }
     elseif ($env:APPVEYOR_REPO_BRANCH -eq $baseBranch) {
         Write-Output "Sonar: on base branch ($baseBranch)"
     }
     else {
         $branchMode = $true;
-        Write-Output "Sonar: on branch $env:APPVEYOR_REPO_BRANCH"
     }
 
     dotnet tool install --global dotnet-sonarscanner
@@ -40,17 +38,24 @@ if ($env:APPVEYOR_REPO_NAME -eq $github) {
 
 
     if ($prMode) {
+        $branch = $env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH 
+        $prBaseBranch = $env:APPVEYOR_REPO_BRANCH;
         $pr = $env:APPVEYOR_PULL_REQUEST_NUMBER
+        
+        Write-Output "Sonar: on PR $pr from $branch to $prBaseBranch"
+        
         Write-Output "Sonar: Running Sonar for PR $pr"
-        dotnet-sonarscanner begin /o:"$sonarOrg" /k:"$sonarQubeId" /d:"sonar.host.url=$sonarUrl" /d:"sonar.login=$sonarToken" /v:"$buildVersion" /d:"sonar.cs.opencover.reportsPaths=coverage.xml" /d:"sonar.github.pullRequest=$pr" /d:"sonar.github.repository=$github" /d:"sonar.github.oauth=$env:github_auth_token"
+        dotnet-sonarscanner begin /o:"$sonarOrg" /k:"$sonarQubeId" /d:"sonar.host.url=$sonarUrl" /d:"sonar.login=$sonarToken" /v:"$buildVersion" /d:"sonar.cs.opencover.reportsPaths=coverage.xml" /d:"sonar.pullrequest.key=$pr" /d:"sonar.pullrequest.branch=$branch"  /d:"sonar.pullrequest.base=$prBaseBranch"  /d:"sonar.github.repository=$github" /d:"sonar.github.oauth=$env:github_auth_token"
     }
     elseif ($branchMode) {
         $branch = $env:APPVEYOR_REPO_BRANCH;
+        
+        Write-Output "Sonar: on branch $branch"
         Write-Output "Sonar: Running Sonar in branch mode for branch $branch"
         dotnet-sonarscanner begin /o:"$sonarOrg" /k:"$sonarQubeId" /d:"sonar.host.url=$sonarUrl" /d:"sonar.login=$sonarToken" /v:"$buildVersion" /d:"sonar.cs.opencover.reportsPaths=coverage.xml" /d:"sonar.branch.name=$branch"  
     }
     else {
-        Write-Output "Sonar: Running Sonar in non-preview mode, on branch $env:APPVEYOR_REPO_BRANCH"
+        Write-Output "Sonar: Running Sonar on base branch"
         dotnet-sonarscanner begin /o:"$sonarOrg" /k:"$sonarQubeId" /d:"sonar.host.url=$sonarUrl" /d:"sonar.login=$sonarToken" /v:"$buildVersion" /d:"sonar.cs.opencover.reportsPaths=coverage.xml"
     }
     
