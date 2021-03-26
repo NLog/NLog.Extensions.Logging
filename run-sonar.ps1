@@ -39,7 +39,7 @@ if ($env:APPVEYOR_REPO_NAME -eq $github) {
         Write-Output "Sonar: Running Sonar for PR $pr"
         dotnet-sonarscanner begin /o:"$sonarOrg" /k:"$sonarQubeId" /d:"sonar.host.url=$sonarUrl" /d:"sonar.login=$sonarToken" /v:"$buildVersion" /d:"sonar.cs.opencover.reportsPaths=coverage.xml" /d:"sonar.pullrequest.key=$pr" /d:"sonar.pullrequest.branch=$branch"  /d:"sonar.pullrequest.base=$prBaseBranch"  /d:"sonar.github.repository=$github" /d:"sonar.github.oauth=$env:github_auth_token"
     }
-    else
+    else {
         $branch = $env:APPVEYOR_REPO_BRANCH;
         
         Write-Output "Sonar: on branch $branch"
