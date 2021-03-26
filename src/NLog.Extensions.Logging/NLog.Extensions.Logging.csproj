@@ -19,13 +19,11 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logging;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
 
-- MicrosoftILoggerTarget - Add support for override LoggerName when using ILoggerFactory (#476) (@snakefoot)
-- MicrosoftILoggerTarget - Reduce chance of deadlock in ILoggerFactory by caching created loggers (#470) (@snakefoot)
-- MicrosoftILoggerTarget - With ILoggerFactory as constructor parameter (#468) (@snakefoot)
-- Added unit-test for NLogProviderOptions.IncludeActivtyIdsWithBeginScope (#463) (@snakefoot)
-- Update Nuget package description with ASP.NET Core so it matches NLog Package (#469) (@snakefoot)
-- Bump NLog from 4.7.6 to 4.7.7 (#467) (@dependabot[bot])
-- Bump NLog from 4.7.7 to 4.7.8 (#477) (@dependabot[bot])
+- Bump NLog from 4.7.8 to 4.7.9 (#495) (@dependabot[bot])
+- MicrosoftConsoleLayoutRenderer - For Hosting Lifetime Startup Messages (#490) (@snakefoot)
+- NLogLoggingConfiguration support custom section names (#488) (@anellomancante)
+- NLogProviderOptions - Added ReplaceLoggerFactory and RemoveLoggerFactoryFilter (#482) (@snakefoot)
+- Enable deterministic build (#479) (@304NotModified)
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
     </PackageReleaseNotes>
