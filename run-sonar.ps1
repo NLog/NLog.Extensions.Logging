@@ -34,16 +34,13 @@ if ($env:APPVEYOR_REPO_NAME -eq $github) {
         $prBaseBranch = $env:APPVEYOR_REPO_BRANCH;
         $pr = $env:APPVEYOR_PULL_REQUEST_NUMBER
         
-        Write-Output "Sonar: on PR $pr from $branch to $prBaseBranch"
-        
-        Write-Output "Sonar: Running Sonar for PR $pr"
+        Write-Host "Sonar: on PR $pr from $branch to $prBaseBranch" -ForegroundColor DarkGreen -BackgroundColor White
         dotnet-sonarscanner begin /o:"$sonarOrg" /k:"$sonarQubeId" /d:"sonar.host.url=$sonarUrl" /d:"sonar.login=$sonarToken" /v:"$buildVersion" /d:"sonar.cs.opencover.reportsPaths=coverage.xml" /d:"sonar.pullrequest.key=$pr" /d:"sonar.pullrequest.branch=$branch"  /d:"sonar.pullrequest.base=$prBaseBranch"  /d:"sonar.github.repository=$github" /d:"sonar.github.oauth=$env:github_auth_token"
     }
     else {
         $branch = $env:APPVEYOR_REPO_BRANCH;
         
-        Write-Output "Sonar: on branch $branch"
-        Write-Output "Sonar: Running Sonar in branch mode for branch $branch"
+        Write-Host "Sonar: on branch $branch" -ForegroundColor DarkGreen -BackgroundColor White
         dotnet-sonarscanner begin /o:"$sonarOrg" /k:"$sonarQubeId" /d:"sonar.host.url=$sonarUrl" /d:"sonar.login=$sonarToken" /v:"$buildVersion" /d:"sonar.cs.opencover.reportsPaths=coverage.xml" /d:"sonar.branch.name=$branch"  
     }
     
@@ -62,5 +59,5 @@ if ($env:APPVEYOR_REPO_NAME -eq $github) {
     }
 }
 else {
-    Write-Output "Sonar: not running as we're on '$env:APPVEYOR_REPO_NAME'"
+    Write-Host "Sonar: not running as we're on '$env:APPVEYOR_REPO_NAME'"
 }
