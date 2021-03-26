@@ -38,7 +38,22 @@ if ($env:APPVEYOR_REPO_NAME -eq $github) {
     $sonarToken = $env:sonar_token
     $buildVersion = $env:APPVEYOR_BUILD_VERSION
 
-    dotnet-sonarscanner begin /o:"$sonarOrg" /k:"$sonarQubeId" /d:"sonar.host.url=$sonarUrl" /d:"sonar.login=$sonarToken" /v:"$buildVersion" /d:"sonar.cs.opencover.reportsPaths=coverage.xml" /d:"sonar.github.repository=$github" /d:"sonar.github.oauth=$env:github_auth_token"
+
+    if ($prMode) {
+        $pr = $env:APPVEYOR_PULL_REQUEST_NUMBER
+        Write-Output "Sonar: Running Sonar for PR $pr"
+        dotnet-sonarscanner begin /o:"$sonarOrg" /k:"$sonarQubeId" /d:"sonar.host.url=$sonarUrl" /d:"sonar.login=$sonarToken" /v:"$buildVersion" /d:"sonar.cs.opencover.reportsPaths=coverage.xml" /d:"sonar.github.pullRequest=$pr" /d:"sonar.github.repository=$github" /d:"sonar.github.oauth=$env:github_auth_token"
+    }
+    elseif ($branchMode) {
+        $branch = $env:APPVEYOR_REPO_BRANCH;
+        Write-Output "Sonar: Running Sonar in branch mode for branch $branch"
+        dotnet-sonarscanner begin /o:"$sonarOrg" /k:"$sonarQubeId" /d:"sonar.host.url=$sonarUrl" /d:"sonar.login=$sonarToken" /v:"$buildVersion" /d:"sonar.cs.opencover.reportsPaths=coverage.xml" /d:"sonar.branch.name=$branch"  
+    }
+    else {
+        Write-Output "Sonar: Running Sonar in non-preview mode, on branch $env:APPVEYOR_REPO_BRANCH"
+        dotnet-sonarscanner begin /o:"$sonarOrg" /k:"$sonarQubeId" /d:"sonar.host.url=$sonarUrl" /d:"sonar.login=$sonarToken" /v:"$buildVersion" /d:"sonar.cs.opencover.reportsPaths=coverage.xml"
+    }
+    
     if (-Not $LastExitCode -eq 0) {
         exit $LastExitCode 
     }
