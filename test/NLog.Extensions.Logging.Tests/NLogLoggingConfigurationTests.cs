@@ -122,6 +122,25 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Fact]
+        public void LoadTargetDefaultWrapperConfig()
+        {
+            var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
+            memoryConfig["NLog:Targets:file:type"] = "File";
+            memoryConfig["NLog:Targets:file:fileName"] = "hello.txt";
+            memoryConfig["NLog:TargetDefaultWrapper:type"] = "AsyncWrapper";
+            memoryConfig["NLog:TargetDefaultWrapper:batchSize"] = "1";
+
+            var logConfig = CreateNLogLoggingConfigurationWithNLogSection(memoryConfig);
+
+            Assert.Single(logConfig.LoggingRules);
+            Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
+            Assert.Equal(2, (logConfig.AllTargets.Count(t => t is AsyncTargetWrapper asyncTarget && asyncTarget.BatchSize == 1)));
+            Assert.Single(logConfig.AllTargets.Where(t => t is AsyncTargetWrapper asyncTarget && asyncTarget.WrappedTarget is FileTarget));
+            Assert.Single(logConfig.AllTargets.Where(t => t is AsyncTargetWrapper asyncTarget && asyncTarget.WrappedTarget is ConsoleTarget));
+            Assert.Equal("hello.txt", ((logConfig.FindTargetByName("file") as AsyncTargetWrapper)?.WrappedTarget as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
+        }
+
+        [Fact]
         public void LoadDefaultTargetParametersConfig()
         {
             var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
@@ -141,18 +160,37 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Fact]
+        public void LoadTargetDefaultParametersConfig()
+        {
+            var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
+            memoryConfig["NLog:Targets:file:type"] = "File";
+            memoryConfig["NLog:TargetDefaultParameters:file:filename"] = "hello.txt";
+            memoryConfig["NLog:TargetDefaultParameters:console:error"] = "true";
+
+            var logConfig = CreateNLogLoggingConfigurationWithNLogSection(memoryConfig);
+
+            Assert.Single(logConfig.LoggingRules);
+            Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
+            Assert.Equal(2, logConfig.AllTargets.Count);
+            Assert.Single(logConfig.AllTargets.Where(t => t is FileTarget));
+            Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
+            Assert.Equal("hello.txt", (logConfig.FindTargetByName("file") as FileTarget)?.FileName?.Render(LogEventInfo.CreateNullEvent()));
+            Assert.True((logConfig.FindTargetByName("console") as ConsoleTarget)?.Error);
+        }
+
+        [Fact]
         public void LoadDefaultTargetParametersJsonLayoutConfig()
         {
             var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
             memoryConfig["NLog:Targets:file:type"] = "File";
-            memoryConfig["NLog:default-target-parameters:file:filename"] = "hello.txt";
-            memoryConfig["NLog:default-target-parameters:file:layout:type"] = "JsonLayout";
-            memoryConfig["NLog:default-target-parameters:file:layout:Attributes:0:name"] = "timestamp";
-            memoryConfig["NLog:default-target-parameters:file:layout:Attributes:0:layout"] = "${date:format=o}";
-            memoryConfig["NLog:default-target-parameters:file:layout:Attributes:1:name"] = "level";
-            memoryConfig["NLog:default-target-parameters:file:layout:Attributes:1:layout"] = "${level}";
-            memoryConfig["NLog:default-target-parameters:file:layout:Attributes:2:name"] = "message";
-            memoryConfig["NLog:default-target-parameters:file:layout:Attributes:2:layout"] = "${message}";
+            memoryConfig["NLog:TargetDefaultParameters:file:filename"] = "hello.txt";
+            memoryConfig["NLog:TargetDefaultParameters:file:layout:type"] = "JsonLayout";
+            memoryConfig["NLog:TargetDefaultParameters:file:layout:Attributes:0:name"] = "timestamp";
+            memoryConfig["NLog:TargetDefaultParameters:file:layout:Attributes:0:layout"] = "${date:format=o}";
+            memoryConfig["NLog:TargetDefaultParameters:file:layout:Attributes:1:name"] = "level";
+            memoryConfig["NLog:TargetDefaultParameters:file:layout:Attributes:1:layout"] = "${level}";
+            memoryConfig["NLog:TargetDefaultParameters:file:layout:Attributes:2:name"] = "message";
+            memoryConfig["NLog:TargetDefaultParameters:file:layout:Attributes:2:layout"] = "${message}";
 
             var logConfig = CreateNLogLoggingConfigurationWithNLogSection(memoryConfig);
 
