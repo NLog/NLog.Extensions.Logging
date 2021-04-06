@@ -250,10 +250,16 @@ namespace NLog.Extensions.Logging
         {
             NLogLoggerProvider provider = new NLogLoggerProvider(options ?? NLogProviderOptions.Default, logFactory ?? LogManager.LogFactory);
             configuration = SetupConfiguration(serviceProvider, configuration);
-            if (configuration != null && options == null)
+            if (configuration != null)
             {
-                provider.Configure(configuration.GetSection("Logging:NLog"));
+                if (options == null)
+                {
+                    provider.Configure(configuration.GetSection("Logging:NLog"));
+                }
+
+                provider.TryLoadConfigurationFromSection(configuration);
             }
+
             return provider;
         }
 

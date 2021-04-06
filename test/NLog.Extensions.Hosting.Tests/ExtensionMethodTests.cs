@@ -92,5 +92,30 @@ namespace NLog.Extensions.Hosting.Tests
 
             Assert.Equal(typeof(NLogLoggerFactory), loggerFactory.GetType());
         }
+
+        [Fact]
+        public void UseNLog_LoadConfigurationFromSection()
+        {
+            var host = new HostBuilder().ConfigureAppConfiguration((context, config) =>
+            {
+                var memoryConfig = new Dictionary<string, string>();
+                memoryConfig["NLog:Rules:0:logger"] = "*";
+                memoryConfig["NLog:Rules:0:minLevel"] = "Trace";
+                memoryConfig["NLog:Rules:0:writeTo"] = "inMemory";
+                memoryConfig["NLog:Targets:inMemory:type"] = "Memory";
+                memoryConfig["NLog:Targets:inMemory:layout"] = "${logger}|${message}|${configsetting:NLog.Targets.inMemory.type}";
+                config.AddInMemoryCollection(memoryConfig);
+            }).UseNLog(new NLogProviderOptions() { LoadConfigurationFromSection = "NLog", ReplaceLoggerFactory = true }).Build();
+
+            var loggerFact = host.Services.GetService<ILoggerFactory>();
+            var logger = loggerFact.CreateLogger("logger1");
+            logger.LogError("error1");
+
+            var loggerProvider = host.Services.GetService<ILoggerProvider>() as NLogLoggerProvider;
+            var logged = loggerProvider.LogFactory.Configuration.FindTargetByName<Targets.MemoryTarget>("inMemory").Logs;
+
+            Assert.Single(logged);
+            Assert.Equal("logger1|error1|Memory", logged[0]);
+        }
     }
 }
