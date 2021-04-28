@@ -105,7 +105,7 @@ namespace NLog.Extensions.Hosting.Tests
                 memoryConfig["NLog:Targets:inMemory:type"] = "Memory";
                 memoryConfig["NLog:Targets:inMemory:layout"] = "${logger}|${message}|${configsetting:NLog.Targets.inMemory.type}";
                 config.AddInMemoryCollection(memoryConfig);
-            }).UseNLog(new NLogProviderOptions() { LoadConfigurationFromSection = "NLog", ReplaceLoggerFactory = true }).Build();
+            }).UseNLog(new NLogProviderOptions() { LoggingConfigurationSectionName = "NLog", ReplaceLoggerFactory = true }).Build();
 
             var loggerFact = host.Services.GetService<ILoggerFactory>();
             var logger = loggerFact.CreateLogger("logger1");

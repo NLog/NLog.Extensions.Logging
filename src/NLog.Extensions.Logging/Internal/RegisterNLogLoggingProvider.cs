@@ -37,10 +37,10 @@
 
         internal static void TryLoadConfigurationFromSection(this NLogLoggerProvider loggerProvider, IConfiguration configuration)
         {
-            if (string.IsNullOrEmpty(loggerProvider.Options.LoadConfigurationFromSection))
+            if (string.IsNullOrEmpty(loggerProvider.Options.LoggingConfigurationSectionName))
                 return;
 
-            var nlogConfig = configuration.GetSection(loggerProvider.Options.LoadConfigurationFromSection);
+            var nlogConfig = configuration.GetSection(loggerProvider.Options.LoggingConfigurationSectionName);
             if (nlogConfig?.GetChildren()?.Any() == true)
             {
                 loggerProvider.LogFactory.Setup().LoadConfiguration(configBuilder =>
