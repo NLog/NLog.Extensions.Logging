@@ -71,6 +71,7 @@
         /// <summary>
         /// Checks the Host Configuration for the specified section-name, and tries to load NLog-LoggingConfiguration after creation of NLogLoggerProvider
         /// </summary>
+        /// <remarks>Will only attempt to load NLog-LoggingConfiguration if valid section-name, and NLog-LoggingConfiguration has not been loaded already.</remarks>
         public string LoggingConfigurationSectionName { get; set; }
 
         /// <summary>Initializes a new instance NLogProviderOptions with default values.</summary>
