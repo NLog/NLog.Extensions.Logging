@@ -37,19 +37,19 @@
 
         internal static void TryLoadConfigurationFromSection(this NLogLoggerProvider loggerProvider, IConfiguration configuration)
         {
-            if (!string.IsNullOrEmpty(loggerProvider.Options.LoadConfigurationFromSection))
+            if (string.IsNullOrEmpty(loggerProvider.Options.LoadConfigurationFromSection))
+                return;
+
+            var nlogConfig = configuration.GetSection(loggerProvider.Options.LoadConfigurationFromSection);
+            if (nlogConfig?.GetChildren()?.Any() == true)
             {
-                var nlogConfig = configuration.GetSection(loggerProvider.Options.LoadConfigurationFromSection);
-                if (nlogConfig?.GetChildren()?.Any() == true)
+                loggerProvider.LogFactory.Setup().LoadConfiguration(configBuilder =>
                 {
-                    loggerProvider.LogFactory.Setup().LoadConfiguration(configBuilder =>
+                    if (configBuilder.Configuration.LoggingRules.Count == 0 && configBuilder.Configuration.AllTargets.Count == 0)
                     {
-                        if (configBuilder.Configuration.LoggingRules.Count == 0 && configBuilder.Configuration.AllTargets.Count == 0)
-                        {
-                            configBuilder.Configuration = new NLogLoggingConfiguration(nlogConfig);
-                        }
-                    });
-                }
+                        configBuilder.Configuration = new NLogLoggingConfiguration(nlogConfig);
+                    }
+                });
             }
         }
     }
