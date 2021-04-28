@@ -316,13 +316,13 @@ namespace NLog.Extensions.Logging
                 if (_topElement)
                 {
                     var targetDefaultParameters = _configurationSection.GetSection(TargetDefaultParameters);
-                    if (targetDefaultParameters != null && targetDefaultParameters.GetChildren().Any())
+                    if (targetDefaultParameters?.GetChildren().Any() == true)
                     {
                         return targetDefaultParameters;
                     }
 
                     targetDefaultParameters = _configurationSection.GetSection(DefaultTargetParameters);
-                    if (targetDefaultParameters != null && targetDefaultParameters.GetChildren().Any())
+                    if (targetDefaultParameters?.GetChildren().Any() == true)
                     {
                         return targetDefaultParameters;
                     }
@@ -336,13 +336,13 @@ namespace NLog.Extensions.Logging
                 if (_topElement)
                 {
                     var targetDefaultWrapper = _configurationSection.GetSection(TargetDefaultWrapper);
-                    if (targetDefaultWrapper != null && targetDefaultWrapper.GetChildren().Any())
+                    if (targetDefaultWrapper?.GetChildren().Any() == true)
                     {
                         return targetDefaultWrapper;
                     }
 
                     targetDefaultWrapper = _configurationSection.GetSection(DefaultWrapper);
-                    if (targetDefaultWrapper != null && targetDefaultWrapper.GetChildren().Any())
+                    if (targetDefaultWrapper?.GetChildren().Any() == true)
                     {
                         return targetDefaultWrapper;
                     }
