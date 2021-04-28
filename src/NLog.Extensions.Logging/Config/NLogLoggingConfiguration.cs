@@ -65,7 +65,7 @@ namespace NLog.Extensions.Logging
 
         private bool LoadConfigurationSection(IConfigurationSection nlogConfig)
         {
-            var configElement = new LoggingConfigurationElement(nlogConfig, true, RootSectionKey);
+            var configElement = new LoggingConfigurationElement(nlogConfig, RootSectionKey);
             LoadConfig(configElement, null);
             return configElement.AutoReload;
         }
@@ -131,20 +131,22 @@ namespace NLog.Extensions.Logging
             private const string TargetKey = "target";
             private const string TargetsKey = "targets";
             private const string DefaultTargetParameters = "Default-target-parameters";
+            private const string TargetDefaultParameters = "TargetDefaultParameters";
             private const string VariableKey = "Variable";
             private const string DefaultWrapper = "Default-wrapper";
+            private const string TargetDefaultWrapper = "TargetDefaultWrapper";
             private readonly IConfigurationSection _configurationSection;
-            private IConfigurationSection DefaultTargetParametersSection { get; set; }
-            private IConfigurationSection DefaultTargetWrapperSection { get; set; }
+            private IConfigurationSection TargetDefaultParametersSection { get; set; }
+            private IConfigurationSection TargetDefaultWrapperSection { get; set; }
             private readonly string _nameOverride;
             private readonly bool _topElement;
 
-            public LoggingConfigurationElement(IConfigurationSection configurationSection, bool topElement, string nameOverride = null)
+            public LoggingConfigurationElement(IConfigurationSection configurationSection, string nameOverride = null)
             {
                 _configurationSection = configurationSection;
                 _nameOverride = nameOverride;
-                _topElement = topElement;
-                if (topElement && bool.TryParse(configurationSection["autoreload"], out var autoReload))
+                _topElement = ReferenceEquals(nameOverride, RootSectionKey);
+                if (_topElement && bool.TryParse(configurationSection["autoreload"], out var autoReload))
                 {
                     AutoReload = autoReload;
                 }
@@ -192,7 +194,7 @@ namespace NLog.Extensions.Logging
                 {
                     foreach (var variable in variables.GetChildren())
                     {
-                        yield return new LoggingConfigurationElement(variable, false, VariableKey);
+                        yield return new LoggingConfigurationElement(variable, VariableKey);
                     }
                 }
 
@@ -214,11 +216,11 @@ namespace NLog.Extensions.Logging
 
             private IEnumerable<ILoggingConfigurationElement> GetChildren(IEnumerable<IConfigurationSection> children, IConfigurationSection variables, bool isTargetsSection)
             {
-                var defaultTargetWrapper = GetDefaultWrapperSection();
-                var defaultTargetParameters = GetDefaultTargetParametersSection();
+                var targetDefaultWrapper = GetTargetDefaultWrapperSection();
+                var targetDefaultParameters = GetTargetDefaultParametersSection();
                 foreach (var child in children)
                 {
-                    if (AlreadyReadChild(child, variables, defaultTargetWrapper, defaultTargetParameters))
+                    if (AlreadyReadChild(child, variables, targetDefaultWrapper, targetDefaultParameters))
                     {
                         continue;
                     }
@@ -231,32 +233,21 @@ namespace NLog.Extensions.Logging
 
                     if (IsTargetWithinWrapper(child))
                     {
-                        yield return new LoggingConfigurationElement(firstChildValue, false, TargetKey);
+                        yield return new LoggingConfigurationElement(firstChildValue, TargetKey);
+                    }
+                    else if (_topElement && GetConfigKey(child).EqualsOrdinalIgnoreCase(TargetsKey))
+                    {
+                        yield return new LoggingConfigurationElement(child)
+                        {
+                            TargetDefaultParametersSection = targetDefaultParameters,
+                            TargetDefaultWrapperSection = targetDefaultWrapper,
+                        };
                     }
                     else
                     {
-                        yield return CreateLoggingConfigurationElement(isTargetsSection, child, defaultTargetParameters, defaultTargetWrapper);
+                        yield return new LoggingConfigurationElement(child, isTargetsSection ? TargetKey : null);
                     }
                 }
-            }
-
-            private static LoggingConfigurationElement CreateLoggingConfigurationElement(bool isTargetsSection, IConfigurationSection child, IConfigurationSection defaultTargetParameters, IConfigurationSection defaultTargetWrapper)
-            {
-                IConfigurationSection defaultTargetParametersSection = null;
-                IConfigurationSection defaultTargetWrapperSection = null;
-
-                if (defaultTargetParameters != null || defaultTargetWrapper != null)
-                {
-                    var isTargetsKey = GetConfigKey(child).EqualsOrdinalIgnoreCase(TargetsKey);
-                    defaultTargetParametersSection = defaultTargetParameters != null && isTargetsKey ? defaultTargetParameters : null;
-                    defaultTargetWrapperSection = defaultTargetWrapper != null && isTargetsKey ? defaultTargetWrapper : null;
-                }
-
-                return new LoggingConfigurationElement(child, false, isTargetsSection ? TargetKey : null)
-                {
-                    DefaultTargetParametersSection = defaultTargetParametersSection,
-                    DefaultTargetWrapperSection = defaultTargetWrapperSection,
-                };
             }
 
             private static string GetConfigKey(IConfigurationSection child)
@@ -272,8 +263,6 @@ namespace NLog.Extensions.Logging
             /// <summary>
             /// Target-config inside Wrapper-Target
             /// </summary>
-            /// <param name="child"></param>
-            /// <returns></returns>
             private bool IsTargetWithinWrapper(IConfigurationSection child)
             {
                 return _nameOverride == TargetKey && GetConfigKey(child).EqualsOrdinalIgnoreCase(TargetKey) && child.GetChildren().Count() == 1;
@@ -281,19 +270,19 @@ namespace NLog.Extensions.Logging
 
             private IEnumerable<LoggingConfigurationElement> GetTargetsDefaultConfigElements()
             {
-                if (DefaultTargetWrapperSection != null)
-                    yield return new LoggingConfigurationElement(DefaultTargetWrapperSection, true, DefaultWrapper);
+                if (TargetDefaultWrapperSection != null)
+                    yield return new LoggingConfigurationElement(TargetDefaultWrapperSection, DefaultWrapper);
 
-                if (DefaultTargetParametersSection != null)
+                if (TargetDefaultParametersSection != null)
                 {
-                    foreach (var targetParameters in DefaultTargetParametersSection.GetChildren())
+                    foreach (var targetParameters in TargetDefaultParametersSection.GetChildren())
                     {
-                        yield return new LoggingConfigurationElement(targetParameters, true, DefaultTargetParameters);
+                        yield return new LoggingConfigurationElement(targetParameters, DefaultTargetParameters);
                     }
                 }
             }
 
-            private bool AlreadyReadChild(IConfigurationSection child, IConfigurationSection variables, IConfigurationSection defaultWrapper, IConfigurationSection defaultTargetParameters)
+            private bool AlreadyReadChild(IConfigurationSection child, IConfigurationSection variables, IConfigurationSection targetDefaultWrapper, IConfigurationSection targetDefaultParameters)
             {
                 if (_topElement)
                 {
@@ -302,12 +291,12 @@ namespace NLog.Extensions.Logging
                         return true;
                     }
 
-                    if (defaultWrapper != null && child.Key.EqualsOrdinalIgnoreCase(defaultWrapper.Key))
+                    if (targetDefaultWrapper != null && child.Key.EqualsOrdinalIgnoreCase(targetDefaultWrapper.Key))
                     {
                         return true;
                     }
 
-                    if (defaultTargetParameters != null && child.Key.EqualsOrdinalIgnoreCase(defaultTargetParameters.Key))
+                    if (targetDefaultParameters != null && child.Key.EqualsOrdinalIgnoreCase(targetDefaultParameters.Key))
                     {
                         return true;
                     }
@@ -322,26 +311,49 @@ namespace NLog.Extensions.Logging
                 return variables;
             }
 
-            private IConfigurationSection GetDefaultTargetParametersSection()
+            private IConfigurationSection GetTargetDefaultParametersSection()
             {
-                var defaultTargetParameters = _topElement ? _configurationSection.GetSection(DefaultTargetParameters) : null;
-                if (defaultTargetParameters != null && defaultTargetParameters.GetChildren().Any())
+                if (_topElement)
                 {
-                    return defaultTargetParameters;
+                    var targetDefaultParameters = _configurationSection.GetSection(TargetDefaultParameters);
+                    if (targetDefaultParameters?.GetChildren().Any() == true)
+                    {
+                        return targetDefaultParameters;
+                    }
+
+                    targetDefaultParameters = _configurationSection.GetSection(DefaultTargetParameters);
+                    if (targetDefaultParameters?.GetChildren().Any() == true)
+                    {
+                        return targetDefaultParameters;
+                    }
                 }
 
                 return null;
             }
 
-            private IConfigurationSection GetDefaultWrapperSection()
+            private IConfigurationSection GetTargetDefaultWrapperSection()
             {
-                var defaultWrapper = _topElement ? _configurationSection.GetSection(DefaultWrapper) : null;
-                if (defaultWrapper != null && defaultWrapper.GetChildren().Any())
+                if (_topElement)
                 {
-                    return defaultWrapper;
+                    var targetDefaultWrapper = _configurationSection.GetSection(TargetDefaultWrapper);
+                    if (targetDefaultWrapper?.GetChildren().Any() == true)
+                    {
+                        return targetDefaultWrapper;
+                    }
+
+                    targetDefaultWrapper = _configurationSection.GetSection(DefaultWrapper);
+                    if (targetDefaultWrapper?.GetChildren().Any() == true)
+                    {
+                        return targetDefaultWrapper;
+                    }
                 }
 
                 return null;
+            }
+
+            public override string ToString()
+            {
+                return Name;
             }
         }
     }
