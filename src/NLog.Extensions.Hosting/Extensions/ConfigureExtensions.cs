@@ -2,9 +2,7 @@
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using NLog.Config;
 using NLog.Extensions.Logging;
 
@@ -52,9 +50,14 @@ namespace NLog.Extensions.Hosting
         {
             configuration = SetupConfiguration(serviceProvider, configuration);
             NLogLoggerProvider provider = new NLogLoggerProvider(options);
-            if (configuration != null && options == null)
+            if (configuration != null)
             {
-                provider.Configure(configuration.GetSection("Logging:NLog"));
+                if (options == null)
+                {
+                    provider.Configure(configuration.GetSection("Logging:NLog"));
+                }
+
+                provider.TryLoadConfigurationFromSection(configuration);
             }
             return provider;
         }

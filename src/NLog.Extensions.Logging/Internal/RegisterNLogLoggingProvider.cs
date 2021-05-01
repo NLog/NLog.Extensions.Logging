@@ -1,14 +1,17 @@
 ﻿namespace NLog.Extensions.Logging
 {
-#if !NETCORE1_0
     using System;
+    using System.Linq;
     using Microsoft.Extensions.Configuration;
+#if !NETCORE1_0
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
     using Microsoft.Extensions.Logging;
+#endif
 
     internal static class RegisterNLogLoggingProvider
     {
+#if !NETCORE1_0
         internal static void TryAddNLogLoggingProvider(this IServiceCollection services, Action<IServiceCollection, Action<ILoggingBuilder>> addLogging, IConfiguration configuration, NLogProviderOptions options, Func<IServiceProvider, IConfiguration, NLogProviderOptions, NLogLoggerProvider> factory)
         {
             var sharedFactory = factory;
@@ -30,6 +33,24 @@
                 addLogging?.Invoke(services, (builder) => builder?.AddFilter<NLogLoggerProvider>(null, Microsoft.Extensions.Logging.LogLevel.Trace));
             }
         }
-    }
 #endif
+
+        internal static void TryLoadConfigurationFromSection(this NLogLoggerProvider loggerProvider, IConfiguration configuration)
+        {
+            if (string.IsNullOrEmpty(loggerProvider.Options.LoggingConfigurationSectionName))
+                return;
+
+            var nlogConfig = configuration.GetSection(loggerProvider.Options.LoggingConfigurationSectionName);
+            if (nlogConfig?.GetChildren()?.Any() == true)
+            {
+                loggerProvider.LogFactory.Setup().LoadConfiguration(configBuilder =>
+                {
+                    if (configBuilder.Configuration.LoggingRules.Count == 0 && configBuilder.Configuration.AllTargets.Count == 0)
+                    {
+                        configBuilder.Configuration = new NLogLoggingConfiguration(nlogConfig);
+                    }
+                });
+            }
+        }
+    }
 }
