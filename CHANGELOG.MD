@@ -2,6 +2,13 @@
 
 Date format: (year/month/day)
 
+### v1.7.2 (2021/03/26)
+- [#495](https://github.com/NLog/NLog.Extensions.Logging/pull/495) Bump NLog from 4.7.8 to 4.7.9 (#495) (@dependabot[bot])
+- [#490](https://github.com/NLog/NLog.Extensions.Logging/pull/490) MicrosoftConsoleLayoutRenderer - For Hosting Lifetime Startup Messages (#490) (@snakefoot)
+- [#488](https://github.com/NLog/NLog.Extensions.Logging/pull/488) NLogLoggingConfiguration support custom section names (#488) (@anellomancante)
+- [#482](https://github.com/NLog/NLog.Extensions.Logging/pull/482) NLogProviderOptions - Added ReplaceLoggerFactory and RemoveLoggerFactoryFilter (#482) (@snakefoot)
+- [#479](https://github.com/NLog/NLog.Extensions.Logging/pull/479) Enable deterministic build (#479) (@304NotModified)
+
 ### v1.7.1 (2021/02/26)
 
 - [#476](https://github.com/NLog/NLog.Extensions.Logging/pull/476) MicrosoftILoggerTarget - Add support for override LoggerName when using ILoggerFactory (#476) (@snakefoot)

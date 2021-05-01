@@ -14,46 +14,50 @@ if ($env:APPVEYOR_REPO_NAME -eq $github) {
     }
  
     $prMode = $false;
-    $branchMode = $false;
      
     if ($env:APPVEYOR_PULL_REQUEST_NUMBER) { 
         # first check PR as that is on the base branch
         $prMode = $true;
-        Write-Output "Sonar: on PR $env:APPVEYOR_PULL_REQUEST_NUMBER"
-    }
-    elseif ($env:APPVEYOR_REPO_BRANCH -eq $baseBranch) {
-        Write-Output "Sonar: on base branch ($baseBranch)"
-    }
-    else {
-        $branchMode = $true;
-        Write-Output "Sonar: on branch $env:APPVEYOR_REPO_BRANCH"
     }
 
-    choco install "msbuild-sonarqube-runner" -y
+    dotnet tool install --global dotnet-sonarscanner
+    if (-Not $LastExitCode -eq 0) {
+        exit $LastExitCode 
+    }
 
     $sonarUrl = "https://sonarcloud.io"
     $sonarToken = $env:sonar_token
     $buildVersion = $env:APPVEYOR_BUILD_VERSION
 
     if ($prMode) {
+        $branch = $env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH 
+        $prBaseBranch = $env:APPVEYOR_REPO_BRANCH;
         $pr = $env:APPVEYOR_PULL_REQUEST_NUMBER
-        Write-Output "Sonar: Running Sonar for PR $pr"
-        SonarScanner.MSBuild.exe begin /o:"$sonarOrg" /k:"$sonarQubeId" /d:"sonar.host.url=$sonarUrl" /d:"sonar.login=$sonarToken" /v:"$buildVersion" /d:"sonar.cs.opencover.reportsPaths=coverage.xml" /d:"sonar.analysis.mode=preview" /d:"sonar.github.pullRequest=$pr" /d:"sonar.github.repository=$github" /d:"sonar.github.oauth=$env:github_auth_token"
-    }
-    elseif ($branchMode) {
-        $branch = $env:APPVEYOR_REPO_BRANCH;
-        Write-Output "Sonar: Running Sonar in branch mode for branch $branch"
-        SonarScanner.MSBuild.exe begin /o:"$sonarOrg" /k:"$sonarQubeId" /d:"sonar.host.url=$sonarUrl" /d:"sonar.login=$sonarToken" /v:"$buildVersion" /d:"sonar.cs.opencover.reportsPaths=coverage.xml" /d:"sonar.branch.name=$branch"  
+        
+        Write-Host "Sonar: on PR $pr from $branch to $prBaseBranch" -ForegroundColor DarkGreen -BackgroundColor White
+        dotnet-sonarscanner begin /o:"$sonarOrg" /k:"$sonarQubeId" /d:"sonar.host.url=$sonarUrl" /d:"sonar.login=$sonarToken" /v:"$buildVersion" /d:"sonar.cs.opencover.reportsPaths=coverage.xml" /d:"sonar.pullrequest.key=$pr" /d:"sonar.pullrequest.branch=$branch"  /d:"sonar.pullrequest.base=$prBaseBranch"  /d:"sonar.github.repository=$github" /d:"sonar.github.oauth=$env:github_auth_token"
     }
     else {
-        Write-Output "Sonar: Running Sonar in non-preview mode, on branch $env:APPVEYOR_REPO_BRANCH"
-        SonarScanner.MSBuild.exe begin /o:"$sonarOrg" /k:"$sonarQubeId" /d:"sonar.host.url=$sonarUrl" /d:"sonar.login=$sonarToken" /v:"$buildVersion" /d:"sonar.cs.opencover.reportsPaths=coverage.xml"
+        $branch = $env:APPVEYOR_REPO_BRANCH;
+        
+        Write-Host "Sonar: on branch $branch" -ForegroundColor DarkGreen -BackgroundColor White
+        dotnet-sonarscanner begin /o:"$sonarOrg" /k:"$sonarQubeId" /d:"sonar.host.url=$sonarUrl" /d:"sonar.login=$sonarToken" /v:"$buildVersion" /d:"sonar.cs.opencover.reportsPaths=coverage.xml" /d:"sonar.branch.name=$branch"  
+    }
+    
+    if (-Not $LastExitCode -eq 0) {
+        exit $LastExitCode 
     }
 
     msbuild /t:Rebuild $projectFile /p:targetFrameworks=$framework /verbosity:minimal
+    if (-Not $LastExitCode -eq 0) {
+        exit $LastExitCode 
+    }
 
-    SonarScanner.MSBuild.exe end /d:"sonar.login=$env:sonar_token"
+    dotnet-sonarscanner end /d:"sonar.login=$env:sonar_token"
+    if (-Not $LastExitCode -eq 0) {
+        exit $LastExitCode 
+    }
 }
 else {
-    Write-Output "Sonar: not running as we're on '$env:APPVEYOR_REPO_NAME'"
+    Write-Host "Sonar: not running as we're on '$env:APPVEYOR_REPO_NAME'"
 }

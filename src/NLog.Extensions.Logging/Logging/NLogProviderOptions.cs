@@ -56,6 +56,24 @@
 #endif
         public bool IncludeActivtyIdsWithBeginScope { get; set; }
 
+        /// <summary>
+        /// Resets the default Microsoft LoggerFactory Filter for the <see cref="NLogLoggerProvider"/>
+        /// </summary>
+        /// <remarks>This option affects the building of service configuration, so assigning it from appsettings.json has no effect (loaded after).</remarks>
+        public bool RemoveLoggerFactoryFilter { get; set; }
+
+        /// <summary>
+        /// Replace Microsoft LoggerFactory with a pure <see cref="NLogLoggerFactory" />
+        /// </summary>
+        /// <remarks>This option affects the building of service configuration, so assigning it from appsettings.json has no effect (loaded after).</remarks>
+        public bool ReplaceLoggerFactory { get; set; }
+
+        /// <summary>
+        /// Checks the Host Configuration for the specified section-name, and tries to load NLog-LoggingConfiguration after creation of NLogLoggerProvider
+        /// </summary>
+        /// <remarks>Will only attempt to load NLog-LoggingConfiguration if valid section-name, and NLog-LoggingConfiguration has not been loaded already.</remarks>
+        public string LoggingConfigurationSectionName { get; set; }
+
         /// <summary>Initializes a new instance NLogProviderOptions with default values.</summary>
         public NLogProviderOptions()
         {
