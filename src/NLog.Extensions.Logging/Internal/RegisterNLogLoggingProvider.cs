@@ -47,9 +47,13 @@
                 {
                     if (configBuilder.Configuration.LoggingRules.Count == 0 && configBuilder.Configuration.AllTargets.Count == 0)
                     {
-                        configBuilder.Configuration = new NLogLoggingConfiguration(nlogConfig);
+                        configBuilder.Configuration = new NLogLoggingConfiguration(nlogConfig, loggerProvider.LogFactory);
                     }
                 });
+            }
+            else
+            {
+                Common.InternalLogger.Debug("Skip loading NLogLoggingConfiguration from empty config section: {0}", loggerProvider.Options.LoggingConfigurationSectionName);
             }
         }
     }
