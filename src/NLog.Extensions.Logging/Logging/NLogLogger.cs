@@ -29,8 +29,7 @@ namespace NLog.Extensions.Logging
 
         public void Log<TState>(Microsoft.Extensions.Logging.LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
-            var nLogLogLevel = ConvertLogLevel(logLevel);
-            if (!_logger.IsEnabled(nLogLogLevel))
+            if (!IsLogLevelEnabled(logLevel))
             {
                 return;
             }
@@ -40,7 +39,7 @@ namespace NLog.Extensions.Logging
                 throw new ArgumentNullException(nameof(formatter));
             }
 
-            LogEventInfo eventInfo = CreateLogEventInfo(nLogLogLevel, state, exception, formatter);
+            LogEventInfo eventInfo = CreateLogEventInfo(ConvertLogLevel(logLevel), state, exception, formatter);
 
             CaptureEventId(eventInfo, eventId);
 
@@ -390,16 +389,28 @@ namespace NLog.Extensions.Logging
         /// <returns></returns>
         public bool IsEnabled(Microsoft.Extensions.Logging.LogLevel logLevel)
         {
-            var convertLogLevel = ConvertLogLevel(logLevel);
-            return IsEnabled(convertLogLevel);
+            return IsLogLevelEnabled(logLevel);
         }
 
-        /// <summary>
-        /// Is logging enabled for this logger at this <paramref name="logLevel"/>?
-        /// </summary>
-        private bool IsEnabled(LogLevel logLevel)
+        private bool IsLogLevelEnabled(Microsoft.Extensions.Logging.LogLevel logLevel)
         {
-            return _logger.IsEnabled(logLevel);
+            switch (logLevel)
+            {
+                case Microsoft.Extensions.Logging.LogLevel.Trace:
+                    return _logger.IsTraceEnabled;
+                case Microsoft.Extensions.Logging.LogLevel.Debug:
+                    return _logger.IsDebugEnabled;
+                case Microsoft.Extensions.Logging.LogLevel.Information:
+                    return _logger.IsInfoEnabled;
+                case Microsoft.Extensions.Logging.LogLevel.Warning:
+                    return _logger.IsWarnEnabled;
+                case Microsoft.Extensions.Logging.LogLevel.Error:
+                    return _logger.IsErrorEnabled;
+                case Microsoft.Extensions.Logging.LogLevel.Critical:
+                    return _logger.IsFatalEnabled;
+                default:
+                    return false;
+            }
         }
 
         /// <inheritdoc />
