@@ -17,9 +17,13 @@ namespace NLog.Extensions.Logging
             if (!string.IsNullOrEmpty(configSection))
             {
                 var nlogConfig = configuration.GetSection(configSection);
-                if (nlogConfig != null && nlogConfig.GetChildren().Any())
+                if (nlogConfig?.GetChildren()?.Any() == true)
                 {
                     setupBuilder.LogFactory.Configuration = new NLogLoggingConfiguration(nlogConfig, setupBuilder.LogFactory);
+                }
+                else
+                {
+                    Common.InternalLogger.Debug("Skip loading NLogLoggingConfiguration from empty config section: {0}", configSection);
                 }
             }
             return setupBuilder;

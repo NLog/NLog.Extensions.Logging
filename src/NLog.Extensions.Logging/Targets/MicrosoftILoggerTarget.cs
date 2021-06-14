@@ -88,21 +88,8 @@ namespace NLog.Extensions.Logging
             if (!ilogger.IsEnabled(logLevel))
                 return;
 
-            var eventId = default(EventId);
-            if (EventId != null)
-            {
-                var eventIdValue = RenderLogEvent(EventId, logEvent);
-                if (!string.IsNullOrEmpty(eventIdValue) && int.TryParse(eventIdValue, out int eventIdParsed) && eventIdParsed != 0)
-                    eventId = new EventId(eventIdParsed);
-            }
-            if (EventName != null)
-            {
-                var eventNameValue = RenderLogEvent(EventName, logEvent);
-                if (!string.IsNullOrEmpty(eventNameValue))
-                    eventId = new EventId(eventId.Id, eventNameValue);
-            }
-
             var layoutMessage = RenderLogEvent(Layout, logEvent);
+
             IDictionary<string, object> contextProperties = null;
             if (ContextProperties.Count > 0 || IncludeMdlc || IncludeMdc || IncludeGdc)
             {
@@ -111,7 +98,29 @@ namespace NLog.Extensions.Logging
                     contextProperties = null;
             }
 
-            ilogger.Log(ConvertToLogLevel(logEvent.Level), eventId, new LogState(logEvent, layoutMessage, contextProperties), logEvent.Exception, (s, ex) => LogStateFormatter(s));
+            var eventId = RenderEventId(logEvent);
+            ilogger.Log(logLevel, eventId, new LogState(logEvent, layoutMessage, contextProperties), logEvent.Exception, (s, ex) => LogStateFormatter(s));
+        }
+
+        private EventId RenderEventId(LogEventInfo logEvent)
+        {
+            var eventId = default(EventId);
+
+            if (EventId != null)
+            {
+                var eventIdValue = RenderLogEvent(EventId, logEvent);
+                if (!string.IsNullOrEmpty(eventIdValue) && int.TryParse(eventIdValue, out int eventIdParsed) && eventIdParsed != 0)
+                    eventId = new EventId(eventIdParsed);
+            }
+
+            if (EventName != null)
+            {
+                var eventNameValue = RenderLogEvent(EventName, logEvent);
+                if (!string.IsNullOrEmpty(eventNameValue))
+                    eventId = new EventId(eventId.Id, eventNameValue);
+            }
+
+            return eventId;
         }
 
         private Microsoft.Extensions.Logging.ILogger CreateFromLoggerFactory(LogEventInfo logEvent)

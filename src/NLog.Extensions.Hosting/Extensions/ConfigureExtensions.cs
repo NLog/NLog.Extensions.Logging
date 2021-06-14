@@ -2,9 +2,7 @@
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using NLog.Config;
 using NLog.Extensions.Logging;
 
@@ -45,16 +43,21 @@ namespace NLog.Extensions.Hosting
         {
             ConfigurationItemFactory.Default.RegisterItemsFromAssembly(typeof(ConfigureExtensions).GetTypeInfo().Assembly);
             LogManager.AddHiddenAssembly(typeof(ConfigureExtensions).GetTypeInfo().Assembly);
-            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, NLogLoggerProvider>(serviceProvider => factory(serviceProvider, configuration, options)));
+            services.TryAddNLogLoggingProvider((svc, addlogging) => svc.AddLogging(addlogging), configuration, options, factory);
         }
 
         private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration configuration, NLogProviderOptions options)
         {
             configuration = SetupConfiguration(serviceProvider, configuration);
             NLogLoggerProvider provider = new NLogLoggerProvider(options);
-            if (configuration != null && options == null)
+            if (configuration != null)
             {
-                provider.Configure(configuration.GetSection("Logging:NLog"));
+                if (options == null)
+                {
+                    provider.Configure(configuration.GetSection("Logging:NLog"));
+                }
+
+                provider.TryLoadConfigurationFromSection(configuration);
             }
             return provider;
         }

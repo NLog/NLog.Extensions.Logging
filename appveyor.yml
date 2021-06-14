@@ -29,8 +29,9 @@ test_script:
   - OpenCover\tools\OpenCover.Console.exe -register:user -mergeoutput -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test -f netcoreapp3.1  -c debug NLog.Extensions.Hosting.Tests" -filter:"+[NLog.Extensions.Logging]* +[NLog.Extensions.Hosting]* -[NLog.Extensions.Logging.Tests]* -[NLog.Extensions.Hosting.Tests]*" -output:"coverage.xml" -oldstyle -targetdir:"test"
   - OpenCover\tools\OpenCover.Console.exe -register:user -mergeoutput -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test -f net5.0         -c debug NLog.Extensions.Hosting.Tests" -filter:"+[NLog.Extensions.Logging]* +[NLog.Extensions.Hosting]* -[NLog.Extensions.Logging.Tests]* -[NLog.Extensions.Hosting.Tests]*" -output:"coverage.xml" -oldstyle -targetdir:"test"
   - pip install codecov
-  - pip install codecov
   - codecov -f "coverage.xml"
+  - set JAVA_HOME=C:\Program Files\Java\jdk11
+  - set PATH=%JAVA_HOME%\bin;%PATH%
   - ps: .\run-sonar.ps1
   - ps: .\run-tests.ps1
 
