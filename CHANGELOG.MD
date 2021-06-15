@@ -2,6 +2,14 @@
 
 Date format: (year/month/day)
 
+### v1.7.3 (2021/06/15)
+- [#510](https://github.com/NLog/NLog.Extensions.Logging/pull/510) Reduced code complexity of MicrosoftILoggerTarget (@snakefoot)
+- [#509](https://github.com/NLog/NLog.Extensions.Logging/pull/509) Faster checking if LogLevel IsEnabled (#509) (@snakefoot)
+- [#507](https://github.com/NLog/NLog.Extensions.Logging/pull/507) Bump NLog from 4.7.9 to 4.7.10 (#507) (@dependabot[bot])
+- [#501](https://github.com/NLog/NLog.Extensions.Logging/pull/501) Extended NLogProviderOptions with the option LoggingConfigurationSectionName (#501) (@snakefoot)
+- [#500](https://github.com/NLog/NLog.Extensions.Logging/pull/500) Support TargetDefaultWrapper and TargetDefaultParameters in appsettings.json (#500) (@snakefoot)
+- [#494](https://github.com/NLog/NLog.Extensions.Logging/pull/494) Fix SonarQube Scanning (#494) (@304NotModified)
+
 ### v1.7.2 (2021/03/26)
 - [#495](https://github.com/NLog/NLog.Extensions.Logging/pull/495) Bump NLog from 4.7.8 to 4.7.9 (#495) (@dependabot[bot])
 - [#490](https://github.com/NLog/NLog.Extensions.Logging/pull/490) MicrosoftConsoleLayoutRenderer - For Hosting Lifetime Startup Messages (#490) (@snakefoot)
@@ -10,7 +18,6 @@ Date format: (year/month/day)
 - [#479](https://github.com/NLog/NLog.Extensions.Logging/pull/479) Enable deterministic build (#479) (@304NotModified)
 
 ### v1.7.1 (2021/02/26)
-
 - [#476](https://github.com/NLog/NLog.Extensions.Logging/pull/476) MicrosoftILoggerTarget - Add support for override LoggerName when using ILoggerFactory (#476) (@snakefoot)
 - [#470](https://github.com/NLog/NLog.Extensions.Logging/pull/470) MicrosoftILoggerTarget - Reduce chance of deadlock in ILoggerFactory by caching created loggers (#470) (@snakefoot)
 - [#468](https://github.com/NLog/NLog.Extensions.Logging/pull/468) MicrosoftILoggerTarget - With ILoggerFactory as constructor parameter (#468) (@snakefoot)

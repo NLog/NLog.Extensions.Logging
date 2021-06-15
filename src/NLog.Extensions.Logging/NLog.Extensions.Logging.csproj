@@ -19,11 +19,12 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logging;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
 
-- Bump NLog from 4.7.8 to 4.7.9 (#495) (@dependabot[bot])
-- MicrosoftConsoleLayoutRenderer - For Hosting Lifetime Startup Messages (#490) (@snakefoot)
-- NLogLoggingConfiguration support custom section names (#488) (@anellomancante)
-- NLogProviderOptions - Added ReplaceLoggerFactory and RemoveLoggerFactoryFilter (#482) (@snakefoot)
-- Enable deterministic build (#479) (@304NotModified)
+- Reduced code complexity of MicrosoftILoggerTarget (@snakefoot)
+- Faster checking if LogLevel IsEnabled (#509) (@snakefoot)
+- Bump NLog from 4.7.9 to 4.7.10 (#507) (@dependabot[bot])
+- Extended NLogProviderOptions with the option LoggingConfigurationSectionName (#501) (@snakefoot)
+- Support TargetDefaultWrapper and TargetDefaultParameters in appsettings.json (#500) (@snakefoot)
+- Fix SonarQube Scanning (#494) (@304NotModified)
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
     </PackageReleaseNotes>
