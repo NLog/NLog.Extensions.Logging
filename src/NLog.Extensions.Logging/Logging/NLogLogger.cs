@@ -137,7 +137,7 @@ namespace NLog.Extensions.Logging
                 // Parsing not needed, we take the fast route 
                 var originalMessage = messageParameters.GetOriginalMessage(messageProperties);
                 var eventInfo = new LogEventInfo(nLogLogLevel, _logger.Name, originalMessage ?? message, messageParameters.IsPositional ? EmptyParameterArray : messageParameters);
-                if (originalMessage != null)
+                if (originalMessage != null && (!ReferenceEquals(originalMessage, message) || messageParameters.Count > 0))
                 {
                     SetLogEventMessageFormatter(eventInfo, messageParameters, message);
                 }
