@@ -48,7 +48,7 @@ if ($env:APPVEYOR_REPO_NAME -eq $github) {
         exit $LastExitCode 
     }
 
-    msbuild /t:Rebuild $projectFile /p:targetFrameworks=$framework /verbosity:minimal
+    msbuild /t:Rebuild $projectFile /p:targetFrameworks=$framework /verbosity:minimal /p:DisableImplicitNuGetFallbackFolder=true
     if (-Not $LastExitCode -eq 0) {
         exit $LastExitCode 
     }
