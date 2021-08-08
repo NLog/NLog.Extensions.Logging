@@ -16,22 +16,22 @@ if (-Not $versionSuffix.Equals("")) {
     $versionProduct = $versionProduct + "-" + $versionSuffix 
 }
 
-dotnet restore .\src\NLog.Extensions.Logging\
+dotnet restore .\src\NLog.Extensions.Logging\ /p:DisableImplicitNuGetFallbackFolder=true
 if (-Not $LastExitCode -eq 0) {
     exit $LastExitCode 
 }
 
-dotnet restore .\src\NLog.Extensions.Hosting\
+dotnet restore .\src\NLog.Extensions.Hosting\ /p:DisableImplicitNuGetFallbackFolder=true
 if (-Not $LastExitCode -eq 0) {
     exit $LastExitCode 
 }
 
-msbuild /t:Pack .\src\NLog.Extensions.Logging\ /p:targetFrameworks='"net451;net461;netstandard1.3;netstandard1.5;netstandard2.0;netcoreapp3.0;net5.0"' /p:VersionPrefix=$versionPrefix /p:VersionSuffix=$versionSuffix /p:FileVersion=$versionFile /p:ProductVersion=$versionProduct /p:Configuration=Release /p:DisableImplicitNuGetFallbackFolder=true /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=..\..\artifacts /verbosity:minimal /p:ContinuousIntegrationBuild=true
+msbuild /t:Pack .\src\NLog.Extensions.Logging\ /p:targetFrameworks='"net451;net461;netstandard1.3;netstandard1.5;netstandard2.0;netcoreapp3.0;net5.0"' /p:VersionPrefix=$versionPrefix /p:VersionSuffix=$versionSuffix /p:FileVersion=$versionFile /p:ProductVersion=$versionProduct /p:Configuration=Release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=..\..\artifacts /verbosity:minimal /p:ContinuousIntegrationBuild=true
 if (-Not $LastExitCode -eq 0) {
     exit $LastExitCode 
 }
 
-msbuild /t:Pack .\src\NLog.Extensions.Hosting\ /p:targetFrameworks='"netstandard2.0;netcoreapp3.0;net5.0"' /p:VersionPrefix=$versionPrefix /p:VersionSuffix=$versionSuffix /p:FileVersion=$versionFile /p:ProductVersion=$versionProduct /p:Configuration=Release /p:DisableImplicitNuGetFallbackFolder=true /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=..\..\artifacts /verbosity:minimal /p:ContinuousIntegrationBuild=true
+msbuild /t:Pack .\src\NLog.Extensions.Hosting\ /p:targetFrameworks='"netstandard2.0;netcoreapp3.0;net5.0"' /p:VersionPrefix=$versionPrefix /p:VersionSuffix=$versionSuffix /p:FileVersion=$versionFile /p:ProductVersion=$versionProduct /p:Configuration=Release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=..\..\artifacts /verbosity:minimal /p:ContinuousIntegrationBuild=true
 if (-Not $LastExitCode -eq 0) {
     exit $LastExitCode 
 }
