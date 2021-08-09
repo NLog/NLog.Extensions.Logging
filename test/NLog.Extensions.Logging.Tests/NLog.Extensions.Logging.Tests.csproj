@@ -13,6 +13,7 @@
     <AssemblyOriginatorKeyFile>..\..\src\NLog.snk</AssemblyOriginatorKeyFile>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <LangVersion>latest</LangVersion>
+    <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' or '$(TargetFramework)' == 'net452' ">
