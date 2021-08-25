@@ -22,7 +22,7 @@ categories:
        - 'test'
        - 'tests'
        - 'build'
-  - title: 'Dependencies'
+  - title: '↜ Dependencies'
     labels:
       - 'dependencies'
       - 'dependency'
@@ -43,5 +43,3 @@ version-resolver:
 change-template: '- #$NUMBER: $TITLE (@$AUTHOR)'
 template: |
   $CHANGES
-  
-  Many thanks to $CONTRIBUTORS for this release!
