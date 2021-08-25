@@ -22,9 +22,26 @@ categories:
        - 'test'
        - 'tests'
        - 'build'
+  - title: 'Dependencies'
+    labels:
+      - 'dependencies'
+      - 'dependency'
 exclude-labels:
   - 'skip-changelog'  
   - 'release'
+version-resolver:
+  major:
+    labels:
+      - 'Major version'
+  minor:
+    labels:
+      - 'Minor version'
+  patch:
+    labels:
+      - 'Patch version'
+  default: patch
 change-template: '- #$NUMBER: $TITLE (@$AUTHOR)'
 template: |
   $CHANGES
+  
+  Many thanks to $CONTRIBUTORS for this release!
