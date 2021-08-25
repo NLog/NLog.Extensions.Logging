@@ -19,9 +19,9 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logging;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
 
-- #513: NLogLogger - Skip custom message formatting when no parameters (@snakefoot)
-- #515: Disable ImplicitNuGetFallbackFolder for tests - fixes NU3005 on AppVeyor (@304NotModified)
-- #516: Bump NLog from 4.7.10 to 4.7.11 (@dependabot)
+- NLogLogger - Skip custom message formatting when no parameters (#513) (@snakefoot)
+- Disable ImplicitNuGetFallbackFolder for tests - fixes NU3005 on AppVeyor (#515) (@304NotModified)
+- Bump NLog from 4.7.10 to 4.7.11 (#516) (@dependabot)
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
     </PackageReleaseNotes>
