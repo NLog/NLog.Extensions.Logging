@@ -40,6 +40,6 @@ version-resolver:
     labels:
       - 'Patch version'
   default: patch
-change-template: '- #$NUMBER: $TITLE (@$AUTHOR)'
+change-template: '- [#$NUMBER]($URL): $TITLE (@$AUTHOR)'
 template: |
   $CHANGES
