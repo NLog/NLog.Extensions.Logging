@@ -19,12 +19,9 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logging;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
 
-- Reduced code complexity of MicrosoftILoggerTarget (@snakefoot)
-- Faster checking if LogLevel IsEnabled (#509) (@snakefoot)
-- Bump NLog from 4.7.9 to 4.7.10 (#507) (@dependabot[bot])
-- Extended NLogProviderOptions with the option LoggingConfigurationSectionName (#501) (@snakefoot)
-- Support TargetDefaultWrapper and TargetDefaultParameters in appsettings.json (#500) (@snakefoot)
-- Fix SonarQube Scanning (#494) (@304NotModified)
+- #513: NLogLogger - Skip custom message formatting when no parameters (@snakefoot)
+- #515: Disable ImplicitNuGetFallbackFolder for tests - fixes NU3005 on AppVeyor (@304NotModified)
+- #516: Bump NLog from 4.7.10 to 4.7.11 (@dependabot)
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
     </PackageReleaseNotes>
