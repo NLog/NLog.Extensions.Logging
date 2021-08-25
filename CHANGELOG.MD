@@ -2,6 +2,21 @@
 
 Date format: (year/month/day)
 
+### v1.7.4 (2021/08/25)
+
+#### ⏩ Performance
+
+- [#513](https://github.com/NLog/NLog.Extensions.Logging/pull/513): NLogLogger - Skip custom message formatting when no parameters (@snakefoot)
+
+#### 🔧 Maintenance
+
+- [#515](https://github.com/NLog/NLog.Extensions.Logging/pull/515): Disable ImplicitNuGetFallbackFolder for tests - fixes NU3005 on AppVeyor (@304NotModified)
+
+#### ↜ Dependencies
+
+- [#516](https://github.com/NLog/NLog.Extensions.Logging/pull/516): Bump NLog from 4.7.10 to 4.7.11 (@dependabot)
+
+
 ### v1.7.3 (2021/06/15)
 - [#510](https://github.com/NLog/NLog.Extensions.Logging/pull/510) Reduced code complexity of MicrosoftILoggerTarget (@snakefoot)
 - [#509](https://github.com/NLog/NLog.Extensions.Logging/pull/509) Faster checking if LogLevel IsEnabled (#509) (@snakefoot)
