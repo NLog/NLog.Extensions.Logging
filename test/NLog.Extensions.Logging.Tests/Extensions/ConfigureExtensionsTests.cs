@@ -78,7 +78,7 @@ namespace NLog.Extensions.Logging.Tests.Extensions
         }
 #endif
 
-#if !NETCOREAPP1_1 && !NET452
+#if !NETCOREAPP1_1
         [Fact]
         public void AddNLog_LoggingBuilder_LogInfo_ShouldLogToNLog()
         {
