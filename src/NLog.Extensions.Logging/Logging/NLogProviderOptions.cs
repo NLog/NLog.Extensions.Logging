@@ -19,7 +19,7 @@
         public bool IgnoreEmptyEventId { get; set; } = true;
 
         /// <summary>
-        /// Enable structured logging by capturing message template parameters and inject into the <see cref="LogEventInfo.Properties" />-dictionary
+        /// Enable structured logging by capturing message template parameters with support for "@" and "$". Enables use of ${message:raw=true}
         /// </summary>
         public bool CaptureMessageTemplates { get; set; } = true;
 
@@ -73,6 +73,14 @@
         /// </summary>
         /// <remarks>Will only attempt to load NLog-LoggingConfiguration if valid section-name, and NLog-LoggingConfiguration has not been loaded already.</remarks>
         public string LoggingConfigurationSectionName { get; set; }
+
+        /// <summary>
+        /// Enable additional capture of the entire <see cref="Microsoft.Extensions.Logging.EventId"/> as "EventId"-property.
+        /// </summary>
+        /// <remarks>
+        /// Enabling capture of the entire "EventId" will increase memory allocation and gives a performance hit. Faster to use "EventId_Id" + "EventId_Name".
+        /// </remarks>
+        public bool CaptureEntireEventId { get; set; }
 
         /// <summary>Initializes a new instance NLogProviderOptions with default values.</summary>
         public NLogProviderOptions()

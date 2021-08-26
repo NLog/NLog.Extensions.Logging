@@ -31,21 +31,24 @@ namespace NLog.Extensions.Logging.Tests.Extensions
         }
 
         [Theory]
-        [InlineData("EventId", "eventId2")]
-        [InlineData("EventId_Name", "eventId2")]
-        [InlineData("EventId_Id", "2")]
+        [InlineData("EventId", "eventId_2", true)]
+        [InlineData("EventId_Name", "eventId_2", true)]
+        [InlineData("EventId_Id", "2", true)]
+        [InlineData("EventId", "", false)]
+        [InlineData("EventId_Name", "eventId_2", false)]
+        [InlineData("EventId_Id", "2", false)]
         [Obsolete("Instead use ILoggingBuilder.AddNLog() or IHostBuilder.UseNLog()")]
-        public void AddNLog_LoggerFactory_LogInfoWithEventId_ShouldLogToNLogWithEventId(string eventPropery, string expectedEventInLog)
+        public void AddNLog_LoggerFactory_LogInfoWithEventId_ShouldLogToNLogWithEventId(string eventPropery, string expectedEventInLog, bool captureEntireEventId)
         {
             // Arrange
             var loggerFactory = new LoggerFactory();
             var config = CreateConfigWithMemoryTarget(out var memoryTarget, $"${{event-properties:{eventPropery}}} - ${{message}}");
 
             // Act
-            loggerFactory.AddNLog(new NLogProviderOptions { EventIdSeparator = "_" });
+            loggerFactory.AddNLog(new NLogProviderOptions { EventIdSeparator = "_", CaptureEntireEventId = captureEntireEventId });
             LogManager.Configuration = config;
             var logger = loggerFactory.CreateLogger("logger1");
-            logger.LogInformation(new EventId(2, "eventId2"), "test message with {0} arg", 1);
+            logger.LogInformation(new EventId(2, "eventId_2"), "test message with {0} arg", 1);
 
             // Assert
             AssertSingleMessage(memoryTarget, $"{expectedEventInLog} - test message with 1 arg");
@@ -95,15 +98,18 @@ namespace NLog.Extensions.Logging.Tests.Extensions
         }
 
         [Theory]
-        [InlineData("EventId", "eventId2")]
-        [InlineData("EventId_Name", "eventId2")]
-        [InlineData("EventId_Id", "2")]
-        public void AddNLog_LoggingBuilder_LogInfoWithEventId_ShouldLogToNLogWithEventId(string eventPropery, string expectedEventInLog)
+        [InlineData("EventId", "eventId2", true)]
+        [InlineData("EventId_Name", "eventId2", true)]
+        [InlineData("EventId_Id", "2", true)]
+        [InlineData("EventId", "", false)]
+        [InlineData("EventId_Name", "eventId2", false)]
+        [InlineData("EventId_Id", "2", false)]
+        public void AddNLog_LoggingBuilder_LogInfoWithEventId_ShouldLogToNLogWithEventId(string eventPropery, string expectedEventInLog, bool captureEntireEventId)
         {
             // Arrange
             ILoggingBuilder builder = new LoggingBuilderStub();
             var config = CreateConfigWithMemoryTarget(out var memoryTarget, $"${{event-properties:{eventPropery}}} - ${{message}}");
-            var options = new NLogProviderOptions { EventIdSeparator = "_" };
+            var options = new NLogProviderOptions { EventIdSeparator = "_", CaptureEntireEventId = captureEntireEventId };
 
             // Act
             builder.AddNLog(config, options);
