@@ -42,7 +42,7 @@ namespace NLog.Extensions.Hosting
         private static void AddNLogLoggerProvider(IServiceCollection services, IConfiguration configuration, NLogProviderOptions options, Func<IServiceProvider, IConfiguration, NLogProviderOptions, NLogLoggerProvider> factory)
         {
             ConfigurationItemFactory.Default.RegisterItemsFromAssembly(typeof(ConfigureExtensions).GetTypeInfo().Assembly);
-
+            LogManager.AddHiddenAssembly(typeof(ConfigureExtensions).GetTypeInfo().Assembly);
             services.TryAddNLogLoggingProvider((svc, addlogging) => svc.AddLogging(addlogging), configuration, options, factory);
         }
 
