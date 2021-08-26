@@ -13,7 +13,7 @@ namespace NLog.Extensions.Logging.Tests
         public void TestNonSerializableSayHello()
         {
             var runner = GetRunner<CustomBeginScopeTestRunner>();
-            var target = new Targets.MemoryTarget { Layout = "${message} ${mdlc:World}. Welcome ${ndlc}" };
+            var target = new Targets.MemoryTarget { Layout = "${message} ${scopeproperty:World}. Welcome ${ndlc}" };
             ConfigureNLog(target);
             runner.SayHello().Wait();
             Assert.Single(target.Logs);
@@ -24,7 +24,7 @@ namespace NLog.Extensions.Logging.Tests
         public void TestNonSerializableSayHelloWithScope()
         {
             var runner = GetRunner<CustomBeginScopeTestRunner>(new NLogProviderOptions { IncludeScopes = false });
-            var target = new Targets.MemoryTarget { Layout = "${message} ${mdlc:World}. Welcome ${ndlc}" };
+            var target = new Targets.MemoryTarget { Layout = "${message} ${scopeproperty:World}. Welcome ${ndlc}" };
             ConfigureNLog(target);
             runner.SayHello().Wait();
             Assert.Single(target.Logs);
@@ -35,7 +35,7 @@ namespace NLog.Extensions.Logging.Tests
         public void TestNonSerializableSayHi()
         {
             var runner = GetRunner<CustomBeginScopeTestRunner>();
-            var target = new Targets.MemoryTarget { Layout = "${message} ${mdlc:World}. Welcome ${ndlc}" };
+            var target = new Targets.MemoryTarget { Layout = "${message} ${scopeproperty:World}. Welcome ${ndlc}" };
             ConfigureNLog(target);
             var scopeString = runner.SayHi().Result;
             Assert.Single(target.Logs);
@@ -47,7 +47,7 @@ namespace NLog.Extensions.Logging.Tests
         public void TestNonSerializableSayHiToEarth()
         {
             var runner = GetRunner<CustomBeginScopeTestRunner>();
-            var target = new Targets.MemoryTarget { Layout = "${message} ${mdlc:Planet}. Welcome to the ${mdlc:Galaxy}" };
+            var target = new Targets.MemoryTarget { Layout = "${message} ${scopeproperty:Planet}. Welcome to the ${scopeproperty:Galaxy}" };
             ConfigureNLog(target);
             var scopeString = runner.SayHiToEarth().Result;
             Assert.Single(target.Logs);

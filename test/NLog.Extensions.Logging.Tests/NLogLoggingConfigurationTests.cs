@@ -156,7 +156,7 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Single(logConfig.AllTargets.Where(t => t is FileTarget));
             Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
             Assert.Equal("hello.txt", (logConfig.FindTargetByName("file") as FileTarget)?.FileName?.Render(LogEventInfo.CreateNullEvent()));
-            Assert.True((logConfig.FindTargetByName("console") as ConsoleTarget)?.Error);
+            Assert.True((logConfig.FindTargetByName("console") as ConsoleTarget)?.StdErr);
         }
 
         [Fact]
@@ -175,7 +175,7 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Single(logConfig.AllTargets.Where(t => t is FileTarget));
             Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
             Assert.Equal("hello.txt", (logConfig.FindTargetByName("file") as FileTarget)?.FileName?.Render(LogEventInfo.CreateNullEvent()));
-            Assert.True((logConfig.FindTargetByName("console") as ConsoleTarget)?.Error);
+            Assert.True((logConfig.FindTargetByName("console") as ConsoleTarget)?.StdErr);
         }
 
         [Fact]
@@ -255,7 +255,6 @@ namespace NLog.Extensions.Logging.Tests
 
             var logFactory = new LogFactory();
             logFactory.Setup()
-                .SetupExtensions(s => s.AutoLoadAssemblies(false))
                 .LoadConfigurationFromSection(configuration);
 
             Assert.Single(logFactory.Configuration.LoggingRules);

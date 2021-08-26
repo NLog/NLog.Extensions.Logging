@@ -45,10 +45,10 @@ namespace NLog.Extensions.Logging.Tests
         {
             // Arrange
             var (logger, mock) = CreateLoggerFactoryMock(out var microsoftTarget);
-            microsoftTarget.LoggerName = "${mdlc:FunctionName}";
+            microsoftTarget.LoggerName = "${scopeproperty:FunctionName}";
 
             // Act
-            using (NLog.MappedDiagnosticsLogicalContext.SetScoped("FunctionName", nameof(OverrideLoggerNameILoggerFactoryMessageTest)))
+            using (NLog.ScopeContext.PushProperty("FunctionName", nameof(OverrideLoggerNameILoggerFactoryMessageTest)))
                 logger.Info("Hello World");
 
             // Assert
@@ -162,7 +162,7 @@ namespace NLog.Extensions.Logging.Tests
         {
             // Arrange
             var (logger, mock) = CreateLoggerMock(out var target);
-            target.IncludeMdc = true;
+            target.IncludeScopeProperties = true;
 
             // Act
             logger.Info("Hello there");

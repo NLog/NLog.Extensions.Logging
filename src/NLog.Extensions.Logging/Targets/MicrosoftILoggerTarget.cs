@@ -42,7 +42,6 @@ namespace NLog.Extensions.Logging
         {
             _logger = logger;
             Layout = "${message}";
-            OptimizeBufferReuse = true;
         }
 
         /// <summary>
@@ -53,7 +52,6 @@ namespace NLog.Extensions.Logging
         {
             _loggerFactory = loggerFactory;
             Layout = "${message}";
-            OptimizeBufferReuse = true;
         }
 
         /// <inheritdoc />
@@ -91,7 +89,7 @@ namespace NLog.Extensions.Logging
             var layoutMessage = RenderLogEvent(Layout, logEvent);
 
             IDictionary<string, object> contextProperties = null;
-            if (ContextProperties.Count > 0 || IncludeMdlc || IncludeMdc || IncludeGdc)
+            if (ContextProperties.Count > 0 || IncludeScopeProperties || IncludeGdc)
             {
                 contextProperties = GetContextProperties(logEvent);
                 if (contextProperties?.Count == 0)

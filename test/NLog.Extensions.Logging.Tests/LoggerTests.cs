@@ -131,12 +131,12 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Theory]
-        [InlineData(Microsoft.Extensions.Logging.LogLevel.Critical, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|FATAL|message Exception of type 'System.Exception' was thrown.|20")]
-        [InlineData(Microsoft.Extensions.Logging.LogLevel.Debug, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message Exception of type 'System.Exception' was thrown.|20")]
-        [InlineData(Microsoft.Extensions.Logging.LogLevel.Error, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|ERROR|message Exception of type 'System.Exception' was thrown.|20")]
-        [InlineData(Microsoft.Extensions.Logging.LogLevel.Information, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|INFO|message Exception of type 'System.Exception' was thrown.|20")]
-        [InlineData(Microsoft.Extensions.Logging.LogLevel.Trace, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|TRACE|message Exception of type 'System.Exception' was thrown.|20")]
-        [InlineData(Microsoft.Extensions.Logging.LogLevel.Warning, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|WARN|message Exception of type 'System.Exception' was thrown.|20")]
+        [InlineData(Microsoft.Extensions.Logging.LogLevel.Critical, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|FATAL|message System.Exception: Exception of type 'System.Exception' was thrown.|20")]
+        [InlineData(Microsoft.Extensions.Logging.LogLevel.Debug, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message System.Exception: Exception of type 'System.Exception' was thrown.|20")]
+        [InlineData(Microsoft.Extensions.Logging.LogLevel.Error, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|ERROR|message System.Exception: Exception of type 'System.Exception' was thrown.|20")]
+        [InlineData(Microsoft.Extensions.Logging.LogLevel.Information, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|INFO|message System.Exception: Exception of type 'System.Exception' was thrown.|20")]
+        [InlineData(Microsoft.Extensions.Logging.LogLevel.Trace, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|TRACE|message System.Exception: Exception of type 'System.Exception' was thrown.|20")]
+        [InlineData(Microsoft.Extensions.Logging.LogLevel.Warning, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|WARN|message System.Exception: Exception of type 'System.Exception' was thrown.|20")]
         public void TestExceptionWithMessage(Microsoft.Extensions.Logging.LogLevel logLevel, string expectedLogMessage)
         {
             GetRunner().Log(logLevel, 20, new Exception(), "message");
@@ -146,12 +146,12 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Theory]
-        [InlineData(Microsoft.Extensions.Logging.LogLevel.Critical, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|FATAL| Exception of type 'System.Exception' was thrown.|20")]
-        [InlineData(Microsoft.Extensions.Logging.LogLevel.Debug, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG| Exception of type 'System.Exception' was thrown.|20")]
-        [InlineData(Microsoft.Extensions.Logging.LogLevel.Error, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|ERROR| Exception of type 'System.Exception' was thrown.|20")]
-        [InlineData(Microsoft.Extensions.Logging.LogLevel.Information, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|INFO| Exception of type 'System.Exception' was thrown.|20")]
-        [InlineData(Microsoft.Extensions.Logging.LogLevel.Trace, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|TRACE| Exception of type 'System.Exception' was thrown.|20")]
-        [InlineData(Microsoft.Extensions.Logging.LogLevel.Warning, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|WARN| Exception of type 'System.Exception' was thrown.|20")]
+        [InlineData(Microsoft.Extensions.Logging.LogLevel.Critical, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|FATAL| System.Exception: Exception of type 'System.Exception' was thrown.|20")]
+        [InlineData(Microsoft.Extensions.Logging.LogLevel.Debug, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG| System.Exception: Exception of type 'System.Exception' was thrown.|20")]
+        [InlineData(Microsoft.Extensions.Logging.LogLevel.Error, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|ERROR| System.Exception: Exception of type 'System.Exception' was thrown.|20")]
+        [InlineData(Microsoft.Extensions.Logging.LogLevel.Information, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|INFO| System.Exception: Exception of type 'System.Exception' was thrown.|20")]
+        [InlineData(Microsoft.Extensions.Logging.LogLevel.Trace, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|TRACE| System.Exception: Exception of type 'System.Exception' was thrown.|20")]
+        [InlineData(Microsoft.Extensions.Logging.LogLevel.Warning, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|WARN| System.Exception: Exception of type 'System.Exception' was thrown.|20")]
         public void TestExceptionWithEmptyMessage(Microsoft.Extensions.Logging.LogLevel logLevel, string expectedLogMessage)
         {
             GetRunner().Log(logLevel, 20, new Exception(), string.Empty);
@@ -161,12 +161,12 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Theory]
-        [InlineData(Microsoft.Extensions.Logging.LogLevel.Critical, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|FATAL|[null] Exception of type 'System.Exception' was thrown.|20")]
-        [InlineData(Microsoft.Extensions.Logging.LogLevel.Debug, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|[null] Exception of type 'System.Exception' was thrown.|20")]
-        [InlineData(Microsoft.Extensions.Logging.LogLevel.Error, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|ERROR|[null] Exception of type 'System.Exception' was thrown.|20")]
-        [InlineData(Microsoft.Extensions.Logging.LogLevel.Information, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|INFO|[null] Exception of type 'System.Exception' was thrown.|20")]
-        [InlineData(Microsoft.Extensions.Logging.LogLevel.Trace, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|TRACE|[null] Exception of type 'System.Exception' was thrown.|20")]
-        [InlineData(Microsoft.Extensions.Logging.LogLevel.Warning, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|WARN|[null] Exception of type 'System.Exception' was thrown.|20")]
+        [InlineData(Microsoft.Extensions.Logging.LogLevel.Critical, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|FATAL|[null] System.Exception: Exception of type 'System.Exception' was thrown.|20")]
+        [InlineData(Microsoft.Extensions.Logging.LogLevel.Debug, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|[null] System.Exception: Exception of type 'System.Exception' was thrown.|20")]
+        [InlineData(Microsoft.Extensions.Logging.LogLevel.Error, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|ERROR|[null] System.Exception: Exception of type 'System.Exception' was thrown.|20")]
+        [InlineData(Microsoft.Extensions.Logging.LogLevel.Information, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|INFO|[null] System.Exception: Exception of type 'System.Exception' was thrown.|20")]
+        [InlineData(Microsoft.Extensions.Logging.LogLevel.Trace, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|TRACE|[null] System.Exception: Exception of type 'System.Exception' was thrown.|20")]
+        [InlineData(Microsoft.Extensions.Logging.LogLevel.Warning, "NLog.Extensions.Logging.Tests.LoggerTests.Runner|WARN|[null] System.Exception: Exception of type 'System.Exception' was thrown.|20")]
         public void TestExceptionWithNullMessage(Microsoft.Extensions.Logging.LogLevel logLevel, string expectedLogMessage)
         {
             GetRunner().Log(logLevel, 20, new Exception(), null);
