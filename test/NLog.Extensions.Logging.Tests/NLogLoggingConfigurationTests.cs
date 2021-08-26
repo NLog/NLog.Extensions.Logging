@@ -230,9 +230,8 @@ namespace NLog.Extensions.Logging.Tests
         {
             var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
             memoryConfig["NLog:Targets:file:type"] = "File";
-            memoryConfig["NLog:Targets:file:fileName"] = "${var:var_filename}";
+            memoryConfig["NLog:Targets:file:fileName"] = "${var_filename}";
             memoryConfig["NLog:autoreload"] = "true";
-            memoryConfig["NLog:KeepVariablesOnReload"] = "true";
             memoryConfig["NLog:variables:var_filename"] = "hello.txt";
             var configuration = new ConfigurationBuilder().AddInMemoryCollection(memoryConfig).Build();
             var logFactory = new LogFactory();
@@ -240,7 +239,6 @@ namespace NLog.Extensions.Logging.Tests
             logFactory.Configuration = logConfig;
             Assert.Equal("hello.txt", (logFactory.Configuration.FindTargetByName("file") as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
             logFactory.Configuration.Variables["var_filename"] = "updated.txt";
-            Assert.Equal("updated.txt", (logFactory.Configuration.FindTargetByName("file") as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
             configuration.Reload(); // Automatic Reload
             Assert.Equal("updated.txt", (logFactory.Configuration.FindTargetByName("file") as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
         }
