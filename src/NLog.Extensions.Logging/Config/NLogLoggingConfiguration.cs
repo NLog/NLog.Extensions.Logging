@@ -36,7 +36,16 @@ namespace NLog.Extensions.Logging
             : base(logFactory)
         {
             _originalConfigSection = nlogConfig;
-            _autoReload = LoadConfigurationSection(nlogConfig);
+            LoadConfigurationSection(nlogConfig);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NLogLoggingConfiguration" /> class.
+        /// </summary>
+        private NLogLoggingConfiguration(LogFactory logFactory, IConfigurationSection nlogConfig)
+            : base(logFactory)
+        {
+            _originalConfigSection = nlogConfig;
         }
 
         /// <summary>
@@ -60,14 +69,22 @@ namespace NLog.Extensions.Logging
         /// <inheritdoc />
         public override LoggingConfiguration Reload()
         {
-            return new NLogLoggingConfiguration(_originalConfigSection, LogFactory);
+            return ReloadLoggingConfiguration(_originalConfigSection);
         }
 
-        private bool LoadConfigurationSection(IConfigurationSection nlogConfig)
+        private LoggingConfiguration ReloadLoggingConfiguration(IConfigurationSection nlogConfig)
+        {
+            var newConfig = new NLogLoggingConfiguration(LogFactory, nlogConfig);
+            newConfig.PrepareForReload(this);   // Ensure KeepVariablesOnReload works as intended
+            newConfig.LoadConfigurationSection(nlogConfig);
+            return newConfig;
+        }
+
+        private void LoadConfigurationSection(IConfigurationSection nlogConfig)
         {
             var configElement = new LoggingConfigurationElement(nlogConfig, RootSectionKey);
             LoadConfig(configElement, null);
-            return configElement.AutoReload;
+            _autoReload = configElement.AutoReload;
         }
 
         private void LogFactory_ConfigurationChanged(object sender, LoggingConfigurationChangedEventArgs e)
@@ -100,15 +117,10 @@ namespace NLog.Extensions.Logging
                 }
 
                 InternalLogger.Info("Reloading NLogLoggingConfiguration...");
-                var newConfig = new NLogLoggingConfiguration(nlogConfig, LogFactory);
+                var newConfig = ReloadLoggingConfiguration(nlogConfig);
                 var oldConfig = LogFactory.Configuration;
                 if (oldConfig != null)
                 {
-                    if (LogFactory.KeepVariablesOnReload)
-                    {
-                        foreach (var variable in oldConfig.Variables)
-                            newConfig.Variables[variable.Key] = variable.Value;
-                    }
                     LogFactory.Configuration = newConfig;
                 }
             }
