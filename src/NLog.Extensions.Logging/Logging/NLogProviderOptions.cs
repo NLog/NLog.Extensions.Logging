@@ -60,7 +60,7 @@
         /// Resets the default Microsoft LoggerFactory Filter for the <see cref="NLogLoggerProvider"/>, and instead only uses NLog LoggingRules.
         /// </summary>
         /// <remarks>This option affects the building of service configuration, so assigning it from appsettings.json has no effect (loaded after).</remarks>
-        public bool RemoveLoggerFactoryFilter { get; set; }
+        public bool RemoveLoggerFactoryFilter { get; set; } = true;
 
         /// <summary>
         /// Replace Microsoft LoggerFactory with a pure <see cref="NLogLoggerFactory" />, and disables Microsoft Filter Logic and multiple LoggingProvider support.
