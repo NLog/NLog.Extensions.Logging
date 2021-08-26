@@ -466,7 +466,7 @@ namespace NLog.Extensions.Logging
         }
 
         /// <summary>
-        /// Begin a scope. Use in config with ${ndlc} 
+        /// Begin a scope. Use in config with ${scopeproperty} or ${scopenested}
         /// </summary>
         /// <param name="state">The state (message)</param>
         /// <returns></returns>

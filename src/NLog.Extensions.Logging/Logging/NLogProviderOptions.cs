@@ -34,7 +34,7 @@
         public bool ParseMessageTemplates { get; set; }
 
         /// <summary>
-        /// Enable capture of scope information and inject into <see cref="NestedDiagnosticsLogicalContext" /> and <see cref="MappedDiagnosticsLogicalContext" />
+        /// Enable capture of scope information and inject into <see cref="NLog.ScopeContext" />
         /// </summary>
         public bool IncludeScopes { get; set; } = true;
 

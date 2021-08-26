@@ -59,11 +59,10 @@ namespace NLog.Extensions.Logging.Tests.Extensions
         public void AddNLog_LoggerFactory_IncludeActivtyIdsWithBeginScope()
         {
             // Arrange
-            var loggerFactory = new LoggerFactory();
-            var config = CreateConfigWithMemoryTarget(out var memoryTarget, $"${{mdlc:ParentId}} - ${{message}}");
+            var loggerFactory = LoggerFactory.Create(builder => builder.AddNLog(new NLogProviderOptions { IncludeActivtyIdsWithBeginScope = true }));
+            var config = CreateConfigWithMemoryTarget(out var memoryTarget, $"${{scopeproperty:ParentId}} - ${{message}}");
 
             // Act
-            loggerFactory.AddNLog(new NLogProviderOptions { IncludeActivtyIdsWithBeginScope = true });
             LogManager.Configuration = config;
             var logger = loggerFactory.CreateLogger(nameof(AddNLog_LoggerFactory_IncludeActivtyIdsWithBeginScope));
             var activity = new System.Diagnostics.Activity("TestActivity").SetParentId("42").Start();
