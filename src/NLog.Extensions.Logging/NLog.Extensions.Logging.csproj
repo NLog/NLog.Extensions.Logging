@@ -19,10 +19,20 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logging;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
 
-- NLogLogger - Skip custom message formatting when no parameters (#513) (@snakefoot)
-- Disable ImplicitNuGetFallbackFolder for tests - fixes NU3005 on AppVeyor (#515) (@304NotModified)
-- Bump NLog from 4.7.10 to 4.7.11 (#516) (@dependabot)
+Version 5 for NLog 5
 
+## Features
+- Changed LoggingConfigurationSectionName to default NLog (@snakefoot)
+- Add support for config variables with JsonLayout (@snakefoot)
+
+## Enhancements
+- Reload now fully support KeepVariablesOnReload (@snakefoot)
+- Change default value for RemoveLoggerFactoryFilter to true (@snakefoot)
+
+## Performance
+- Update to NLog 5.0 Preview 1 with ScopeContext instead of MDLC (@snakefoot)
+- Remove startup overhead caused by enumerating all assemblies for callsite logic (@snakefoot)
+- NLogLogger - Reduce allocation by not boxing EventId when CaptureEntireEventId = false (@snakefoot)
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
     </PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/NLog/NLog.Extensions.Logging</PackageProjectUrl>
