@@ -9,7 +9,7 @@ using NLog.Extensions.Logging;
 namespace NLog.Extensions.Hosting
 {
     /// <summary>
-    ///     Helpers for IHostbuilder, netcore 2.1
+    ///     Helpers for IHostbuilder
     /// </summary>
     public static class ConfigureExtensions
     {
