@@ -1,12 +1,15 @@
 ![NLog](https://nlog-project.org/images/NLog.png)
 
-# NLog.Extensions.Logging 
+# NLog.Extensions.Logging & NLog.Extensions.Hosting
 
 
-[![NuGet Release](https://img.shields.io/nuget/v/NLog.Extensions.Logging.svg)](https://www.nuget.org/packages/NLog.Extensions.Logging)
-[![NuGet Pre Release](https://img.shields.io/nuget/vpre/NLog.Extensions.Logging.svg)](https://www.nuget.org/packages/NLog.Extensions.Logging)
+[![NuGet Release](https://img.shields.io/nuget/v/NLog.Extensions.Logging.svg?label=NLog.Extensions.Logging)](https://www.nuget.org/packages/NLog.Extensions.Logging)
+[![NuGet Pre Release](https://img.shields.io/nuget/vpre/NLog.Extensions.Logging.svg?label=NLog.Extensions.Logging)](https://www.nuget.org/packages/NLog.Extensions.Logging)
+
+[![NuGet Release](https://img.shields.io/nuget/v/NLog.Extensions.Hosting.svg?label=NLog.Extensions.Hosting)](https://www.nuget.org/packages/NLog.Extensions.Hosting)
+[![NuGet Pre Release](https://img.shields.io/nuget/vpre/NLog.Extensions.Hosting.svg?label=NLog.Extensions.Hosting)](https://www.nuget.org/packages/NLog.Extensions.Hosting)
+
 [![Build status](https://ci.appveyor.com/api/projects/status/0nrg8cksp4b6tab1/branch/master?svg=true)](https://ci.appveyor.com/project/nlog/nlog-framework-logging/branch/master)
-
 [![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=ncloc)](https://sonarcloud.io/dashboard/?id=nlog.extensions.logging&branch=master) 
 [![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=bugs)](https://sonarcloud.io/dashboard/?id=nlog.extensions.logging&branch=master) 
 [![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=vulnerabilities)](https://sonarcloud.io/dashboard/?id=nlog.extensions.logging&branch=master) 
@@ -15,15 +18,15 @@
 [![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=sqale_debt_ratio)](https://sonarcloud.io/dashboard/?id=nlog.extensions.logging&branch=master) 
 [![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=coverage)](https://sonarcloud.io/component_measures?id=nlog.extensions.logging&branch=master&metric=coverage) 
 
+## NLog.Extensions.Logging
+
 [NLog](https://github.com/NLog/NLog) provider for [Microsoft.Extensions.Logging](https://github.com/aspnet/Logging); .NET Core. 
 **ASP.NET Core** users should install  [NLog.Web.AspNetCore](https://www.nuget.org/packages/NLog.web.aspnetcore). 
 
+## Getting started
 
 **Note**: Microsoft haven't ported all their classes to .NET standard, so not every target/layout renderer is available. 
 Please check [platform support](https://github.com/NLog/NLog/wiki/platform-support)
-
-
-## Getting started
 
 ### ASP.NET Core
 
@@ -47,6 +50,7 @@ To use DI, you can use NLog in conjunction with `Microsoft.Extensions.Logging` b
 Known issues
 ---
 - auto load of NLog extensions won't work yet. Use `<extensions>` (see [docs](https://github.com/NLog/NLog/wiki/Configuration-file#extensions))
+- note: auto loading of extensions is removed in NLog 5. See [NLog 5.0 Preview-1 ready for release testing](https://nlog-project.org/2021/08/25/nlog-5-0-preview1-ready.html)
 
 
 ### How to run the examples
