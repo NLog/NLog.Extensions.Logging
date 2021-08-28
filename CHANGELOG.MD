@@ -1,6 +1,28 @@
 ## Change Log
 
 Date format: (year/month/day)
+### v5.0-preview 1 (2021/08/28)
+Version 5 for NLog 5
+
+#### 🚀 Features
+
+- [#520](https://github.com/NLog/NLog.Extensions.Logging/pull/520): Changed LoggingConfigurationSectionName to default NLog (@snakefoot)
+- [#465](https://github.com/NLog/NLog.Extensions.Logging/pull/465): Add support for config variables with JsonLayout (@snakefoot)
+
+#### 👍 Enhancements
+
+- [#522](https://github.com/NLog/NLog.Extensions.Logging/pull/522): Reload now fully support KeepVariablesOnReload (@snakefoot)
+- [#521](https://github.com/NLog/NLog.Extensions.Logging/pull/521): Change default value for RemoveLoggerFactoryFilter to true (@snakefoot)
+
+#### ⏩ Performance
+
+- [#519](https://github.com/NLog/NLog.Extensions.Logging/pull/519): Update to NLog 5.0 Preview 1 with ScopeContext instead of MDLC (@snakefoot)
+- [#485](https://github.com/NLog/NLog.Extensions.Logging/pull/485): Remove startup overhead caused by enumerating all assemblies for callsite logic (@snakefoot)
+- [#319](https://github.com/NLog/NLog.Extensions.Logging/pull/319): NLogLogger - Reduce allocation by not boxing EventId when CaptureEntireEventId = false (@snakefoot)
+
+#### 🔧 Maintenance
+
+- [#486](https://github.com/NLog/NLog.Extensions.Logging/pull/486): Removed platform .NET 4.5.1 (@snakefoot)
 
 ### v1.7.4 (2021/08/25)
 
