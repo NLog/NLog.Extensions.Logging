@@ -252,11 +252,7 @@ namespace NLog.Extensions.Logging
             configuration = SetupConfiguration(serviceProvider, configuration);
             if (configuration != null)
             {
-                if (options == null)
-                {
-                    provider.Configure(configuration.GetSection("Logging:NLog"));
-                }
-
+                provider.Configure(configuration.GetSection("Logging:NLog"));
                 provider.TryLoadConfigurationFromSection(configuration);
             }
 

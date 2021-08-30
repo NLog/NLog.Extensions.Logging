@@ -48,17 +48,14 @@ namespace NLog.Extensions.Hosting
 
         private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration configuration, NLogProviderOptions options)
         {
-            configuration = SetupConfiguration(serviceProvider, configuration);
             NLogLoggerProvider provider = new NLogLoggerProvider(options);
+            configuration = SetupConfiguration(serviceProvider, configuration);
             if (configuration != null)
             {
-                if (options == null)
-                {
-                    provider.Configure(configuration.GetSection("Logging:NLog"));
-                }
-
+                provider.Configure(configuration.GetSection("Logging:NLog"));
                 provider.TryLoadConfigurationFromSection(configuration);
             }
+
             return provider;
         }
 
