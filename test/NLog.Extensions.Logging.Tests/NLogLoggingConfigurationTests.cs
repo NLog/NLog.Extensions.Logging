@@ -295,6 +295,7 @@ namespace NLog.Extensions.Logging.Tests
         private static Dictionary<string, string> CreateMemoryConfigConsoleTargetAndRule(string sectionName = DefaultSectionName)
         {
             var memoryConfig = new Dictionary<string, string>();
+            memoryConfig[$"{sectionName}:throwConfigExceptions"] = "true";
             memoryConfig[$"{sectionName}:Rules:0:logger"] = "*";
             memoryConfig[$"{sectionName}:Rules:0:minLevel"] = "Trace";
             memoryConfig[$"{sectionName}:Rules:0:writeTo"] = "File,Console";
