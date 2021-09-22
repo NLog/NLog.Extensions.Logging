@@ -175,7 +175,7 @@ namespace NLog.Extensions.Logging
                     {
                         yield return new KeyValuePair<string, string>("type", GetConfigKey(_configurationSection));
                     }
-                    else
+                    else if (!_topElement)
                     {
                         yield return new KeyValuePair<string, string>("name", GetConfigKey(_configurationSection));
                     }
