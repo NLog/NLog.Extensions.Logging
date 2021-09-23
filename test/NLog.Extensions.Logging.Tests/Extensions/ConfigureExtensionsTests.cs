@@ -56,15 +56,15 @@ namespace NLog.Extensions.Logging.Tests.Extensions
 
 #if NET5_0
         [Fact]
-        public void AddNLog_LoggerFactory_IncludeActivtyIdsWithBeginScope()
+        public void AddNLog_LoggerFactory_IncludeActivityIdsWithBeginScope()
         {
             // Arrange
-            var loggerFactory = LoggerFactory.Create(builder => builder.AddNLog(new NLogProviderOptions { IncludeActivtyIdsWithBeginScope = true }));
+            var loggerFactory = LoggerFactory.Create(builder => builder.AddNLog(new NLogProviderOptions { IncludeActivityIdsWithBeginScope = true }));
             var config = CreateConfigWithMemoryTarget(out var memoryTarget, $"${{scopeproperty:ParentId}} - ${{message}}");
 
             // Act
             LogManager.Configuration = config;
-            var logger = loggerFactory.CreateLogger(nameof(AddNLog_LoggerFactory_IncludeActivtyIdsWithBeginScope));
+            var logger = loggerFactory.CreateLogger(nameof(AddNLog_LoggerFactory_IncludeActivityIdsWithBeginScope));
             var activity = new System.Diagnostics.Activity("TestActivity").SetParentId("42").Start();
             var scopeProperties = new Dictionary<string, object> { { "RequestId", "123" }, { "RequestPath", "Unknown" } };
             using (logger.BeginScope(scopeProperties.ToList()))

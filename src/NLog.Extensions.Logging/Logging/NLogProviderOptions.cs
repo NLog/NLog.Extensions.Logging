@@ -1,4 +1,6 @@
-﻿namespace NLog.Extensions.Logging
+﻿using System;
+
+namespace NLog.Extensions.Logging
 {
     /// <summary>
     /// Options for logging to NLog with 
@@ -47,14 +49,28 @@
         /// <summary>
         /// Automatically include <see cref="System.Diagnostics.Activity.SpanId"/>, <see cref="System.Diagnostics.Activity.TraceId"/> and <see cref="System.Diagnostics.Activity.ParentId"/>
         /// </summary>
-        /// <remarks>For Net5.0 where these properties are no longer included by default for performance reasons</remarks>
+        /// <remarks>
+        /// Intended for Net5.0 where these properties are no longer included by default for performance reasons
+        /// 
+        /// Consider using <a href="https://www.nuget.org/packages/NLog.DiagnosticSource/">${activity}</a> as alternative
+        /// </remarks>
 #else
         /// <summary>
         /// Automatically include Activity.SpanId, Activity.TraceId and Activity.ParentId.
         /// </summary>
-        /// <remarks>For Net5.0 where these properties are no longer included by default for performance reasons</remarks>
+        /// <remarks>
+        /// Intended for Net5.0 where these properties are no longer included by default for performance reasons
+        /// 
+        /// Consider using <a href="https://www.nuget.org/packages/NLog.DiagnosticSource/">${activity}</a> as alternative
+        /// </remarks>
 #endif
-        public bool IncludeActivtyIdsWithBeginScope { get; set; }
+        public bool IncludeActivityIdsWithBeginScope { get; set; }
+
+        /// <summary>
+        /// See <see cref="IncludeActivityIdsWithBeginScope"/> for documentation
+        /// </summary>
+        [Obsolete("Fixed spelling, so use IncludeActivityIdsWithBeginScope instead. Marked obsolete with NLog 5.0")]
+        public bool IncludeActivtyIdsWithBeginScope { get => IncludeActivityIdsWithBeginScope; set => IncludeActivityIdsWithBeginScope = value; }
 
         /// <summary>
         /// Resets the default Microsoft LoggerFactory Filter for the <see cref="NLogLoggerProvider"/>, and instead only uses NLog LoggingRules.

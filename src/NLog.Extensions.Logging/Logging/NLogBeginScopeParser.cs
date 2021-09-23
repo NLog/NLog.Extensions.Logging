@@ -58,7 +58,7 @@ namespace NLog.Extensions.Logging
                 {
                     scopePropertyList = ExcludeOriginalFormatProperty(scopePropertyList);
                 }
-                else if (_options.IncludeActivtyIdsWithBeginScope && "RequestId".Equals(scopePropertyList[0].Key))
+                else if (_options.IncludeActivityIdsWithBeginScope && "RequestId".Equals(scopePropertyList[0].Key))
                 {
                     scopePropertyList = IncludeActivityIdsProperties(scopePropertyList);
                 }
