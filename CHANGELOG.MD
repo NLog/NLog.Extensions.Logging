@@ -1,8 +1,20 @@
 ## Change Log
 
 Date format: (year/month/day)
+
+### v5.0-preview 1 (2021/10/03)
+See [Release post for NLog 5](https://nlog-project.org/2021/08/25/nlog-5-0-preview1-ready.html)
+
+#### 👍 Enhancements
+
+- [#529](https://github.com/NLog/NLog.Extensions.Logging/pull/529): NLogLoggerProvider - Always load from appsettings when possible (@snakefoot)
+- [#530](https://github.com/NLog/NLog.Extensions.Logging/pull/530): Replaced platform netcoreapp3.0 with netcoreapp3.1 (@snakefoot)
+- [#531](https://github.com/NLog/NLog.Extensions.Logging/pull/531): Fix NLogLoggingConfiguration to handle throwConfigExceptions with NLog 5.0 (@snakefoot)
+- [#534](https://github.com/NLog/NLog.Extensions.Logging/pull/534): Fixed spelling for IncludeActivityIdsWithBeginScope (@snakefoot)
+- [#535](https://github.com/NLog/NLog.Extensions.Logging/pull/535): NLogProviderOptions with support for RegisterServiceProvider (@snakefoot)
+
 ### v5.0-preview 1 (2021/08/28)
-Version 5 for NLog 5
+See [Release post for NLog 5](https://nlog-project.org/2021/08/25/nlog-5-0-preview1-ready.html)
 
 #### 🚀 Features
 
