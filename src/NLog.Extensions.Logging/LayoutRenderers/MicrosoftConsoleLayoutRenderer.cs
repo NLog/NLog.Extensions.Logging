@@ -9,7 +9,6 @@ namespace NLog.Extensions.Logging
     /// Renders output that simulates simple Microsoft Console Logger. Useful for Hosting Lifetime Startup Messages.
     /// </summary>
     [LayoutRenderer("MicrosoftConsoleLayout")]
-    [ThreadSafe]
     [ThreadAgnostic]
     class MicrosoftConsoleLayoutRenderer : LayoutRenderer
     {

@@ -30,7 +30,6 @@ namespace NLog.Extensions.Logging
     /// </example>
     [LayoutRenderer("configsetting")]
     [ThreadAgnostic]
-    [ThreadSafe]
     public class ConfigSettingLayoutRenderer : LayoutRenderer
     {
         private IConfiguration _serviceConfiguration;
@@ -73,11 +72,16 @@ namespace NLog.Extensions.Logging
         {
             try
             {
-                _serviceConfiguration = ResolveService<IConfiguration>();
+                // Avoid NLogDependencyResolveException when possible
+                if (!ReferenceEquals(ResolveService<IServiceProvider>(), LoggingConfiguration?.LogFactory?.ServiceRepository))
+                {
+                    _serviceConfiguration = ResolveService<IConfiguration>();
+                }
             }
             catch (NLogDependencyResolveException ex)
             {
-                InternalLogger.Debug("ConfigSetting - IConfiguration could not be resolved, so fallback to DefaultConfiguration: {0}", ex.Message);
+                _serviceConfiguration = null;
+                InternalLogger.Debug("ConfigSetting - Fallback to DefaultConfiguration: {0}", ex.Message);
             }
 
             base.InitializeLayoutRenderer();
