@@ -13,11 +13,8 @@ namespace NLog.Extensions.Logging
         public string EventIdSeparator { get; set; } = "_";
 
         /// <summary>
-        /// Skip allocation of <see cref="LogEventInfo.Properties" />-dictionary
+        /// Skip creating "EventId_Id" and "EventId_Name" as <see cref="LogEventInfo.Properties" /> when <c>default(EventId)</c>
         /// </summary>
-        /// <remarks>
-        /// using
-        ///     <c>default(EventId)</c></remarks>
         public bool IgnoreEmptyEventId { get; set; } = true;
 
         /// <summary>
@@ -79,7 +76,7 @@ namespace NLog.Extensions.Logging
         public bool RemoveLoggerFactoryFilter { get; set; } = true;
 
         /// <summary>
-        /// Replace Microsoft LoggerFactory with a pure <see cref="NLogLoggerFactory" />, and disables Microsoft Filter Logic and multiple LoggingProvider support.
+        /// Replace Microsoft LoggerFactory with a pure <see cref="NLogLoggerFactory" />, and disables Microsoft Filter Logic and removes other LoggingProviders.
         /// </summary>
         /// <remarks>This option affects the building of service configuration, so assigning it from appsettings.json has no effect (loaded after).</remarks>
         public bool ReplaceLoggerFactory { get; set; }
@@ -97,6 +94,11 @@ namespace NLog.Extensions.Logging
         /// Enabling capture of the entire "EventId" will increase memory allocation and gives a performance hit. Faster to use "EventId_Id" + "EventId_Name".
         /// </remarks>
         public bool CaptureEntireEventId { get; set; }
+
+        /// <summary>
+        /// Enable NLog Targets and Layouts to perform dependency lookup using the Microsoft Dependency Injection IServiceProvider
+        /// </summary>
+        public bool RegisterServiceProvider { get; set; } = true;
 
         /// <summary>Initializes a new instance NLogProviderOptions with default values.</summary>
         public NLogProviderOptions()

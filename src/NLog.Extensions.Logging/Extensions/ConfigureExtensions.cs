@@ -249,7 +249,14 @@ namespace NLog.Extensions.Logging
         private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration configuration, NLogProviderOptions options, LogFactory logFactory)
         {
             NLogLoggerProvider provider = new NLogLoggerProvider(options ?? NLogProviderOptions.Default, logFactory ?? LogManager.LogFactory);
+
             configuration = SetupConfiguration(serviceProvider, configuration);
+
+            if (serviceProvider != null && provider.Options.RegisterServiceProvider)
+            {
+                provider.LogFactory.ServiceRepository.RegisterService(typeof(IServiceProvider), serviceProvider);
+            }
+
             if (configuration != null)
             {
                 provider.Configure(configuration.GetSection("Logging:NLog"));

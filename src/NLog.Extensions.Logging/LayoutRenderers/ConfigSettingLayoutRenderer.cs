@@ -30,9 +30,10 @@ namespace NLog.Extensions.Logging
     /// </example>
     [LayoutRenderer("configsetting")]
     [ThreadAgnostic]
-    [ThreadSafe]
     public class ConfigSettingLayoutRenderer : LayoutRenderer
     {
+        private IConfiguration _serviceConfiguration;
+
         /// <summary>
         /// Global Configuration Container
         /// </summary>
@@ -67,13 +68,33 @@ namespace NLog.Extensions.Logging
         public string Default { get; set; }
 
         /// <inheritdoc/>
+        protected override void InitializeLayoutRenderer()
+        {
+            try
+            {
+                // Avoid NLogDependencyResolveException when possible
+                if (!ReferenceEquals(ResolveService<IServiceProvider>(), LoggingConfiguration?.LogFactory?.ServiceRepository))
+                {
+                    _serviceConfiguration = ResolveService<IConfiguration>();
+                }
+            }
+            catch (NLogDependencyResolveException ex)
+            {
+                _serviceConfiguration = null;
+                InternalLogger.Debug("ConfigSetting - Fallback to DefaultConfiguration: {0}", ex.Message);
+            }
+
+            base.InitializeLayoutRenderer();
+        }
+
+        /// <inheritdoc/>
         protected override void Append(StringBuilder builder, LogEventInfo logEvent)
         {
             if (string.IsNullOrEmpty(_itemLookup))
                 return;
 
             string value = null;
-            var configurationRoot = DefaultConfiguration;
+            var configurationRoot = _serviceConfiguration ?? DefaultConfiguration;
             if (configurationRoot != null)
             {
                 value = configurationRoot[_itemLookup];

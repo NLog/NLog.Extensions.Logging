@@ -109,6 +109,9 @@ namespace NLog.Extensions.Hosting.Tests
 
             var loggerFact = host.Services.GetService<ILoggerFactory>();
             var logger = loggerFact.CreateLogger("logger1");
+
+            ConfigSettingLayoutRenderer.DefaultConfiguration = null;    // See dependency resolving is working
+
             logger.LogError("error1");
 
             var loggerProvider = host.Services.GetService<ILoggerProvider>() as NLogLoggerProvider;
