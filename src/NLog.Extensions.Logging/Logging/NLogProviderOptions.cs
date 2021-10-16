@@ -13,9 +13,17 @@ namespace NLog.Extensions.Logging
         public string EventIdSeparator { get; set; } = "_";
 
         /// <summary>
-        /// Skip creating "EventId_Id" and "EventId_Name" as <see cref="LogEventInfo.Properties" /> when <c>default(EventId)</c>
+        /// Skip capture of "EventId_Id" and "EventId_Name" as <see cref="LogEventInfo.Properties" /> when <c>default(EventId)</c>
         /// </summary>
         public bool IgnoreEmptyEventId { get; set; } = true;
+
+        /// <summary>
+        /// Control capture of <see cref="Microsoft.Extensions.Logging.EventId"/> as "EventId"-property.
+        /// </summary>
+        /// <remarks>
+        /// Enabling capture of the entire "EventId" will increase memory allocation and gives a performance hit. Faster to use "EventId_Id" + "EventId_Name".
+        /// </remarks>
+        public EventIdCaptureType CaptureEventId { get; set; } = EventIdCaptureType.EventId_Id | EventIdCaptureType.EventId_Name;
 
         /// <summary>
         /// Enable structured logging by capturing message template parameters with support for "@" and "$". Enables use of ${message:raw=true}
@@ -86,14 +94,6 @@ namespace NLog.Extensions.Logging
         /// </summary>
         /// <remarks>Will only attempt to load NLog-LoggingConfiguration if valid section-name, and NLog-LoggingConfiguration has not been loaded already.</remarks>
         public string LoggingConfigurationSectionName { get; set; } = "NLog";
-
-        /// <summary>
-        /// Enable additional capture of the entire <see cref="Microsoft.Extensions.Logging.EventId"/> as "EventId"-property.
-        /// </summary>
-        /// <remarks>
-        /// Enabling capture of the entire "EventId" will increase memory allocation and gives a performance hit. Faster to use "EventId_Id" + "EventId_Name".
-        /// </remarks>
-        public bool CaptureEntireEventId { get; set; }
 
         /// <summary>
         /// Enable NLog Targets and Layouts to perform dependency lookup using the Microsoft Dependency Injection IServiceProvider
