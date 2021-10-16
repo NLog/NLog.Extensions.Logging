@@ -14,7 +14,6 @@ namespace NLog.Extensions.Logging
         private static readonly NLogMessageParameterList EmptyList = new NLogMessageParameterList(new KeyValuePair<string, object>[0]);
         private static readonly NLogMessageParameterList OriginalMessageList = new NLogMessageParameterList(new[] { new KeyValuePair<string, object>(NLogLogger.OriginalFormatPropertyName, string.Empty) });
 
-        public bool HasOriginalMessage => _originalMessageIndex.HasValue;
         private readonly int? _originalMessageIndex;
 
         public bool HasComplexParameters => _hasMessageTemplateCapture || _isMixedPositional;
@@ -60,7 +59,7 @@ namespace NLog.Extensions.Logging
 
         public bool HasMessageTemplateSyntax(bool parseMessageTemplates)
         {
-            return HasOriginalMessage && (HasComplexParameters || (parseMessageTemplates && Count > 0));
+            return _originalMessageIndex.HasValue && (HasComplexParameters || (parseMessageTemplates && Count > 0));
         }
 
         public string GetOriginalMessage(IReadOnlyList<KeyValuePair<string, object>> messageProperties)

@@ -45,7 +45,7 @@ namespace NLog.Extensions.Logging.Tests.Extensions
             var config = CreateConfigWithMemoryTarget(out var memoryTarget, $"${{event-properties:{eventPropery}}} - ${{message}}");
 
             // Act
-            loggerFactory.AddNLog(new NLogProviderOptions { EventIdSeparator = "_", CaptureEntireEventId = captureEntireEventId });
+            loggerFactory.AddNLog(new NLogProviderOptions { EventIdSeparator = "_", CaptureEventId = captureEntireEventId ? EventIdCaptureType.All : EventIdCaptureType.EventId_Id | EventIdCaptureType.EventId_Name });
             LogManager.Configuration = config;
             var logger = loggerFactory.CreateLogger("logger1");
             logger.LogInformation(new EventId(2, "eventId_2"), "test message with {0} arg", 1);
@@ -108,7 +108,7 @@ namespace NLog.Extensions.Logging.Tests.Extensions
             // Arrange
             ILoggingBuilder builder = new LoggingBuilderStub();
             var config = CreateConfigWithMemoryTarget(out var memoryTarget, $"${{event-properties:{eventPropery}}} - ${{message}}");
-            var options = new NLogProviderOptions { EventIdSeparator = "_", CaptureEntireEventId = captureEntireEventId };
+            var options = new NLogProviderOptions { EventIdSeparator = "_", CaptureEventId = captureEntireEventId ? EventIdCaptureType.All : EventIdCaptureType.EventId_Id | EventIdCaptureType.EventId_Name };
 
             // Act
             builder.AddNLog(config, options);

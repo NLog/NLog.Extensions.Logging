@@ -200,7 +200,7 @@ namespace NLog.Extensions.Logging
         }
 
         private static readonly object[] SingleItemArray = { null };
-        private static readonly IList<MessageTemplateParameter> EmptyParameterArray = new MessageTemplateParameter[] { };
+        private static readonly IList<MessageTemplateParameter> EmptyParameterArray = Array.Empty<MessageTemplateParameter>();
 
         /// <summary>
         /// Are all parameters positional and correctly mapped?
@@ -328,7 +328,7 @@ namespace NLog.Extensions.Logging
 
         private void CaptureEventId(LogEventInfo eventInfo, EventId eventId)
         {
-            if (_options.CaptureMessageProperties && (!_options.IgnoreEmptyEventId || eventId.Id != 0 || !String.IsNullOrEmpty(eventId.Name)))
+            if (_options.CaptureMessageProperties && _options.CaptureEventId != EventIdCaptureType.None && (!_options.IgnoreEmptyEventId || eventId.Id != 0 || !String.IsNullOrEmpty(eventId.Name)))
             {
                 // Attempt to reuse the same string-allocations based on the current <see cref="NLogProviderOptions.EventIdSeparator"/>
                 var eventIdPropertyNames = _eventIdPropertyNames ?? new Tuple<string, string, string>(null, null, null);
@@ -341,16 +341,12 @@ namespace NLog.Extensions.Logging
 
                 var idIsZero = eventId.Id == 0;
                 var eventIdObj = idIsZero ? ZeroEventId : GetEventId(eventId.Id);
-                eventInfo.Properties[eventIdPropertyNames.Item2] = eventIdObj;
-                if (_options.CaptureEntireEventId)
-                {
+                if ((_options.CaptureEventId & EventIdCaptureType.EventId_Id) != 0)
+                    eventInfo.Properties[eventIdPropertyNames.Item2] = eventIdObj;
+                if ((_options.CaptureEventId & EventIdCaptureType.EventId_Name) != 0 && (!string.IsNullOrEmpty(eventId.Name) || !_options.IgnoreEmptyEventId))
                     eventInfo.Properties[eventIdPropertyNames.Item3] = eventId.Name;
+                if ((_options.CaptureEventId & EventIdCaptureType.EventId) != 0)
                     eventInfo.Properties["EventId"] = idIsZero && eventId.Name == null ? EmptyEventId : eventId;
-                }
-                else if (!string.IsNullOrEmpty(eventId.Name))
-                {
-                    eventInfo.Properties[eventIdPropertyNames.Item3] = eventId.Name;
-                }
             }
         }
 
