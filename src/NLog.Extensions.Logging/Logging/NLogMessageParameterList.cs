@@ -11,7 +11,7 @@ namespace NLog.Extensions.Logging
     internal class NLogMessageParameterList : IList<MessageTemplateParameter>
     {
         private readonly IReadOnlyList<KeyValuePair<string, object>> _parameterList;
-        private static readonly NLogMessageParameterList EmptyList = new NLogMessageParameterList(new KeyValuePair<string, object>[0]);
+        private static readonly NLogMessageParameterList EmptyList = new NLogMessageParameterList(Array.Empty<KeyValuePair<string, object>>());
         private static readonly NLogMessageParameterList OriginalMessageList = new NLogMessageParameterList(new[] { new KeyValuePair<string, object>(NLogLogger.OriginalFormatPropertyName, string.Empty) });
 
         private readonly int? _originalMessageIndex;

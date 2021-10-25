@@ -228,7 +228,7 @@ namespace NLog.Extensions.Logging
                 {
                     try
                     {
-                        var result = Convert.ChangeType(configValue.Value, propertyInfo.PropertyType);
+                        var result = Convert.ChangeType(configValue.Value, propertyInfo.PropertyType, System.Globalization.CultureInfo.InvariantCulture);
                         propertyInfo.SetMethod.Invoke(nlogProvider.Options, new[] { result });
                     }
                     catch (Exception ex)

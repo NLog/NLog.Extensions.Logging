@@ -61,10 +61,10 @@ namespace NLog.Extensions.Logging
         }
 
         /// <summary>
-        /// Creates a new <see cref="T:Microsoft.Extensions.Logging.ILogger" /> instance.
+        /// Creates a new <see cref="Microsoft.Extensions.Logging.ILogger" /> instance.
         /// </summary>
         /// <param name="categoryName">The logger name for messages produced by the logger.</param>
-        /// <returns>The <see cref="T:Microsoft.Extensions.Logging.ILogger" />.</returns>
+        /// <returns>The <see cref="Microsoft.Extensions.Logging.ILogger" />.</returns>
         public Microsoft.Extensions.Logging.ILogger CreateLogger(string categoryName)
         {
             lock (_loggers)
@@ -81,7 +81,7 @@ namespace NLog.Extensions.Logging
         /// <summary>
         /// Do nothing
         /// </summary>
-        /// <param name="provider">The <see cref="T:Microsoft.Extensions.Logging.ILoggerProvider" />.</param>
+        /// <param name="provider">The <see cref="Microsoft.Extensions.Logging.ILoggerProvider" />.</param>
         public void AddProvider(ILoggerProvider provider)
         {
             InternalLogger.Debug("NLogLoggerFactory: AddProvider has been ignored {0}", provider?.GetType());

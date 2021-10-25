@@ -12,7 +12,7 @@ namespace NLog.Extensions.Logging
     [ThreadAgnostic]
     class MicrosoftConsoleLayoutRenderer : LayoutRenderer
     {
-        private static readonly string[] EventIdMapper = Enumerable.Range(0, 50).Select(id => id.ToString()).ToArray();
+        private static readonly string[] EventIdMapper = Enumerable.Range(0, 50).Select(id => id.ToString(System.Globalization.CultureInfo.InvariantCulture)).ToArray();
 
         /// <inheritdoc />
         protected override void Append(StringBuilder builder, LogEventInfo logEvent)
@@ -21,7 +21,7 @@ namespace NLog.Extensions.Logging
             builder.Append(microsoftLogLevel);
             builder.Append(": ");
             builder.Append(logEvent.LoggerName);
-            builder.Append("[");
+            builder.Append('[');
             int eventId = 0;
             if (logEvent.HasProperties && logEvent.Properties.TryGetValue("EventId_Id", out var eventIdValue))
             {
@@ -35,7 +35,7 @@ namespace NLog.Extensions.Logging
                 eventId = 0;
             }
             builder.Append(ConvertEventId(eventId));
-            builder.Append("]");
+            builder.Append(']');
             builder.Append(System.Environment.NewLine);
             builder.Append("      ");
             builder.Append(logEvent.FormattedMessage);
@@ -53,7 +53,7 @@ namespace NLog.Extensions.Logging
             else if (eventId > 0 || eventId < EventIdMapper.Length)
                 return EventIdMapper[eventId];
             else
-                return eventId.ToString();
+                return eventId.ToString(System.Globalization.CultureInfo.InvariantCulture);
         }
 
         string ConvertLogLevel(LogLevel logLevel)
