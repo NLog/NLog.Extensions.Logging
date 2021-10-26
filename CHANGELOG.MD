@@ -2,7 +2,19 @@
 
 Date format: (year/month/day)
 
-### v5.0-preview 1 (2021/10/03)
+### v5.0-preview 3 (2021/10/26)
+See [Release post for NLog 5](https://nlog-project.org/2021/08/25/nlog-5-0-preview1-ready.html)
+
+## 🚀 Features
+
+- [#538](https://github.com/NLog/NLog.Extensions.Logging/pull/538): NLogProviderOptions with support for CaptureEventId (@snakefoot)
+
+## 🔧 Maintenance
+
+- [#541](https://github.com/NLog/NLog.Extensions.Logging/pull/541): NLogLogger refactoring for faster EventId-property capture (@snakefoot)
+- [#539](https://github.com/NLog/NLog.Extensions.Logging/pull/539): NLogLogger refactoring to reduce code-path-navigations (@snakefoot)
+
+### v5.0-preview 2 (2021/10/03)
 See [Release post for NLog 5](https://nlog-project.org/2021/08/25/nlog-5-0-preview1-ready.html)
 
 #### 👍 Enhancements
