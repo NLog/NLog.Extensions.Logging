@@ -296,7 +296,8 @@ namespace NLog.Extensions.Logging
 
         private void CaptureEventIdProperties(LogEventInfo logEvent, EventId eventId)
         {
-            if (IncludeEventIdProperties(eventId))
+            var captureEventId = _options.CaptureEventId;
+            if (captureEventId != EventIdCaptureType.None && IncludeEventIdProperties(eventId))
             {
                 // Attempt to reuse the same string-allocations based on the current <see cref="NLogProviderOptions.EventIdSeparator"/>
                 var eventIdPropertyNames = _eventIdPropertyNames ?? new Tuple<string, string, string>(null, null, null);
@@ -307,20 +308,20 @@ namespace NLog.Extensions.Logging
                     _eventIdPropertyNames = eventIdPropertyNames = CreateEventIdPropertyNames(eventIdSeparator);
                 }
 
-                if ((_options.CaptureEventId & EventIdCaptureType.EventId_Name) != 0 && eventId.Name != null)
-                    logEvent.Properties[eventIdPropertyNames.Item3] = eventId.Name;
-
-                if ((_options.CaptureEventId & EventIdCaptureType.EventId_Id) != 0 && (eventId.Id != 0 || eventId.Name != null))
+                if ((captureEventId & EventIdCaptureType.EventId_Id) != 0)
                     logEvent.Properties[eventIdPropertyNames.Item2] = eventId.Id == 0 ? ZeroEventId : GetEventId(eventId.Id);
 
-                if ((_options.CaptureEventId & EventIdCaptureType.EventId) != 0)
+                if ((captureEventId & EventIdCaptureType.EventId_Name) != 0 && eventId.Name != null)
+                    logEvent.Properties[eventIdPropertyNames.Item3] = eventId.Name;
+
+                if ((captureEventId & EventIdCaptureType.EventId) != 0)
                     logEvent.Properties[nameof(EventId)] = eventId;
             }
         }
 
         private bool IncludeEventIdProperties(EventId eventId)
         {
-            return (eventId.Id != 0 || !string.IsNullOrEmpty(eventId.Name) || !_options.IgnoreEmptyEventId) && _options.CaptureEventId != EventIdCaptureType.None;
+            return (eventId.Id != 0 || !string.IsNullOrEmpty(eventId.Name) || !_options.IgnoreEmptyEventId);
         }
 
         private static Tuple<string, string, string> CreateEventIdPropertyNames(string eventIdSeparator)
