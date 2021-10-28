@@ -321,7 +321,11 @@ namespace NLog.Extensions.Logging
 
         private bool IncludeEventIdProperties(EventId eventId)
         {
-            return (eventId.Id != 0 || !string.IsNullOrEmpty(eventId.Name) || !_options.IgnoreEmptyEventId);
+#if !NETSTANDARD1_3 && !NETSTANDARD1_5
+            return eventId != default || !_options.IgnoreEmptyEventId;
+#else
+            return eventId.Id != 0 || !string.IsNullOrEmpty(eventId.Name) || !_options.IgnoreEmptyEventId; 
+#endif
         }
 
         private static Tuple<string, string, string> CreateEventIdPropertyNames(string eventIdSeparator)
