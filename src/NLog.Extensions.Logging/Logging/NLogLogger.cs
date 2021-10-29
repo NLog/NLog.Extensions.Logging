@@ -322,7 +322,7 @@ namespace NLog.Extensions.Logging
         private bool IncludeEventIdProperties(EventId eventId)
         {
 #if !NETSTANDARD1_3 && !NETSTANDARD1_5
-            return eventId != default || !_options.IgnoreEmptyEventId;
+            return !eventId.Equals(default) || !_options.IgnoreEmptyEventId;
 #else
             return eventId.Id != 0 || !string.IsNullOrEmpty(eventId.Name) || !_options.IgnoreEmptyEventId; 
 #endif
