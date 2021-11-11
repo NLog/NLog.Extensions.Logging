@@ -78,7 +78,7 @@ NLog 5 release post: https://nlog-project.org/2021/08/25/nlog-5-0-preview1-ready
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NLog" Version="5.0.0-preview.3" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.0" />
