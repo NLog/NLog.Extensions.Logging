@@ -14,26 +14,43 @@ namespace NLog.Extensions.Logging
     {
         private static readonly string[] EventIdMapper = Enumerable.Range(0, 50).Select(id => id.ToString(System.Globalization.CultureInfo.InvariantCulture)).ToArray();
 
+        /// <summary>
+        /// Gets or sets format string used to format timestamp in logging messages. Defaults to <c>null</c>.
+        /// </summary>
+        public string TimestampFormat
+        {
+            get => _timestampFormat;
+            set
+            {
+                _timestampFormat = value;
+                _timestampFormatString = string.IsNullOrEmpty(value) ? null : $"{{0:{value}}}";
+            }
+        }
+        private string _timestampFormat;
+        private string _timestampFormatString;
+
+        /// <summary>
+        /// Gets or sets indication whether or not UTC timezone should be used to format timestamps in logging messages. Defaults to <c>false</c>.
+        /// </summary>
+        public bool UseUtcTimestamp { get; set; }
+
         /// <inheritdoc />
         protected override void Append(StringBuilder builder, LogEventInfo logEvent)
         {
+            string timestampFormat = _timestampFormat;
+            if (timestampFormat != null)
+            {
+                var timestamp = UseUtcTimestamp ? logEvent.TimeStamp.ToUniversalTime() : logEvent.TimeStamp;
+                builder.AppendFormat(UseUtcTimestamp ? System.Globalization.CultureInfo.InvariantCulture : System.Globalization.CultureInfo.CurrentCulture, _timestampFormatString, timestamp);
+                builder.Append(' ');
+            }
+
             var microsoftLogLevel = ConvertLogLevel(logEvent.Level);
             builder.Append(microsoftLogLevel);
             builder.Append(": ");
             builder.Append(logEvent.LoggerName);
             builder.Append('[');
-            int eventId = 0;
-            if (logEvent.HasProperties && logEvent.Properties.TryGetValue("EventId_Id", out var eventIdValue))
-            {
-                if (eventIdValue is int)
-                    eventId = (int)eventIdValue;
-                else if (!int.TryParse(eventIdValue?.ToString() ?? string.Empty, out eventId))
-                    eventId = 0;
-            }
-            else
-            {
-                eventId = 0;
-            }
+            int eventId = LookupEventId(logEvent);
             builder.Append(ConvertEventId(eventId));
             builder.Append(']');
             builder.Append(System.Environment.NewLine);
@@ -46,7 +63,21 @@ namespace NLog.Extensions.Logging
             }
         }
 
-        static string ConvertEventId(int eventId)
+        private static int LookupEventId(LogEventInfo logEvent)
+        {
+            int eventId = 0;
+            if (logEvent.HasProperties && (logEvent.Properties.TryGetValue("EventId_Id", out var eventIdValue) || logEvent.Properties.TryGetValue("EventId", out eventIdValue)))
+            {
+                if (eventIdValue is int)
+                    eventId = (int)eventIdValue;
+                else if (eventIdValue is Microsoft.Extensions.Logging.EventId eventIdStuct)
+                    eventId = eventIdStuct.Id;
+            }
+
+            return eventId;
+        }
+
+        private static string ConvertEventId(int eventId)
         {
             if (eventId == 0)
                 return "0";
@@ -56,7 +87,7 @@ namespace NLog.Extensions.Logging
                 return eventId.ToString(System.Globalization.CultureInfo.InvariantCulture);
         }
 
-        string ConvertLogLevel(LogLevel logLevel)
+        private static string ConvertLogLevel(LogLevel logLevel)
         {
             if (logLevel == LogLevel.Trace)
                 return "trce";
