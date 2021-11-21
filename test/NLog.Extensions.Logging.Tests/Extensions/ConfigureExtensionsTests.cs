@@ -32,11 +32,13 @@ namespace NLog.Extensions.Logging.Tests.Extensions
 
         [Theory]
         [InlineData("EventId", "eventId_2", true)]
-        [InlineData("EventId_Name", "eventId_2", true)]
+        [InlineData("EventName", "", true)]
         [InlineData("EventId_Id", "2", true)]
-        [InlineData("EventId", "", false)]
-        [InlineData("EventId_Name", "eventId_2", false)]
-        [InlineData("EventId_Id", "2", false)]
+        [InlineData("EventId_Name", "eventId_2", true)]
+        [InlineData("EventId", "2", false)]
+        [InlineData("EventName", "eventId_2", false)]
+        [InlineData("EventId_Id", "", false)]
+        [InlineData("EventId_Name", "", false)]
         [Obsolete("Instead use ILoggingBuilder.AddNLog() or IHostBuilder.UseNLog()")]
         public void AddNLog_LoggerFactory_LogInfoWithEventId_ShouldLogToNLogWithEventId(string eventPropery, string expectedEventInLog, bool captureEntireEventId)
         {
@@ -45,7 +47,7 @@ namespace NLog.Extensions.Logging.Tests.Extensions
             var config = CreateConfigWithMemoryTarget(out var memoryTarget, $"${{event-properties:{eventPropery}}} - ${{message}}");
 
             // Act
-            loggerFactory.AddNLog(new NLogProviderOptions { EventIdSeparator = "_", CaptureEventId = captureEntireEventId ? EventIdCaptureType.All : EventIdCaptureType.EventId_Id | EventIdCaptureType.EventId_Name });
+            loggerFactory.AddNLog(new NLogProviderOptions { EventIdSeparator = "_", CaptureEventId = captureEntireEventId ? EventIdCaptureType.Legacy : (EventIdCaptureType.EventId | EventIdCaptureType.EventName) });
             LogManager.Configuration = config;
             var logger = loggerFactory.CreateLogger("logger1");
             logger.LogInformation(new EventId(2, "eventId_2"), "test message with {0} arg", 1);
@@ -98,17 +100,19 @@ namespace NLog.Extensions.Logging.Tests.Extensions
 
         [Theory]
         [InlineData("EventId", "eventId2", true)]
+        [InlineData("EventName", "", true)]
         [InlineData("EventId_Name", "eventId2", true)]
         [InlineData("EventId_Id", "2", true)]
-        [InlineData("EventId", "", false)]
-        [InlineData("EventId_Name", "eventId2", false)]
-        [InlineData("EventId_Id", "2", false)]
+        [InlineData("EventId", "2", false)]
+        [InlineData("EventName", "eventId2", false)]
+        [InlineData("EventId_Id", "", false)]
+        [InlineData("EventId_Name", "", false)]
         public void AddNLog_LoggingBuilder_LogInfoWithEventId_ShouldLogToNLogWithEventId(string eventPropery, string expectedEventInLog, bool captureEntireEventId)
         {
             // Arrange
             ILoggingBuilder builder = new LoggingBuilderStub();
             var config = CreateConfigWithMemoryTarget(out var memoryTarget, $"${{event-properties:{eventPropery}}} - ${{message}}");
-            var options = new NLogProviderOptions { EventIdSeparator = "_", CaptureEventId = captureEntireEventId ? EventIdCaptureType.All : EventIdCaptureType.EventId_Id | EventIdCaptureType.EventId_Name };
+            var options = new NLogProviderOptions { EventIdSeparator = "_", CaptureEventId = captureEntireEventId ? EventIdCaptureType.Legacy : (EventIdCaptureType.EventId | EventIdCaptureType.EventName) };
 
             // Act
             builder.AddNLog(config, options);

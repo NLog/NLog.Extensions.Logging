@@ -13,20 +13,28 @@ namespace NLog.Extensions.Logging
         /// </summary>
         None = 0,
         /// <summary>
-        /// Capture entire <see cref="Microsoft.Extensions.Logging.EventId"/> as "EventId"-property (with boxing)
+        /// Capture integer <see cref="Microsoft.Extensions.Logging.EventId.Id"/> as "EventId"-property
         /// </summary>
         EventId = 1,
         /// <summary>
-        /// Capture <see cref="Microsoft.Extensions.Logging.EventId.Id"/> as "EventId_Id"-property.
+        /// Capture string <see cref="Microsoft.Extensions.Logging.EventId.Name"/> as "EventName"-property
         /// </summary>
-        EventId_Id = 2,
+        EventName = 2,
         /// <summary>
-        /// Capture <see cref="Microsoft.Extensions.Logging.EventId.Name"/> as "EventId_Name"-property.
+        /// Capture struct <see cref="Microsoft.Extensions.Logging.EventId"/> as "EventId"-property (with boxing)
         /// </summary>
-        EventId_Name = 4,
+        EventIdStruct = 4,
         /// <summary>
-        /// Capture all properties (Legacy)
+        /// Capture integer <see cref="Microsoft.Extensions.Logging.EventId.Id"/> as "EventId_Id"-property (Legacy)
         /// </summary>
-        All = EventId | EventId_Id | EventId_Name,
+        EventId_Id = 8,
+        /// <summary>
+        /// Capture string <see cref="Microsoft.Extensions.Logging.EventId.Name"/> as "EventId_Name"-property (Legacy)
+        /// </summary>
+        EventId_Name = 16,
+        /// <summary>
+        /// Captures legacy properties (EventId-struct + EventId_Id + EventId_Name)
+        /// </summary>
+        Legacy = EventIdStruct | EventId_Id | EventId_Name,
     }
 }

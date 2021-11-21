@@ -27,8 +27,8 @@ namespace NLog.Extensions.Logging
             Attributes.Add(new JsonAttribute("Message", "${message}"));
             Attributes.Add(new JsonAttribute("Exception", "${replace-newlines:${exception:format=tostring,data}}"));
             var stateJsonLayout = new JsonLayout() { IncludeEventProperties = true };
-            stateJsonLayout.ExcludeProperties.Add("EventId");
-            stateJsonLayout.ExcludeProperties.Add("EventId_Id");
+            stateJsonLayout.ExcludeProperties.Add(nameof(EventIdCaptureType.EventId));
+            stateJsonLayout.ExcludeProperties.Add(nameof(EventIdCaptureType.EventId_Id));
             stateJsonLayout.Attributes.Add(new JsonAttribute("{OriginalFormat}", "${message:raw=true}"));
             Attributes.Add(new JsonAttribute("State", stateJsonLayout) { Encode = false });
         }
@@ -108,7 +108,7 @@ namespace NLog.Extensions.Logging
         {
             if (logEvent.HasProperties)
             {
-                if (logEvent.Properties.TryGetValue("EventId", out var eventObject))
+                if (logEvent.Properties.TryGetValue(nameof(EventIdCaptureType.EventId), out var eventObject))
                 {
                     if (eventObject is int eventId)
                         return ConvertEventId(eventId);
@@ -116,7 +116,7 @@ namespace NLog.Extensions.Logging
                         return ConvertEventId(eventIdStruct.Id);
                 }
 
-                if (logEvent.Properties.TryGetValue("EventId_Id", out var eventid) && eventid is int)
+                if (logEvent.Properties.TryGetValue(nameof(EventIdCaptureType.EventId_Id), out var eventid) && eventid is int)
                 {
                     return ConvertEventId((int)eventid);
                 }
