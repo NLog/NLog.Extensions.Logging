@@ -47,6 +47,19 @@ namespace NLog.Extensions.Logging
         }
 
         /// <summary>
+        /// Gets the array of attributes for the "scopes"-section. Requires <see cref="IncludeScopes"/> = true
+        /// </summary>
+        [ArrayParameter(typeof(JsonAttribute), "scope")]
+        public IList<JsonAttribute> ScopeAttributes
+        {
+            get
+            {
+                var index = LookupNamedAttributeIndex("Scopes");
+                return index >= 0 ? (Attributes[index]?.Layout as JsonLayout)?.Attributes : null;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets whether to include "scopes"-section
         /// </summary>
         public bool IncludeScopes
