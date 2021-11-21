@@ -24,5 +24,17 @@ namespace NLog.Extensions.Logging.Tests
             var result = layoutRenderer.Render(new LogEventInfo(LogLevel.Error, "MyLogger", null, "Alert {EventId_Id}", new object[] { eventId }, exception));
             Assert.Equal($"fail: MyLogger[{eventId}]{Environment.NewLine}      Alert 42{Environment.NewLine}{exception}", result);
         }
+
+        [Fact]
+        public void MicrosoftConsoleLayoutRenderer_TimestampFormat()
+        {
+            var timestampFormat = "hh:mm:ss";
+            var layoutRenderer = new MicrosoftConsoleLayoutRenderer() { TimestampFormat = timestampFormat };
+            var exception = new ArgumentException("Test");
+            var eventId = 42;
+            var logEvent = new LogEventInfo(LogLevel.Error, "MyLogger", null, "Alert {EventId}", new object[] { eventId }, exception);
+            var result1 = layoutRenderer.Render(logEvent);
+            Assert.Equal($"{logEvent.TimeStamp.ToString(timestampFormat)} fail: MyLogger[{eventId}]{Environment.NewLine}      Alert 42{Environment.NewLine}{exception}", result1);
+        }
     }
 }
