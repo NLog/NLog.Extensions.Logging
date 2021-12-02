@@ -77,7 +77,6 @@ namespace NLog.Extensions.Logging.Tests.Extensions
         }
 #endif
 
-#if !NETCORE1_0
         [Fact]
         public void AddNLog_LoggingBuilder_LogInfo_ShouldLogToNLog()
         {
@@ -166,7 +165,6 @@ namespace NLog.Extensions.Logging.Tests.Extensions
         {
             public IServiceCollection Services { get; set; } = new ServiceCollection();
         }
-#endif
 
         private static void AssertSingleMessage(MemoryTarget memoryTarget, string expectedMessage)
         {

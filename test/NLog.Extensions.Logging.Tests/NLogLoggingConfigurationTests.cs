@@ -13,7 +13,6 @@ namespace NLog.Extensions.Logging.Tests
         const string DefaultSectionName = "NLog";
         const string CustomSectionName = "MyCustomSection";
 
-#if !NETCORE1_0
         [Fact]
         public void LoadSimpleConfig()
         {
@@ -303,6 +302,5 @@ namespace NLog.Extensions.Logging.Tests
 
             return memoryConfig;
         }
-#endif
     }
 }

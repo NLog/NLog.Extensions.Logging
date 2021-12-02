@@ -15,7 +15,6 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Equal("MyTableName", result);
         }
 
-#if !NETCORE1_0
         [Fact]
         public void ConfigSettingGlobalConfigLookup()
         {
@@ -26,6 +25,5 @@ namespace NLog.Extensions.Logging.Tests
             var result = layoutRenderer.Render(LogEventInfo.CreateNullEvent());
             Assert.Equal("Test", result);
         }
-#endif
     }
 }
