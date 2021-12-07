@@ -52,7 +52,7 @@ namespace NLog.Extensions.Logging
 
         private LogEventInfo CreateLogEventInfo<TState>(LogLevel nLogLogLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
-            if ((_options.CaptureMessageTemplates || _options.CaptureMessageProperties) && state is IReadOnlyList<KeyValuePair<string, object>> messagePropertyList)
+            if (_options.CaptureMessageProperties && state is IReadOnlyList<KeyValuePair<string, object>> messagePropertyList)
             {
                 if (_options.CaptureMessageTemplates)
                 {
@@ -181,7 +181,7 @@ namespace NLog.Extensions.Logging
 
             for (int i = 0; i < messageTemplateParameters.Count; ++i)
             {
-                if (!messageParameters[i].Name.Equals(messageTemplateParameters[i].Name))
+                if (!messageParameters[i].Name.Equals(messageTemplateParameters[i].Name, StringComparison.Ordinal))
                 {
                     return false;
                 }
@@ -204,7 +204,7 @@ namespace NLog.Extensions.Logging
                 bool extraProperty = true;
                 for (int j = startPos; j < messageTemplateParameters.Count; ++j)
                 {
-                    if (propertyName.Equals(messageTemplateParameters[j].Name))
+                    if (propertyName.Equals(messageTemplateParameters[j].Name, StringComparison.Ordinal))
                     {
                         extraProperty = false;
                         paramsArray[j] = messageParameters[i].Value;
