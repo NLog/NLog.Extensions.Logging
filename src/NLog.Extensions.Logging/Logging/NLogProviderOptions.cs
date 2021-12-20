@@ -8,22 +8,22 @@ namespace NLog.Extensions.Logging
     public class NLogProviderOptions
     {
         /// <summary>
-        /// Separator between for EventId.Id and EventId.Name. Default to _
+        /// Control capture of <see cref="Microsoft.Extensions.Logging.EventId"/> as "EventId"-property.
         /// </summary>
-        public string EventIdSeparator { get; set; } = "_";
+        public EventIdCaptureType CaptureEventId { get; set; } = EventIdCaptureType.EventId | EventIdCaptureType.EventName;
 
         /// <summary>
-        /// Skip capture of "EventId_Id" and "EventId_Name" as <see cref="LogEventInfo.Properties" /> when <c>default(EventId)</c>
+        /// Skip capture of <see cref="Microsoft.Extensions.Logging.EventId"/> in <see cref="LogEventInfo.Properties" /> when <c>default(EventId)</c>
         /// </summary>
         public bool IgnoreEmptyEventId { get; set; } = true;
 
         /// <summary>
-        /// Control capture of <see cref="Microsoft.Extensions.Logging.EventId"/> as "EventId"-property.
+        /// Separator between for EventId.Id and EventId.Name. Default to _
         /// </summary>
         /// <remarks>
-        /// Enabling capture of the entire "EventId" will increase memory allocation and gives a performance hit. Faster to use "EventId_Id" + "EventId_Name".
+        /// Only relevant for <see cref="EventIdCaptureType.EventId_Id"/>, <see cref="EventIdCaptureType.EventId_Name"/> or <see cref="EventIdCaptureType.Legacy"/>
         /// </remarks>
-        public EventIdCaptureType CaptureEventId { get; set; } = EventIdCaptureType.EventId_Id | EventIdCaptureType.EventId_Name;
+        public string EventIdSeparator { get; set; } = "_";
 
         /// <summary>
         /// Enable structured logging by capturing message template parameters with support for "@" and "$". Enables use of ${message:raw=true}

@@ -66,7 +66,7 @@ namespace NLog.Extensions.Logging
         private static int LookupEventId(LogEventInfo logEvent)
         {
             int eventId = 0;
-            if (logEvent.HasProperties && (logEvent.Properties.TryGetValue("EventId_Id", out var eventIdValue) || logEvent.Properties.TryGetValue("EventId", out eventIdValue)))
+            if (logEvent.HasProperties && (logEvent.Properties.TryGetValue(nameof(EventIdCaptureType.EventId_Id), out var eventIdValue) || logEvent.Properties.TryGetValue(nameof(EventIdCaptureType.EventId), out eventIdValue)))
             {
                 if (eventIdValue is int)
                     eventId = (int)eventIdValue;
