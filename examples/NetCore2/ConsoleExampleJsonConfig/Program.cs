@@ -17,22 +17,27 @@ namespace ConsoleExample
                 .Build();
 
             var logger = LogManager.Setup()
-                .SetupExtensions(s => s.AutoLoadAssemblies(false))
                 .SetupExtensions(s => s.RegisterConfigSettings(config))
                 .LoadConfigurationFromSection(config)
                 .GetCurrentClassLogger();
 
             try
             {
-                var servicesProvider = BuildDi(config);
-                using (servicesProvider as IDisposable)
-                {
-                    var runner = servicesProvider.GetRequiredService<Runner>();
-                    runner.DoAction("Action1");
+                using var servicesProvider = new ServiceCollection()
+                    .AddTransient<Runner>() // Runner is the custom class
+                    .AddLogging(loggingBuilder =>
+                    {
+                        // configure Logging with NLog
+                        loggingBuilder.ClearProviders();
+                        loggingBuilder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+                        loggingBuilder.AddNLog(config);
+                    }).BuildServiceProvider();
 
-                    Console.WriteLine("Press ANY key to exit");
-                    Console.ReadKey();
-                }
+                var runner = servicesProvider.GetRequiredService<Runner>();
+                runner.DoAction("Action1");
+
+                Console.WriteLine("Press ANY key to exit");
+                Console.ReadKey();
             }
             catch (Exception ex)
             {
@@ -45,20 +50,6 @@ namespace ConsoleExample
                 // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
                 LogManager.Shutdown();
             }
-        }
-
-        private static IServiceProvider BuildDi(IConfiguration config)
-        {
-            return new ServiceCollection()
-                .AddTransient<Runner>() // Runner is the custom class
-                .AddLogging(loggingBuilder =>
-                {
-                    // configure Logging with NLog
-                    loggingBuilder.ClearProviders();
-                    loggingBuilder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
-                    loggingBuilder.AddNLog(config);
-                })
-                .BuildServiceProvider();
         }
     }
 
