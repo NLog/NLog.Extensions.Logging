@@ -20,15 +20,16 @@
 
 ## NLog.Extensions.Logging
 
-[NLog](https://github.com/NLog/NLog) provider for [Microsoft.Extensions.Logging](https://github.com/aspnet/Logging); .NET Core. 
-**ASP.NET Core** users should install  [NLog.Web.AspNetCore](https://www.nuget.org/packages/NLog.web.aspnetcore). 
+[NLog.Extensions.Logging](https://www.nuget.org/packages/NLog.Extensions.Logging) makes it possible to use NLog together with [Microsoft ILogger](https://github.com/NLog/NLog.Extensions.Logging/wiki/NLog-GetCurrentClassLogger-and-Microsoft-ILogger)-abstraction and Dependency Injection.
+It provides extension methods to register NLog as LoggingProvider for Microsoft Extension Logging using `AddNLog()` or `UseNLog()`.
+> Note if using **ASP.NET Core** then instead install [NLog.Web.AspNetCore](https://www.nuget.org/packages/NLog.web.aspnetcore).
 
-## Getting started
+[NLog.Extensions.Logging](https://www.nuget.org/packages/NLog.Extensions.Logging) also makes it possible to load [NLog Configurations from appsettings.json](https://github.com/NLog/NLog.Extensions.Logging/wiki/NLog-configuration-with-appsettings.json)
 
-**Note**: Microsoft haven't ported all their classes to .NET standard, so not every target/layout renderer is available. 
-Please check [platform support](https://github.com/NLog/NLog/wiki/platform-support)
+Notice the standard [NLog NuGet package](https://www.nuget.org/packages/NLog) is enough for using NLog Logger with simple console application on the .NET Core platform.
+Just add `NLog.config` file to the project, and follow the [tutorial](https://github.com/NLog/NLog/wiki/Tutorial#configure-nlog-targets-for-output) for using `GetCurrentClassLogger()`.
 
-### ASP.NET Core
+### Getting Started Tutorials:
 
 - [Getting started for ASP.NET Core 6](https://github.com/NLog/NLog/wiki/Getting-started-with-ASP.NET-Core-6)
 - [Getting started for ASP.NET Core 5](https://github.com/NLog/NLog/wiki/Getting-started-with-ASP.NET-Core-5)
@@ -36,25 +37,4 @@ Please check [platform support](https://github.com/NLog/NLog/wiki/platform-suppo
 - [Getting started for ASP.NET Core 2](https://github.com/NLog/NLog/wiki/Getting-started-with-ASP.NET-Core-2)
 - [Getting started for .NET Core 2 Console application](https://github.com/NLog/NLog/wiki/Getting-started-with-.NET-Core-2---Console-application)
 - [How to use structured logging](https://github.com/NLog/NLog/wiki/How-to-use-structured-logging)
-- [Multiple blogs to get started with ASP.NET Core and NLog](https://github.com/damienbod/AspNetCoreNlog)
-
-### .NET Core Console application
-
-You can choose whether or not to use Dependency Injection when using NLog in a .NET Core Console application. If you don't want to use DI, you can just add the [NLog NuGet package](https://www.nuget.org/packages/NLog) to your project, manually add an `NLog.config` file, follow this [tutorial](https://github.com/NLog/NLog/wiki/Tutorial#configure-nlog-targets-for-output) to `GetCurrentClassLogger()`, and use that for logging.
-
-To use DI, you can use NLog in conjunction with `Microsoft.Extensions.Logging` by following the 'getting started' tutorial below.
-
-- [Getting started with .NET Core 2 Console application](https://github.com/NLog/NLog.Extensions.Logging/wiki/Getting-started-with-.NET-Core-2---Console-application)
-
-
-Known issues
----
-- auto load of NLog extensions won't work yet. Use `<extensions>` (see [docs](https://github.com/NLog/NLog/wiki/Configuration-file#extensions))
-- note: auto loading of extensions is removed in NLog 5. See [NLog 5.0 Preview-1 ready for release testing](https://nlog-project.org/2021/08/25/nlog-5-0-preview1-ready.html)
-
-
-### How to run the examples
-How to run the [dotnet-core-examples](https://github.com/NLog/NLog.Extensions.Logging/tree/master/examples):
-
-1. Install dotnet: http://dot.net 
-2. From source: `dotnet run`
+- [Blog posts for how to get started with ASP.NET Core and NLog](https://github.com/damienbod/AspNetCoreNlog)
