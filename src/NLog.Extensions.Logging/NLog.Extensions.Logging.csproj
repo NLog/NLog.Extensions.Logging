@@ -18,18 +18,11 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     </Description>
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logging;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
-## Features
-
-- [#554] NLogProviderOptions with support for CaptureEventId.EventId + EventName (@snakefoot)
-- [#555] MicrosoftConsoleJsonLayout - Simulates Microsoft AddJsonConsole Formatter (@snakefoot)
-
 ## Maintenance
 
-- [#546] NLogLogger refactoring for faster EventId-property capture (@snakefoot)
-- [#547] NLogLogger refactoring for faster EventId-property capture (@snakefoot)
-- [#552] Bump Microsoft.SourceLink.GitHub from 1.0.0 to 1.1.1 (@dependabot[bot])
-- [#558] Bump to Visual Studio 2022 on AppVeyor (@snakefoot)
-- [#559] NLogLogger - Reduce complexity of CreateLogEventInfo (@snakefoot)
+- [#564] NLog.ExtensionsHosting includes ContentRootPath when scanning for NLog.config candidate (@snakefoot)
+- [#565] NLogProviderOptions ShutdownOnDispose = true disables LogFactory.AutoShutdown (@snakefoot)
+
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
 
@@ -81,7 +74,7 @@ NLog 5 release post: https://nlog-project.org/2021/08/25/nlog-5-0-preview1-ready
     <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NLog" Version="5.0.0-rc1" />
+    <PackageReference Include="NLog" Version="5.0.0-rc2" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
