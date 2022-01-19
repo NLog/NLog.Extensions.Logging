@@ -2,6 +2,13 @@
 
 Date format: (year/month/day)
 
+### v5.0-rc2 (2022/01/19)
+
+#### 🔧 Maintenance
+
+- [#564](https://github.com/NLog/NLog.Extensions.Logging/pull/564): NLog.ExtensionsHosting includes ContentRootPath when scanning for NLog.config candidate (@snakefoot)
+- [#565](https://github.com/NLog/NLog.Extensions.Logging/pull/565): NLogProviderOptions ShutdownOnDispose = true disables LogFactory.AutoShutdown (@snakefoot)
+
 ### v5.0-rc1 (2021/12/20)
 
 #### 🚀 Features
