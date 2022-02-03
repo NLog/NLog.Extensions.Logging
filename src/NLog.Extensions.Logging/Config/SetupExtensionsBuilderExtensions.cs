@@ -14,7 +14,7 @@ namespace NLog.Extensions.Logging
         public static ISetupExtensionsBuilder RegisterConfigSettings(this ISetupExtensionsBuilder setupBuilder, IConfiguration configuration)
         {
             ConfigSettingLayoutRenderer.DefaultConfiguration = configuration;
-            return setupBuilder.RegisterLayoutRenderer<ConfigSettingLayoutRenderer>("configsetting");
+            return setupBuilder.RegisterLayoutRenderer<ConfigSettingLayoutRenderer>("configsetting").RegisterLayoutRenderer<MicrosoftConsoleLayoutRenderer>("MicrosoftConsoleLayout");
         }
     }
 }
