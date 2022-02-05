@@ -26,9 +26,11 @@ namespace NLog.Extensions.Logging.Tests
             var logEvent1 = new LogEventInfo(LogLevel.Error, "MyLogger", null, "Alert {EventId}", new object[] { eventId }, exception);
             var result1 = layout.Render(logEvent1);
             Assert.Equal($"{{ \"Timestamp\": \"{logEvent1.TimeStamp.ToUniversalTime().ToString("O")}\", \"EventId\": {eventId}, \"LogLevel\": \"Error\", \"Category\": \"MyLogger\", \"Message\": \"Alert {eventId}\", \"Exception\": \"{exception.ToString()}\", \"State\": {{ \"{{OriginalFormat}}\": \"Alert {{EventId}}\" }} }}", result1);
-            var logEvent2 = new LogEventInfo(LogLevel.Error, "MyLogger", null, "Alert {EventId_Id}", new object[] { eventId }, exception);
+
+            var eventId2 = 420;
+            var logEvent2 = new LogEventInfo(LogLevel.Error, "MyLogger", null, "Alert {EventId_Id}", new object[] { eventId2 }, exception);
             var result2 = layout.Render(logEvent2);
-            Assert.Equal($"{{ \"Timestamp\": \"{logEvent2.TimeStamp.ToUniversalTime().ToString("O")}\", \"EventId\": {eventId}, \"LogLevel\": \"Error\", \"Category\": \"MyLogger\", \"Message\": \"Alert {eventId}\", \"Exception\": \"{exception.ToString()}\", \"State\": {{ \"{{OriginalFormat}}\": \"Alert {{EventId_Id}}\" }} }}", result2);
+            Assert.Equal($"{{ \"Timestamp\": \"{logEvent2.TimeStamp.ToUniversalTime().ToString("O")}\", \"EventId\": {eventId2}, \"LogLevel\": \"Error\", \"Category\": \"MyLogger\", \"Message\": \"Alert {eventId2}\", \"Exception\": \"{exception.ToString()}\", \"State\": {{ \"{{OriginalFormat}}\": \"Alert {{EventId_Id}}\" }} }}", result2);
         }
 
         [Fact]
