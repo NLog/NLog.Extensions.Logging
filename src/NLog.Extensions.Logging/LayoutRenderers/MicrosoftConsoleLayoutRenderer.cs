@@ -50,8 +50,8 @@ namespace NLog.Extensions.Logging
             builder.Append(": ");
             builder.Append(logEvent.LoggerName);
             builder.Append('[');
-            int eventId = LookupEventId(logEvent);
-            builder.Append(ConvertEventId(eventId));
+            var eventId = LookupEventId(logEvent);
+            builder.Append(eventId);
             builder.Append(']');
             builder.Append(System.Environment.NewLine);
             builder.Append("      ");
@@ -63,18 +63,25 @@ namespace NLog.Extensions.Logging
             }
         }
 
-        private static int LookupEventId(LogEventInfo logEvent)
+        private static string LookupEventId(LogEventInfo logEvent)
         {
-            int eventId = 0;
-            if (logEvent.HasProperties && (logEvent.Properties.TryGetValue(nameof(EventIdCaptureType.EventId_Id), out var eventIdValue) || logEvent.Properties.TryGetValue(nameof(EventIdCaptureType.EventId), out eventIdValue)))
+            if (logEvent.HasProperties)
             {
-                if (eventIdValue is int)
-                    eventId = (int)eventIdValue;
-                else if (eventIdValue is Microsoft.Extensions.Logging.EventId eventIdStuct)
-                    eventId = eventIdStuct.Id;
+                if (logEvent.Properties.TryGetValue(nameof(EventIdCaptureType.EventId), out var eventObject))
+                {
+                    if (eventObject is int eventId)
+                        return ConvertEventId(eventId);
+                    else if (eventObject is Microsoft.Extensions.Logging.EventId eventIdStruct)
+                        return ConvertEventId(eventIdStruct.Id);
+                }
+
+                if (logEvent.Properties.TryGetValue(nameof(EventIdCaptureType.EventId_Id), out var eventid) && eventid is int)
+                {
+                    return ConvertEventId((int)eventid);
+                }
             }
 
-            return eventId;
+            return "0";
         }
 
         private static string ConvertEventId(int eventId)
