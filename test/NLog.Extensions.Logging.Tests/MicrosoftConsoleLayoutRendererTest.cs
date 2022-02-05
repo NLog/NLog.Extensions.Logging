@@ -26,6 +26,17 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Fact]
+        public void MicrosoftConsoleLayoutRenderer_OutOfMapperBoundsEventId()
+        {
+            var layoutRenderer = new MicrosoftConsoleLayoutRenderer();
+            var exception = new ArgumentException("Test");
+            var eventId = 500;
+            var result = layoutRenderer.Render(new LogEventInfo(LogLevel.Error, "MyLogger", null, "Alert {EventId_Id}", new object[] { eventId }, exception));
+            Assert.Equal($"fail: MyLogger[{eventId}]{Environment.NewLine}      Alert 500{Environment.NewLine}{exception}", result);
+        }
+
+
+        [Fact]
         public void MicrosoftConsoleLayoutRenderer_TimestampFormat()
         {
             var timestampFormat = "hh:mm:ss";

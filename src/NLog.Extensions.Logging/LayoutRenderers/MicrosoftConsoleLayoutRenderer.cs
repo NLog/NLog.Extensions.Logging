@@ -81,7 +81,7 @@ namespace NLog.Extensions.Logging
         {
             if (eventId == 0)
                 return "0";
-            else if (eventId > 0 || eventId < EventIdMapper.Length)
+            else if (eventId > 0 && eventId < EventIdMapper.Length)
                 return EventIdMapper[eventId];
             else
                 return eventId.ToString(System.Globalization.CultureInfo.InvariantCulture);
