@@ -50,8 +50,7 @@ namespace NLog.Extensions.Logging
             builder.Append(": ");
             builder.Append(logEvent.LoggerName);
             builder.Append('[');
-            var eventId = LookupEventId(logEvent);
-            builder.Append(eventId);
+            AppendEventId(LookupEventId(logEvent), builder);
             builder.Append(']');
             builder.Append(System.Environment.NewLine);
             builder.Append("      ");
@@ -63,35 +62,35 @@ namespace NLog.Extensions.Logging
             }
         }
 
-        private static string LookupEventId(LogEventInfo logEvent)
+        private static void AppendEventId(int eventId, StringBuilder builder)
+        {
+            if (eventId == 0)
+                builder.Append('0');
+            else if (eventId > 0 && eventId < EventIdMapper.Length)
+                builder.Append(EventIdMapper[eventId]);
+            else
+                builder.Append(eventId);    // .NET5 (and newer) can append integer without string-allocation (using span)
+        }
+
+        private static int LookupEventId(LogEventInfo logEvent)
         {
             if (logEvent.HasProperties)
             {
                 if (logEvent.Properties.TryGetValue(nameof(EventIdCaptureType.EventId), out var eventObject))
                 {
                     if (eventObject is int eventId)
-                        return ConvertEventId(eventId);
+                        return eventId;
                     else if (eventObject is Microsoft.Extensions.Logging.EventId eventIdStruct)
-                        return ConvertEventId(eventIdStruct.Id);
+                        return eventIdStruct.Id;
                 }
 
                 if (logEvent.Properties.TryGetValue(nameof(EventIdCaptureType.EventId_Id), out var eventid) && eventid is int)
                 {
-                    return ConvertEventId((int)eventid);
+                    return (int)eventid;
                 }
             }
 
-            return "0";
-        }
-
-        private static string ConvertEventId(int eventId)
-        {
-            if (eventId == 0)
-                return "0";
-            else if (eventId > 0 && eventId < EventIdMapper.Length)
-                return EventIdMapper[eventId];
-            else
-                return eventId.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            return 0;
         }
 
         private static string ConvertLogLevel(LogLevel logLevel)
