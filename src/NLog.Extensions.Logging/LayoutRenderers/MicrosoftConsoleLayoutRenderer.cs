@@ -22,21 +22,9 @@ namespace NLog.Extensions.Logging
             builder.Append(microsoftLogLevel);
             builder.Append(": ");
             builder.Append(logEvent.LoggerName);
-            builder.Append("[");
-            int eventId = 0;
-            if (logEvent.HasProperties && logEvent.Properties.TryGetValue("EventId_Id", out var eventIdValue))
-            {
-                if (eventIdValue is int)
-                    eventId = (int)eventIdValue;
-                else if (!int.TryParse(eventIdValue?.ToString() ?? string.Empty, out eventId))
-                    eventId = 0;
-            }
-            else
-            {
-                eventId = 0;
-            }
-            builder.Append(ConvertEventId(eventId));
-            builder.Append("]");
+            builder.Append('[');
+            AppendEventId(LookupEventId(logEvent), builder);
+            builder.Append(']');
             builder.Append(System.Environment.NewLine);
             builder.Append("      ");
             builder.Append(logEvent.FormattedMessage);
@@ -47,14 +35,38 @@ namespace NLog.Extensions.Logging
             }
         }
 
-        static string ConvertEventId(int eventId)
+        private static void AppendEventId(int eventId, StringBuilder builder)
         {
             if (eventId == 0)
-                return "0";
+                builder.Append('0');
             else if (eventId > 0 && eventId < EventIdMapper.Length)
-                return EventIdMapper[eventId];
+                builder.Append(EventIdMapper[eventId]);
             else
-                return eventId.ToString();
+                builder.Append(eventId);    // .NET5 (and newer) can append integer without string-allocation (using span)
+        }
+
+        private static int LookupEventId(LogEventInfo logEvent)
+        {
+            if (logEvent.HasProperties)
+            {
+                if (logEvent.Properties.TryGetValue("EventId_Id", out var eventObject))
+                {
+                    if (eventObject is int eventId)
+                        return eventId;
+                    else if (eventObject is Microsoft.Extensions.Logging.EventId eventIdStruct)
+                        return eventIdStruct.Id;
+                }
+
+                if (logEvent.Properties.TryGetValue("EventId", out var eventid))
+                {
+                    if (eventObject is int eventId)
+                        return eventId;
+                    else if (eventObject is Microsoft.Extensions.Logging.EventId eventIdStruct)
+                        return eventIdStruct.Id;
+                }
+            }
+
+            return 0;
         }
 
         string ConvertLogLevel(LogLevel logLevel)
