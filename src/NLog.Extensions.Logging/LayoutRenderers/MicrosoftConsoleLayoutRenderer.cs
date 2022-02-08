@@ -37,11 +37,11 @@ namespace NLog.Extensions.Logging
         /// <inheritdoc />
         protected override void Append(StringBuilder builder, LogEventInfo logEvent)
         {
-            string timestampFormat = _timestampFormat;
-            if (timestampFormat != null)
+            string timestampFormatString = _timestampFormatString;
+            if (timestampFormatString != null)
             {
                 var timestamp = UseUtcTimestamp ? logEvent.TimeStamp.ToUniversalTime() : logEvent.TimeStamp;
-                builder.AppendFormat(UseUtcTimestamp ? System.Globalization.CultureInfo.InvariantCulture : System.Globalization.CultureInfo.CurrentCulture, _timestampFormatString, timestamp);
+                builder.AppendFormat(UseUtcTimestamp ? System.Globalization.CultureInfo.InvariantCulture : System.Globalization.CultureInfo.CurrentCulture, timestampFormatString, timestamp);
                 builder.Append(' ');
             }
 
