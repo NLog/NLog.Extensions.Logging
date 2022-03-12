@@ -138,6 +138,12 @@ namespace NLog.Extensions.Logging
             _registerChangeCallback = nlogConfig.GetReloadToken().RegisterChangeCallback(_reloadConfiguration, nlogConfig);
         }
 
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return base.ToString() + $" ConfigSection={_originalConfigSection?.Key}";
+        }
+
         private class LoggingConfigurationElement : ILoggingConfigurationElement
         {
             private const string TargetKey = "target";
