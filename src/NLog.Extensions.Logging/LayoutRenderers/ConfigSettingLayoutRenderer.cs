@@ -73,7 +73,7 @@ namespace NLog.Extensions.Logging
             try
             {
                 // Avoid NLogDependencyResolveException when possible
-                if (!ReferenceEquals(ResolveService<IServiceProvider>(), LoggingConfiguration?.LogFactory?.ServiceRepository))
+                if (!ReferenceEquals(ResolveService<IServiceProvider>(), LoggingConfiguration?.LogFactory?.ServiceRepository ?? NLog.LogManager.LogFactory.ServiceRepository))
                 {
                     _serviceConfiguration = ResolveService<IConfiguration>();
                 }
