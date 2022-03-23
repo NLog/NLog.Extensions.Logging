@@ -152,7 +152,7 @@ namespace NLog.Extensions.Logging
             {
                 var provider = CreateNLogLoggerProvider(serviceProvider, config, options);
                 // Delay initialization of targets until we have loaded config-settings
-                LogManager.LoadConfiguration(configFileRelativePath);
+                provider.LogFactory.Setup().LoadConfigurationFromFile(configFileRelativePath);
                 return provider;
             });
             return builder;
@@ -189,7 +189,7 @@ namespace NLog.Extensions.Logging
         /// <param name="loggerFactory"></param>
         /// <param name="configFileRelativePath">relative path to NLog configuration file.</param>
         /// <returns>Current configuration for chaining.</returns>
-        [Obsolete("Instead use NLog.LogManager.LoadConfiguration()")]
+        [Obsolete("Instead use NLog.LogManager.Setup().LoadConfigurationFromFile()")]
         public static LoggingConfiguration ConfigureNLog(this ILoggerFactory loggerFactory, string configFileRelativePath)
         {
             LogManager.AddHiddenAssembly(typeof(NLogLoggerProvider).GetTypeInfo().Assembly);
