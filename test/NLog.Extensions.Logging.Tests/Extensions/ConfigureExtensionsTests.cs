@@ -7,6 +7,7 @@ using NLog.Targets;
 using Xunit;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
 
 namespace NLog.Extensions.Logging.Tests.Extensions
 {
@@ -149,6 +150,26 @@ namespace NLog.Extensions.Logging.Tests.Extensions
 
             // Act
             builder.AddNLog(new NLogProviderOptions() { ReplaceLoggerFactory = true, RemoveLoggerFactoryFilter = true });
+            var loggerFactory = builder.Services.BuildServiceProvider().GetService<ILoggerFactory>();
+            var loggerProvider = GetLoggerProvider(builder);
+
+            // Assert
+            Assert.Equal(typeof(NLogLoggerFactory), loggerFactory.GetType());
+            Assert.Equal(typeof(NLogLoggerProvider), loggerProvider.GetType());
+        }
+
+        [Fact]
+        public void AddNLog_WithConfig_ReplaceLoggerFactory()
+        {
+            // Arrange
+            ILoggingBuilder builder = new LoggingBuilderStub();
+            var memoryConfig = new Dictionary<string, string>();
+            memoryConfig["Logging:NLog:ReplaceLoggerFactory"] = "True";
+            memoryConfig["Logging:NLog:RemoveLoggerFactoryFilter"] = "True";
+            var configuration = new ConfigurationBuilder().AddInMemoryCollection(memoryConfig).Build();
+
+            // Act
+            builder.AddNLog(configuration);
             var loggerFactory = builder.Services.BuildServiceProvider().GetService<ILoggerFactory>();
             var loggerProvider = GetLoggerProvider(builder);
 

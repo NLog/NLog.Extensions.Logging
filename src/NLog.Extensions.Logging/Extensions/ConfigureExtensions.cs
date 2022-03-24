@@ -168,7 +168,8 @@ namespace NLog.Extensions.Logging
         {
             AddNLogLoggerProvider(builder, null, null, (serviceProvider, config, options) =>
             {
-                config = SetupConfiguration(serviceProvider, config);
+                RegisterNLogLoggingProvider.SetupConfiguration(serviceProvider, config);
+
                 // Delay initialization of targets until we have loaded config-settings
                 var logFactory = factoryBuilder(serviceProvider);
                 var provider = CreateNLogLoggerProvider(serviceProvider, config, options, logFactory);
@@ -177,9 +178,9 @@ namespace NLog.Extensions.Logging
             return builder;
         }
 
-        private static void AddNLogLoggerProvider(ILoggingBuilder builder, IConfiguration configuration, NLogProviderOptions options, Func<IServiceProvider, IConfiguration, NLogProviderOptions, NLogLoggerProvider> factory)
+        private static void AddNLogLoggerProvider(ILoggingBuilder builder, IConfiguration hostConfiguration, NLogProviderOptions options, Func<IServiceProvider, IConfiguration, NLogProviderOptions, NLogLoggerProvider> factory)
         {
-            builder.Services.TryAddNLogLoggingProvider((svc, addlogging) => addlogging(builder), configuration, options ?? NLogProviderOptions.Default, factory);
+            builder.Services.TryAddNLogLoggingProvider((svc, addlogging) => addlogging(builder), hostConfiguration, options ?? NLogProviderOptions.Default, factory);
         }
 #endif
 
@@ -218,10 +219,25 @@ namespace NLog.Extensions.Logging
         /// <returns></returns>
         public static NLogLoggerProvider Configure(this NLogLoggerProvider nlogProvider, IConfigurationSection configurationSection)
         {
-            if (configurationSection == null)
+            if (nlogProvider == null || configurationSection == null)
                 return nlogProvider;
 
-            var configProps = nlogProvider.Options.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(p => p.SetMethod?.IsPublic == true).ToDictionary(p => p.Name, StringComparer.OrdinalIgnoreCase);
+            Configure(nlogProvider.Options, configurationSection);
+            return nlogProvider;
+        }
+
+        /// <summary>
+        /// Factory method for <see cref="NLogProviderOptions"/>
+        /// </summary>
+        /// <param name="options"></param>
+        /// <param name="configurationSection">Microsoft Extension Configuration</param>
+        /// <returns></returns>
+        public static NLogProviderOptions Configure(this NLogProviderOptions options, IConfigurationSection configurationSection)
+        {
+            if (options == null || configurationSection == null || !(configurationSection.GetChildren()?.Any() ?? false))
+                return options ?? NLogProviderOptions.Default;
+
+            var configProps = options.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(p => p.SetMethod?.IsPublic == true).ToDictionary(p => p.Name, StringComparer.OrdinalIgnoreCase);
             foreach (var configValue in configurationSection.GetChildren())
             {
                 if (configProps.TryGetValue(configValue.Key, out var propertyInfo))
@@ -229,7 +245,7 @@ namespace NLog.Extensions.Logging
                     try
                     {
                         var result = Convert.ChangeType(configValue.Value, propertyInfo.PropertyType, System.Globalization.CultureInfo.InvariantCulture);
-                        propertyInfo.SetMethod.Invoke(nlogProvider.Options, new[] { result });
+                        propertyInfo.SetMethod.Invoke(options, new[] { result });
                     }
                     catch (Exception ex)
                     {
@@ -237,43 +253,17 @@ namespace NLog.Extensions.Logging
                     }
                 }
             }
-
-            return nlogProvider;
+            return options;
         }
 
-        private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration configuration, NLogProviderOptions options)
+        private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration hostConfiguration, NLogProviderOptions options)
         {
-            return CreateNLogLoggerProvider(serviceProvider, configuration, options, null);
+            return CreateNLogLoggerProvider(serviceProvider, hostConfiguration, options, null);
         }
 
-        private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration configuration, NLogProviderOptions options, LogFactory logFactory)
+        private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration hostConfiguration, NLogProviderOptions options, LogFactory logFactory)
         {
-            NLogLoggerProvider provider = new NLogLoggerProvider(options ?? NLogProviderOptions.Default, logFactory ?? LogManager.LogFactory);
-
-            configuration = SetupConfiguration(serviceProvider, configuration);
-
-            if (serviceProvider != null && provider.Options.RegisterServiceProvider)
-            {
-                provider.LogFactory.ServiceRepository.RegisterService(typeof(IServiceProvider), serviceProvider);
-            }
-
-            if (configuration != null)
-            {
-                provider.Configure(configuration.GetSection("Logging:NLog"));
-                provider.TryLoadConfigurationFromSection(configuration);
-            }
-
-            return provider;
-        }
-
-        private static IConfiguration SetupConfiguration(IServiceProvider serviceProvider, IConfiguration configuration)
-        {
-            configuration = configuration ?? (serviceProvider?.GetService(typeof(IConfiguration)) as IConfiguration);
-            if (configuration != null)
-            {
-                ConfigSettingLayoutRenderer.DefaultConfiguration = configuration;
-            }
-            return configuration;
+            return RegisterNLogLoggingProvider.CreateNLogLoggerProvider(serviceProvider, hostConfiguration, options, logFactory);
         }
     }
 }

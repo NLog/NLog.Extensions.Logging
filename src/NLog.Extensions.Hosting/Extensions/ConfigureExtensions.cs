@@ -42,29 +42,16 @@ namespace NLog.Extensions.Hosting
             return builder;
         }
 
-        private static void AddNLogLoggerProvider(IServiceCollection services, IConfiguration configuration, IHostEnvironment hostEnvironment, NLogProviderOptions options, Func<IServiceProvider, IConfiguration, IHostEnvironment, NLogProviderOptions, NLogLoggerProvider> factory)
+        private static void AddNLogLoggerProvider(IServiceCollection services, IConfiguration hostConfiguration, IHostEnvironment hostEnvironment, NLogProviderOptions options, Func<IServiceProvider, IConfiguration, IHostEnvironment, NLogProviderOptions, NLogLoggerProvider> factory)
         {
             ConfigurationItemFactory.Default.RegisterItemsFromAssembly(typeof(ConfigureExtensions).GetTypeInfo().Assembly);
             LogManager.AddHiddenAssembly(typeof(ConfigureExtensions).GetTypeInfo().Assembly);
-            services.TryAddNLogLoggingProvider((svc, addlogging) => svc.AddLogging(addlogging), configuration, options, (provider, cfg, opt) => factory(provider, cfg, hostEnvironment, opt));
+            services.TryAddNLogLoggingProvider((svc, addlogging) => svc.AddLogging(addlogging), hostConfiguration, options ?? new NLogProviderOptions(), (provider, cfg, opt) => factory(provider, cfg, hostEnvironment, opt));
         }
 
-        private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration configuration, IHostEnvironment hostEnvironment, NLogProviderOptions options)
+        private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration hostConfiguration, IHostEnvironment hostEnvironment, NLogProviderOptions options)
         {
-            NLogLoggerProvider provider = new NLogLoggerProvider(options);
-
-            configuration = SetupConfiguration(serviceProvider, configuration);
-
-            if (serviceProvider != null && provider.Options.RegisterServiceProvider)
-            {
-                provider.LogFactory.ServiceRepository.RegisterService(typeof(IServiceProvider), serviceProvider);
-            }
-
-            if (configuration != null)
-            {
-                provider.Configure(configuration.GetSection("Logging:NLog"));
-                provider.TryLoadConfigurationFromSection(configuration);
-            }
+            NLogLoggerProvider provider = RegisterNLogLoggingProvider.CreateNLogLoggerProvider(serviceProvider, hostConfiguration, options, null);
 
             var contentRootPath = hostEnvironment?.ContentRootPath;
             if (!string.IsNullOrEmpty(contentRootPath))
@@ -78,16 +65,6 @@ namespace NLog.Extensions.Hosting
             }
 
             return provider;
-        }
-
-        private static IConfiguration SetupConfiguration(IServiceProvider serviceProvider, IConfiguration configuration)
-        {
-            configuration = configuration ?? (serviceProvider?.GetService(typeof(IConfiguration)) as IConfiguration);
-            if (configuration != null)
-            {
-                ConfigSettingLayoutRenderer.DefaultConfiguration = configuration;
-            }
-            return configuration;
         }
 
         private static void TryLoadConfigurationFromContentRootPath(LogFactory logFactory, string contentRootPath)
