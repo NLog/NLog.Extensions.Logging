@@ -16,10 +16,7 @@
         {
             var sharedFactory = factory;
 
-            if (hostConfiguration != null)
-            {
-                options.Configure(hostConfiguration.GetSection("Logging:NLog"));
-            }
+            options = options.Configure(hostConfiguration?.GetSection("Logging:NLog"));
 
             if (options.ReplaceLoggerFactory)
             {
@@ -62,11 +59,11 @@
             }
         }
 
-        internal static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration hostConfiguration, NLogProviderOptions options, LogFactory logFactory)
+        internal static NLogLoggerProvider CreateNLogLoggerProvider(this IServiceProvider serviceProvider, IConfiguration hostConfiguration, NLogProviderOptions options, LogFactory logFactory)
         {
             var provider = new NLogLoggerProvider(options, logFactory);
 
-            var configuration = SetupConfiguration(serviceProvider, hostConfiguration);
+            var configuration = serviceProvider.SetupNLogConfigSettings(hostConfiguration);
 
             if (configuration != null && (!ReferenceEquals(configuration, hostConfiguration) || options == null))
             {
@@ -86,7 +83,7 @@
             return provider;
         }
 
-        internal static IConfiguration SetupConfiguration(IServiceProvider serviceProvider, IConfiguration configuration)
+        internal static IConfiguration SetupNLogConfigSettings(this IServiceProvider serviceProvider, IConfiguration configuration)
         {
             configuration = configuration ?? (serviceProvider?.GetService(typeof(IConfiguration)) as IConfiguration);
             if (configuration != null)
