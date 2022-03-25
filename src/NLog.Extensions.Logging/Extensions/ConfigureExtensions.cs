@@ -168,7 +168,7 @@ namespace NLog.Extensions.Logging
         {
             AddNLogLoggerProvider(builder, null, null, (serviceProvider, config, options) =>
             {
-                RegisterNLogLoggingProvider.SetupConfiguration(serviceProvider, config);
+                serviceProvider.SetupNLogConfigSettings(config);
 
                 // Delay initialization of targets until we have loaded config-settings
                 var logFactory = factoryBuilder(serviceProvider);
@@ -180,7 +180,7 @@ namespace NLog.Extensions.Logging
 
         private static void AddNLogLoggerProvider(ILoggingBuilder builder, IConfiguration hostConfiguration, NLogProviderOptions options, Func<IServiceProvider, IConfiguration, NLogProviderOptions, NLogLoggerProvider> factory)
         {
-            builder.Services.TryAddNLogLoggingProvider((svc, addlogging) => addlogging(builder), hostConfiguration, options ?? NLogProviderOptions.Default, factory);
+            builder.Services.TryAddNLogLoggingProvider((svc, addlogging) => addlogging(builder), hostConfiguration, options, factory);
         }
 #endif
 
@@ -234,8 +234,10 @@ namespace NLog.Extensions.Logging
         /// <returns></returns>
         public static NLogProviderOptions Configure(this NLogProviderOptions options, IConfigurationSection configurationSection)
         {
-            if (options == null || configurationSection == null || !(configurationSection.GetChildren()?.Any() ?? false))
-                return options ?? NLogProviderOptions.Default;
+            options = options ?? NLogProviderOptions.Default;
+
+            if (configurationSection == null || !(configurationSection.GetChildren()?.Any() ?? false))
+                return options;
 
             var configProps = options.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(p => p.SetMethod?.IsPublic == true).ToDictionary(p => p.Name, StringComparer.OrdinalIgnoreCase);
             foreach (var configValue in configurationSection.GetChildren())
@@ -263,7 +265,7 @@ namespace NLog.Extensions.Logging
 
         private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration hostConfiguration, NLogProviderOptions options, LogFactory logFactory)
         {
-            return RegisterNLogLoggingProvider.CreateNLogLoggerProvider(serviceProvider, hostConfiguration, options, logFactory);
+            return serviceProvider.CreateNLogLoggerProvider(hostConfiguration, options, logFactory);
         }
     }
 }

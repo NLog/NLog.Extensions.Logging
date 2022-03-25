@@ -46,12 +46,12 @@ namespace NLog.Extensions.Hosting
         {
             ConfigurationItemFactory.Default.RegisterItemsFromAssembly(typeof(ConfigureExtensions).GetTypeInfo().Assembly);
             LogManager.AddHiddenAssembly(typeof(ConfigureExtensions).GetTypeInfo().Assembly);
-            services.TryAddNLogLoggingProvider((svc, addlogging) => svc.AddLogging(addlogging), hostConfiguration, options ?? new NLogProviderOptions(), (provider, cfg, opt) => factory(provider, cfg, hostEnvironment, opt));
+            services.TryAddNLogLoggingProvider((svc, addlogging) => svc.AddLogging(addlogging), hostConfiguration, options, (provider, cfg, opt) => factory(provider, cfg, hostEnvironment, opt));
         }
 
         private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration hostConfiguration, IHostEnvironment hostEnvironment, NLogProviderOptions options)
         {
-            NLogLoggerProvider provider = RegisterNLogLoggingProvider.CreateNLogLoggerProvider(serviceProvider, hostConfiguration, options, null);
+            NLogLoggerProvider provider = serviceProvider.CreateNLogLoggerProvider(hostConfiguration, options, null);
 
             var contentRootPath = hostEnvironment?.ContentRootPath;
             if (!string.IsNullOrEmpty(contentRootPath))
