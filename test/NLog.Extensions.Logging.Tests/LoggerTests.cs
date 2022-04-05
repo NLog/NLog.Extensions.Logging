@@ -88,27 +88,54 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Fact]
-        public void TestScopeProperty()
+        public void TestScopeParameter()
         {
             GetRunner().LogWithScopeParameter();
 
             var target = GetTarget();
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters |20", target.Logs.LastOrDefault());
+        }
+
+        [Fact]
+        public void TestScopeProperty()
+        {
+            GetRunner().LogWithScopeProperty();
+
+            var target = GetTarget();
             Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters |Hello", target.Logs.LastOrDefault());
+        }
+
+        [Fact]
+        public void TestScopePropertyInt()
+        {
+            GetRunner().LogWithScopeIntProperty();
+
+            var target = GetTarget();
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters |42", target.Logs.LastOrDefault());
         }
 
         [Fact]
         public void TestScopePropertyList()
         {
-            GetRunner().LogWithScopeParameterList();
+            GetRunner().LogWithScopePropertyList();
 
             var target = GetTarget();
             Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters |Hello", target.Logs.LastOrDefault());
         }
 
         [Fact]
+        public void TestScopeIntPropertyList()
+        {
+            GetRunner().LogWithScopeIntPropertyList();
+
+            var target = GetTarget();
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters |42", target.Logs.LastOrDefault());
+        }
+
+        [Fact]
         public void TestScopePropertyDictionary()
         {
-            GetRunner().LogWithScopeParameterDictionary();
+            GetRunner().LogWithScopePropertyDictionary();
 
             var target = GetTarget();
             Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters |Hello", target.Logs.LastOrDefault());
@@ -303,7 +330,7 @@ namespace NLog.Extensions.Logging.Tests
                 _logger.Log(Microsoft.Extensions.Logging.LogLevel.Debug, default(EventId), new List<KeyValuePair<string, object>>(new[] { new KeyValuePair<string, object>("ParameterCount", "1") }), null, (s, ex) => "message with id and 1 property");
             }
 
-            public void LogWithScope()
+            public void LogWithScopeParameter()
             {
                 using (_logger.BeginScope("scope1"))
                 {
@@ -311,7 +338,7 @@ namespace NLog.Extensions.Logging.Tests
                 }
             }
 
-            public void LogWithScopeParameter()
+            public void LogWithScopeProperty()
             {
                 using (_logger.BeginScope(new KeyValuePair<string, string>("scope1", "Hello")))
                 {
@@ -319,7 +346,15 @@ namespace NLog.Extensions.Logging.Tests
                 }
             }
 
-            public void LogWithScopeParameterList()
+            public void LogWithScopeIntProperty()
+            {
+                using (_logger.BeginScope(new KeyValuePair<string, int>("scope1", 42)))
+                {
+                    _logger.LogDebug("message with id and {0} parameters", 1);
+                }
+            }
+
+            public void LogWithScopePropertyList()
             {
                 using (_logger.BeginScope(new[] { new KeyValuePair<string, object>("scope1", "Hello") }))
                 {
@@ -327,7 +362,15 @@ namespace NLog.Extensions.Logging.Tests
                 }
             }
 
-            public void LogWithScopeParameterDictionary()
+            public void LogWithScopeIntPropertyList()
+            {
+                using (_logger.BeginScope(new[] { new KeyValuePair<string, int>("scope1", 42) }))
+                {
+                    _logger.LogDebug("message with id and {0} parameters", 1);
+                }
+            }
+
+            public void LogWithScopePropertyDictionary()
             {
                 using (_logger.BeginScope(new Dictionary<string, string> { ["scope1"] = "Hello" }))
                 {
