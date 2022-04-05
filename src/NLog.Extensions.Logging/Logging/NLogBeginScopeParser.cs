@@ -187,7 +187,7 @@ namespace NLog.Extensions.Logging
                     continue;
                 }
 
-                propertyList = propertyList ?? new List<KeyValuePair<string, object>>();
+                propertyList = propertyList ?? new List<KeyValuePair<string, object>>((scopePropertyCollection as ICollection)?.Count ?? 0);
                 propertyList.Add(propertyValue.Value);
             }
 
@@ -276,7 +276,8 @@ namespace NLog.Extensions.Logging
             var propertyKeyLambda = Expression.Lambda<Func<object, object>>(propertyKeyAccessObj, keyValuePairObjParam).Compile();
 
             var propertyValueAccess = Expression.Property(keyValuePairTypeParam, valuePropertyInfo);
-            var propertyValueLambda = Expression.Lambda<Func<object, object>>(propertyValueAccess, keyValuePairObjParam).Compile();
+            var propertyValueAccessObj = Expression.Convert(propertyValueAccess, typeof(object));
+            var propertyValueLambda = Expression.Lambda<Func<object, object>>(propertyValueAccessObj, keyValuePairObjParam).Compile();
 
             keyValueExtractor = new KeyValuePair<Func<object, object>, Func<object, object>>(propertyKeyLambda, propertyValueLambda);
             return true;
