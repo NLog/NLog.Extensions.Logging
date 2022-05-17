@@ -2,6 +2,20 @@
 
 Date format: (year/month/day)
 
+### v5.0 (2022/05/17)
+
+#### 🔧 Maintenance
+
+- [#590](https://github.com/NLog/NLog.Extensions.Logging/pull/590): Added nuget-dependency Microsoft.Extensions.Configuration.Abstractions for all platforms (@snakefoot)
+- [#583](https://github.com/NLog/NLog.Extensions.Logging/pull/583): NLogBeginScopeParser - Improve parsing of custom KeyValuePair as scope-properties (@snakefoot)
+- [#581](https://github.com/NLog/NLog.Extensions.Logging/pull/581): Support RemoveLoggerFactoryFilter and ReplaceLoggerFactory in appsettings.json (@snakefoot)
+- [#579](https://github.com/NLog/NLog.Extensions.Logging/pull/579): ConfigSettingLayoutRenderer - Improve support for RegisterServiceProvider (@snakefoot)
+- [#572](https://github.com/NLog/NLog.Extensions.Logging/pull/572): MicrosoftConsoleLayoutRenderer - Skip string-allocation for EventId when possible on platform (@snakefoot)
+- [#571](https://github.com/NLog/NLog.Extensions.Logging/pull/571): MicrosoftConsoleJsonLayout - Fixed IndexOutOfRangeException when large EventID (@snakefoot)
+- [#570](https://github.com/NLog/NLog.Extensions.Logging/pull/570): MicrosoftConsoleLayoutRenderer - Fixed IndexOutOfRangeException when large EventID (@mickelsonmichael)
+
+See also [List of major changes in NLog 5](https://nlog-project.org/2021/08/25/nlog-5-0-preview1-ready.html)
+
 ### v5.0-rc2 (2022/01/19)
 
 #### 🔧 Maintenance
@@ -24,8 +38,6 @@ Date format: (year/month/day)
 - [#558](https://github.com/NLog/NLog.Extensions.Logging/pull/558): Bump to Visual Studio 2022 on AppVeyor (@snakefoot)
 - [#559](https://github.com/NLog/NLog.Extensions.Logging/pull/559): NLogLogger - Reduce complexity of CreateLogEventInfo (@snakefoot)
 
-See also [Release post for NLog 5](https://nlog-project.org/2021/08/25/nlog-5-0-preview1-ready.html)
-
 ### v5.0-preview 3 (2021/10/26)
 
 #### 🚀 Features
@@ -37,8 +49,6 @@ See also [Release post for NLog 5](https://nlog-project.org/2021/08/25/nlog-5-0-
 - [#541](https://github.com/NLog/NLog.Extensions.Logging/pull/541): NLogLogger refactoring for faster EventId-property capture (@snakefoot)
 - [#539](https://github.com/NLog/NLog.Extensions.Logging/pull/539): NLogLogger refactoring to reduce code-path-navigations (@snakefoot)
 
-See also [Release post for NLog 5](https://nlog-project.org/2021/08/25/nlog-5-0-preview1-ready.html)
-
 ### v5.0-preview 2 (2021/10/03)
 
 #### 👍 Enhancements
@@ -48,8 +58,6 @@ See also [Release post for NLog 5](https://nlog-project.org/2021/08/25/nlog-5-0-
 - [#531](https://github.com/NLog/NLog.Extensions.Logging/pull/531): Fix NLogLoggingConfiguration to handle throwConfigExceptions with NLog 5.0 (@snakefoot)
 - [#534](https://github.com/NLog/NLog.Extensions.Logging/pull/534): Fixed spelling for IncludeActivityIdsWithBeginScope (@snakefoot)
 - [#535](https://github.com/NLog/NLog.Extensions.Logging/pull/535): NLogProviderOptions with support for RegisterServiceProvider (@snakefoot)
-
-See also [Release post for NLog 5](https://nlog-project.org/2021/08/25/nlog-5-0-preview1-ready.html)
 
 ### v5.0-preview 1 (2021/08/28)
 
@@ -73,7 +81,7 @@ See also [Release post for NLog 5](https://nlog-project.org/2021/08/25/nlog-5-0-
 
 - [#486](https://github.com/NLog/NLog.Extensions.Logging/pull/486): Removed platform .NET 4.5.1 (@snakefoot)
 
-See also [Release post for NLog 5](https://nlog-project.org/2021/08/25/nlog-5-0-preview1-ready.html)
+See also [List of major changes in NLog 5](https://nlog-project.org/2021/08/25/nlog-5-0-preview1-ready.html)
 
 ### v1.7.4 (2021/08/25)
 
