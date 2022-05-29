@@ -7,7 +7,7 @@ using NLog.Layouts;
 namespace NLog.Extensions.Logging
 {
     /// <summary>
-    /// Renders output that simulates Microsoft Json Console Formatter from AddJsonConsol
+    /// Renders output that simulates Microsoft Json Console Formatter from AddJsonConsole
     /// </summary>
     [Layout("MicrosoftConsoleJsonLayout")]
     [ThreadAgnostic]
