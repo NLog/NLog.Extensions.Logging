@@ -1,4 +1,4 @@
-version: 1.0.{build}
+version: 1.7.0-{build}
 image: Visual Studio 2019
 configuration: Release
 skip_tags: true
