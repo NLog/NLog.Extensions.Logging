@@ -83,6 +83,12 @@ See also [List of major changes in NLog 5](https://nlog-project.org/2021/08/25/n
 
 See also [List of major changes in NLog 5](https://nlog-project.org/2021/08/25/nlog-5-0-preview1-ready.html)
 
+### v1.7.5 (2022/06/04)
+
+- [#570](https://github.com/NLog/NLog.Extensions.Logging/pull/570): MicrosoftConsoleLayoutRenderer - Fixed IndexOutOfRangeException when large EventID (@mickelsonmichael)
+- [#572](https://github.com/NLog/NLog.Extensions.Logging/pull/572): MicrosoftConsoleLayoutRenderer - Skip string-allocation for EventId when possible on platform (@snakefoot)
+- Bump NLog from 4.7.11 to 4.7.15
+
 ### v1.7.4 (2021/08/25)
 
 #### ⏩ Performance
