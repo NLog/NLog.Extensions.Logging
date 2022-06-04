@@ -40,4 +40,4 @@ deploy:
   api_key:
     secure: N/3SLEg4r4QlbIVrI6epIHgv2KfwkwkrIUeLRyqS8D3AkC29Ql86NMkHxWOfcmUM
   on:
-    branch: master
+    branch: v1.7
