@@ -3,7 +3,7 @@
 namespace NLog.Extensions.Logging
 {
     /// <summary>
-    /// Options for logging to NLog with 
+    /// Configuration options for the NLog Logging Provider with Microsoft Extension Logging
     /// </summary>
     public class NLogProviderOptions
     {
