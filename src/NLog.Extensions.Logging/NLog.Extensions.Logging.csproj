@@ -16,50 +16,11 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     </Description>
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logging;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
-### v5.0 (2022/05/17)
+#### 🔧 Improvements
 
-#### 🚀 Features
-
-- [#465] Add support for config variables with JsonLayout (@snakefoot)
-- [#520] Changed LoggingConfigurationSectionName to default NLog (@snakefoot)
-- [#529] NLogLoggerProvider - Always load NLog config from appsettings when possible (@snakefoot)
-- [#554] NLogProviderOptions with support for CaptureEventId.EventId + EventName (@snakefoot)
-- [#555] MicrosoftConsoleJsonLayout - Simulates Microsoft AddJsonConsole Formatter (@snakefoot)
-
-#### 👍 Enhancements
-
-- [#522] Reload now fully support KeepVariablesOnReload (@snakefoot)
-- [#521] Change default value for RemoveLoggerFactoryFilter to true (@snakefoot)
-- [#535] NLogProviderOptions with support for RegisterServiceProvider (@snakefoot)
-- [#531] Fix NLogLoggingConfiguration to handle throwConfigExceptions with NLog 5.0 (@snakefoot)
-- [#564] NLog.ExtensionsHosting includes ContentRootPath when scanning for NLog.config candidate (@snakefoot)
-- [#565] NLogProviderOptions ShutdownOnDispose = true disables LogFactory.AutoShutdown (@snakefoot)
-- [#583] NLogBeginScopeParser - Improve parsing of custom KeyValuePair as scope-properties (@snakefoot)
-- [#581] Support RemoveLoggerFactoryFilter and ReplaceLoggerFactory in appsettings.json (@snakefoot)
-
-#### ⏩ Performance
-
-- [#319] NLogLogger - Reduce allocation by not boxing EventId unless CaptureEventId = Legacy (@snakefoot)
-- [#485] Remove startup overhead caused by enumerating all assemblies for callsite logic (@snakefoot)
-- [#519] Update to NLog 5.0 with ScopeContext instead of MDLC (@snakefoot)
-
-#### 🔧 Maintenance
-
-- [#486] Removed platform .NET 4.5.1 (@snakefoot)
-- [#530] Replaced platform netcoreapp3.0 with netcoreapp3.1 (@snakefoot)
-- [#534] Fixed spelling for IncludeActivityIdsWithBeginScope (@snakefoot)
-- [#539] NLogLogger refactoring to reduce code-path-navigations (@snakefoot)
-- [#541] NLogLogger refactoring for faster EventId-property capture (@snakefoot)
-- [#546] NLogLogger refactoring for faster EventId-property capture (@snakefoot)
-- [#547] NLogLogger refactoring for faster EventId-property capture (@snakefoot)
-- [#552] Bump Microsoft.SourceLink.GitHub from 1.0.0 to 1.1.1 (@dependabot[bot])
-- [#558] Bump to Visual Studio 2022 on AppVeyor (@snakefoot)
-- [#559] NLogLogger - Reduce complexity of CreateLogEventInfo (@snakefoot)
-- [#570] MicrosoftConsoleLayoutRenderer - Fixed IndexOutOfRangeException when large EventID (@mickelsonmichael)
-- [#571] MicrosoftConsoleJsonLayout - Fixed IndexOutOfRangeException when large EventID (@snakefoot)
-- [#572] MicrosoftConsoleLayoutRenderer - Skip string-allocation for EventId when possible on platform (@snakefoot)
-- [#579] ConfigSettingLayoutRenderer - Improve support for RegisterServiceProvider (@snakefoot)
-- [#590] Added nuget-dependency Microsoft.Extensions.Configuration.Abstractions for all platforms (@snakefoot)
+- [#599] Fixed MissingMethodException for HostBuilderContext.get_HostingEnvironment() (@snakefoot)
+- [#595] Added AddNLog-extension-method with custom options and serviceprovider-functor (@dependabot)
+- [#486] Bump NLog from 5.0.0 to 5.0.1 (@dependabot)
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
 

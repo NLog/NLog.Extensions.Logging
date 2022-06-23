@@ -2,6 +2,14 @@
 
 Date format: (year/month/day)
 
+### v5.0.1 (2022/06/23)
+
+#### 🔧 Maintenance
+
+- [#599](https://github.com/NLog/NLog.Extensions.Logging/pull/599): Fixed MissingMethodException for HostBuilderContext.get_HostingEnvironment() (@snakefoot)
+- [#595](https://github.com/NLog/NLog.Extensions.Logging/pull/595): Added AddNLog-extension-method with custom options and serviceprovider-functor (@dependabot)
+- [#486](https://github.com/NLog/NLog.Extensions.Logging/pull/486): Bump NLog from 5.0.0 to 5.0.1 (@dependabot)
+
 ### v5.0 (2022/05/17)
 
 #### 🔧 Maintenance
