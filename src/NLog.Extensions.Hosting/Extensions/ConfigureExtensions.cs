@@ -38,7 +38,11 @@ namespace NLog.Extensions.Hosting
         public static IHostBuilder UseNLog(this IHostBuilder builder, NLogProviderOptions options)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
+#if NETSTANDARD2_0
+            builder.ConfigureServices((builderContext, services) => AddNLogLoggerProvider(services, builderContext.Configuration, null, options, CreateNLogLoggerProvider));
+#else
             builder.ConfigureServices((builderContext, services) => AddNLogLoggerProvider(services, builderContext.Configuration, builderContext.HostingEnvironment, options, CreateNLogLoggerProvider));
+#endif
             return builder;
         }
 
