@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.1;netcoreapp3.1;net5.0</TargetFrameworks>
+    <TargetFrameworks>net461;netcoreapp3.1;net5.0</TargetFrameworks>
     <OutputType>Library</OutputType>
     <IsPackable>false</IsPackable>
     <DebugType>full</DebugType>
@@ -13,9 +13,9 @@
     <LangVersion>latest</LangVersion>
     <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
   </PropertyGroup>
-  
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="2.1.0" />
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.0" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
@@ -31,9 +31,11 @@
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3" />
   </ItemGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\..\src\NLog.Extensions.Hosting\NLog.Extensions.Hosting.csproj" />
   </ItemGroup>
+  
   <ItemGroup>
     <None Update="nlog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
