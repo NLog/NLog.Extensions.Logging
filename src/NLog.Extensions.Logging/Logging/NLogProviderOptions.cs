@@ -50,6 +50,11 @@ namespace NLog.Extensions.Logging
         /// </summary>
         public bool ShutdownOnDispose { get; set; }
 
+        /// <summary>
+        /// Automatically Shutdown NLog on AppDomain.Unload or AppDomain.ProcessExit
+        /// </summary>
+        public bool AutoShutdown { get; set; }
+
 #if NET5_0
         /// <summary>
         /// Automatically include <see cref="System.Diagnostics.Activity.SpanId"/>, <see cref="System.Diagnostics.Activity.TraceId"/> and <see cref="System.Diagnostics.Activity.ParentId"/>

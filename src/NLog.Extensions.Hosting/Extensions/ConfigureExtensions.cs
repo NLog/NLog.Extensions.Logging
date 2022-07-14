@@ -63,11 +63,6 @@ namespace NLog.Extensions.Hosting
                 TryLoadConfigurationFromContentRootPath(provider.LogFactory, contentRootPath);
             }
 
-            if (provider.Options.ShutdownOnDispose)
-            {
-                provider.LogFactory.AutoShutdown = false;
-            }
-
             return provider;
         }
 

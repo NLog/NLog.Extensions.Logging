@@ -80,6 +80,11 @@
                 provider.TryLoadConfigurationFromSection(configuration);
             }
 
+            if (provider.Options.ShutdownOnDispose || !provider.Options.AutoShutdown)
+            {
+                provider.LogFactory.AutoShutdown = false;
+            }
+
             return provider;
         }
 
