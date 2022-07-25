@@ -4,7 +4,7 @@ Date format: (year/month/day)
 
 ### Version 5.0.1 (2022/06/23)
 
-#### 🔧 Maintenance
+**Improvements**
 
 - [#599](https://github.com/NLog/NLog.Extensions.Logging/pull/599): Fixed MissingMethodException for HostBuilderContext.get_HostingEnvironment() (@snakefoot)
 - [#595](https://github.com/NLog/NLog.Extensions.Logging/pull/595): Added AddNLog-extension-method with custom options and serviceprovider-functor (@dependabot)
@@ -12,7 +12,7 @@ Date format: (year/month/day)
 
 ### Version 5.0.0 (2022/05/17)
 
-#### 🔧 Maintenance
+**Improvements*
 
 - [#590](https://github.com/NLog/NLog.Extensions.Logging/pull/590): Added nuget-dependency Microsoft.Extensions.Configuration.Abstractions for all platforms (@snakefoot)
 - [#583](https://github.com/NLog/NLog.Extensions.Logging/pull/583): NLogBeginScopeParser - Improve parsing of custom KeyValuePair as scope-properties (@snakefoot)
@@ -26,19 +26,19 @@ See also [List of major changes in NLog 5](https://nlog-project.org/2021/08/25/n
 
 ### Version 5.0-rc2 (2022/01/19)
 
-#### 🔧 Maintenance
+**Improvements**
 
 - [#564](https://github.com/NLog/NLog.Extensions.Logging/pull/564): NLog.ExtensionsHosting includes ContentRootPath when scanning for NLog.config candidate (@snakefoot)
 - [#565](https://github.com/NLog/NLog.Extensions.Logging/pull/565): NLogProviderOptions ShutdownOnDispose = true disables LogFactory.AutoShutdown (@snakefoot)
 
 ### Version 5.0-rc1 (2021/12/20)
 
-#### 🚀 Features
+**Features**
 
 - [#554](https://github.com/NLog/NLog.Extensions.Logging/pull/554): NLogProviderOptions with support for CaptureEventId.EventId + EventName (@snakefoot)
 - [#555](https://github.com/NLog/NLog.Extensions.Logging/pull/555): MicrosoftConsoleJsonLayout - Simulates Microsoft AddJsonConsole Formatter (@snakefoot)
 
-#### 🔧 Maintenance
+**Improvements**
 
 - [#546](https://github.com/NLog/NLog.Extensions.Logging/pull/546): NLogLogger refactoring for faster EventId-property capture (@snakefoot)
 - [#547](https://github.com/NLog/NLog.Extensions.Logging/pull/547): NLogLogger refactoring for faster EventId-property capture (@snakefoot)
@@ -48,18 +48,18 @@ See also [List of major changes in NLog 5](https://nlog-project.org/2021/08/25/n
 
 ### Version 5.0-preview 3 (2021/10/26)
 
-#### 🚀 Features
+**Features**
 
 - [#538](https://github.com/NLog/NLog.Extensions.Logging/pull/538): NLogProviderOptions with support for CaptureEventId (@snakefoot)
 
-#### 🔧 Maintenance
+**Improvements**
 
 - [#541](https://github.com/NLog/NLog.Extensions.Logging/pull/541): NLogLogger refactoring for faster EventId-property capture (@snakefoot)
 - [#539](https://github.com/NLog/NLog.Extensions.Logging/pull/539): NLogLogger refactoring to reduce code-path-navigations (@snakefoot)
 
 ### Version 5.0-preview 2 (2021/10/03)
 
-#### 👍 Enhancements
+**Improvements**
 
 - [#529](https://github.com/NLog/NLog.Extensions.Logging/pull/529): NLogLoggerProvider - Always load from appsettings when possible (@snakefoot)
 - [#530](https://github.com/NLog/NLog.Extensions.Logging/pull/530): Replaced platform netcoreapp3.0 with netcoreapp3.1 (@snakefoot)
@@ -69,25 +69,22 @@ See also [List of major changes in NLog 5](https://nlog-project.org/2021/08/25/n
 
 ### Version 5.0-preview 1 (2021/08/28)
 
-#### 🚀 Features
+**Features**
 
 - [#520](https://github.com/NLog/NLog.Extensions.Logging/pull/520): Changed LoggingConfigurationSectionName to default NLog (@snakefoot)
 - [#465](https://github.com/NLog/NLog.Extensions.Logging/pull/465): Add support for config variables with JsonLayout (@snakefoot)
 
-#### 👍 Enhancements
+**Improvements**
 
 - [#522](https://github.com/NLog/NLog.Extensions.Logging/pull/522): Reload now fully support KeepVariablesOnReload (@snakefoot)
 - [#521](https://github.com/NLog/NLog.Extensions.Logging/pull/521): Change default value for RemoveLoggerFactoryFilter to true (@snakefoot)
+- [#486](https://github.com/NLog/NLog.Extensions.Logging/pull/486): Removed platform .NET 4.5.1 (@snakefoot)
 
-#### ⏩ Performance
+**Performance**
 
 - [#519](https://github.com/NLog/NLog.Extensions.Logging/pull/519): Update to NLog 5.0 Preview 1 with ScopeContext instead of MDLC (@snakefoot)
 - [#485](https://github.com/NLog/NLog.Extensions.Logging/pull/485): Remove startup overhead caused by enumerating all assemblies for callsite logic (@snakefoot)
 - [#319](https://github.com/NLog/NLog.Extensions.Logging/pull/319): NLogLogger - Reduce allocation by not boxing EventId when CaptureEntireEventId = false (@snakefoot)
-
-#### 🔧 Maintenance
-
-- [#486](https://github.com/NLog/NLog.Extensions.Logging/pull/486): Removed platform .NET 4.5.1 (@snakefoot)
 
 See also [List of major changes in NLog 5](https://nlog-project.org/2021/08/25/nlog-5-0-preview1-ready.html)
 
@@ -99,18 +96,14 @@ See also [List of major changes in NLog 5](https://nlog-project.org/2021/08/25/n
 
 ### Version 1.7.4 (2021/08/25)
 
-#### ⏩ Performance
+**Performance**
 
 - [#513](https://github.com/NLog/NLog.Extensions.Logging/pull/513): NLogLogger - Skip custom message formatting when no parameters (@snakefoot)
 
-#### 🔧 Maintenance
+**Improvements**
 
 - [#515](https://github.com/NLog/NLog.Extensions.Logging/pull/515): Disable ImplicitNuGetFallbackFolder for tests - fixes NU3005 on AppVeyor (@304NotModified)
-
-#### ↜ Dependencies
-
 - [#516](https://github.com/NLog/NLog.Extensions.Logging/pull/516): Bump NLog from 4.7.10 to 4.7.11 (@dependabot)
-
 
 ### Version 1.7.3 (2021/06/15)
 - [#510](https://github.com/NLog/NLog.Extensions.Logging/pull/510) Reduced code complexity of MicrosoftILoggerTarget (@snakefoot)
@@ -265,31 +258,28 @@ See https://github.com/NLog/NLog.Extensions.Logging/milestone/24?closed=1
 - [#162](https://github.com/nlog/NLog.Extensions.Logging/pull/162) Auto patch file version on AppVeyor (@304NotModified)
 - [#167](https://github.com/nlog/NLog.Extensions.Logging/pull/167) Update NetCore2 ConsoleExample to include the minimumlevel. (@seblucas)
 
-
 ### 1.0.0-rtm-rc2 (2017/10/19)
 
-#### Fixes
+**Fixes**
 
 - [#159](https://github.com/nlog/NLog.Extensions.Logging/pull/159) Fix Recursive resource lookup bug (@304NotModified)
 - [#158](https://github.com/nlog/NLog.Extensions.Logging/pull/158) Update dependencies version range (@304NotModified)
 
-
 ### Version 1.0.0-rtm-rc1 (2017/10/16)
 
-####  breaking changes:
-Breaking changes in behavior!
+**Breaking Changes**
 
 - [#154](https://github.com/nlog/NLog.Extensions.Logging/pull/154) Enable by default: CaptureMessageTemplates & CaptureMessageProperties (@304NotModified)
 - [#151](https://github.com/nlog/NLog.Extensions.Logging/pull/151) NLogProviderOptions: added IgnoreEmptyEventId, enabled by default. (@snakefoot)
 - [#151](https://github.com/nlog/NLog.Extensions.Logging/pull/151) NLogProviderOptions: set default EventIdSeparator to underscore. (@snakefoot)
 
-#### Features
+**Features**
   
 - [#125](https://github.com/nlog/NLog.Extensions.Logging/pull/125) Capture structured logging parameter names (@snakefoot)
 - [#148](https://github.com/nlog/NLog.Extensions.Logging/pull/148) MessageProperties - Allow capture of message properties (CaptureMessageProperties option) (@snakefoot)
 - [#152](https://github.com/nlog/NLog.Extensions.Logging/pull/152) Introduced NetStandard1.5 by updating to NLog 4.5-beta07 (@snakefoot)
 
-#### Other
+**Other**
 
 - [#143](https://github.com/nlog/NLog.Extensions.Logging/pull/143) Added Console Example to git (@304NotModified)
 - [#142](https://github.com/nlog/NLog.Extensions.Logging/pull/142) Enabled Travis build (@304NotModified)
