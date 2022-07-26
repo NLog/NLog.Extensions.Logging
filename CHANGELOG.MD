@@ -12,7 +12,7 @@ Date format: (year/month/day)
 
 ### Version 5.0.0 (2022/05/17)
 
-**Improvements*
+**Improvements**
 
 - [#590](https://github.com/NLog/NLog.Extensions.Logging/pull/590): Added nuget-dependency Microsoft.Extensions.Configuration.Abstractions for all platforms (@snakefoot)
 - [#583](https://github.com/NLog/NLog.Extensions.Logging/pull/583): NLogBeginScopeParser - Improve parsing of custom KeyValuePair as scope-properties (@snakefoot)
