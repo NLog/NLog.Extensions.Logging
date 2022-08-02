@@ -10,6 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		build.ps1 = build.ps1
 		CHANGELOG.MD = CHANGELOG.MD
 		README.md = README.md
+		run-tests.ps1 = run-tests.ps1
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NLog.Extensions.Logging", "src\NLog.Extensions.Logging\NLog.Extensions.Logging.csproj", "{6A236D76-C9D9-4B1D-8DDE-F6978D110288}"
