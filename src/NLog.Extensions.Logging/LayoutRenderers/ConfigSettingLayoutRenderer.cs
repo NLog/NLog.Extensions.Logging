@@ -50,7 +50,7 @@ namespace NLog.Extensions.Logging
             set
             {
                 _item = value;
-                _itemLookup = value?.Replace(".", ":");
+                _itemLookup = value?.Replace("\\.", "::").Replace(".", ":").Replace("::", ".");
             }
         }
         private string _item;
