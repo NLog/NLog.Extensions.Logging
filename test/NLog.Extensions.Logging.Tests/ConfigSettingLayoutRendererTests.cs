@@ -25,5 +25,16 @@ namespace NLog.Extensions.Logging.Tests
             var result = layoutRenderer.Render(LogEventInfo.CreateNullEvent());
             Assert.Equal("Test", result);
         }
+
+        [Fact]
+        public void ConfigSettingGlobalConfigEscapeLookup()
+        {
+            var memoryConfig = new Dictionary<string, string>();
+            memoryConfig["Microsoft.Logging"] = "Test";
+            ConfigSettingLayoutRenderer.DefaultConfiguration = new ConfigurationBuilder().AddInMemoryCollection(memoryConfig).Build();
+            var layoutRenderer = new ConfigSettingLayoutRenderer { Item = @"Microsoft\.Logging" };
+            var result = layoutRenderer.Render(LogEventInfo.CreateNullEvent());
+            Assert.Equal("Test", result);
+        }
     }
 }
