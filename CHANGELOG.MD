@@ -2,6 +2,14 @@
 
 Date format: (year/month/day)
 
+### Version 5.0.2 (2022/08/12)
+
+**Improvements**
+
+- [#614](https://github.com/NLog/NLog.Extensions.Logging/pull/614):  ConfigSettingLayoutRenderer - Support escape of dot-separator (@snakefoot)
+- [#606](https://github.com/NLog/NLog.Extensions.Logging/pull/606):  Introduced NLogProviderOptions AutoShutdown that is turned off by default (@snakefoot)
+- [#615](https://github.com/NLog/NLog.Extensions.Logging/pull/615):  Bump NLog from 5.0.1 to 5.0.2 (@snakefoot)
+
 ### Version 5.0.1 (2022/06/23)
 
 **Improvements**
