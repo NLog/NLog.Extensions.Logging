@@ -70,27 +70,36 @@ namespace NLog.Extensions.Hosting
         {
             logFactory.Setup().LoadConfiguration(config =>
             {
-                if (config.Configuration.LoggingRules.Count == 0 && config.Configuration.AllTargets.Count == 0)
+                if (!IsLoggingConfigurationLoaded(config.Configuration))
                 {
-                    var standardPath = System.IO.Path.Combine(contentRootPath, "NLog.config");
-                    if (System.IO.File.Exists(standardPath))
+                    config.Configuration = config.LogFactory.Configuration;
+                    if (!IsLoggingConfigurationLoaded(config.Configuration))
                     {
-                        config.Configuration = new XmlLoggingConfiguration(standardPath, config.LogFactory);
-                    }
-                    else
-                    {
-                        var lowercasePath = System.IO.Path.Combine(contentRootPath, "nlog.config");
-                        if (System.IO.File.Exists(lowercasePath))
+                        var standardPath = System.IO.Path.Combine(contentRootPath, "NLog.config");
+                        if (System.IO.File.Exists(standardPath))
                         {
-                            config.Configuration = new XmlLoggingConfiguration(lowercasePath, config.LogFactory);
+                            config.Configuration = new XmlLoggingConfiguration(standardPath, config.LogFactory);
                         }
                         else
                         {
-                            config.Configuration = null;    // Perform default loading
+                            var lowercasePath = System.IO.Path.Combine(contentRootPath, "nlog.config");
+                            if (System.IO.File.Exists(lowercasePath))
+                            {
+                                config.Configuration = new XmlLoggingConfiguration(lowercasePath, config.LogFactory);
+                            }
+                            else
+                            {
+                                config.Configuration = null;    // Perform default loading
+                            }
                         }
                     }
                 }
             });
+        }
+
+        private static bool IsLoggingConfigurationLoaded(LoggingConfiguration cfg)
+        {
+            return cfg?.LoggingRules?.Count > 0 && cfg?.AllTargets?.Count > 0;
         }
     }
 }
