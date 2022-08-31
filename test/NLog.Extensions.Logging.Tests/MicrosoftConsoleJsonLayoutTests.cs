@@ -14,7 +14,7 @@ namespace NLog.Extensions.Logging.Tests
         {
             var layout = new MicrosoftConsoleJsonLayout() { TimestampFormat = null };
             var result = layout.Render(LogEventInfo.CreateNullEvent());
-            Assert.Contains("{ \"EventId\": 0, \"LogLevel\": \"Critical\", \"State\": { } }", result);
+            Assert.Contains("{ \"EventId\": 0, \"LogLevel\": \"Critical\" }", result);
         }
 
         [Fact]
