@@ -2,6 +2,12 @@
 
 Date format: (year/month/day)
 
+### Version 5.0.3 (2022/09/01)
+
+**Improvements**
+- [#617](https://github.com/NLog/NLog.Extensions.Logging/pull/617):  NLog.ExtensionsHosting loads NLog.config from ContentRootPath as last fallback (@snakefoot)
+- [#619](https://github.com/NLog/NLog.Extensions.Logging/pull/619):  Bump NLog from 5.0.2 to 5.0.3 (@snakefoot)
+
 ### Version 5.0.2 (2022/08/12)
 
 **Improvements**
