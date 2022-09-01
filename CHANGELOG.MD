@@ -6,7 +6,7 @@ Date format: (year/month/day)
 
 **Improvements**
 - [#621](https://github.com/NLog/NLog.Extensions.Logging/pull/621):  Added embedded resource ILLink.Descriptors.xml (@snakefoot)
-- [#619](https://github.com/NLog/NLog.Extensions.Logging/pull/619):  Bump NLog from 5.0.3 to 5.0.4 (@snakefoot)
+- [#621](https://github.com/NLog/NLog.Extensions.Logging/pull/621):  Bump NLog from 5.0.3 to 5.0.4 (@snakefoot)
 
 ### Version 5.0.3 (2022/09/01)
 
