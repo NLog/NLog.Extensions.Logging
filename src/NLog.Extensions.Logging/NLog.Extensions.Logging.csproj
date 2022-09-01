@@ -34,13 +34,10 @@ List of major changes in NLog 5.0: https://nlog-project.org/2021/08/25/nlog-5-0-
     <AssemblyVersion>5.0.0.0</AssemblyVersion>
     <AssemblyOriginatorKeyFile>..\NLog.snk</AssemblyOriginatorKeyFile>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <LangVersion>latest</LangVersion>
     <!-- EmbedUntrackedSources for deterministic build -->
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
-
-  <Target Name="DownloadMissingContent" BeforeTargets="GenerateNuspec">
-    <DownloadFile SourceUrl="https://nlog-project.org/N.png" DestinationFolder="$(MSBuildThisFileDirectory)" />
-  </Target>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Title>NLog.Extensions.Logging for .NET Framework 4.6.1</Title>
@@ -68,8 +65,12 @@ List of major changes in NLog 5.0: https://nlog-project.org/2021/08/25/nlog-5-0-
     <Title>NLog.Extensions.Logging for .NET 5.0</Title>
     <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
   </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyTitle>$(Title)</AssemblyTitle>
+  </PropertyGroup>
+  
   <ItemGroup>
-    <PackageReference Include="NLog" Version="5.0.3" />
+    <PackageReference Include="NLog" Version="5.0.4" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
@@ -100,13 +101,19 @@ List of major changes in NLog 5.0: https://nlog-project.org/2021/08/25/nlog-5-0-
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="ILLink.Descriptors.xml">
+      <LogicalName>ILLink.Descriptors.xml</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <Target Name="DownloadMissingContent" BeforeTargets="GenerateNuspec">
+    <DownloadFile SourceUrl="https://nlog-project.org/N.png" DestinationFolder="$(MSBuildThisFileDirectory)" />
+  </Target>
+
+  <ItemGroup>
     <None Include="N.png" Pack="true" PackagePath="" Visible="false" />
   </ItemGroup>
   <Target Name="DownloadMissingContent" BeforeTargets="GenerateNuspec">
     <DownloadFile SourceUrl="https://nlog-project.org/N.png" DestinationFolder="$(MSBuildThisFileDirectory)" />
   </Target>
-  <PropertyGroup>
-    <AssemblyTitle>$(Title)</AssemblyTitle>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
 </Project>

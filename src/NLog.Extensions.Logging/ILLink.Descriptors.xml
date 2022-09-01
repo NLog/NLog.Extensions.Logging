@@ -1,0 +1,4 @@
+<linker>
+  <assembly fullname="NLog" preserve="all" />
+  <assembly fullname="NLog.Extensions.Logging" preserve="all" />
+</linker>
