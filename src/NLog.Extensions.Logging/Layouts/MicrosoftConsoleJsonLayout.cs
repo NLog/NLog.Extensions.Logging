@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using NLog.Config;
 using NLog.Layouts;
 
@@ -20,7 +21,7 @@ namespace NLog.Extensions.Logging
         /// </summary>
         public MicrosoftConsoleJsonLayout()
         {
-            Attributes.Add(new JsonAttribute("Timestamp", "${date:format=O:universalTime=true}"));
+            Attributes.Add(new JsonAttribute("Timestamp", new TimestampLayout()));
             Attributes.Add(new JsonAttribute("EventId", Layout.FromMethod(evt => LookupEventId(evt), LayoutRenderOptions.ThreadAgnostic)) { Encode = false });
             Attributes.Add(new JsonAttribute("LogLevel", Layout.FromMethod(evt => ConvertLogLevel(evt.Level), LayoutRenderOptions.ThreadAgnostic)));
             Attributes.Add(new JsonAttribute("Category", "${logger}"));
@@ -75,7 +76,7 @@ namespace NLog.Extensions.Logging
             get
             {
                 var index = LookupNamedAttributeIndex("Timestamp");
-                return index >= 0 ? ((Attributes[index].Layout as SimpleLayout)?.LayoutRenderers?.FirstOrDefault() as NLog.LayoutRenderers.DateLayoutRenderer)?.Format : null;
+                return index >= 0 ? (Attributes[index].Layout as TimestampLayout)?.TimestampFormat : null;
             }
             set
             {
@@ -87,7 +88,7 @@ namespace NLog.Extensions.Logging
                 
                 if (!string.IsNullOrEmpty(value))
                 {
-                    Attributes.Insert(0, new JsonAttribute("Timestamp", $"${{date:format={value}:universalTime=true}}"));
+                    Attributes.Insert(0, new JsonAttribute("Timestamp", new TimestampLayout() { TimestampFormat = value }));
                 }
             }
         }
@@ -149,6 +150,87 @@ namespace NLog.Extensions.Logging
                 return nameof(Microsoft.Extensions.Logging.LogLevel.Error);
             else
                 return nameof(Microsoft.Extensions.Logging.LogLevel.Critical);
+        }
+
+        [ThreadAgnostic]
+        private sealed class TimestampLayout : Layout
+        {
+            public string TimestampFormat
+            {
+                get => _timestampFormat;
+                set
+                {
+                    if ("o".Equals(value))
+                        value = "O";
+                    _timestampFormat = value;
+                    _timestampFormatString = string.IsNullOrEmpty(value) ? null : $"{{0:{value}}}";
+                }
+            }
+            private string _timestampFormat;
+            private string _timestampFormatString;
+
+            public TimestampLayout()
+            {
+                TimestampFormat = "O";  // Round-trip - ISO8601 - yyyy-MM-ddTHH:mm:ss.fffffffZ
+            }
+
+            protected override string GetFormattedMessage(LogEventInfo logEvent)
+            {
+                return _timestampFormatString != null ? logEvent.TimeStamp.ToUniversalTime().ToString(TimestampFormat, System.Globalization.CultureInfo.InvariantCulture) : String.Empty;
+            }
+
+            protected override void RenderFormattedMessage(LogEventInfo logEvent, StringBuilder target)
+            {
+                var utcTimestamp = logEvent.TimeStamp.ToUniversalTime();
+                if ("O".Equals(TimestampFormat))
+                {
+                    // yyyy-MM-ddTHH:mm:ss.fffffffZ
+                    Append4DigitsZeroPadded(target, utcTimestamp.Year);
+                    target.Append('-');
+                    Append2DigitsZeroPadded(target, utcTimestamp.Month);
+                    target.Append('-');
+                    Append2DigitsZeroPadded(target, utcTimestamp.Day);
+                    target.Append('T');
+                    Append2DigitsZeroPadded(target, utcTimestamp.Hour);
+                    target.Append(':');
+                    Append2DigitsZeroPadded(target, utcTimestamp.Minute);
+                    target.Append(':');
+                    Append2DigitsZeroPadded(target, utcTimestamp.Second);
+                    target.Append('.');
+                    var ticks = (int)(utcTimestamp.Ticks % 10000000);
+                    Append7DigitsZeroPadded(target, ticks);
+                    target.Append('Z');
+                }
+                else if (_timestampFormatString != null)
+                {
+                    target.AppendFormat(System.Globalization.CultureInfo.InvariantCulture, _timestampFormatString, utcTimestamp);
+                }
+            }
+
+            internal static void Append2DigitsZeroPadded(StringBuilder builder, int number)
+            {
+                builder.Append((char)((number / 10) + '0'));
+                builder.Append((char)((number % 10) + '0'));
+            }
+
+            internal static void Append4DigitsZeroPadded( StringBuilder builder, int number)
+            {
+                builder.Append((char)(((number / 1000) % 10) + '0'));
+                builder.Append((char)(((number / 100) % 10) + '0'));
+                builder.Append((char)(((number / 10) % 10) + '0'));
+                builder.Append((char)((number % 10) + '0'));
+            }
+
+            internal static void Append7DigitsZeroPadded(StringBuilder builder, int number)
+            {
+                builder.Append((char)(((number / 1000000) % 10) + '0'));
+                builder.Append((char)(((number / 100000) % 10) + '0'));
+                builder.Append((char)(((number / 10000) % 10) + '0'));
+                builder.Append((char)(((number / 1000) % 10) + '0'));
+                builder.Append((char)(((number / 100) % 10) + '0'));
+                builder.Append((char)(((number / 10) % 10) + '0'));
+                builder.Append((char)((number % 10) + '0'));
+            }
         }
     }
 }
