@@ -57,7 +57,7 @@ namespace NLog.Extensions.Logging.Tests.Extensions
             AssertSingleMessage(memoryTarget, $"{expectedEventInLog} - test message with 1 arg");
         }
 
-#if NET5_0
+#if NET6_0
         [Fact]
         public void AddNLog_LoggerFactory_IncludeActivityIdsWithBeginScope()
         {

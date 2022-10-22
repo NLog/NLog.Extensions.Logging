@@ -58,7 +58,7 @@ namespace NLog.Extensions.Logging
                 {
                     scopePropertyList = ExcludeOriginalFormatProperty(scopePropertyList);
                 }
-                else if (_options.IncludeActivityIdsWithBeginScope && "RequestId".Equals(scopePropertyList[0].Key))
+                else
                 {
                     scopePropertyList = IncludeActivityIdsProperties(scopePropertyList);
                 }
@@ -68,19 +68,22 @@ namespace NLog.Extensions.Logging
             return ScopeContext.PushNestedStateProperties(scopeObject, scopePropertyList);
         }
 
-#if !NET5_0
+#if !NET6_0
         private static IReadOnlyList<KeyValuePair<string, object>> IncludeActivityIdsProperties(IReadOnlyList<KeyValuePair<string, object>> scopePropertyList)
         {
-            return scopePropertyList;
+            return scopePropertyList;   // Not supported
         }
 #else
-        private static IReadOnlyList<KeyValuePair<string, object>> IncludeActivityIdsProperties(IReadOnlyList<KeyValuePair<string, object>> scopePropertyList)
+        private IReadOnlyList<KeyValuePair<string, object>> IncludeActivityIdsProperties(IReadOnlyList<KeyValuePair<string, object>> scopePropertyList)
         {
-            if (scopePropertyList.Count > 1 && "RequestPath".Equals(scopePropertyList[1].Key))
+            if (_options.IncludeActivityIdsWithBeginScope && "RequestId".Equals(scopePropertyList[0].Key))
             {
-                var activty = System.Diagnostics.Activity.Current;
-                if (activty != null)
-                    return new ScopePropertiesWithActivityIds(scopePropertyList, activty);
+                if (scopePropertyList.Count > 1 && "RequestPath".Equals(scopePropertyList[1].Key))
+                {
+                    var activty = System.Diagnostics.Activity.Current;
+                    if (activty != null)
+                        return new ScopePropertiesWithActivityIds(scopePropertyList, activty);
+                }
             }
 
             return scopePropertyList;

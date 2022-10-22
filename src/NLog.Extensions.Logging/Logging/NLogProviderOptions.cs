@@ -55,7 +55,7 @@ namespace NLog.Extensions.Logging
         /// </summary>
         public bool AutoShutdown { get; set; }
 
-#if NET5_0
+#if NET6_0
         /// <summary>
         /// Automatically include <see cref="System.Diagnostics.Activity.SpanId"/>, <see cref="System.Diagnostics.Activity.TraceId"/> and <see cref="System.Diagnostics.Activity.ParentId"/>
         /// </summary>
@@ -73,6 +73,7 @@ namespace NLog.Extensions.Logging
         /// 
         /// Consider using <a href="https://www.nuget.org/packages/NLog.DiagnosticSource/">${activity}</a> as alternative
         /// </remarks>
+        [Obsolete("Only supported with NET6 (or newer)")]
 #endif
         public bool IncludeActivityIdsWithBeginScope { get; set; }
 
