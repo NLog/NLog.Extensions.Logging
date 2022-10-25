@@ -16,8 +16,10 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     </Description>
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logging;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
-- NLog.ExtensionsHosting loads NLog.config from ContentRootPath as last fallback (#617) (@snakefoot)
-- Bump NLog from 5.0.2 to 5.0.3 (#619) (@snakefoot)
+- Replace NetCoreApp31 + Net50 with NetStandard2.1 + Net60 (#629) (@snakefoot)
+- MicrosoftConsoleJsonLayout - Skip string-allocation for timestamp-output (#628) (@snakefoot)
+- LoadConfigurationFromSection should RegisterConfigSettings without configuration assign (#627) (@snakefoot)
+- Bump NLog from 5.0.4 to 5.0.5 (#630) (@snakefoot)
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
 
@@ -70,7 +72,7 @@ List of major changes in NLog 5.0: https://nlog-project.org/2021/08/25/nlog-5-0-
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="NLog" Version="5.0.4" />
+    <PackageReference Include="NLog" Version="5.0.5" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">

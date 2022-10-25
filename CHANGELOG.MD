@@ -2,6 +2,14 @@
 
 Date format: (year/month/day)
 
+### Version 5.1.0 (2022/10/26)
+
+**Improvements**
+- [#629](https://github.com/NLog/NLog.Extensions.Logging/pull/629): Replace NetCoreApp31 + Net50 with NetStandard2.1 + Net60 (@snakefoot)
+- [#628](https://github.com/NLog/NLog.Extensions.Logging/pull/628): MicrosoftConsoleJsonLayout - Skip string-allocation for timestamp-output (@snakefoot)
+- [#627](https://github.com/NLog/NLog.Extensions.Logging/pull/627): LoadConfigurationFromSection should RegisterConfigSettings without configuration assign (@snakefoot)
+- [#630](https://github.com/NLog/NLog.Extensions.Logging/pull/630): Bump NLog from 5.0.4 to 5.0.5 (@snakefoot)
+
 ### Version 5.0.4 (2022/09/01)
 
 **Improvements**
