@@ -169,7 +169,7 @@ namespace NLog.Extensions.Logging
         {
             AddNLogLoggerProvider(builder, null, options, (serviceProvider, config, options) =>
             {
-                serviceProvider.SetupNLogConfigSettings(config);
+                serviceProvider.SetupNLogConfigSettings(config, LogManager.LogFactory);
 
                 // Delay initialization of targets until we have loaded config-settings
                 var logFactory = factoryBuilder(serviceProvider);
@@ -189,7 +189,7 @@ namespace NLog.Extensions.Logging
         {
             AddNLogLoggerProvider(builder, null, null, (serviceProvider, config, options) =>
             {
-                serviceProvider.SetupNLogConfigSettings(config);
+                serviceProvider.SetupNLogConfigSettings(config, LogManager.LogFactory);
 
                 // Delay initialization of targets until we have loaded config-settings
                 var logFactory = factoryBuilder(serviceProvider);

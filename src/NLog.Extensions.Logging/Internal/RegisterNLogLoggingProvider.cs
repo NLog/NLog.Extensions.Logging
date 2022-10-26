@@ -63,7 +63,7 @@
         {
             var provider = new NLogLoggerProvider(options, logFactory);
 
-            var configuration = serviceProvider.SetupNLogConfigSettings(hostConfiguration);
+            var configuration = serviceProvider.SetupNLogConfigSettings(hostConfiguration, provider.LogFactory);
 
             if (configuration != null && (!ReferenceEquals(configuration, hostConfiguration) || options == null))
             {
@@ -88,13 +88,10 @@
             return provider;
         }
 
-        internal static IConfiguration SetupNLogConfigSettings(this IServiceProvider serviceProvider, IConfiguration configuration)
+        internal static IConfiguration SetupNLogConfigSettings(this IServiceProvider serviceProvider, IConfiguration configuration, LogFactory logFactory)
         {
-            configuration = configuration ?? (serviceProvider?.GetService(typeof(IConfiguration)) as IConfiguration);
-            if (configuration != null)
-            {
-                ConfigSettingLayoutRenderer.DefaultConfiguration = configuration;
-            }
+            configuration = configuration ?? (serviceProvider?.GetService(typeof(IConfiguration)) as IConfiguration) ?? ConfigSettingLayoutRenderer.DefaultConfiguration;
+            logFactory.Setup().SetupExtensions(ext => ext.RegisterConfigSettings(configuration));
             return configuration;
         }
     }
