@@ -23,7 +23,7 @@ namespace NLog.Extensions.Logging
             {
                 ConfigSettingLayoutRenderer.DefaultConfiguration = configuration;
             }
-            return setupBuilder.RegisterLayoutRenderer<ConfigSettingLayoutRenderer>("configsetting").RegisterLayoutRenderer<MicrosoftConsoleLayoutRenderer>("MicrosoftConsoleLayout");
+            return setupBuilder.RegisterLayoutRenderer<ConfigSettingLayoutRenderer>("configsetting").RegisterLayoutRenderer<MicrosoftConsoleLayoutRenderer>("MicrosoftConsoleLayout").RegisterLayout<MicrosoftConsoleJsonLayout>("MicrosoftConsoleJsonLayout");
         }
     }
 }
