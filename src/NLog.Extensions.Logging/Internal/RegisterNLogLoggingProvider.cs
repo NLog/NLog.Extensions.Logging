@@ -90,7 +90,7 @@
 
         internal static IConfiguration SetupNLogConfigSettings(this IServiceProvider serviceProvider, IConfiguration configuration, LogFactory logFactory)
         {
-            configuration = configuration ?? (serviceProvider?.GetService(typeof(IConfiguration)) as IConfiguration) ?? ConfigSettingLayoutRenderer.DefaultConfiguration;
+            configuration = configuration ?? (serviceProvider?.GetService(typeof(IConfiguration)) as IConfiguration);
             logFactory.Setup().SetupExtensions(ext => ext.RegisterConfigSettings(configuration));
             return configuration;
         }
