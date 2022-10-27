@@ -13,7 +13,7 @@ namespace NLog.Extensions.Logging
         /// </summary>
         public static ISetupBuilder LoadConfigurationFromSection(this ISetupBuilder setupBuilder, Microsoft.Extensions.Configuration.IConfiguration configuration, string configSection = "NLog")
         {
-            setupBuilder.SetupExtensions(ext => ext.RegisterExtensionsLogging(configuration));
+            setupBuilder.SetupExtensions(ext => ext.RegisterConfigSettings(ConfigSettingLayoutRenderer.DefaultConfiguration ?? configuration));
             if (!string.IsNullOrEmpty(configSection))
             {
                 var nlogConfig = configuration.GetSection(configSection);
