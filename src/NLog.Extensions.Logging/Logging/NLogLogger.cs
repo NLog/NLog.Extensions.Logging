@@ -174,12 +174,13 @@ namespace NLog.Extensions.Logging
         /// <returns>true if correct</returns>
         private static bool AllParameterCorrectlyPositionalMapped(NLogMessageParameterList messageParameters, MessageTemplateParameters messageTemplateParameters)
         {
-            if (messageTemplateParameters.Count != messageParameters.Count)
+            var messageParameterCount = messageParameters.Count;
+            if (messageParameterCount != messageTemplateParameters.Count)
             {
                 return false;
             }
 
-            for (int i = 0; i < messageTemplateParameters.Count; ++i)
+            for (int i = 0; i < messageParameterCount; ++i)
             {
                 if (!messageParameters[i].Name.Equals(messageTemplateParameters[i].Name, StringComparison.Ordinal))
                 {
