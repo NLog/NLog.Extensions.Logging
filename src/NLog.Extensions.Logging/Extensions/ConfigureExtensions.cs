@@ -49,7 +49,7 @@ namespace NLog.Extensions.Logging
         /// Enable NLog as logging provider for Microsoft Extension Logging
         /// </summary>
         /// <param name="factory"></param>
-        /// <param name="configuration"></param>
+        /// <param name="configuration">Host Configuration for ${configsetting}</param>
         /// <returns>ILoggerFactory for chaining</returns>
 #if !NETCORE1_0
         [Obsolete("Instead use ILoggingBuilder.AddNLog() or IHostBuilder.UseNLog()")]
@@ -76,7 +76,7 @@ namespace NLog.Extensions.Logging
         /// Enable NLog as logging provider for Microsoft Extension Logging
         /// </summary>
         /// <param name="factory"></param>
-        /// <param name="configuration">Configuration</param>
+        /// <param name="configuration">Override configuration and not use default Host Builder Configuration</param>
         /// <returns>ILoggingBuilder for chaining</returns>
         public static ILoggingBuilder AddNLog(this ILoggingBuilder factory, IConfiguration configuration)
         {
@@ -88,7 +88,7 @@ namespace NLog.Extensions.Logging
         /// Enable NLog as logging provider for Microsoft Extension Logging
         /// </summary>
         /// <param name="factory"></param>
-        /// <param name="configuration">Configuration</param>
+        /// <param name="configuration">Override configuration and not use default Host Builder Configuration</param>
         /// <param name="options">NLog Logging Provider options</param>
         /// <returns>ILoggingBuilder for chaining</returns>
         public static ILoggingBuilder AddNLog(this ILoggingBuilder factory, IConfiguration configuration, NLogProviderOptions options)
