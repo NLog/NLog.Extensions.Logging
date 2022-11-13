@@ -1,16 +1,12 @@
-Please only post issues here when it is an issue of NLog.Extensions.Logging. 
-
-If it's a NLog issue or unsure, please create an issue on the main repo, you will get faster response there:
-https://github.com/NLog/NLog/issues/new
-
------
-
-
 Hi! Thanks for reporting this feature/bug/question! 
 
 Please keep / fill in the relevant info from this template so that we can help you as best as possible.
 
-For .NET Core users, please check the platform support: https://github.com/NLog/NLog/wiki/platform-support
+QUESTIONS are preferred on StackOverflow. You could expect a faster response there (but do include all the info below). Use the tag "nlog" https://stackoverflow.com/questions/ask
+
+Please only post issues here related to NLog.Extensions.Logging. If unsure, please post on https://github.com/NLog/NLog/issues/new
+
+-----
 
 **Type** (choose one):
 
@@ -19,11 +15,13 @@ For .NET Core users, please check the platform support: https://github.com/NLog/
 - Question
 
 
-**NLog version**: (e.g. 4.2.3)
-**NLog.Extensions.Logging version**: (e.g. 4.2.3)
-**NLog.Web.AspNetCore version**: (e.g. 4.2.3) (or not used)
+**NLog version**: (e.g. 4.5.6)
 
-**Platform**: .Net 3.5 / .Net 4.0 / .Net 4.5 / Mono 4 / Silverlight 4 / Silverlight 5 / Xamarin Android / Xamarin iOs / .NET Core 1 / .NET Core 2
+**NLog.Extensions.Logging version**: (e.g. 1.2.3)
+
+**NLog.Web.AspNetCore version**: (e.g. 4.5.6) (or not used)
+
+**Platform**: .Net 4.6.1 / .NET Core 1 / .NET Core 2 / .NET Core 3.1 / .NET 6.0
 
 **Current NLog config** (xml or C#, if relevant)
 
@@ -52,5 +50,4 @@ in case of a FEATURE REQUEST:
  
  - Why do we need it?
  - An example of the XML config, if relevant. 
-
 
