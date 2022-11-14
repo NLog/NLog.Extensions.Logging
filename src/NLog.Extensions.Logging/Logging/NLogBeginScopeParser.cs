@@ -31,7 +31,9 @@ namespace NLog.Extensions.Logging
             {
                 if (state is IReadOnlyList<KeyValuePair<string, object>> scopePropertyList)
                 {
-                    return CaptureScopeProperties(scopePropertyList);
+                    object scopeObject = scopePropertyList;
+                    scopePropertyList = ParseScopeProperties(scopePropertyList);
+                    return ScopeContext.PushNestedStateProperties(scopeObject, scopePropertyList);
                 }
 
                 if (!(state is string))
@@ -48,50 +50,44 @@ namespace NLog.Extensions.Logging
             return ScopeContext.PushNestedState(state);
         }
 
-        private IDisposable CaptureScopeProperties(IReadOnlyList<KeyValuePair<string, object>> scopePropertyList)
+        private IReadOnlyList<KeyValuePair<string, object>> ParseScopeProperties(IReadOnlyList<KeyValuePair<string, object>> scopePropertyList)
         {
-            object scopeObject = scopePropertyList;
-
             var scopePropertyCount = scopePropertyList.Count;
-            if (scopePropertyCount > 0)
+            if (scopePropertyCount == 0)
+                return Array.Empty<KeyValuePair<string, object>>();
+
+            if (NLogLogger.OriginalFormatPropertyName.Equals(scopePropertyList[scopePropertyCount - 1].Key))
             {
-                if (NLogLogger.OriginalFormatPropertyName.Equals(scopePropertyList[scopePropertyCount - 1].Key))
+                var firstProperty = scopePropertyList[0];
+                if (scopePropertyCount == 2 && !string.IsNullOrEmpty(firstProperty.Key) && !NLogLogger.OriginalFormatPropertyName.Equals(firstProperty.Key))
                 {
-                    var firstProperty = scopePropertyList[0];
-                    if (scopePropertyCount == 2 && !string.IsNullOrEmpty(firstProperty.Key) && !NLogLogger.OriginalFormatPropertyName.Equals(firstProperty.Key))
-                    {
-                        scopePropertyList = new[] { firstProperty };
-                    }
-                    else if (scopePropertyCount <= 2)
-                    {
-                        scopePropertyList = Array.Empty<KeyValuePair<string, object>>();
-                    }
-                    else
-                    {
-                        var propertyList = new List<KeyValuePair<string, object>>(scopePropertyCount - 1);
-                        for (var i = 0; i < scopePropertyCount; ++i)
-                        {
-                            var property = scopePropertyList[i];
-                            if (string.IsNullOrEmpty(property.Key))
-                            {
-                                continue;
-                            }
-                            if (NLogLogger.OriginalFormatPropertyName.Equals(property.Key))
-                            {
-                                continue; // Handle BeginScope("Hello {World}", "Earth")
-                            }
-                            propertyList.Add(property);
-                        }
-                        scopePropertyList = propertyList;
-                    }
+                    return new[] { firstProperty };
+                }
+                else if (scopePropertyCount <= 2)
+                {
+                    return Array.Empty<KeyValuePair<string, object>>();
                 }
                 else
                 {
-                    scopePropertyList = IncludeActivityIdsProperties(scopePropertyList);
+                    var propertyList = new List<KeyValuePair<string, object>>(scopePropertyCount - 1);
+                    for (var i = 0; i < scopePropertyCount; ++i)
+                    {
+                        var property = scopePropertyList[i];
+                        if (string.IsNullOrEmpty(property.Key))
+                        {
+                            continue;
+                        }
+                        if (NLogLogger.OriginalFormatPropertyName.Equals(property.Key))
+                        {
+                            continue; // Handle BeginScope("Hello {World}", "Earth")
+                        }
+                        propertyList.Add(property);
+                    }
+                    return propertyList;
                 }
             }
 
-            return ScopeContext.PushNestedStateProperties(scopeObject, scopePropertyList);
+            return IncludeActivityIdsProperties(scopePropertyList);
         }
 
 #if !NET6_0
