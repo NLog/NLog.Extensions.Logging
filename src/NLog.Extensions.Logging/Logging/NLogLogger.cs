@@ -123,7 +123,7 @@ namespace NLog.Extensions.Logging
         {
             // Parsing not needed, we take the fast route 
             var originalMessage = messageParameters.GetOriginalMessage(messageProperties) ?? message;
-            var logEvent = new LogEventInfo(nLogLogLevel, _logger.Name, originalMessage, messageParameters.IsPositional ? EmptyParameterArray : messageParameters);
+            var logEvent = new LogEventInfo(nLogLogLevel, _logger.Name, originalMessage, messageParameters);
             if (!ReferenceEquals(originalMessage, message))
             {
                 SetLogEventMessageFormatter(logEvent, messageParameters, message);

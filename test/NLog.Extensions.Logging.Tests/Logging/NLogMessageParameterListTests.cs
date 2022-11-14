@@ -13,7 +13,7 @@ namespace NLog.Extensions.Logging.Tests.Logging
         /// <inheritdoc />
         public NLogMessageParameterListTests()
         {
-            _messageParameterList = new NLogMessageParameterList(new List<KeyValuePair<string, object>>
+            _messageParameterList = NLogMessageParameterList.TryParse(new List<KeyValuePair<string, object>>
             {
                 new KeyValuePair<string, object>("nr1", "a"),
                 new KeyValuePair<string, object>("@nr2", "b"),
