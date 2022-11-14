@@ -17,7 +17,7 @@ namespace NLog.Extensions.Logging.Tests
                 new KeyValuePair<string, object>("b", 3),
                 new KeyValuePair<string, object>("{OriginalFormat}", "{0}{1}{2}"),
             };
-            var list = new NLogMessageParameterList(items);
+            var list = NLogMessageParameterList.TryParse(items);
 
             Assert.Equal(2, list.Count);
             Assert.Equal(new MessageTemplateParameter("a", 2, null, CaptureType.Normal), list[0]);
@@ -35,7 +35,7 @@ namespace NLog.Extensions.Logging.Tests
                 new KeyValuePair<string, object>("{OriginalFormat}", originalFormat),
                 new KeyValuePair<string, object>("b", 3)
             };
-            var list = new NLogMessageParameterList(items);
+            var list = NLogMessageParameterList.TryParse(items);
 
             Assert.Equal(2, list.Count);
             Assert.Equal(new MessageTemplateParameter("a", 2, null, CaptureType.Normal), list[0]);
@@ -51,7 +51,7 @@ namespace NLog.Extensions.Logging.Tests
                 new KeyValuePair<string, object>("$b", 2),
                 new KeyValuePair<string, object>("@c", 3)
             };
-            var list = new NLogMessageParameterList(items);
+            var list = NLogMessageParameterList.TryParse(items);
 
             Assert.Equal(3, list.Count);
             Assert.Equal(new MessageTemplateParameter("a", 1, null, CaptureType.Normal), list[0]);
