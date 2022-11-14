@@ -52,17 +52,43 @@ namespace NLog.Extensions.Logging
         {
             object scopeObject = scopePropertyList;
 
-            if (scopePropertyList.Count > 0)
+            var scopePropertyCount = scopePropertyList.Count;
+            if (scopePropertyCount > 0)
             {
-                if (NLogLogger.OriginalFormatPropertyName.Equals(scopePropertyList[scopePropertyList.Count - 1].Key))
+                if (NLogLogger.OriginalFormatPropertyName.Equals(scopePropertyList[scopePropertyCount - 1].Key))
                 {
-                    scopePropertyList = ExcludeOriginalFormatProperty(scopePropertyList);
+                    var firstProperty = scopePropertyList[0];
+                    if (scopePropertyCount == 2 && !string.IsNullOrEmpty(firstProperty.Key) && !NLogLogger.OriginalFormatPropertyName.Equals(firstProperty.Key))
+                    {
+                        scopePropertyList = new[] { firstProperty };
+                    }
+                    else if (scopePropertyCount <= 2)
+                    {
+                        scopePropertyList = Array.Empty<KeyValuePair<string, object>>();
+                    }
+                    else
+                    {
+                        var propertyList = new List<KeyValuePair<string, object>>(scopePropertyCount - 1);
+                        for (var i = 0; i < scopePropertyCount; ++i)
+                        {
+                            var property = scopePropertyList[i];
+                            if (string.IsNullOrEmpty(property.Key))
+                            {
+                                continue;
+                            }
+                            if (NLogLogger.OriginalFormatPropertyName.Equals(property.Key))
+                            {
+                                continue; // Handle BeginScope("Hello {World}", "Earth")
+                            }
+                            propertyList.Add(property);
+                        }
+                        scopePropertyList = propertyList;
+                    }
                 }
                 else
                 {
                     scopePropertyList = IncludeActivityIdsProperties(scopePropertyList);
                 }
-
             }
 
             return ScopeContext.PushNestedStateProperties(scopeObject, scopePropertyList);
@@ -137,35 +163,6 @@ namespace NLog.Extensions.Logging
             }
         }
 #endif
-
-        private static IReadOnlyList<KeyValuePair<string, object>> ExcludeOriginalFormatProperty(IReadOnlyList<KeyValuePair<string, object>> scopePropertyList)
-        {
-            if (scopePropertyList.Count == 2 && !NLogLogger.OriginalFormatPropertyName.Equals(scopePropertyList[0].Key))
-            {
-                scopePropertyList = new[] { scopePropertyList[0] };
-            }
-            else if (scopePropertyList.Count <= 2)
-            {
-                scopePropertyList = Array.Empty<KeyValuePair<string, object>>();
-            }
-            else
-            {
-                var propertyList = new List<KeyValuePair<string, object>>(scopePropertyList.Count - 1);
-                for (var i = 0; i < scopePropertyList.Count; ++i)
-                {
-                    var property = scopePropertyList[i];
-                    if (i == scopePropertyList.Count - 1 && i > 0 && NLogLogger.OriginalFormatPropertyName.Equals(property.Key))
-                    {
-                        continue; // Handle BeginScope("Hello {World}", "Earth")
-                    }
-
-                    propertyList.Add(property);
-                }
-                scopePropertyList = propertyList;
-            }
-
-            return scopePropertyList;
-        }
 
         public static IDisposable CaptureScopeProperties(IEnumerable scopePropertyCollection, ExtractorDictionary stateExtractor)
         {

@@ -157,20 +157,20 @@ namespace NLog.Extensions.Logging
         /// </summary>
         private static IReadOnlyList<KeyValuePair<string, object>> CreateValidParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList)
         {
-            var validParameterList = new List<KeyValuePair<string, object>>(parameterList.Count);
-            for (int i = 0; i < parameterList.Count; ++i)
+            var parameterCount = parameterList.Count;
+            var validParameterList = new List<KeyValuePair<string, object>>(parameterCount);
+
+            for (int i = 0; i < parameterCount; ++i)
             {
-                var paramPair = parameterList[i];
-                if (string.IsNullOrEmpty(paramPair.Key))
+                if (!TryGetParameterName(parameterList, i, out var parameterName))
                     continue;
 
-                if (NLogLogger.OriginalFormatPropertyName.Equals(paramPair.Key))
-                {
+                if (NLogLogger.OriginalFormatPropertyName.Equals(parameterName))
                     continue;
-                }
 
                 validParameterList.Add(parameterList[i]);
             }
+
             return validParameterList;
         }
 
@@ -200,7 +200,6 @@ namespace NLog.Extensions.Logging
             else
                 return CaptureType.Normal;
         }
-
 
         public int Count => _parameterList.Count - (_originalMessageIndex.HasValue ? 1 : 0);
 
