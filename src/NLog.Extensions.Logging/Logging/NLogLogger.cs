@@ -164,7 +164,6 @@ namespace NLog.Extensions.Logging
         }
 
         private static readonly object[] SingleItemArray = { null };
-        private static readonly IList<MessageTemplateParameter> EmptyParameterArray = Array.Empty<MessageTemplateParameter>();
 
         /// <summary>
         /// Are all parameters positional and correctly mapped?
