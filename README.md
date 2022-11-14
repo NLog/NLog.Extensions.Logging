@@ -36,4 +36,3 @@ Just add `NLog.config` file to the project, and follow the [tutorial](https://gi
 - [Getting started for ASP.NET Core 3.1](https://github.com/NLog/NLog/wiki/Getting-started-with-ASP.NET-Core-3)
 - [Getting started for .NET Core Console application](https://github.com/NLog/NLog/wiki/Getting-started-with-.NET-Core-2---Console-application)
 - [How to use structured logging](https://github.com/NLog/NLog/wiki/How-to-use-structured-logging)
-- [Blog posts for how to get started with ASP.NET Core and NLog](https://github.com/damienbod/AspNetCoreNlog)
