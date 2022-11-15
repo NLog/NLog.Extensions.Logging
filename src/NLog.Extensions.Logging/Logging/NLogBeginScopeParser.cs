@@ -56,38 +56,36 @@ namespace NLog.Extensions.Logging
             if (scopePropertyCount == 0)
                 return Array.Empty<KeyValuePair<string, object>>();
 
-            if (NLogLogger.OriginalFormatPropertyName.Equals(scopePropertyList[scopePropertyCount - 1].Key))
-            {
-                var firstProperty = scopePropertyList[0];
-                if (scopePropertyCount == 2 && !string.IsNullOrEmpty(firstProperty.Key) && !NLogLogger.OriginalFormatPropertyName.Equals(firstProperty.Key))
-                {
-                    return new[] { firstProperty };
-                }
-                else if (scopePropertyCount <= 2)
-                {
-                    return Array.Empty<KeyValuePair<string, object>>();
-                }
-                else
-                {
-                    var propertyList = new List<KeyValuePair<string, object>>(scopePropertyCount - 1);
-                    for (var i = 0; i < scopePropertyCount; ++i)
-                    {
-                        var property = scopePropertyList[i];
-                        if (string.IsNullOrEmpty(property.Key))
-                        {
-                            continue;
-                        }
-                        if (NLogLogger.OriginalFormatPropertyName.Equals(property.Key))
-                        {
-                            continue; // Handle BeginScope("Hello {World}", "Earth")
-                        }
-                        propertyList.Add(property);
-                    }
-                    return propertyList;
-                }
-            }
+            if (!NLogLogger.OriginalFormatPropertyName.Equals(scopePropertyList[scopePropertyCount - 1].Key))
+                return IncludeActivityIdsProperties(scopePropertyList);
 
-            return IncludeActivityIdsProperties(scopePropertyList);
+            var firstProperty = scopePropertyList[0];
+            if (scopePropertyCount == 2 && !string.IsNullOrEmpty(firstProperty.Key) && !NLogLogger.OriginalFormatPropertyName.Equals(firstProperty.Key))
+            {
+                return new[] { firstProperty };
+            }
+            else if (scopePropertyCount <= 2)
+            {
+                return Array.Empty<KeyValuePair<string, object>>();
+            }
+            else
+            {
+                var propertyList = new List<KeyValuePair<string, object>>(scopePropertyCount - 1);
+                for (var i = 0; i < scopePropertyCount; ++i)
+                {
+                    var property = scopePropertyList[i];
+                    if (string.IsNullOrEmpty(property.Key))
+                    {
+                        continue;
+                    }
+                    if (NLogLogger.OriginalFormatPropertyName.Equals(property.Key))
+                    {
+                        continue; // Handle BeginScope("Hello {World}", "Earth")
+                    }
+                    propertyList.Add(property);
+                }
+                return propertyList;
+            }
         }
 
 #if !NET6_0
