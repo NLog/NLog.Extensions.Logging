@@ -43,6 +43,24 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Fact]
+        public void TestTwoParameters()
+        {
+            GetRunner().LogDebugWithTwoParameters();
+
+            var target = GetTarget();
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 2 parameters |", target.Logs.FirstOrDefault());
+        }
+
+        [Fact]
+        public void TestTwoReverseParameters()
+        {
+            GetRunner().LogDebugWithTwoReverseParameters();
+
+            var target = GetTarget();
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 2 parameters |", target.Logs.FirstOrDefault());
+        }
+
+        [Fact]
         public void TestStructuredLogging()
         {
             GetRunner().LogDebugWithStructuredParameters();
@@ -303,6 +321,16 @@ namespace NLog.Extensions.Logging.Tests
             public void LogDebugWithParameters()
             {
                 _logger.LogDebug("message with id and {0} parameters", "1");
+            }
+
+            public void LogDebugWithTwoParameters()
+            {
+                _logger.LogDebug("message with {0} and {1} parameters", "id", "2");
+            }
+
+            public void LogDebugWithTwoReverseParameters()
+            {
+                _logger.LogDebug("message with {1} and {0} parameters", "2", "id"); // NLog will fix it
             }
 
             public void LogDebugWithStructuredParameters()
