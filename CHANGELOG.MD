@@ -2,6 +2,18 @@
 
 Date format: (year/month/day)
 
+### Version 5.2.0 (2022/11/27)
+
+**Improvements**
+- [#645](https://github.com/NLog/NLog.Extensions.Logging/pull/645): Updated to NLog v5.1 with support for ISpanFormattable (@snakefoot)
+- [#646](https://github.com/NLog/NLog.Extensions.Logging/pull/646): Use CallerArgumentExpressionAttribute in helper method for throwing ArgumentNullException (@snakefoot)
+- [#639](https://github.com/NLog/NLog.Extensions.Logging/pull/639): NLogBeginScopeParser - CaptureScopeProperties with cached scopePropertyCount (@snakefoot)
+- [#638](https://github.com/NLog/NLog.Extensions.Logging/pull/638): NLogMessageParameterList - Skip parsing Parameters-array when simple positional message template (@snakefoot)
+- [#635](https://github.com/NLog/NLog.Extensions.Logging/pull/635): Improve XML docs for AddNLog with IConfiguration override (@snakefoot)
+- [#634](https://github.com/NLog/NLog.Extensions.Logging/pull/634): NLogLogger - Small optimization when message-template syntax is used (@snakefoot)
+- [#632](https://github.com/NLog/NLog.Extensions.Logging/pull/632): Use RegisterConfigSettings instead of ConfigSettingLayoutRenderer (@snakefoot)
+- [#631](https://github.com/NLog/NLog.Extensions.Logging/pull/631): NLog.Extensions.Hosting - Skip RegisterItemsFromAssembly since handled by RegisterConfigSettings (@snakefoot)
+
 ### Version 5.1.0 (2022/10/26)
 
 **Improvements**
