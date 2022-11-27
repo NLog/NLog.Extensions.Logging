@@ -165,12 +165,12 @@ namespace NLog.Extensions.Logging
             var keyValueExtractor = default(KeyValuePair<Func<object, object>, Func<object, object>>);
             foreach (var property in scopePropertyCollection)
             {
-                if (property == null)
+                if (property is null)
                 {
                     break;
                 }
 
-                if (keyValueExtractor.Key == null && !TryLookupExtractor(stateExtractor, property.GetType(), out keyValueExtractor))
+                if (keyValueExtractor.Key is null && !TryLookupExtractor(stateExtractor, property.GetType(), out keyValueExtractor))
                 {
                     break;
                 }
@@ -257,7 +257,7 @@ namespace NLog.Extensions.Logging
 
             var keyPropertyInfo = itemType.GetDeclaredProperty("Key");
             var valuePropertyInfo = itemType.GetDeclaredProperty("Value");
-            if (valuePropertyInfo == null || keyPropertyInfo == null)
+            if (valuePropertyInfo is null || keyPropertyInfo is null)
             {
                 return false;
             }

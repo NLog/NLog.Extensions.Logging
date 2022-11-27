@@ -11,7 +11,7 @@ namespace NLog.Extensions.Logging.Tests
 
         protected NLogLoggerProvider ConfigureLoggerProvider(NLogProviderOptions options = null, Action<ServiceCollection> configureServices = null)
         {
-            if (_serviceProvider == null)
+            if (_serviceProvider is null)
             {
                 var logFactory = new LogFactory();
                 LoggerProvider = new NLogLoggerProvider(options ?? new NLogProviderOptions { CaptureMessageTemplates = true, CaptureMessageProperties = true }, logFactory);
@@ -28,7 +28,7 @@ namespace NLog.Extensions.Logging.Tests
 
         protected IServiceProvider ConfigureTransientService<T>(Action<ServiceCollection> configureServices = null, NLogProviderOptions options = null) where T : class
         {
-            if (_serviceProvider == null)
+            if (_serviceProvider is null)
                 ConfigureLoggerProvider(options, s => { s.AddTransient<T>(); configureServices?.Invoke(s); });
             return _serviceProvider;
         }

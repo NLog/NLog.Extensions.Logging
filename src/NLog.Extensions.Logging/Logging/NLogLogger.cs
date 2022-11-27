@@ -35,7 +35,7 @@ namespace NLog.Extensions.Logging
                 return;
             }
 
-            if (formatter == null)
+            if (formatter is null)
             {
                 throw new ArgumentNullException(nameof(formatter));
             }
@@ -233,7 +233,7 @@ namespace NLog.Extensions.Logging
             for (int i = 0; i < messageParameterCount; ++i)
             {
                 // First positional name is the startPos
-                if (char.IsDigit(messageParameters[i].Name[0]) && paramsArray == null)
+                if (char.IsDigit(messageParameters[i].Name[0]) && paramsArray is null)
                 {
                     paramsArray = new object[maxIndex + 1];
                     for (int j = 0; j <= maxIndex; ++j)
@@ -457,7 +457,7 @@ namespace NLog.Extensions.Logging
         /// <returns></returns>
         public IDisposable BeginScope<TState>(TState state)
         {
-            if (!_options.IncludeScopes || state == null)
+            if (!_options.IncludeScopes || state is null)
             {
                 return NullScope.Instance;
             }

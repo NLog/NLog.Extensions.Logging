@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +11,14 @@ namespace NLog.Extensions.Hosting.Tests
 {
     public class ExtensionMethodTests
     {
+        [Fact]
+        public void UseNLog_ArgumentNullException()
+        {
+            IHostBuilder hostBuilder = null;
+            var argNulLException = Assert.Throws<ArgumentNullException>(() => hostBuilder.UseNLog());
+            Assert.Equal("builder", argNulLException.ParamName);
+        }
+
         [Fact]
         public void UseNLog_noParams_WorksWithNLog()
         {

@@ -41,6 +41,7 @@ namespace NLog.Extensions.Logging
 #endif
         public static ILoggerFactory AddNLog(this ILoggerFactory factory, NLogProviderOptions options)
         {
+            Guard.ThrowIfNull(factory);
             factory.AddProvider(new NLogLoggerProvider(options));
             return factory;
         }
@@ -56,6 +57,7 @@ namespace NLog.Extensions.Logging
 #endif
         public static ILoggerFactory AddNLog(this ILoggerFactory factory, IConfiguration configuration)
         {
+            Guard.ThrowIfNull(factory);
             var provider = CreateNLogLoggerProvider(null, configuration, null);
             factory.AddProvider(provider);
             return factory;
@@ -65,11 +67,11 @@ namespace NLog.Extensions.Logging
         /// <summary>
         /// Enable NLog as logging provider for Microsoft Extension Logging
         /// </summary>
-        /// <param name="factory"></param>
+        /// <param name="builder"></param>
         /// <returns>ILoggingBuilder for chaining</returns>
-        public static ILoggingBuilder AddNLog(this ILoggingBuilder factory)
+        public static ILoggingBuilder AddNLog(this ILoggingBuilder builder)
         {
-            return factory.AddNLog((NLogProviderOptions)null);
+            return builder.AddNLog((NLogProviderOptions)null);
         }
 
         /// <summary>
@@ -80,6 +82,7 @@ namespace NLog.Extensions.Logging
         /// <returns>ILoggingBuilder for chaining</returns>
         public static ILoggingBuilder AddNLog(this ILoggingBuilder factory, IConfiguration configuration)
         {
+            Guard.ThrowIfNull(factory);
             AddNLogLoggerProvider(factory, configuration, null, CreateNLogLoggerProvider);
             return factory;
         }
@@ -87,26 +90,28 @@ namespace NLog.Extensions.Logging
         /// <summary>
         /// Enable NLog as logging provider for Microsoft Extension Logging
         /// </summary>
-        /// <param name="factory"></param>
+        /// <param name="builder"></param>
         /// <param name="configuration">Override configuration and not use default Host Builder Configuration</param>
         /// <param name="options">NLog Logging Provider options</param>
         /// <returns>ILoggingBuilder for chaining</returns>
-        public static ILoggingBuilder AddNLog(this ILoggingBuilder factory, IConfiguration configuration, NLogProviderOptions options)
+        public static ILoggingBuilder AddNLog(this ILoggingBuilder builder, IConfiguration configuration, NLogProviderOptions options)
         {
-            AddNLogLoggerProvider(factory, configuration, options, CreateNLogLoggerProvider);
-            return factory;
+            Guard.ThrowIfNull(builder);
+            AddNLogLoggerProvider(builder, configuration, options, CreateNLogLoggerProvider);
+            return builder;
         }
 
         /// <summary>
         /// Enable NLog as logging provider for Microsoft Extension Logging
         /// </summary>
-        /// <param name="factory"></param>
+        /// <param name="builder"></param>
         /// <param name="options">NLog Logging Provider options</param>
         /// <returns>ILoggingBuilder for chaining</returns>
-        public static ILoggingBuilder AddNLog(this ILoggingBuilder factory, NLogProviderOptions options)
+        public static ILoggingBuilder AddNLog(this ILoggingBuilder builder, NLogProviderOptions options)
         {
-            AddNLogLoggerProvider(factory, null, options, CreateNLogLoggerProvider);
-            return factory;
+            Guard.ThrowIfNull(builder);
+            AddNLogLoggerProvider(builder, null, options, CreateNLogLoggerProvider);
+            return builder;
         }
 
         /// <summary>
@@ -129,6 +134,7 @@ namespace NLog.Extensions.Logging
         /// <returns>ILoggingBuilder for chaining</returns>
         public static ILoggingBuilder AddNLog(this ILoggingBuilder builder, LoggingConfiguration configuration, NLogProviderOptions options)
         {
+            Guard.ThrowIfNull(builder);
             AddNLogLoggerProvider(builder, null, options, (serviceProvider, config, options) =>
             {
                 var logFactory = configuration?.LogFactory ?? LogManager.LogFactory;
@@ -148,6 +154,7 @@ namespace NLog.Extensions.Logging
         /// <returns>ILoggingBuilder for chaining</returns>
         public static ILoggingBuilder AddNLog(this ILoggingBuilder builder, string configFileRelativePath)
         {
+            Guard.ThrowIfNull(builder);
             AddNLogLoggerProvider(builder, null, null, (serviceProvider, config, options) =>
             {
                 var provider = CreateNLogLoggerProvider(serviceProvider, config, options);
@@ -167,6 +174,8 @@ namespace NLog.Extensions.Logging
         /// <returns>ILoggingBuilder for chaining</returns>
         public static ILoggingBuilder AddNLog(this ILoggingBuilder builder, NLogProviderOptions options, Func<IServiceProvider, LogFactory> factoryBuilder)
         {
+            Guard.ThrowIfNull(builder);
+            Guard.ThrowIfNull(factoryBuilder);
             AddNLogLoggerProvider(builder, null, options, (serviceProvider, config, options) =>
             {
                 serviceProvider.SetupNLogConfigSettings(config, LogManager.LogFactory);
@@ -187,6 +196,8 @@ namespace NLog.Extensions.Logging
         /// <returns>ILoggingBuilder for chaining</returns>
         public static ILoggingBuilder AddNLog(this ILoggingBuilder builder, Func<IServiceProvider, LogFactory> factoryBuilder)
         {
+            Guard.ThrowIfNull(builder);
+            Guard.ThrowIfNull(factoryBuilder);
             AddNLogLoggerProvider(builder, null, null, (serviceProvider, config, options) =>
             {
                 serviceProvider.SetupNLogConfigSettings(config, LogManager.LogFactory);
@@ -240,7 +251,7 @@ namespace NLog.Extensions.Logging
         /// <returns></returns>
         public static NLogLoggerProvider Configure(this NLogLoggerProvider nlogProvider, IConfigurationSection configurationSection)
         {
-            if (nlogProvider == null || configurationSection == null)
+            if (nlogProvider is null || configurationSection is null)
                 return nlogProvider;
 
             Configure(nlogProvider.Options, configurationSection);
@@ -257,7 +268,7 @@ namespace NLog.Extensions.Logging
         {
             options = options ?? NLogProviderOptions.Default;
 
-            if (configurationSection == null || !(configurationSection.GetChildren()?.Any() ?? false))
+            if (configurationSection is null || !(configurationSection.GetChildren()?.Any() ?? false))
                 return options;
 
             var configProps = options.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(p => p.SetMethod?.IsPublic == true).ToDictionary(p => p.Name, StringComparer.OrdinalIgnoreCase);

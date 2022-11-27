@@ -65,7 +65,7 @@
 
             var configuration = serviceProvider.SetupNLogConfigSettings(hostConfiguration, provider.LogFactory);
 
-            if (configuration != null && (!ReferenceEquals(configuration, hostConfiguration) || options == null))
+            if (configuration != null && (!ReferenceEquals(configuration, hostConfiguration) || options is null))
             {
                 provider.Configure(configuration.GetSection("Logging:NLog"));
             }

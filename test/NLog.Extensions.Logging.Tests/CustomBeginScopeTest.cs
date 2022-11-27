@@ -119,7 +119,7 @@ namespace NLog.Extensions.Logging.Tests
 
             public ActionLogScope(string world)
             {
-                if (world == null)
+                if (world is null)
                 {
                     throw new ArgumentNullException(nameof(world));
                 }
