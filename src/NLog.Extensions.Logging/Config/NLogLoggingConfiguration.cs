@@ -55,7 +55,7 @@ namespace NLog.Extensions.Logging
         {
             get
             {
-                if (_autoReload && _reloadConfiguration == null)
+                if (_autoReload && _reloadConfiguration is null)
                 {
                     // Prepare for setting up reload notification handling
                     _reloadConfiguration = state => ReloadConfigurationSection((IConfigurationSection)state);
@@ -229,7 +229,7 @@ namespace NLog.Extensions.Logging
                     }
                 }
 
-                if (ReferenceEquals(_nameOverride, VariableKey) && _configurationSection.Value == null)
+                if (ReferenceEquals(_nameOverride, VariableKey) && _configurationSection.Value is null)
                 {
                     yield return new LoggingConfigurationElement(_configurationSection);
                 }
@@ -255,7 +255,7 @@ namespace NLog.Extensions.Logging
                     }
 
                     var firstChildValue = child?.GetChildren()?.FirstOrDefault();
-                    if (firstChildValue == null)
+                    if (firstChildValue is null)
                     {
                         continue; // Simple value without children
                     }
@@ -286,7 +286,7 @@ namespace NLog.Extensions.Logging
 
             private bool IsTargetsSection()
             {
-                return !_topElement && _nameOverride == null && GetConfigKey(_configurationSection).EqualsOrdinalIgnoreCase(TargetsKey);
+                return !_topElement && _nameOverride is null && GetConfigKey(_configurationSection).EqualsOrdinalIgnoreCase(TargetsKey);
             }
 
             /// <summary>

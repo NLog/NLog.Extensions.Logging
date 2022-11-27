@@ -12,7 +12,7 @@ using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 namespace NLog.Extensions.Hosting
 {
     /// <summary>
-    ///     Helpers for IHostbuilder, netcore 2.1
+    ///     Helpers for IHostbuilder
     /// </summary>
     public static class ConfigureExtensions
     {
@@ -24,7 +24,7 @@ namespace NLog.Extensions.Hosting
         /// <returns>IHostBuilder for chaining</returns>
         public static IHostBuilder UseNLog(this IHostBuilder builder)
         {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
+            Guard.ThrowIfNull(builder);
             return builder.UseNLog(null);
         }
 
@@ -37,7 +37,7 @@ namespace NLog.Extensions.Hosting
         /// <returns>IHostBuilder for chaining</returns>
         public static IHostBuilder UseNLog(this IHostBuilder builder, NLogProviderOptions options)
         {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
+            Guard.ThrowIfNull(builder);
 #if NETSTANDARD2_0
             builder.ConfigureServices((builderContext, services) => AddNLogLoggerProvider(services, builderContext.Configuration, null, options, CreateNLogLoggerProvider));
 #else

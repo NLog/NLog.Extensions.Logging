@@ -159,6 +159,14 @@ namespace NLog.Extensions.Logging.Tests.Extensions
         }
 
         [Fact]
+        public void AddNLog_ArgumentNullException()
+        {
+            ILoggingBuilder loggingBuilder = null;
+            var argNulLException = Assert.Throws<ArgumentNullException>(() => loggingBuilder.AddNLog());
+            Assert.Equal("builder", argNulLException.ParamName);
+        }
+
+        [Fact]
         public void AddNLog_WithConfig_ReplaceLoggerFactory()
         {
             // Arrange
