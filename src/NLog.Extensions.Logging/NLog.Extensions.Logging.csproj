@@ -16,10 +16,14 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     </Description>
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logging;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
-- Replace NetCoreApp31 + Net50 with NetStandard2.1 + Net60 (#629) (@snakefoot)
-- MicrosoftConsoleJsonLayout - Skip string-allocation for timestamp-output (#628) (@snakefoot)
-- LoadConfigurationFromSection should RegisterConfigSettings without configuration assign (#627) (@snakefoot)
-- Bump NLog from 5.0.4 to 5.0.5 (#630) (@snakefoot)
+- Updated to NLog v5.1 with support for ISpanFormattable (#645) (@snakefoot)
+- Use CallerArgumentExpressionAttribute in helper method for throwing ArgumentNullException (#646) (@snakefoot)
+- NLogBeginScopeParser - CaptureScopeProperties with cached scopePropertyCount (#639) (@snakefoot)
+- NLogMessageParameterList - Skip parsing Parameters-array when simple positional message template (#638) (@snakefoot)
+- Improve XML docs for AddNLog with IConfiguration override (#635) (@snakefoot)
+- NLogLogger - Small optimization when message-template syntax is used (#634) (@snakefoot)
+- Use RegisterConfigSettings instead of ConfigSettingLayoutRenderer (#632) (@snakefoot)
+- NLog.Extensions.Hosting - Skip RegisterItemsFromAssembly since handled by RegisterConfigSettings (#631) (@snakefoot)
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
 
@@ -72,7 +76,7 @@ List of major changes in NLog 5.0: https://nlog-project.org/2021/08/25/nlog-5-0-
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="NLog" Version="5.0.5" />
+    <PackageReference Include="NLog" Version="5.1.0" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
