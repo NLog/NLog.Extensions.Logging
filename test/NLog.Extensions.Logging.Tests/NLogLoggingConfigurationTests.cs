@@ -84,6 +84,41 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Fact]
+        public void LoadWrapperConfigExplicitName()
+        {
+            var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
+            memoryConfig["NLog:Targets:file:type"] = "AsyncWrapper";
+            memoryConfig["NLog:Targets:file:target:type"] = "Memory";
+            memoryConfig["NLog:Targets:file:target:name"] = "wrappedMem";
+
+            var logConfig = CreateNLogLoggingConfigurationWithNLogSection(memoryConfig);
+
+            Assert.Single(logConfig.LoggingRules);
+            Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
+            Assert.Equal(3, logConfig.AllTargets.Count);
+            Assert.Single(logConfig.AllTargets.Where(t => t is AsyncTargetWrapper));
+            Assert.Single(logConfig.AllTargets.Where(t => t is MemoryTarget));
+            Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
+            Assert.NotNull(logConfig.FindTargetByName("wrappedMem") as MemoryTarget);
+        }
+
+        [Fact]
+        public void LoadWrapperConfigWithoutName()
+        {
+            var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
+            memoryConfig["NLog:Targets:file:type"] = "AsyncWrapper";
+            memoryConfig["NLog:Targets:file:target:type"] = "Memory";
+
+            var logConfig = CreateNLogLoggingConfigurationWithNLogSection(memoryConfig);
+
+            Assert.Single(logConfig.LoggingRules);
+            Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
+            Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
+            Assert.Single(logConfig.AllTargets.Where(t => t is AsyncTargetWrapper));
+            Assert.True(logConfig.FindTargetByName<AsyncTargetWrapper>("file")?.WrappedTarget is MemoryTarget);
+        }
+
+        [Fact]
         public void LoadVariablesConfig()
         {
             var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
