@@ -184,18 +184,26 @@ namespace NLog.Extensions.Logging
                     {
                         yield return new KeyValuePair<string, string>("type", GetConfigKey(_configurationSection));
                     }
+                    else if (ReferenceEquals(_nameOverride, VariableKey))
+                    {
+                        var configValue = _configurationSection.Value;
+                        yield return new KeyValuePair<string, string>("name", GetConfigKey(_configurationSection));
+                        if (configValue is null)
+                            yield break;    // Signal to NLog Config Parser to check GetChildren() for variable layout
+                        else
+                            yield return new KeyValuePair<string, string>("value", configValue);
+                    }
                     else if (!_topElement)
                     {
-                        yield return new KeyValuePair<string, string>("name", GetConfigKey(_configurationSection));
-                    }
-
-                    if (ReferenceEquals(_nameOverride, VariableKey))
-                    {
-                        var value = _configurationSection.Value;
-                        if (value != null)
-                            yield return new KeyValuePair<string, string>("value", value);
+                        var configValue = _configurationSection.Value;
+                        if (configValue is null)
+                        {
+                            yield return new KeyValuePair<string, string>("name", GetConfigKey(_configurationSection));
+                        }
                         else
-                            yield break;    // Signal to NLog Config Parser to check GetChildren() for variable layout
+                        {
+                            yield return new KeyValuePair<string, string>(GetConfigKey(_configurationSection), configValue);
+                        }
                     }
                 }
 
