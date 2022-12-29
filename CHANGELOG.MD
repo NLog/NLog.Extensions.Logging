@@ -2,6 +2,13 @@
 
 Date format: (year/month/day)
 
+### Version 5.2.1 (2022/12/29)
+
+**Improvements**
+- [#650](https://github.com/NLog/NLog.Extensions.Logging/pull/650): Fixed NLogLoggingConfiguration to handle wrapped targets without name (@snakefoot)
+- [#653](https://github.com/NLog/NLog.Extensions.Logging/pull/653): Improve code-coverage by merging similar AddNLog-methods (@snakefoot)
+- [#653](https://github.com/NLog/NLog.Extensions.Logging/pull/653): Updated to NLog v5.1.1 (@snakefoot)
+
 ### Version 5.2.0 (2022/11/27)
 
 **Improvements**
