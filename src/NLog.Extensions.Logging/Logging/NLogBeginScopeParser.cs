@@ -54,33 +54,31 @@ namespace NLog.Extensions.Logging
         {
             var scopePropertyCount = scopePropertyList.Count;
             if (scopePropertyCount == 0)
-                return Array.Empty<KeyValuePair<string, object>>();
+                return scopePropertyList;
 
             if (!NLogLogger.OriginalFormatPropertyName.Equals(scopePropertyList[scopePropertyCount - 1].Key))
                 return IncludeActivityIdsProperties(scopePropertyList);
+            else
+                scopePropertyCount -= 1;    // Handle BeginScope("Hello {World}", "Earth")
 
             var firstProperty = scopePropertyList[0];
-            if (scopePropertyCount == 2 && !string.IsNullOrEmpty(firstProperty.Key) && !NLogLogger.OriginalFormatPropertyName.Equals(firstProperty.Key))
+            if (scopePropertyCount == 1 && !string.IsNullOrEmpty(firstProperty.Key))
             {
                 return new[] { firstProperty };
             }
-            else if (scopePropertyCount <= 2)
+            else if (scopePropertyCount == 0)
             {
                 return Array.Empty<KeyValuePair<string, object>>();
             }
             else
             {
-                var propertyList = new List<KeyValuePair<string, object>>(scopePropertyCount - 1);
+                var propertyList = new List<KeyValuePair<string, object>>(scopePropertyCount);
                 for (var i = 0; i < scopePropertyCount; ++i)
                 {
                     var property = scopePropertyList[i];
                     if (string.IsNullOrEmpty(property.Key))
                     {
                         continue;
-                    }
-                    if (NLogLogger.OriginalFormatPropertyName.Equals(property.Key))
-                    {
-                        continue; // Handle BeginScope("Hello {World}", "Earth")
                     }
                     propertyList.Add(property);
                 }
