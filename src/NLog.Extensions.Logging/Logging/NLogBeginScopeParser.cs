@@ -58,6 +58,8 @@ namespace NLog.Extensions.Logging
 
             if (!NLogLogger.OriginalFormatPropertyName.Equals(scopePropertyList[scopePropertyCount - 1].Key))
                 return IncludeActivityIdsProperties(scopePropertyList);
+            else if (scopePropertyCount == 1)
+                return Array.Empty<KeyValuePair<string, object>>();
             else
                 scopePropertyCount -= 1;    // Handle BeginScope("Hello {World}", "Earth")
 
@@ -65,10 +67,6 @@ namespace NLog.Extensions.Logging
             if (scopePropertyCount == 1 && !string.IsNullOrEmpty(firstProperty.Key))
             {
                 return new[] { firstProperty };
-            }
-            else if (scopePropertyCount == 0)
-            {
-                return Array.Empty<KeyValuePair<string, object>>();
             }
             else
             {
