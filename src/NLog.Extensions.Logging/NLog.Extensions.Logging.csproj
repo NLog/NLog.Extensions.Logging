@@ -16,13 +16,11 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     </Description>
     <PackageTags>NLog;Microsoft.Extensions.Logging;log;logging;logfiles;netcore</PackageTags>
     <PackageReleaseNotes>
-      - Fixed NLogLoggingConfiguration to handle wrapped targets without name (#650) (@snakefoot)
-      - Improve code-coverage by merging similar AddNLog-methods (#648) (@snakefoot)
-      - Updated to NLog v5.1.1 (#653) (@snakefoot)
+- Updated to NLog v5.1.2 (#659) (@snakefoot)
 
-      Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
+Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
 
-      List of major changes in NLog 5.0: https://nlog-project.org/2021/08/25/nlog-5-0-preview1-ready.html
+List of major changes in NLog 5.0: https://nlog-project.org/2021/08/25/nlog-5-0-preview1-ready.html
     </PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/NLog/NLog.Extensions.Logging</PackageProjectUrl>
     <PackageLicenseExpression>BSD-2-Clause</PackageLicenseExpression>
@@ -71,7 +69,7 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="NLog" Version="5.1.1" />
+    <PackageReference Include="NLog" Version="5.1.2" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
