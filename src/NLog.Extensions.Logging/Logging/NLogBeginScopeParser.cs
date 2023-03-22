@@ -31,9 +31,19 @@ namespace NLog.Extensions.Logging
             {
                 if (state is IReadOnlyList<KeyValuePair<string, object>> scopePropertyList)
                 {
+                    if (scopePropertyList is IList)
+                        return ScopeContext.PushNestedStateProperties(null, scopePropertyList);  // Probably List/Array without nested state
+
                     object scopeObject = scopePropertyList;
                     scopePropertyList = ParseScopeProperties(scopePropertyList);
                     return ScopeContext.PushNestedStateProperties(scopeObject, scopePropertyList);
+                }
+                else if (state is IReadOnlyCollection<KeyValuePair<string, object>> scopeProperties)
+                {
+                    if (scopeProperties is IDictionary)
+                        return ScopeContext.PushNestedStateProperties(null, scopeProperties);    // Probably Dictionary without nested state
+                    else
+                        return ScopeContext.PushNestedStateProperties(scopeProperties, scopeProperties);
                 }
 
                 if (!(state is string))
@@ -181,7 +191,10 @@ namespace NLog.Extensions.Logging
                 propertyList.Add(propertyValue.Value);
             }
 
-            return ScopeContext.PushNestedStateProperties(scopePropertyCollection, propertyList);
+            if (scopePropertyCollection is IList || scopePropertyCollection is IDictionary)
+                return ScopeContext.PushNestedStateProperties(null, propertyList);   // Probably List/Array/Dictionary without nested state
+            else
+                return ScopeContext.PushNestedStateProperties(scopePropertyCollection, propertyList);
         }
 
         public static IDisposable CaptureScopeProperty<TState>(TState scopeProperty, ExtractorDictionary stateExtractor)

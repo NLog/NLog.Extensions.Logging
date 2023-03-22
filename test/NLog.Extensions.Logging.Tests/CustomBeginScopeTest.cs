@@ -65,6 +65,17 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Equal("Nothing", target.Logs[0]);
         }
 
+        [Fact]
+        public void TestNonSerializableSaySomething()
+        {
+            var runner = GetRunner<CustomBeginScopeTestRunner>();
+            var target = new Targets.MemoryTarget { Layout = "${message}${scopeproperty:Say}" };
+            ConfigureNLog(target);
+            runner.SaySomething().Wait();
+            Assert.Single(target.Logs);
+            Assert.Equal("SaySomething", target.Logs[0]);
+        }     
+
         public class CustomBeginScopeTestRunner
         {
             private readonly ILogger<CustomBeginScopeTestRunner> _logger;
@@ -109,6 +120,18 @@ namespace NLog.Extensions.Logging.Tests
                 {
                     await Task.Yield();
                     _logger.LogInformation("Nothing");
+                }
+            }
+
+            public async Task SaySomething()
+            {
+                using (var scopeState = _logger.BeginScope(new Dictionary<string, object>()
+                {
+                    { "Say", "Something" },
+                }))
+                {
+                    await Task.Yield();
+                    _logger.LogInformation("Say");
                 }
             }
         }

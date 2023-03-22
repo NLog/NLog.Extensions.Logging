@@ -70,7 +70,7 @@ namespace NLog.Extensions.Logging.Tests.Extensions
             var logger = loggerFactory.CreateLogger(nameof(AddNLog_LoggerFactory_IncludeActivityIdsWithBeginScope));
             var activity = new System.Diagnostics.Activity("TestActivity").SetParentId("42").Start();
             var scopeProperties = new Dictionary<string, object> { { "RequestId", "123" }, { "RequestPath", "Unknown" } };
-            using (logger.BeginScope(scopeProperties.ToList()))
+            using (logger.BeginScope(new ArraySegment<KeyValuePair<string, object>>(scopeProperties.ToArray())))
             {
                 logger.LogInformation(default(EventId), "test message with {0} arg", 1);
             }
