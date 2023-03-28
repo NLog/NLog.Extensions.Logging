@@ -2,6 +2,12 @@
 
 Date format: (year/month/day)
 
+### Version 5.2.2 (2023/03/28)
+
+**Improvements**
+- [#662](https://github.com/NLog/NLog.Extensions.Logging/pull/662): NLogBeginScopeParser - Skip capture of nested state when List + Array + Dictionary (@snakefoot)
+- [#663](https://github.com/NLog/NLog.Extensions.Logging/pull/663): Updated to NLog v5.1.3 (@snakefoot)
+
 ### Version 5.2.2 (2023/02/17)
 
 **Improvements**
