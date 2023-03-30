@@ -21,9 +21,10 @@
 ## NLog.Extensions.Logging
 
 [NLog.Extensions.Logging](https://www.nuget.org/packages/NLog.Extensions.Logging) makes it possible to use NLog together with [Microsoft ILogger](https://github.com/NLog/NLog.Extensions.Logging/wiki/NLog-GetCurrentClassLogger-and-Microsoft-ILogger)-abstraction and Dependency Injection.
-It provides extension methods to register NLog as LoggingProvider for Microsoft Extension Logging using `AddNLog()` or `UseNLog()`.
 
-[NLog.Extensions.Logging](https://www.nuget.org/packages/NLog.Extensions.Logging) also makes it possible to load [NLog Configurations from appsettings.json](https://github.com/NLog/NLog.Extensions.Logging/wiki/NLog-configuration-with-appsettings.json)
+- Introduces `AddNLog()` extension methods to register NLog as LoggingProvider for Microsoft Extension Logging.
+- Introduces [${configsetting}](https://github.com/NLog/NLog/wiki/ConfigSetting-Layout-Renderer) for doing lookup of appsettings.json configuration settings.
+- Adds support for loading [NLog Configurations from appsettings.json](https://github.com/NLog/NLog.Extensions.Logging/wiki/NLog-configuration-with-appsettings.json)
 
 Notice the standard [NLog NuGet package](https://www.nuget.org/packages/NLog) is enough for using NLog Logger with simple console application on the .NET Core platform.
 Just add `NLog.config` file to the project, and follow the [tutorial](https://github.com/NLog/NLog/wiki/Tutorial#configure-nlog-targets-for-output) for using `GetCurrentClassLogger()`.
