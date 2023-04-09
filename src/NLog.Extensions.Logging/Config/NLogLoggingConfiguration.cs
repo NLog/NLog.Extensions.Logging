@@ -144,7 +144,7 @@ namespace NLog.Extensions.Logging
             return base.ToString() + $" ConfigSection={_originalConfigSection?.Key}";
         }
 
-        private class LoggingConfigurationElement : ILoggingConfigurationElement
+        private sealed class LoggingConfigurationElement : ILoggingConfigurationElement
         {
             private const string TargetKey = "target";
             private const string TargetsKey = "targets";
