@@ -103,7 +103,7 @@ namespace NLog.Extensions.Logging
         {
             if (messageParameters.HasMessageTemplateSyntax(_options.ParseMessageTemplates))
             {
-                var originalMessage = messageParameters.GetOriginalMessage(messageProperties);
+                var originalMessage = messageParameters?.GetOriginalMessage(messageProperties);
                 var logEvent = new LogEventInfo(nLogLogLevel, _logger.Name, null, originalMessage, SingleItemArray);
                 var messageTemplateParameters = logEvent.MessageTemplateParameters;   // Forces parsing of OriginalMessage
                 if (messageTemplateParameters.Count > 0)

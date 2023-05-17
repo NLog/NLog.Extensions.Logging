@@ -12,6 +12,7 @@ namespace NLog.Extensions.Logging
     /// <summary>
     /// Forwards NLog LogEvents to Microsoft ILogger-interface with support for NLog Layout-features
     /// </summary>
+    /// <seealso href="https://github.com/NLog/NLog/wiki/MicrosoftILogger-Target">Documentation on NLog Wiki</seealso>
     [Target("MicrosoftILogger")]
     public class MicrosoftILoggerTarget : TargetWithContext
     {
@@ -33,6 +34,18 @@ namespace NLog.Extensions.Logging
         /// Override name of ILogger, when target has been initialized with <see cref="Microsoft.Extensions.Logging.ILoggerFactory"/>
         /// </summary>
         public Layout LoggerName { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MicrosoftILoggerTarget" /> class.
+        /// </summary>
+        public MicrosoftILoggerTarget()
+        {
+#if !NETSTANDARD1_3 && !NETSTANDARD1_5
+            _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
+#else
+            _logger = new NLog.Extensions.Logging.NLogLogger(NLog.LogManager.CreateNullLogger(), null, new NLogBeginScopeParser(null));
+#endif
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MicrosoftILoggerTarget" /> class.

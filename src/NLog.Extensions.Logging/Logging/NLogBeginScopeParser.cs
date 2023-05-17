@@ -264,8 +264,8 @@ namespace NLog.Extensions.Logging
                 return false;
             }
 
-            var keyPropertyInfo = itemType.GetDeclaredProperty("Key");
-            var valuePropertyInfo = itemType.GetDeclaredProperty("Value");
+            var keyPropertyInfo = typeof(KeyValuePair<,>).MakeGenericType(itemType.GenericTypeArguments).GetTypeInfo().GetDeclaredProperty("Key");
+            var valuePropertyInfo = typeof(KeyValuePair<,>).MakeGenericType(itemType.GenericTypeArguments).GetTypeInfo().GetDeclaredProperty("Value");
             if (valuePropertyInfo is null || keyPropertyInfo is null)
             {
                 return false;

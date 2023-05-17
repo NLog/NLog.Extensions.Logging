@@ -24,3 +24,7 @@ if (-Not $LastExitCode -eq 1)
 	dotnet list ./ package --vulnerable --include-transitive
 	exit 1
 }
+
+dotnet publish -r win-x64 -c release --self-contained -p:PublishTrimmed=true .\examples\NetCore2\HostingExample
+if (-Not $LastExitCode -eq 0)
+	{ exit $LastExitCode }

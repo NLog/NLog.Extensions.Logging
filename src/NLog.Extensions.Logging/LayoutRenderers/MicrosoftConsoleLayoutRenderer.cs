@@ -8,6 +8,7 @@ namespace NLog.Extensions.Logging
     /// <summary>
     /// Renders output that simulates simple Microsoft Console Logger. Useful for Hosting Lifetime Startup Messages.
     /// </summary>
+    /// <seealso href="https://github.com/NLog/NLog/wiki/MicrosoftConsoleLayout">Documentation on NLog Wiki</seealso>
     [LayoutRenderer("MicrosoftConsoleLayout")]
     [ThreadAgnostic]
     class MicrosoftConsoleLayoutRenderer : LayoutRenderer

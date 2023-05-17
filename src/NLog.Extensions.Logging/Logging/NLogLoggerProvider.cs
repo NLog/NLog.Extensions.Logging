@@ -52,7 +52,6 @@ namespace NLog.Extensions.Logging
             LogFactory = logFactory ?? LogManager.LogFactory;
             Options = options ?? NLogProviderOptions.Default;
             _beginScopeParser = new NLogBeginScopeParser(options);
-            RegisterHiddenAssembliesForCallSite();
         }
 
         /// <summary>
@@ -92,47 +91,6 @@ namespace NLog.Extensions.Logging
                 }
             }
         }
-
-        /// <summary>
-        /// Ignore assemblies for ${callsite}
-        /// </summary>
-        private static void RegisterHiddenAssembliesForCallSite()
-        {
-            InternalLogger.Debug("Hide assemblies for callsite");
-            Config.ConfigurationItemFactory.Default.RegisterItemsFromAssembly(typeof(NLogLoggerProvider).GetTypeInfo().Assembly);
-
-            LogManager.AddHiddenAssembly(typeof(NLogLoggerProvider).GetTypeInfo().Assembly);
-            LogManager.AddHiddenAssembly(typeof(Microsoft.Extensions.Logging.ILogger).GetTypeInfo().Assembly);
-
-#if !NETCORE1_0
-            LogManager.AddHiddenAssembly(typeof(Microsoft.Extensions.Logging.LoggerFactory).GetTypeInfo().Assembly);
-#else
-            SafeAddHiddenAssembly("Microsoft.Logging");
-            SafeAddHiddenAssembly("Microsoft.Extensions.Logging");
-
-            //try the Filter ext, this one is not mandatory so could fail
-            SafeAddHiddenAssembly("Microsoft.Extensions.Logging.Filter", false);
-#endif
-        }
-
-#if NETCORE1_0
-        private static void SafeAddHiddenAssembly(string assemblyName, bool logOnException = true)
-        {
-            try
-            {
-                InternalLogger.Trace("Hide {0}", assemblyName);
-                var assembly = Assembly.Load(new AssemblyName(assemblyName));
-                LogManager.AddHiddenAssembly(assembly);
-            }
-            catch (Exception ex)
-            {
-                if (logOnException)
-                {
-                    InternalLogger.Debug(ex, "Hiding assembly {0} failed. This could influence the ${{callsite}}", assemblyName);
-                }
-            }
-        }
-#endif
     }
 }
 

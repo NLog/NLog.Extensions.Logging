@@ -13,15 +13,11 @@ namespace NLog.Extensions.Logging.Tests
         {
             if (_serviceProvider is null)
             {
-                var logFactory = new LogFactory();
-                LoggerProvider = new NLogLoggerProvider(options ?? new NLogProviderOptions { CaptureMessageTemplates = true, CaptureMessageProperties = true }, logFactory);
                 var services = new ServiceCollection();
-                services.AddSingleton<ILoggerFactory, LoggerFactory>();
-                services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
+                services.AddLogging(builder => builder.AddNLog(options ?? new NLogProviderOptions { CaptureMessageTemplates = true, CaptureMessageProperties = true }, provider => new LogFactory()));
                 configureServices?.Invoke(services);
                 _serviceProvider = services.BuildServiceProvider();
-                var loggerFactory = _serviceProvider.GetRequiredService<ILoggerFactory>();
-                loggerFactory.AddProvider(LoggerProvider);
+                LoggerProvider = _serviceProvider.GetRequiredService<ILoggerProvider>() as NLogLoggerProvider;
             }
             return LoggerProvider;
         }

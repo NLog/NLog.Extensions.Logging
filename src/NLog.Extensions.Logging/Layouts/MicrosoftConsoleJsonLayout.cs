@@ -10,6 +10,7 @@ namespace NLog.Extensions.Logging
     /// <summary>
     /// Renders output that simulates Microsoft Json Console Formatter from AddJsonConsole
     /// </summary>
+    /// <seealso href="https://github.com/NLog/NLog/wiki/MicrosoftConsoleJsonLayout">Documentation on NLog Wiki</seealso>
     [Layout("MicrosoftConsoleJsonLayout")]
     [ThreadAgnostic]
     public class MicrosoftConsoleJsonLayout : JsonLayout
