@@ -1,8 +1,8 @@
 # NLog.Extensions.Logging
 
-[![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=masterr&metric=reliability_rating)](https://sonarcloud.io/dashboard/?id=nlog.web&branch=master) 
-[![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=sqale_rating)](https://sonarcloud.io/dashboard/?id=nlog.web&branch=master) 
-[![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=vulnerabilities)](https://sonarcloud.io/dashboard/?id=nlog.web&branch=master) 
+[![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=reliability_rating)](https://sonarcloud.io/dashboard/?id=nlog.extensions.logging&branch=master) 
+[![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=sqale_rating)](https://sonarcloud.io/dashboard/?id=nlog.extensions.logging&branch=master) 
+[![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=vulnerabilities)](https://sonarcloud.io/dashboard/?id=nlog.extensions.logging&branch=master) 
 
 Integrates NLog as Logging provider for Microsoft.Extensions.Logging, by just calling `AddNLog()` on the Logging-builder.
 
