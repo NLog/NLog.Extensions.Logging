@@ -101,7 +101,7 @@ namespace NLog.Extensions.Logging
         /// </remarks>
         private LogEventInfo TryParseMessageTemplate(LogLevel nLogLogLevel, IReadOnlyList<KeyValuePair<string, object>> messageProperties, NLogMessageParameterList messageParameters)
         {
-            if (messageParameters?.HasMessageTemplateSyntax(_options.ParseMessageTemplates) == true)
+            if (messageParameters.HasMessageTemplateSyntax(_options.ParseMessageTemplates))
             {
                 var originalMessage = messageParameters.GetOriginalMessage(messageProperties);
                 var logEvent = new LogEventInfo(nLogLogLevel, _logger.Name, null, originalMessage, SingleItemArray);
