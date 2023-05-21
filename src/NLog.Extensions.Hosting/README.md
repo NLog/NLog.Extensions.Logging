@@ -26,7 +26,7 @@ Supported platforms:
 Registration of NLog as logging provider:
 
 ```csharp
-builder.UseNLog();
+var hostBuilder = new HostBuilder().UseNLog();
 ```
 
 Useful Links
