@@ -2,6 +2,12 @@
 
 Date format: (year/month/day)
 
+### Version 5.3.0 (2023/05/30)
+
+**Improvements**
+- [#669](https://github.com/NLog/NLog.Extensions.Logging/pull/669): Updated to NLog v5.2 (@snakefoot)
+- [#669](https://github.com/NLog/NLog.Extensions.Logging/pull/669): NLogLoggerProvider - Replaced dynamic assembly loading with registration methods (@snakefoot)
+
 ### Version 5.2.5 (2023/05/25)
 
 **Improvements**
