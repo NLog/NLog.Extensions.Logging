@@ -28,6 +28,7 @@ namespace NLog.Extensions.Logging
     /// Config Setting Lookup Cached:
     ///      ${configsetting:cached=True:name=Mode}
     /// </example>
+    /// <seealso href="https://github.com/NLog/NLog/wiki/ConfigSetting-Layout-Renderer">Documentation on NLog Wiki</seealso>
     [LayoutRenderer("configsetting")]
     [ThreadAgnostic]
     public class ConfigSettingLayoutRenderer : LayoutRenderer

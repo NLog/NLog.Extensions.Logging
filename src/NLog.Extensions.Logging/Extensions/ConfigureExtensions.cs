@@ -187,7 +187,7 @@ namespace NLog.Extensions.Logging
             Guard.ThrowIfNull(factoryBuilder);
             AddNLogLoggerProvider(builder, null, options, (serviceProvider, config, options) =>
             {
-                serviceProvider.SetupNLogConfigSettings(config, LogManager.LogFactory);
+                config = serviceProvider.SetupNLogConfigSettings(config, LogManager.LogFactory);
 
                 // Delay initialization of targets until we have loaded config-settings
                 var logFactory = factoryBuilder(serviceProvider);
@@ -258,7 +258,7 @@ namespace NLog.Extensions.Logging
             if (configurationSection is null || !(configurationSection.GetChildren()?.Any() ?? false))
                 return options;
 
-            var configProps = options.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(p => p.SetMethod?.IsPublic == true).ToDictionary(p => p.Name, StringComparer.OrdinalIgnoreCase);
+            var configProps = typeof(NLogProviderOptions).GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(p => p.SetMethod?.IsPublic == true).ToDictionary(p => p.Name, StringComparer.OrdinalIgnoreCase);
             foreach (var configValue in configurationSection.GetChildren())
             {
                 if (configProps.TryGetValue(configValue.Key, out var propertyInfo))

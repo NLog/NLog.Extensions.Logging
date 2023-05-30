@@ -273,8 +273,9 @@ namespace NLog.Extensions.Logging.Tests
 
         private Runner GetRunner()
         {
-            ConfigureTransientService<Runner>((s) => LoggerProvider.LogFactory.LoadConfiguration("nlog.config"));
-            return base.GetRunner<Runner>();
+            var runner = base.GetRunner<Runner>();
+            LoggerProvider.LogFactory.Setup().LoadConfigurationFromFile("nlog.config");
+            return runner;
         }
 
         public class Runner

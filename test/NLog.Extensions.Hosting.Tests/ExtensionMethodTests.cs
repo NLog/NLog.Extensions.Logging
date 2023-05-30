@@ -76,7 +76,7 @@ namespace NLog.Extensions.Hosting.Tests
             try
             {
                 var nlogTarget = new Targets.MemoryTarget() { Name = "Output" };
-                Config.SimpleConfigurator.ConfigureForTargetLogging(nlogTarget, LogLevel.Fatal);
+                NLog.LogManager.Setup().LoadConfiguration(c => c.ForLogger().WriteTo(nlogTarget));
 
                 var loggerFactory = host.Services.GetService<ILoggerFactory>();
                 Assert.NotNull(loggerFactory);
