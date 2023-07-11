@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net461;net6.0</TargetFrameworks>
+    <TargetFrameworks>net461;net6.0</TargetFrameworks>
     <OutputType>Library</OutputType>
     <IsPackable>false</IsPackable>
     <DebugType>Full</DebugType>
@@ -22,10 +22,6 @@
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.0" />
-  </ItemGroup>
-  
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.0" />
   </ItemGroup>
   
