@@ -24,7 +24,7 @@ namespace NLog.Extensions.Logging
                                .RegisterTarget<MicrosoftILoggerTarget>("MicrosoftILogger");
         }
 
-        private static void RegisterHiddenAssembliesForCallSite()
+        internal static void RegisterHiddenAssembliesForCallSite()
         {
             InternalLogger.Debug("Hide assemblies for callsite");
             LogManager.AddHiddenAssembly(typeof(NLogLoggerProvider).GetTypeInfo().Assembly);
