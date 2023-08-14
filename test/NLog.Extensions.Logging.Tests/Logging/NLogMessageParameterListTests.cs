@@ -8,23 +8,16 @@ namespace NLog.Extensions.Logging.Tests.Logging
 {
     public class NLogMessageParameterListTests
     {
-        private readonly NLogMessageParameterList _messageParameterList;
-
-        /// <inheritdoc />
-        public NLogMessageParameterListTests()
-        {
-            _messageParameterList = NLogMessageParameterList.TryParse(new List<KeyValuePair<string, object>>
+        private readonly NLogMessageParameterList _messageParameterList = NLogMessageParameterList.TryParse(new List<KeyValuePair<string, object>>
             {
                 new KeyValuePair<string, object>("nr1", "a"),
                 new KeyValuePair<string, object>("@nr2", "b"),
             });
-        }
 
         [Fact]
         public void CopyTo_FullCopy_AllCopied()
         {
             // Arrange
-
             MessageTemplateParameter[] array = new MessageTemplateParameter[2];
             int arrayIndex = 0;
 
@@ -39,7 +32,6 @@ namespace NLog.Extensions.Logging.Tests.Logging
         public void CopyTo_WithOffset_AllCopied()
         {
             // Arrange
-
             MessageTemplateParameter[] array = new MessageTemplateParameter[3];
             int arrayIndex = 1;
 
@@ -55,24 +47,23 @@ namespace NLog.Extensions.Logging.Tests.Logging
         {
             // Arrange
 
-
             // Act
             using (var enumerator = _messageParameterList.GetEnumerator())
             {
-                var array = ToArray(enumerator);
+                var list = new List<MessageTemplateParameter>();
+                while (enumerator.MoveNext())
+                    list.Add(enumerator.Current);
+                var array = list.ToArray();
+
                 // Assert
                 AssertParameters(array);
             }
         }
 
-
-
-
         [Fact]
         public void Add_ThrowsNotSupported()
         {
             // Arrange
-
             MessageTemplateParameter item = new MessageTemplateParameter();
 
             // Act & Assert
@@ -92,7 +83,6 @@ namespace NLog.Extensions.Logging.Tests.Logging
         public void Contains_ThrowsNotSupported()
         {
             // Arrange
-
             MessageTemplateParameter item = new MessageTemplateParameter();
 
             // Act & Assert
@@ -104,7 +94,6 @@ namespace NLog.Extensions.Logging.Tests.Logging
         public void IndexOf_ThrowsNotSupported()
         {
             // Arrange
-
             MessageTemplateParameter item = new MessageTemplateParameter();
 
             // Act & Assert
@@ -115,7 +104,6 @@ namespace NLog.Extensions.Logging.Tests.Logging
         public void Insert_ThrowsNotSupported()
         {
             // Arrange
-
             int index = 0;
             MessageTemplateParameter item = new MessageTemplateParameter();
 
@@ -127,7 +115,6 @@ namespace NLog.Extensions.Logging.Tests.Logging
         public void Remove_ThrowsNotSupported()
         {
             // Arrange
-
             MessageTemplateParameter item = new MessageTemplateParameter();
 
             // Act & Assert
@@ -143,22 +130,12 @@ namespace NLog.Extensions.Logging.Tests.Logging
             Assert.Throws<NotSupportedException>(() => _messageParameterList.RemoveAt(0));
         }
 
-        private static MessageTemplateParameter[] ToArray(IEnumerator<MessageTemplateParameter> enumerator)
-        {
-            var list = new List<MessageTemplateParameter>();
-            while (enumerator.MoveNext())
-                list.Add(enumerator.Current);
-            var array = list.ToArray();
-            return array;
-        }
-
         private static void AssertParameters(MessageTemplateParameter[] array, int startIndex = 0)
         {
             AssertParameter(array[startIndex], "nr1", "a", CaptureType.Normal);
             AssertParameter(array[startIndex + 1], "nr2", "b", CaptureType.Serialize);
         }
 
-        [SuppressMessage("ReSharper", "ParameterOnlyUsedForPreconditionCheck.Local")]
         private static void AssertParameter(MessageTemplateParameter item, string expectedName, string expectedValue, CaptureType captureType)
         {
             Assert.Equal(expectedName, item.Name);

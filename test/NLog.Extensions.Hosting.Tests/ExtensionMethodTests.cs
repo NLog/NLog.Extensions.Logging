@@ -29,7 +29,7 @@ namespace NLog.Extensions.Hosting.Tests
         [Fact]
         public void UseNLog_withOptionsParam_WorksWithNLog()
         {
-            var someParam = new NLogProviderOptions {CaptureMessageProperties = false, CaptureMessageTemplates = false};
+            var someParam = new NLogProviderOptions { CaptureMessageProperties = false, CaptureMessageTemplates = false };
             var actual = new HostBuilder().UseNLog(someParam).Build();
             TestHostingResult(actual, true);
         }

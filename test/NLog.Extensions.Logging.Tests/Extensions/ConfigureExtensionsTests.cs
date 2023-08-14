@@ -194,7 +194,7 @@ namespace NLog.Extensions.Logging.Tests.Extensions
             return provider;
         }
 
-        internal class LoggingBuilderStub : ILoggingBuilder
+        internal sealed class LoggingBuilderStub : ILoggingBuilder
         {
             public IServiceCollection Services { get; set; } = new ServiceCollection();
         }

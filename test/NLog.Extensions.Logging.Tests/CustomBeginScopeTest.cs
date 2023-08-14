@@ -12,9 +12,8 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void TestNonSerializableSayHello()
         {
-            var runner = GetRunner<CustomBeginScopeTestRunner>();
             var target = new Targets.MemoryTarget { Layout = "${message} ${scopeproperty:World}. Welcome ${scopenested}" };
-            ConfigureNLog(target);
+            var runner = GetRunner<CustomBeginScopeTestRunner>(target: target);
             runner.SayHello().Wait();
             Assert.Single(target.Logs);
             Assert.Equal("Hello Earth. Welcome Earth People", target.Logs[0]);
@@ -23,9 +22,8 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void TestNonSerializableSayHelloWithScope()
         {
-            var runner = GetRunner<CustomBeginScopeTestRunner>(new NLogProviderOptions { IncludeScopes = false });
             var target = new Targets.MemoryTarget { Layout = "${message} ${scopeproperty:World}. Welcome ${scopenested}" };
-            ConfigureNLog(target);
+            var runner = GetRunner<CustomBeginScopeTestRunner>(new NLogProviderOptions { IncludeScopes = false }, target: target);
             runner.SayHello().Wait();
             Assert.Single(target.Logs);
             Assert.Equal("Hello . Welcome ", target.Logs[0]);
@@ -34,9 +32,8 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void TestNonSerializableSayHi()
         {
-            var runner = GetRunner<CustomBeginScopeTestRunner>();
             var target = new Targets.MemoryTarget { Layout = "${message} ${scopeproperty:World}. Welcome ${scopenested}" };
-            ConfigureNLog(target);
+            var runner = GetRunner<CustomBeginScopeTestRunner>(target: target);
             var scopeString = runner.SayHi().Result;
             Assert.Single(target.Logs);
             Assert.Equal("Hi Earth. Welcome Earth People", target.Logs[0]);
@@ -46,9 +43,8 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void TestNonSerializableSayHiToEarth()
         {
-            var runner = GetRunner<CustomBeginScopeTestRunner>();
             var target = new Targets.MemoryTarget { Layout = "${message} ${scopeproperty:Planet}. Welcome to the ${scopeproperty:Galaxy}" };
-            ConfigureNLog(target);
+            var runner = GetRunner<CustomBeginScopeTestRunner>(target: target);
             var scopeString = runner.SayHiToEarth().Result;
             Assert.Single(target.Logs);
             Assert.Equal("Hi Earth. Welcome to the Milky Way", target.Logs[0]);
@@ -57,9 +53,8 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void TestNonSerializableSayNothing()
         {
-            var runner = GetRunner<CustomBeginScopeTestRunner>();
             var target = new Targets.MemoryTarget { Layout = "${message}" };
-            ConfigureNLog(target);
+            var runner = GetRunner<CustomBeginScopeTestRunner>(target: target);
             runner.SayNothing().Wait();
             Assert.Single(target.Logs);
             Assert.Equal("Nothing", target.Logs[0]);
@@ -68,15 +63,14 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void TestNonSerializableSaySomething()
         {
-            var runner = GetRunner<CustomBeginScopeTestRunner>();
             var target = new Targets.MemoryTarget { Layout = "${message}${scopeproperty:Say}" };
-            ConfigureNLog(target);
+            var runner = GetRunner<CustomBeginScopeTestRunner>(target: target);
             runner.SaySomething().Wait();
             Assert.Single(target.Logs);
             Assert.Equal("SaySomething", target.Logs[0]);
         }     
 
-        public class CustomBeginScopeTestRunner
+        public sealed class CustomBeginScopeTestRunner
         {
             private readonly ILogger<CustomBeginScopeTestRunner> _logger;
 
@@ -136,7 +130,7 @@ namespace NLog.Extensions.Logging.Tests
             }
         }
 
-        private class ActionLogScope : IReadOnlyList<KeyValuePair<string, object>>
+        private sealed class ActionLogScope : IReadOnlyList<KeyValuePair<string, object>>
         {
             private readonly string _world;
 

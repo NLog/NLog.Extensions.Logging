@@ -57,8 +57,42 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Equal(new MessageTemplateParameter("a", 1, null, CaptureType.Normal), list[0]);
             Assert.Equal(new MessageTemplateParameter("b", 2, null, CaptureType.Stringify), list[1]);
             Assert.Equal(new MessageTemplateParameter("c", 3, null, CaptureType.Serialize), list[2]);
+            Assert.True(list.HasComplexParameters);
         }
-        
+
+        [Fact]
+        public void CreateNLogMessageParameterIsPositional()
+        {
+            var items = new List<KeyValuePair<string, object>>
+            {
+                new KeyValuePair<string, object>("0", 1),
+                new KeyValuePair<string, object>("1", 2),
+                new KeyValuePair<string, object>("2", 3)
+            };
+            var list = NLogMessageParameterList.TryParse(items);
+
+            Assert.Empty(list);
+            Assert.False(list.HasComplexParameters);
+        }
+
+        [Fact]
+        public void CreateNLogMessageParameterMixedPositional()
+        {
+            var items = new List<KeyValuePair<string, object>>
+            {
+                new KeyValuePair<string, object>("2", 1),
+                new KeyValuePair<string, object>("1", 2),
+                new KeyValuePair<string, object>("0", 3)
+            };
+            var list = NLogMessageParameterList.TryParse(items);
+
+            Assert.Equal(3, list.Count);
+            Assert.Equal(new MessageTemplateParameter("2", 1, null, CaptureType.Normal), list[0]);
+            Assert.Equal(new MessageTemplateParameter("1", 2, null, CaptureType.Normal), list[1]);
+            Assert.Equal(new MessageTemplateParameter("0", 3, null, CaptureType.Normal), list[2]);
+            Assert.True(list.HasComplexParameters);
+        }
+
         [Fact]
         public void TryParseShouldReturnEmptyListWhenInputIsEmpty()
         {
