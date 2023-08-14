@@ -7,48 +7,48 @@ namespace NLog.Extensions.Logging.Tests
     public abstract class NLogTestBase
     {
         private IServiceProvider _serviceProvider;
-        protected NLogLoggerProvider LoggerProvider { get; private set; }
 
-        protected NLogLoggerProvider ConfigureLoggerProvider(NLogProviderOptions options = null, Action<ServiceCollection> configureServices = null)
+        protected NLogTestBase()
         {
-            if (_serviceProvider is null)
+            LogManager.ThrowExceptions = true;
+        }
+
+        protected IServiceProvider SetupServiceProvider(NLogProviderOptions options = null, Targets.Target target = null, Action<ServiceCollection> configureServices = null)
+        {
+            IServiceProvider serviceProvider = _serviceProvider;
+
+            if (serviceProvider is null || options != null || target != null)
             {
+                var configTarget = target ?? new Targets.MemoryTarget("output") { Layout = "${logger}|${level:uppercase=true}|${message}|${all-event-properties:includeScopeProperties=true}${onexception:|}${exception:format=tostring}" };
+
                 var services = new ServiceCollection();
-                services.AddLogging(builder => builder.AddNLog(options ?? new NLogProviderOptions { CaptureMessageTemplates = true, CaptureMessageProperties = true }, provider => new LogFactory()));
+                services.AddLogging(builder => builder.AddNLog(options ?? new NLogProviderOptions(), provider => new LogFactory()));
                 configureServices?.Invoke(services);
-                _serviceProvider = services.BuildServiceProvider();
-                LoggerProvider = _serviceProvider.GetRequiredService<ILoggerProvider>() as NLogLoggerProvider;
+                serviceProvider = services.BuildServiceProvider();
+                if (options is null && target is null)
+                {
+                    _serviceProvider = serviceProvider;
+                    var loggerProvider = serviceProvider.GetRequiredService<ILoggerProvider>() as NLogLoggerProvider;
+                    var nlogConfig = new Config.LoggingConfiguration(loggerProvider.LogFactory);
+                    nlogConfig.AddRuleForAllLevels(configTarget);
+                    loggerProvider.LogFactory.Configuration = nlogConfig;
+                }
+                else
+                {
+                    var loggerProvider = serviceProvider.GetRequiredService<ILoggerProvider>() as NLogLoggerProvider;
+                    var nlogConfig = new Config.LoggingConfiguration(loggerProvider.LogFactory);
+                    nlogConfig.AddRuleForAllLevels(configTarget);
+                    loggerProvider.LogFactory.Configuration = nlogConfig;
+                }
             }
-            return LoggerProvider;
+
+            return serviceProvider;
         }
 
-        protected IServiceProvider ConfigureTransientService<T>(Action<ServiceCollection> configureServices = null, NLogProviderOptions options = null) where T : class
-        {
-            if (_serviceProvider is null)
-                ConfigureLoggerProvider(options, s => { s.AddTransient<T>(); configureServices?.Invoke(s); });
-            return _serviceProvider;
-        }
-
-        protected void ConfigureNLog(Targets.Target target = null)
-        {
-            target = target ?? new Targets.MemoryTarget("output") { Layout = "${message}" };
-            var nlogConfig = new Config.LoggingConfiguration(LoggerProvider.LogFactory);
-            nlogConfig.AddRuleForAllLevels(target);
-            if (target is Targets.Wrappers.WrapperTargetBase wrapperTarget)
-                nlogConfig.AddTarget(wrapperTarget.WrappedTarget);
-            LoggerProvider.LogFactory.Configuration = nlogConfig;
-        }
-
-        protected T GetRunner<T>(NLogProviderOptions options = null) where T : class
+        protected T GetRunner<T>(NLogProviderOptions options = null, Targets.Target target = null) where T : class
         {
             // Start program
-            var runner = ConfigureTransientService<T>(null, options).GetRequiredService<T>();
-            return runner;
-        }
-
-        protected void SetupTestRunner<TRunner>(Type implType, NLogProviderOptions options = null) where TRunner : class
-        {
-            ConfigureTransientService<TRunner>(s => s.AddSingleton(typeof(ILogger<>), implType), options);
+            return SetupServiceProvider(options, target, configureServices: (s) => s.AddTransient<T>()).GetRequiredService<T>();
         }
     }
 }

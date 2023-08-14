@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog.Targets;
 using Xunit;
@@ -13,26 +15,22 @@ namespace NLog.Extensions.Logging.Tests
         public void TestExtraMessageTemplatePropertySayHello()
         {
             var runner = GetRunner();
-            var target = CreateMemoryTarget();
-            ConfigureNLog(target);
 
             runner.SayHello();
 
-            Assert.Single(target.Logs);
-            Assert.Equal(@"Hello ""World""|userid=World, ActivityId=42", target.Logs[0]);
+            Assert.Single(runner.GetTarget().Logs);
+            Assert.Equal(@"Hello ""World""|userid=World, ActivityId=42", runner.GetTarget().Logs[0]);
         }
 
         [Fact]
         public void TestExtraMessageTemplatePropertySayHigh5()
         {
             var runner = GetRunner();
-            var target = CreateMemoryTarget();
-            ConfigureNLog(target);
 
             runner.SayHigh5();
 
-            Assert.Single(target.Logs);
-            Assert.Equal(@"Hi 5|ActivityId=42", target.Logs[0]);
+            Assert.Single(runner.GetTarget().Logs);
+            Assert.Equal(@"Hi 5|ActivityId=42", runner.GetTarget().Logs[0]);
         }
 
         [Fact]
@@ -40,29 +38,20 @@ namespace NLog.Extensions.Logging.Tests
         {
             var options = new NLogProviderOptions { CaptureMessageTemplates = false };
             var runner = GetRunner(options);
-            var target = CreateMemoryTarget();
-            ConfigureNLog(target);
 
             runner.SayHigh5();
 
-            Assert.Single(target.Logs);
-            Assert.Equal(@"Hi 5|ActivityId=42, 0=5", target.Logs[0]);
-        }
-
-        private static MemoryTarget CreateMemoryTarget()
-        {
-            var target = new Targets.MemoryTarget { Layout = "${message}|${all-event-properties}" };
-            return target;
+            Assert.Single(runner.GetTarget().Logs);
+            Assert.Equal(@"Hi 5|ActivityId=42, 0=5", runner.GetTarget().Logs[0]);
         }
 
         private CustomLoggerPropertyTestRunner GetRunner(NLogProviderOptions options = null)
         {
-            SetupTestRunner<CustomLoggerPropertyTestRunner>(typeof(SameAssemblyLogger<>), options);
-            var runner = GetRunner<CustomLoggerPropertyTestRunner>();
-            return runner;
+            var target = new Targets.MemoryTarget { Layout = "${message}|${all-event-properties}" };
+            return SetupServiceProvider(options, target, configureServices: (s) => s.AddTransient<CustomLoggerPropertyTestRunner>().AddSingleton(typeof(ILogger<>), typeof(SameAssemblyLogger<>))).GetRequiredService<CustomLoggerPropertyTestRunner>();
         }
 
-        public class SameAssemblyLogger<T> : ILogger<T>
+        public sealed class SameAssemblyLogger<T> : ILogger<T>
         {
             private readonly Microsoft.Extensions.Logging.ILogger _logger;
 
@@ -88,13 +77,19 @@ namespace NLog.Extensions.Logging.Tests
             }
         }
 
-        public class CustomLoggerPropertyTestRunner
+        public sealed class CustomLoggerPropertyTestRunner
         {
             private readonly ILogger<CustomLoggerPropertyTestRunner> _logger;
+            private readonly IServiceProvider _serviceProvider;
 
-            public CustomLoggerPropertyTestRunner(ILogger<CustomLoggerPropertyTestRunner> logger)
+            public LogFactory LogFactory => (_serviceProvider.GetRequiredService<ILoggerProvider>() as NLogLoggerProvider)?.LogFactory;
+
+            public MemoryTarget GetTarget() => LogFactory?.Configuration?.AllTargets.OfType<MemoryTarget>().FirstOrDefault();
+
+            public CustomLoggerPropertyTestRunner(ILogger<CustomLoggerPropertyTestRunner> logger, IServiceProvider serviceProvider)
             {
                 _logger = logger;
+                _serviceProvider = serviceProvider;
             }
 
             public void SayHello()
@@ -108,11 +103,11 @@ namespace NLog.Extensions.Logging.Tests
             }
         }
 
-        class MyLogEvent<TState> : IReadOnlyList<KeyValuePair<string, object>>
+        sealed class MyLogEvent<TState> : IReadOnlyList<KeyValuePair<string, object>>
         {
-            List<KeyValuePair<string, object>> _properties = new List<KeyValuePair<string, object>>();
-            Func<TState, Exception, string> _originalFormattter;
-            TState _originalState;
+            private readonly List<KeyValuePair<string, object>> _properties = new List<KeyValuePair<string, object>>();
+            private readonly Func<TState, Exception, string> _originalFormattter;
+            private readonly TState _originalState;
 
             public MyLogEvent(TState state, Func<TState, Exception, string> formatter)
             {

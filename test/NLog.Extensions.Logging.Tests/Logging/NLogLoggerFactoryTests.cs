@@ -1,24 +1,29 @@
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace NLog.Extensions.Logging.Tests.Logging
 {
-    public class NLogLoggerFactoryTests : NLogTestBase
+    public class NLogLoggerFactoryTests
     {
         [Fact]
         public void Dispose_HappyPath_FlushLogFactory()
         {
             // Arrange
-            ConfigureLoggerProvider();
-            ConfigureNLog(new Targets.Wrappers.BufferingTargetWrapper("buffer", new Targets.MemoryTarget("output")));
-            var loggerFactory = new NLogLoggerFactory(LoggerProvider);
+            var logFactory = new LogFactory();
+            var logConfig = new Config.LoggingConfiguration(logFactory);
+            var target = new Targets.Wrappers.BufferingTargetWrapper("buffer", new Targets.MemoryTarget("output"));
+            logConfig.AddRuleForAllLevels(target);
+            logFactory.Configuration = logConfig;
+            var provider = new NLogLoggerProvider(new NLogProviderOptions(), logFactory);
+            var loggerFactory = new NLogLoggerFactory(provider);
 
             // Act
             loggerFactory.CreateLogger("test").LogInformation("Hello");
             loggerFactory.Dispose();
 
             // Assert
-            Assert.Single(LoggerProvider.LogFactory.Configuration.FindTargetByName<Targets.MemoryTarget>("output").Logs);
+            Assert.Single(logFactory.Configuration.AllTargets.OfType<Targets.MemoryTarget>().FirstOrDefault().Logs);
         }
 
         [Fact]

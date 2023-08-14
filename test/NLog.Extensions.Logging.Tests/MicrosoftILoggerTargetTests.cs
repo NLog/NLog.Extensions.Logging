@@ -249,7 +249,7 @@ namespace NLog.Extensions.Logging.Tests
             return (logger, loggerFactoryMock);
         }
 
-        class LoggerFactoryMock : Microsoft.Extensions.Logging.ILoggerFactory
+        sealed class LoggerFactoryMock : Microsoft.Extensions.Logging.ILoggerFactory
         {
             public readonly Dictionary<string, LoggerMock> Loggers = new Dictionary<string, LoggerMock>();
 
@@ -274,7 +274,7 @@ namespace NLog.Extensions.Logging.Tests
             }
         }
 
-        class LoggerMock : Microsoft.Extensions.Logging.ILogger
+        sealed class LoggerMock : Microsoft.Extensions.Logging.ILogger
         {
             public readonly string CategoryName;
             public Microsoft.Extensions.Logging.LogLevel LastLogLevel;

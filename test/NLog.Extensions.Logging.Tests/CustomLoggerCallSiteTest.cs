@@ -1,5 +1,7 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NLog.Targets;
 using Xunit;
 
 namespace NLog.Extensions.Logging.Tests
@@ -9,10 +11,8 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void TestCallSiteSayHello()
         {
-            SetupTestRunner<CustomLoggerCallSiteTestRunner>(typeof(SameAssemblyLogger<>));
             var target = new Targets.MemoryTarget { Layout = "${callsite}|${message}" };
-            ConfigureNLog(target);
-            var runner = GetRunner<CustomLoggerCallSiteTestRunner>();
+            var runner = GetRunner(target: target);
 
             runner.SayHello();
             
@@ -21,7 +21,12 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Contains("stuff", target.Logs[0]);
         }
 
-        public class SameAssemblyLogger<T> : ILogger<T>
+        private CustomLoggerCallSiteTestRunner GetRunner(NLogProviderOptions options = null, Target target = null)
+        {
+            return SetupServiceProvider(options, target, configureServices: (s) => s.AddTransient<CustomLoggerCallSiteTestRunner>().AddSingleton(typeof(ILogger<>), typeof(SameAssemblyLogger<>))).GetRequiredService<CustomLoggerCallSiteTestRunner>();
+        }
+
+        public sealed class SameAssemblyLogger<T> : ILogger<T>
         {
             private readonly Microsoft.Extensions.Logging.ILogger _logger;
 
@@ -54,7 +59,7 @@ namespace NLog.Extensions.Logging.Tests
             }
         }
 
-        public class CustomLoggerCallSiteTestRunner
+        public sealed class CustomLoggerCallSiteTestRunner
         {
             private readonly ILogger<CustomLoggerCallSiteTestRunner> _logger;
 
