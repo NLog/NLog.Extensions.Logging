@@ -36,6 +36,11 @@ namespace NLog.Extensions.Logging
         public bool CaptureMessageProperties { get; set; } = true;
 
         /// <summary>
+        /// Enable capture of <see cref="LogEventInfo.Parameters"/> from the ILogger-State-object. Only relevant when <see cref="CaptureMessageTemplates"/> = true
+        /// </summary>
+        public bool CaptureMessageParameters { get; set; }
+
+        /// <summary>
         /// Use the NLog engine for parsing the message template (again) and format using the NLog formatter
         /// </summary>
         public bool ParseMessageTemplates { get; set; }

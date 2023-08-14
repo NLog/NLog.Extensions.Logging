@@ -240,6 +240,80 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG||EventId=20", runner.LastTargetMessage);
         }
 
+        [Fact]
+        public void TestPositionalCaptureMessageParameters()
+        {
+            LogEventInfo logEvent = null;
+            var debugTarget = new MethodCallTarget("output", (l, args) => logEvent = l);
+            var runner = GetRunner<Runner>(new NLogProviderOptions() { CaptureMessageParameters = true }, debugTarget);
+            string formatString = "{0,8:S} {1,8:S}";
+            runner.Logger.LogDebug(formatString, "Hello", "World");
+
+            Assert.NotNull(logEvent);
+            Assert.Equal("   Hello    World", logEvent.FormattedMessage);
+            Assert.Equal(formatString, logEvent.Message);
+            Assert.NotNull(logEvent.Parameters);
+            Assert.Equal(2, logEvent.Parameters.Length);
+            Assert.Equal("Hello", logEvent.Parameters[0]);
+            Assert.Equal("World", logEvent.Parameters[1]);
+
+            var messageParameters = logEvent.MessageTemplateParameters;
+            Assert.True(messageParameters.IsPositional);
+            Assert.Equal(2, messageParameters.Count);
+            Assert.Equal("Hello", messageParameters[0].Value);
+            Assert.Equal("S", messageParameters[0].Format);
+            Assert.Equal("World", messageParameters[1].Value);
+            Assert.Equal("S", messageParameters[1].Format);
+        }
+
+        [Fact]
+        public void TestParseMessageTemplates()
+        {
+            LogEventInfo logEvent = null;
+            var debugTarget = new MethodCallTarget("output", (l, args) => logEvent = l);
+            var runner = GetRunner<Runner>(new NLogProviderOptions() { ParseMessageTemplates = true }, debugTarget);
+            var messageTemplate = "message with {ParameterCount} parameters";
+            runner.Logger.LogDebug(messageTemplate, "1");
+
+            Assert.NotNull(logEvent);
+            Assert.Equal(messageTemplate, logEvent.Message);
+            Assert.NotNull(logEvent.Parameters);
+            Assert.Single(logEvent.Parameters);
+            Assert.Equal("1", logEvent.Parameters[0]);
+
+            var messageParameters = logEvent.MessageTemplateParameters;
+            Assert.False(messageParameters.IsPositional);
+            Assert.Equal(1, messageParameters.Count);
+            Assert.Equal("ParameterCount", messageParameters[0].Name);
+            Assert.Equal("1", messageParameters[0].Value);
+        }
+
+        [Fact]
+        public void TestPositionalParseMessageTemplates()
+        {
+            LogEventInfo logEvent = null;
+            var debugTarget = new MethodCallTarget("output", (l, args) => logEvent = l);
+            var runner = GetRunner<Runner>(new NLogProviderOptions() { ParseMessageTemplates = true }, debugTarget);
+            string formatString = "{0,8:S} {1,8:S}";
+            runner.Logger.LogDebug(formatString, "Hello", "World");
+
+            Assert.NotNull(logEvent);
+            Assert.Equal("   Hello    World", logEvent.FormattedMessage);
+            Assert.Equal(formatString, logEvent.Message);
+            Assert.NotNull(logEvent.Parameters);
+            Assert.Equal(2, logEvent.Parameters.Length);
+            Assert.Equal("Hello", logEvent.Parameters[0]);
+            Assert.Equal("World", logEvent.Parameters[1]);
+
+            var messageParameters = logEvent.MessageTemplateParameters;
+            Assert.True(messageParameters.IsPositional);
+            Assert.Equal(2, messageParameters.Count);
+            Assert.Equal("Hello", messageParameters[0].Value);
+            Assert.Equal("S", messageParameters[0].Format);
+            Assert.Equal("World", messageParameters[1].Value);
+            Assert.Equal("S", messageParameters[1].Format);
+        }
+
         private Runner GetRunner()
         {
             return base.GetRunner<Runner>();
