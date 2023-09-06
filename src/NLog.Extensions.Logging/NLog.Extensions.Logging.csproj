@@ -18,7 +18,8 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     <PackageReleaseNotes>
 ChangeLog:
 
-- Updated to NLog v5.2.3 (#685) (@snakefoot)
+- Introduced CaptureMessageParameters to skip allocating Parameters-array (#685) (@snakefoot)
+- Updated to NLog v5.2.4 (#685) (@snakefoot)
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
 
