@@ -2,6 +2,12 @@
 
 Date format: (year/month/day)
 
+### Version 5.3.4 (2023/09/06)
+
+**Improvements**
+- [#687](https://github.com/NLog/NLog.Extensions.Logging/pull/687): Introduced CaptureMessageParameters to skip allocating Parameters-array (@snakefoot)
+- [#687](https://github.com/NLog/NLog.Extensions.Logging/pull/687): Updated to NLog v5.2.4 (@snakefoot)
+
 ### Version 5.3.3 (2023/08/05)
 
 **Improvements**

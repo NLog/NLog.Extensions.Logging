@@ -59,10 +59,11 @@ namespace NLog.Extensions.Logging
                     var messageParameters = NLogMessageParameterList.TryParse(messagePropertyList);
                     if (messageParameters.Count == 0)
                     {
-                        var logEvent = LogEventInfo.Create(nLogLogLevel, _logger.Name, formatter(state, exception));
+                        var logEvent = TryParsePostionalMessageTemplate(nLogLogLevel, messagePropertyList, messageParameters)
+                            ?? CaputureBasicLogEvent(nLogLogLevel, formatter(state, exception), messagePropertyList, messageParameters);
                         CaptureEventIdProperties(logEvent, eventId);
                         return logEvent;
-                    }
+}
                     else
                     {
                         var logEvent = TryParseMessageTemplate(nLogLogLevel, messagePropertyList, messageParameters)
@@ -103,7 +104,7 @@ namespace NLog.Extensions.Logging
         {
             if (messageParameters.HasMessageTemplateSyntax(_options.ParseMessageTemplates))
             {
-                var originalMessage = messageParameters?.GetOriginalMessage(messageProperties);
+                var originalMessage = messageParameters.GetOriginalMessage(messageProperties);
                 var logEvent = new LogEventInfo(nLogLogLevel, _logger.Name, null, originalMessage, SingleItemArray);
                 var messageTemplateParameters = logEvent.MessageTemplateParameters;   // Forces parsing of OriginalMessage
                 if (messageTemplateParameters.Count > 0)
@@ -119,16 +120,73 @@ namespace NLog.Extensions.Logging
             return null;    // Parsing not needed
         }
 
+        private LogEventInfo TryParsePostionalMessageTemplate(LogLevel nLogLogLevel, IReadOnlyList<KeyValuePair<string, object>> messageProperties, NLogMessageParameterList messageParameters)
+        {
+            if (messageParameters.IsPositional && _options.ParseMessageTemplates)
+            {
+                string originalMessage = TryParsePositionalParameters(messageProperties, out var parameters);
+                if (originalMessage != null)
+                {
+                    return new LogEventInfo(nLogLogLevel, _logger.Name, null, originalMessage, parameters);
+                }
+            }
+
+            return null;
+        }
+
         private LogEventInfo CaptureMessageTemplate(LogLevel nLogLogLevel, string message, IReadOnlyList<KeyValuePair<string, object>> messageProperties, NLogMessageParameterList messageParameters)
         {
             // Parsing not needed, we take the fast route 
             var originalMessage = messageParameters.GetOriginalMessage(messageProperties) ?? message;
-            var logEvent = new LogEventInfo(nLogLogLevel, _logger.Name, originalMessage, messageParameters);
-            if (!ReferenceEquals(originalMessage, message))
+            var logEvent = new LogEventInfo(nLogLogLevel, _logger.Name, message, originalMessage, messageParameters.IsPositional ? Array.Empty<MessageTemplateParameter>() : messageParameters);
+            if (_options.CaptureMessageParameters && !ReferenceEquals(originalMessage, message))
             {
-                SetLogEventMessageFormatter(logEvent, messageParameters, message);
+                var parameterCount = messageParameters.Count;
+                if (parameterCount > 0)
+                {
+                    var parameters = new object[parameterCount];
+                    for (int i = 0; i < parameterCount; ++i)
+                        parameters[i] = messageParameters[i].Value;
+                    logEvent.Parameters = parameters;
+                }
             }
             return logEvent;
+        }
+
+        private LogEventInfo CaputureBasicLogEvent(LogLevel nLogLogLevel, string formattedMessage, IReadOnlyList<KeyValuePair<string, object>> messageProperties, NLogMessageParameterList messageParameters)
+        {
+            if (messageParameters.IsPositional && _options.CaptureMessageParameters)
+            {
+                string originalMessage = TryParsePositionalParameters(messageProperties, out var parameters);
+                var logEvent = new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, originalMessage ?? formattedMessage, Array.Empty<MessageTemplateParameter>());
+                logEvent.Parameters = parameters;
+                return logEvent;
+            }
+            else
+            {
+                return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, formattedMessage, Array.Empty<MessageTemplateParameter>());
+            }
+        }
+
+        private static string TryParsePositionalParameters(IReadOnlyList<KeyValuePair<string, object>> messageProperties, out object[] parameters)
+        {
+            var parameterCount = messageProperties.Count;
+            var parameterIndex = 0;
+            parameters = new object[parameterCount - 1];
+            string originalMessage = null;
+            for (int i = 0; i < parameterCount; ++i)
+            {
+                var parameter = messageProperties[i];
+                if (OriginalFormatPropertyName.Equals(parameter.Key))
+                {
+                    originalMessage = parameter.Value.ToString();
+                }
+                else
+                {
+                    parameters[parameterIndex++] = parameter.Value;
+                }
+            }
+            return originalMessage;
         }
 
         /// <summary>
@@ -282,16 +340,6 @@ namespace NLog.Extensions.Logging
             }
 
             return maxIndex;
-        }
-
-        private static void SetLogEventMessageFormatter(LogEventInfo logEvent, NLogMessageParameterList messageTemplateParameters, string formattedMessage)
-        {
-            var parameters = new object[messageTemplateParameters.Count + 1];
-            for (int i = 0; i < parameters.Length - 1; ++i)
-                parameters[i] = messageTemplateParameters[i].Value;
-            parameters[parameters.Length - 1] = formattedMessage;
-            logEvent.Parameters = parameters;
-            logEvent.MessageFormatter = (l) => (string)l.Parameters[l.Parameters.Length - 1];
         }
 
         private void CaptureEventIdProperties(LogEventInfo logEvent, EventId eventId)
