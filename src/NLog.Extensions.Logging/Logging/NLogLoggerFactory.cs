@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using NLog.Common;
 
@@ -10,7 +10,7 @@ namespace NLog.Extensions.Logging
     /// </summary>
     public class NLogLoggerFactory : ILoggerFactory
     {
-        private readonly Dictionary<string, Microsoft.Extensions.Logging.ILogger> _loggers = new Dictionary<string, Microsoft.Extensions.Logging.ILogger>(StringComparer.Ordinal);
+        private readonly ConcurrentDictionary<string, Microsoft.Extensions.Logging.ILogger> _loggers = new ConcurrentDictionary<string, Microsoft.Extensions.Logging.ILogger>(StringComparer.Ordinal);
 
         private readonly NLogLoggerProvider _provider;
 
@@ -68,15 +68,18 @@ namespace NLog.Extensions.Logging
         /// <returns>The <see cref="Microsoft.Extensions.Logging.ILogger" />.</returns>
         public Microsoft.Extensions.Logging.ILogger CreateLogger(string categoryName)
         {
-            lock (_loggers)
+            if (!_loggers.TryGetValue(categoryName, out var logger))
             {
-                if (!_loggers.TryGetValue(categoryName, out var logger))
+                lock (_loggers)
                 {
-                    logger = _provider.CreateLogger(categoryName);
-                    _loggers[categoryName] = logger;
+                    if (!_loggers.TryGetValue(categoryName, out logger))
+                    {
+                        logger = _provider.CreateLogger(categoryName);
+                        _loggers[categoryName] = logger;
+                    }
                 }
-                return logger;
             }
+            return logger;
         }
 
         /// <summary>
