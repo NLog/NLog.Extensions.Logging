@@ -259,26 +259,50 @@ namespace NLog.Extensions.Logging
             keyValueExtractor = default;
 
             var itemType = propertyType.GetTypeInfo();
-            if (!itemType.IsGenericType || itemType.GetGenericTypeDefinition() != typeof(KeyValuePair<,>))
-            {
+            if (!itemType.IsGenericType)
                 return false;
+
+            if (itemType.GetGenericTypeDefinition() == typeof(KeyValuePair<,>))
+            {
+                var keyPropertyInfo = typeof(KeyValuePair<,>).MakeGenericType(itemType.GenericTypeArguments).GetTypeInfo().GetDeclaredProperty("Key");
+                var valuePropertyInfo = typeof(KeyValuePair<,>).MakeGenericType(itemType.GenericTypeArguments).GetTypeInfo().GetDeclaredProperty("Value");
+                if (valuePropertyInfo is null || keyPropertyInfo is null)
+                {
+                    return false;
+                }
+
+                var keyValuePairObjParam = Expression.Parameter(typeof(object), "KeyValuePair");
+                var keyValuePairTypeParam = Expression.Convert(keyValuePairObjParam, propertyType);
+                var propertyKeyAccess = Expression.Property(keyValuePairTypeParam, keyPropertyInfo);
+                var propertyValueAccess = Expression.Property(keyValuePairTypeParam, valuePropertyInfo);
+                return BuildKeyValueExtractor(keyValuePairObjParam, propertyKeyAccess, propertyValueAccess, out keyValueExtractor);
             }
 
-            var keyPropertyInfo = typeof(KeyValuePair<,>).MakeGenericType(itemType.GenericTypeArguments).GetTypeInfo().GetDeclaredProperty("Key");
-            var valuePropertyInfo = typeof(KeyValuePair<,>).MakeGenericType(itemType.GenericTypeArguments).GetTypeInfo().GetDeclaredProperty("Value");
-            if (valuePropertyInfo is null || keyPropertyInfo is null)
+#if !NETSTANDARD1_3 && !NETSTANDARD1_5
+            if (itemType.GetGenericTypeDefinition() == typeof(ValueTuple<,>))
             {
-                return false;
+                var keyPropertyInfo = typeof(ValueTuple<,>).MakeGenericType(itemType.GenericTypeArguments).GetTypeInfo().GetDeclaredField("Item1");
+                var valuePropertyInfo = typeof(ValueTuple<,>).MakeGenericType(itemType.GenericTypeArguments).GetTypeInfo().GetDeclaredField("Item2");
+                if (valuePropertyInfo is null || keyPropertyInfo is null)
+                {
+                    return false;
+                }
+
+                var keyValuePairObjParam = Expression.Parameter(typeof(object), "ValueTuple");
+                var keyValuePairTypeParam = Expression.Convert(keyValuePairObjParam, propertyType);
+                var propertyKeyAccess = Expression.Field(keyValuePairTypeParam, keyPropertyInfo);
+                var propertyValueAccess = Expression.Field(keyValuePairTypeParam, valuePropertyInfo);
+                return BuildKeyValueExtractor(keyValuePairObjParam, propertyKeyAccess, propertyValueAccess, out keyValueExtractor);
             }
+#endif
+            return false;
+        }
 
-            var keyValuePairObjParam = Expression.Parameter(typeof(object), "pair");
-            var keyValuePairTypeParam = Expression.Convert(keyValuePairObjParam, propertyType);
-
-            var propertyKeyAccess = Expression.Property(keyValuePairTypeParam, keyPropertyInfo);
+        private static bool BuildKeyValueExtractor(ParameterExpression keyValuePairObjParam, MemberExpression propertyKeyAccess, MemberExpression propertyValueAccess, out KeyValuePair<Func<object, object>, Func<object, object>> keyValueExtractor)
+        {
             var propertyKeyAccessObj = Expression.Convert(propertyKeyAccess, typeof(object));
             var propertyKeyLambda = Expression.Lambda<Func<object, object>>(propertyKeyAccessObj, keyValuePairObjParam).Compile();
 
-            var propertyValueAccess = Expression.Property(keyValuePairTypeParam, valuePropertyInfo);
             var propertyValueAccessObj = Expression.Convert(propertyValueAccess, typeof(object));
             var propertyValueLambda = Expression.Lambda<Func<object, object>>(propertyValueAccessObj, keyValuePairObjParam).Compile();
 
