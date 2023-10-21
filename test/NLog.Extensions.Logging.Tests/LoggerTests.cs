@@ -162,6 +162,42 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Fact]
+        public void TestScopeValueTuple()
+        {
+            var runner = GetRunner();
+            using (runner.Logger.BeginScope(("scope1", "Hello")))
+            {
+                runner.Logger.LogDebug("message with id and {0} parameters", 1);
+            }
+
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters|scope1=Hello", runner.LastTargetMessage);
+        }
+
+        [Fact]
+        public void TestScopeValueTupleInt()
+        {
+            var runner = GetRunner();
+            using (runner.Logger.BeginScope(("scope1", 42)))
+            {
+                runner.Logger.LogDebug("message with id and {0} parameters", 1);
+            }
+
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters|scope1=42", runner.LastTargetMessage);
+        }
+
+        [Fact]
+        public void TestScopeValueTupleList()
+        {
+            var runner = GetRunner();
+            using (runner.Logger.BeginScope(new[] { ("scope1", "Hello") }))
+            {
+                runner.Logger.LogDebug("message with id and {0} parameters", 1);
+            }
+
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters|scope1=Hello", runner.LastTargetMessage);
+        }
+
+        [Fact]
         public void TestScopePropertyDictionary()
         {
             var runner = GetRunner();
