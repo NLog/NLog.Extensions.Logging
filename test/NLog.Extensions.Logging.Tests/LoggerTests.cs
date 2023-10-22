@@ -277,6 +277,29 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Fact]
+        public void TestCaptureMessageParameters()
+        {
+            LogEventInfo logEvent = null;
+            var debugTarget = new MethodCallTarget("output", (l, args) => logEvent = l);
+            var runner = GetRunner<Runner>(new NLogProviderOptions() { CaptureMessageParameters = true }, debugTarget);
+            var messageTemplte = "{Action} {Target}";
+            runner.Logger.LogDebug("{Action} {Target}", "Hello", "World");
+
+            Assert.NotNull(logEvent);
+            Assert.Equal("Hello World", logEvent.FormattedMessage);
+            Assert.Equal(messageTemplte, logEvent.Message);
+            Assert.NotNull(logEvent.Parameters);
+            Assert.Equal(2, logEvent.Parameters.Length);
+            Assert.Equal("Hello", logEvent.Parameters[0]);
+            Assert.Equal("World", logEvent.Parameters[1]);
+
+            var messageParameters = logEvent.MessageTemplateParameters;
+            Assert.Equal(2, messageParameters.Count);
+            Assert.Equal("Hello", messageParameters[0].Value);
+            Assert.Equal("World", messageParameters[1].Value);
+        }
+
+        [Fact]
         public void TestPositionalCaptureMessageParameters()
         {
             LogEventInfo logEvent = null;
