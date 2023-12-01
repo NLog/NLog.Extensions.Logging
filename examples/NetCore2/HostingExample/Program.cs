@@ -23,10 +23,14 @@ namespace HostingExample
 
             try
             {
+                logger.Info("Message before configure host builder");
                 var hostBuilder = new HostBuilder()
-                    .ConfigureLogging(builder => builder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace))
-                    .ConfigureServices((hostContext, services) => services.AddHostedService<ConsoleHostedService>())
-                    .UseNLog();
+                    .ConfigureLogging(builder =>
+                    {
+                        builder.AddNLog(logger.Factory.Configuration);
+                        builder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+                    })
+                    .ConfigureServices((hostContext, services) => services.AddHostedService<ConsoleHostedService>());
 
                 // Build and run the host in one go; .RCA is specialized for running it in a console.
                 // It registers SIGTERM(Ctrl-C) to the CancellationTokenSource that's shared with all services in the container.
