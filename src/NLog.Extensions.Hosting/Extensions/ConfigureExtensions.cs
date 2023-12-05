@@ -17,8 +17,7 @@ namespace NLog.Extensions.Hosting
     public static class ConfigureExtensions
     {
         /// <summary>
-        ///     Enable and configure NLog as a logging provider for buildable generic host (.NET Core 2.1+).
-        ///     Can be used in discrete containers as well.
+        /// Enable NLog as logging provider for Microsoft Extension Logging
         /// </summary>
         /// <param name="builder"></param>
         /// <returns>IHostBuilder for chaining</returns>
@@ -29,8 +28,7 @@ namespace NLog.Extensions.Hosting
         }
 
         /// <summary>
-        ///     Enable and configure NLog as a logging provider for buildable generic host (.NET Core 2.1+).
-        ///     Can be used in discrete containers as well.
+        /// Enable NLog as logging provider for Microsoft Extension Logging
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="options">NLogProviderOptions object to configure NLog behavior</param>
