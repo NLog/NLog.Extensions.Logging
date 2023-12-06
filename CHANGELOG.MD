@@ -2,6 +2,13 @@
 
 Date format: (year/month/day)
 
+### Version 5.3.7 (2023/12/06)
+
+**Improvements**
+- [#705](https://github.com/NLog/NLog.Extensions.Logging/pull/705): Added target platform for NET 8.0 (#705) (@snakefoot)
+- [#710](https://github.com/NLog/NLog.Extensions.Logging/pull/710): Improve XML docs for AddNLog and UseNLog (#710) (@snakefoot)
+- [#713](https://github.com/NLog/NLog.Extensions.Logging/pull/713): Updated to NLog v5.2.7 (#713) (@snakefoot)
+
 ### Version 5.3.5 (2023/10/15)
 
 **Improvements**
