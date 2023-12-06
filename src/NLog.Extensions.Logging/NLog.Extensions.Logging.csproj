@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net461;netstandard1.3;netstandard1.5;netstandard2.0;netstandard2.1;net6.0;net8.0</TargetFrameworks>
     <DebugType Condition=" '$(Configuration)' == 'Debug' ">Full</DebugType>
@@ -18,7 +18,9 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     <PackageReleaseNotes>
 ChangeLog:
 
-- Updated to NLog v5.2.5 (#695) (@snakefoot)
+- Added target platform for NET 8.0 (#705) (@snakefoot)
+- Improve XML docs for AddNLog and UseNLog (#710) (@snakefoot)
+- Updated to NLog v5.2.7 (#713) (@snakefoot)
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
 
