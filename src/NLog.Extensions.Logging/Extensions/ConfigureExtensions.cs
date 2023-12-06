@@ -113,10 +113,10 @@ namespace NLog.Extensions.Logging
         }
 
         /// <summary>
-        /// Enable NLog as logging provider for Microsoft Extension Logging
+        /// Enable NLog as logging provider for Microsoft Extension Logging, and loads the new NLog <paramref name="configuration"/>.
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="configuration">New NLog config.</param>
+        /// <param name="configuration">New NLog config to be loaded.</param>
         /// <returns>ILoggingBuilder for chaining</returns>
         public static ILoggingBuilder AddNLog(this ILoggingBuilder builder, LoggingConfiguration configuration)
         {
@@ -124,10 +124,10 @@ namespace NLog.Extensions.Logging
         }
 
         /// <summary>
-        /// Enable NLog as logging provider for Microsoft Extension Logging
+        /// Enable NLog as logging provider for Microsoft Extension Logging, and loads the new NLog <paramref name="configuration"/>.
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="configuration">New NLog config.</param>
+        /// <param name="configuration">New NLog config to be loaded.</param>
         /// <param name="options">NLog Logging Provider options</param>
         /// <returns>ILoggingBuilder for chaining</returns>
         public static ILoggingBuilder AddNLog(this ILoggingBuilder builder, LoggingConfiguration configuration, NLogProviderOptions options)
@@ -145,10 +145,10 @@ namespace NLog.Extensions.Logging
         }
 
         /// <summary>
-        /// Enable NLog as logging provider for Microsoft Extension Logging
+        /// Enable NLog as logging provider for Microsoft Extension Logging, and loads NLog config from <paramref name="configFileRelativePath"/>
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="configFileRelativePath">relative path to NLog configuration file.</param>
+        /// <param name="configFileRelativePath">relative file-path to NLog configuration file.</param>
         /// <returns>ILoggingBuilder for chaining</returns>
         public static ILoggingBuilder AddNLog(this ILoggingBuilder builder, string configFileRelativePath)
         {
