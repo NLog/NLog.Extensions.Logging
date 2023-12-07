@@ -55,39 +55,46 @@ namespace NLog.Extensions.Hosting
             NLogLoggerProvider provider = serviceProvider.CreateNLogLoggerProvider(hostConfiguration, options, null);
 
             var contentRootPath = hostEnvironment?.ContentRootPath;
-            if (!string.IsNullOrEmpty(contentRootPath))
+            if (!string.IsNullOrWhiteSpace(contentRootPath))
             {
-                TryLoadConfigurationFromContentRootPath(provider.LogFactory, contentRootPath);
+                TryLoadConfigurationFromContentRootPath(provider.LogFactory, contentRootPath, hostEnvironment?.EnvironmentName);
             }
 
             return provider;
         }
 
-        private static void TryLoadConfigurationFromContentRootPath(LogFactory logFactory, string contentRootPath)
+        private static void TryLoadConfigurationFromContentRootPath(LogFactory logFactory, string contentRootPath, string environmentName)
         {
             logFactory.Setup().LoadConfiguration(config =>
             {
-                if (!IsLoggingConfigurationLoaded(config.Configuration))
+                if (IsLoggingConfigurationLoaded(config.Configuration))
+                    return;
+
+                if (!string.IsNullOrEmpty(environmentName))
                 {
-                    config.Configuration = config.LogFactory.Configuration;
-                    if (!IsLoggingConfigurationLoaded(config.Configuration))
-                    {
-                        config.Configuration = LoadXmlLoggingConfigurationFromPath(contentRootPath, config.LogFactory);
-                    }
+                    var nlogConfig = LoadXmlLoggingConfigurationFromPath(contentRootPath, $"NLog.{environmentName}.config", config.LogFactory) ?? LoadXmlLoggingConfigurationFromPath(contentRootPath, "NLog.config", config.LogFactory);
+                    if (nlogConfig != null)
+                        config.Configuration = nlogConfig;
+                }
+                else
+                {
+                    var nlogConfig = LoadXmlLoggingConfigurationFromPath(contentRootPath, "NLog.config", config.LogFactory);
+                    if (nlogConfig != null)
+                        config.Configuration = nlogConfig;
                 }
             });
         }
 
-        private static LoggingConfiguration LoadXmlLoggingConfigurationFromPath(string contentRootPath, LogFactory logFactory)
+        private static LoggingConfiguration LoadXmlLoggingConfigurationFromPath(string contentRootPath, string nlogConfigFileName, LogFactory logFactory)
         {
-            var standardPath = System.IO.Path.Combine(contentRootPath, "NLog.config");
+            var standardPath = System.IO.Path.Combine(contentRootPath, nlogConfigFileName);
             if (System.IO.File.Exists(standardPath))
             {
                 return new XmlLoggingConfiguration(standardPath, logFactory);
             }
             else
             {
-                var lowercasePath = System.IO.Path.Combine(contentRootPath, "nlog.config");
+                var lowercasePath = System.IO.Path.Combine(contentRootPath, nlogConfigFileName.ToLowerInvariant());
                 if (System.IO.File.Exists(lowercasePath))
                 {
                     return new XmlLoggingConfiguration(lowercasePath, logFactory);
