@@ -18,9 +18,9 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     <PackageReleaseNotes>
 ChangeLog:
 
-- Added target platform for NET 8.0 (#705) (@snakefoot)
-- Improve XML docs for AddNLog and UseNLog (#710) (@snakefoot)
-- Updated to NLog v5.2.7 (#713) (@snakefoot)
+- Fixed IncludeActivityIdsWithBeginScope to work with NET 8.0 (#719) (@Owen-Krueger)
+- UseNLog includes EnvironmentName when loading NLog config (#714) (@snakefoot)
+- Updated to NLog v5.2.8 (#720) (@Osnakefoot)
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
 
@@ -83,7 +83,7 @@ List of major changes in NLog 5.0: https://nlog-project.org/2021/08/25/nlog-5-0-
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="NLog" Version="5.2.7" />
+    <PackageReference Include="NLog" Version="5.2.8" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
