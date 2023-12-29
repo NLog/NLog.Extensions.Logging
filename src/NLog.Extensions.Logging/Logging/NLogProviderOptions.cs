@@ -60,7 +60,7 @@ namespace NLog.Extensions.Logging
         /// </summary>
         public bool AutoShutdown { get; set; }
 
-#if NET6_0
+#if NET5_0_OR_GREATER
         /// <summary>
         /// Automatically include <see cref="System.Diagnostics.Activity.SpanId"/>, <see cref="System.Diagnostics.Activity.TraceId"/> and <see cref="System.Diagnostics.Activity.ParentId"/>
         /// </summary>
