@@ -20,7 +20,7 @@ ChangeLog:
 
 - Fixed IncludeActivityIdsWithBeginScope to work with NET 8.0 (#719) (@Owen-Krueger)
 - UseNLog includes EnvironmentName when loading NLog config (#714) (@snakefoot)
-- Updated to NLog v5.2.8 (#720) (@Osnakefoot)
+- Updated to NLog v5.2.8 (#720) (@snakefoot)
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
 
