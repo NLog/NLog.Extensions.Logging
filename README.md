@@ -24,7 +24,7 @@
 
 - Introduces `AddNLog()` extension methods to register NLog as LoggingProvider for Microsoft Extension Logging.
 - Introduces [${configsetting}](https://github.com/NLog/NLog/wiki/ConfigSetting-Layout-Renderer) for doing lookup of appsettings.json configuration settings.
-- Adds support for loading [NLog Configurations from appsettings.json](https://github.com/NLog/NLog.Extensions.Logging/wiki/NLog-configuration-with-appsettings.json)
+- Adds support for loading [NLog Configuration from appsettings.json](https://github.com/NLog/NLog.Extensions.Logging/wiki/NLog-configuration-with-appsettings.json)
 
 Notice the standard [NLog NuGet package](https://www.nuget.org/packages/NLog) is enough for using NLog Logger with simple console application on the .NET Core platform.
 Just add `NLog.config` file to the project, and follow the [tutorial](https://github.com/NLog/NLog/wiki/Tutorial#configure-nlog-targets-for-output) for using `GetCurrentClassLogger()`.
