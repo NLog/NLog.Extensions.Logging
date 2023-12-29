@@ -2,6 +2,13 @@
 
 Date format: (year/month/day)
 
+### Version 5.3.8 (2023/12/29)
+
+**Improvements**
+- [#719](https://github.com/NLog/NLog.Extensions.Logging/pull/719): Fixed IncludeActivityIdsWithBeginScope to work with NET 8.0 (#719) (@Owen-Krueger)
+- [#714](https://github.com/NLog/NLog.Extensions.Logging/pull/714): UseNLog includes EnvironmentName when loading NLog config (#714) (@snakefoot)
+- [#720](https://github.com/NLog/NLog.Extensions.Logging/pull/720): Updated to NLog v5.2.8 (#720) (@Osnakefoot)
+
 ### Version 5.3.7 (2023/12/06)
 
 **Improvements**
