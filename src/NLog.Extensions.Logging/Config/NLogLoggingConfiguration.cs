@@ -210,7 +210,7 @@ namespace NLog.Extensions.Logging
                 var children = _configurationSection.GetChildren();
                 foreach (var child in children)
                 {
-                    if (!child.GetChildren().Any())
+                    if (!child.GetChildren().Any() && child.Value != null)
                     {
                         yield return new KeyValuePair<string, string>(GetConfigKey(child), child.Value);
                     }
