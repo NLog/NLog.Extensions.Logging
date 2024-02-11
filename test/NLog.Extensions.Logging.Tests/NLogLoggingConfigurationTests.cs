@@ -41,7 +41,8 @@ namespace NLog.Extensions.Logging.Tests
     ""variables"": {},
     ""extensions"": [],
     ""targets"": {},
-    ""rules"": []
+    ""rules"": [],
+    ""keyThatPretendsToBeAComplexStructure"": {}
   }
 }";
             var logConfig = CreateNLogLoggingConfigurationWithNLogSection(appSettings);
@@ -49,6 +50,21 @@ namespace NLog.Extensions.Logging.Tests
             Assert.False(logConfig.LoggingRules.Any());
             Assert.False(logConfig.AllTargets.Any());
             Assert.False(logConfig.Variables.Any());
+        }
+        
+        [Fact]
+        public void LoadConfigShouldThrowForUnrecognisedSections()
+        {
+            var appSettings = @"
+{
+  ""NLog"": {
+    ""throwConfigExceptions"": true,
+    ""someRandomKey"": null
+  }
+}";
+            var ex = Assert.Throws<NLog.NLogConfigurationException>(() =>
+                CreateNLogLoggingConfigurationWithNLogSection(appSettings));
+            Assert.Equal("Unrecognized value 'someRandomKey'='' for element 'NLog'", ex.Message); 
         }
 
         [Fact]
