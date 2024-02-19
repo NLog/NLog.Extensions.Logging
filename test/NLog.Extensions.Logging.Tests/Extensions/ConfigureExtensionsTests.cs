@@ -201,7 +201,7 @@ namespace NLog.Extensions.Logging.Tests.Extensions
 
         private static void AssertSingleMessage(MemoryTarget memoryTarget, string expectedMessage)
         {
-            Assert.Equal(1, memoryTarget.Logs.Count);
+            Assert.Single(memoryTarget.Logs);
             var log = memoryTarget.Logs.Single();
             Assert.Equal(expectedMessage, log);
         }
