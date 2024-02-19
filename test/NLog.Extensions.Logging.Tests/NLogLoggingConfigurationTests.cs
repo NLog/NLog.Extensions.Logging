@@ -153,7 +153,7 @@ namespace NLog.Extensions.Logging.Tests
             var logConfig = CreateNLogLoggingConfigurationWithNLogSection(memoryConfig);
 
             Assert.Single(logConfig.LoggingRules);
-            Assert.Equal(1, logConfig.Variables.Count);
+            Assert.Single(logConfig.Variables);
             Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
             Assert.Equal(2, logConfig.AllTargets.Count);
             Assert.Single(logConfig.AllTargets.Where(t => t is FileTarget));
@@ -276,7 +276,7 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Equal(2, logFactory.Configuration.LoggingRules[0].Targets.Count);
             configuration["NLog:Rules:0:writeTo"] = "Console";
             logFactory.Configuration = logConfig.Reload();  // Manual Reload
-            Assert.Equal(1, logFactory.Configuration.LoggingRules[0].Targets.Count);
+            Assert.Single(logFactory.Configuration.LoggingRules[0].Targets);
             configuration["NLog:Rules:0:writeTo"] = "File,Console";
             configuration.Reload(); // Automatic Reload
             Assert.Equal(2, logFactory.Configuration.LoggingRules[0].Targets.Count);

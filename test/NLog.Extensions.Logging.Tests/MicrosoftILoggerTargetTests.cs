@@ -169,7 +169,7 @@ namespace NLog.Extensions.Logging.Tests
 
             // Assert
             Assert.Equal("Hello there", mock.LastLogMessage);
-            Assert.Equal(1, mock.LastLogProperties.Count);
+            Assert.Single(mock.LastLogProperties);
             Assert.Equal("{OriginalFormat}", mock.LastLogProperties[0].Key);
             Assert.Equal("Hello there", mock.LastLogProperties[0].Value);
         }
@@ -215,7 +215,7 @@ namespace NLog.Extensions.Logging.Tests
             // Assert
             Assert.Equal("Hello there", mock.LastLogMessage);
             Assert.Equal(ex, mock.LastLogException);
-            Assert.Equal(1, mock.LastLogProperties.Count);
+            Assert.Single(mock.LastLogProperties);
             Assert.Equal("{OriginalFormat}", mock.LastLogProperties[0].Key);
             Assert.Equal("Hello there", mock.LastLogProperties[0].Value);
         }

@@ -14,7 +14,7 @@ namespace NLog.Extensions.Logging.Tests
         {
             var target = new Targets.MemoryTarget { Layout = "${message} ${scopeproperty:World}. Welcome ${scopenested}" };
             var runner = GetRunner<CustomBeginScopeTestRunner>(target: target);
-            runner.SayHello().Wait();
+            Assert.True(runner.SayHello().Wait(5000));
             Assert.Single(target.Logs);
             Assert.Equal("Hello Earth. Welcome Earth People", target.Logs[0]);
         }
@@ -24,7 +24,7 @@ namespace NLog.Extensions.Logging.Tests
         {
             var target = new Targets.MemoryTarget { Layout = "${message} ${scopeproperty:World}. Welcome ${scopenested}" };
             var runner = GetRunner<CustomBeginScopeTestRunner>(new NLogProviderOptions { IncludeScopes = false }, target: target);
-            runner.SayHello().Wait();
+            Assert.True(runner.SayHello().Wait(5000));
             Assert.Single(target.Logs);
             Assert.Equal("Hello . Welcome ", target.Logs[0]);
         }
@@ -55,7 +55,7 @@ namespace NLog.Extensions.Logging.Tests
         {
             var target = new Targets.MemoryTarget { Layout = "${message}" };
             var runner = GetRunner<CustomBeginScopeTestRunner>(target: target);
-            runner.SayNothing().Wait();
+            Assert.True(runner.SayNothing().Wait(5000));
             Assert.Single(target.Logs);
             Assert.Equal("Nothing", target.Logs[0]);
         }
@@ -65,7 +65,7 @@ namespace NLog.Extensions.Logging.Tests
         {
             var target = new Targets.MemoryTarget { Layout = "${message}${scopeproperty:Say}" };
             var runner = GetRunner<CustomBeginScopeTestRunner>(target: target);
-            runner.SaySomething().Wait();
+            Assert.True(runner.SaySomething().Wait(5000));
             Assert.Single(target.Logs);
             Assert.Equal("SaySomething", target.Logs[0]);
         }     
