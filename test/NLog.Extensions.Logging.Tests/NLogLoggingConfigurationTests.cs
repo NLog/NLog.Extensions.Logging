@@ -32,7 +32,7 @@ namespace NLog.Extensions.Logging.Tests
         }
         
         [Fact]
-        public void LoadConfigShouldIgnoreEmptySections()
+        public void LoadConfigShouldIgnoreWellKnownEmptySections()
         {
             var appSettings = @"
 {
@@ -41,8 +41,7 @@ namespace NLog.Extensions.Logging.Tests
     ""variables"": {},
     ""extensions"": [],
     ""targets"": {},
-    ""rules"": [],
-    ""keyThatPretendsToBeAComplexStructure"": {}
+    ""rules"": []
   }
 }";
             var logConfig = CreateNLogLoggingConfigurationWithNLogSection(appSettings);
@@ -60,6 +59,21 @@ namespace NLog.Extensions.Logging.Tests
   ""NLog"": {
     ""throwConfigExceptions"": true,
     ""someRandomKey"": null
+  }
+}";
+            var ex = Assert.Throws<NLog.NLogConfigurationException>(() =>
+                CreateNLogLoggingConfigurationWithNLogSection(appSettings));
+            Assert.Equal("Unrecognized value 'someRandomKey'='' for element 'NLog'", ex.Message); 
+        }
+        
+        [Fact]
+        public void LoadConfigShouldThrowForUnrecognisedComplexSections()
+        {
+            var appSettings = @"
+{
+  ""NLog"": {
+    ""throwConfigExceptions"": true,
+    ""someRandomKey"": {}
   }
 }";
             var ex = Assert.Throws<NLog.NLogConfigurationException>(() =>
