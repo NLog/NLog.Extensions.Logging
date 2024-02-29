@@ -8,6 +8,7 @@ environment:
     secure: WYvd/k1xGCsDS+4iOhjzxA5/e36RjkxnuVOHpBR+eDtZNNjpYydCyNfd1COME9jI
   sonar_token:
     secure: OUI/jCbBF75TwKMPT+IfewdgwCgx9nQkRg3cYOEQNJeX5J2++oWS3dmpwO51XduP
+  JAVA_HOME: C:\Program Files\Java\jdk19
 
 build_script:
   - ps: .\build.ps1
