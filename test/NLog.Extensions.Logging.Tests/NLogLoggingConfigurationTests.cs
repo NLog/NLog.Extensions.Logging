@@ -1,6 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using Microsoft.Extensions.Configuration;
 using NLog.Targets;
 using NLog.Targets.Wrappers;
@@ -28,6 +29,56 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Single(logConfig.AllTargets.Where(t => t is FileTarget));
             Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
             Assert.Equal("hello.txt", (logConfig.FindTargetByName("file") as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
+        }
+        
+        [Fact]
+        public void LoadConfigShouldIgnoreWellKnownEmptySections()
+        {
+            var appSettings = @"
+{
+  ""NLog"": {
+    ""throwConfigExceptions"": true,
+    ""variables"": {},
+    ""extensions"": [],
+    ""targets"": {},
+    ""rules"": []
+  }
+}";
+            var logConfig = CreateNLogLoggingConfigurationWithNLogSection(appSettings);
+            
+            Assert.False(logConfig.LoggingRules.Any());
+            Assert.False(logConfig.AllTargets.Any());
+            Assert.False(logConfig.Variables.Any());
+        }
+        
+        [Fact]
+        public void LoadConfigShouldThrowForUnrecognisedSections()
+        {
+            var appSettings = @"
+{
+  ""NLog"": {
+    ""throwConfigExceptions"": true,
+    ""someRandomKey"": null
+  }
+}";
+            var ex = Assert.Throws<NLog.NLogConfigurationException>(() =>
+                CreateNLogLoggingConfigurationWithNLogSection(appSettings));
+            Assert.Equal("Unrecognized value 'someRandomKey'='' for element 'NLog'", ex.Message); 
+        }
+        
+        [Fact]
+        public void LoadConfigShouldThrowForUnrecognisedComplexSections()
+        {
+            var appSettings = @"
+{
+  ""NLog"": {
+    ""throwConfigExceptions"": true,
+    ""someRandomKey"": {}
+  }
+}";
+            var ex = Assert.Throws<NLog.NLogConfigurationException>(() =>
+                CreateNLogLoggingConfigurationWithNLogSection(appSettings));
+            Assert.Equal("Unrecognized value 'someRandomKey'='' for element 'NLog'", ex.Message); 
         }
 
         [Fact]
@@ -321,6 +372,14 @@ namespace NLog.Extensions.Logging.Tests
         private static NLogLoggingConfiguration CreateNLogLoggingConfigurationWithNLogSection(IDictionary<string, string> memoryConfig, string sectionName = DefaultSectionName)
         {
             var configuration = new ConfigurationBuilder().AddInMemoryCollection(memoryConfig).Build();
+            var logFactory = new LogFactory();
+            var logConfig = new NLogLoggingConfiguration(configuration.GetSection(sectionName), logFactory);
+            return logConfig;
+        }
+        
+        private static NLogLoggingConfiguration CreateNLogLoggingConfigurationWithNLogSection(string appSettingsContent, string sectionName = DefaultSectionName)
+        {
+            var configuration = new ConfigurationBuilder().AddJsonStream(new MemoryStream(Encoding.UTF8.GetBytes(appSettingsContent))).Build();
             var logFactory = new LogFactory();
             var logConfig = new NLogLoggingConfiguration(configuration.GetSection(sectionName), logFactory);
             return logConfig;

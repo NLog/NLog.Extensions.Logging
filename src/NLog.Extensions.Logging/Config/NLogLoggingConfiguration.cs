@@ -151,6 +151,9 @@ namespace NLog.Extensions.Logging
             private const string DefaultTargetParameters = "Default-target-parameters";
             private const string TargetDefaultParameters = "TargetDefaultParameters";
             private const string VariableKey = "Variable";
+            private const string VariablesKey = "Variables";
+            private const string RulesKey = "Rules";
+            private const string ExtensionsKey = "Extensions";
             private const string DefaultWrapper = "Default-wrapper";
             private const string TargetDefaultWrapper = "TargetDefaultWrapper";
             private readonly IConfigurationSection _configurationSection;
@@ -212,9 +215,30 @@ namespace NLog.Extensions.Logging
                 {
                     if (!child.GetChildren().Any())
                     {
-                        yield return new KeyValuePair<string, string>(GetConfigKey(child), child.Value);
+                        var configKey = GetConfigKey(child);
+                        var configValue = child.Value;
+                        if (_topElement && IgnoreTopElementChildNullValue(configKey, configValue))
+                            continue;   // Complex object without any properties has no children and null-value (Ex. empty targets-section)
+
+                        yield return new KeyValuePair<string, string>(configKey, configValue);
                     }
                 }
+            }
+            
+            private static bool IgnoreTopElementChildNullValue(string configKey, object configValue)
+            {
+                if (configValue is null)
+                {
+                    if (string.Equals(TargetsKey, configKey, StringComparison.OrdinalIgnoreCase)
+                        || string.Equals(VariablesKey, configKey, StringComparison.OrdinalIgnoreCase)
+                        || string.Equals(TargetDefaultParameters, configKey, StringComparison.OrdinalIgnoreCase)
+                        || string.Equals(DefaultTargetParameters, configKey, StringComparison.OrdinalIgnoreCase)
+                        || string.Equals(RulesKey, configKey, StringComparison.OrdinalIgnoreCase)
+                        || string.Equals(ExtensionsKey, configKey, StringComparison.OrdinalIgnoreCase))
+                        return true;    // Only accept known section-names as being empty (when no children and null value)
+                }
+
+                return false;
             }
 
             private IEnumerable<ILoggingConfigurationElement> GetChildren()
@@ -344,7 +368,7 @@ namespace NLog.Extensions.Logging
 
             private IConfigurationSection GetVariablesSection()
             {
-                var variables = _topElement ? _configurationSection.GetSection("Variables") : null;
+                var variables = _topElement ? _configurationSection.GetSection(VariablesKey) : null;
                 return variables;
             }
 
