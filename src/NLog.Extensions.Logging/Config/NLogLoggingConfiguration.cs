@@ -218,7 +218,7 @@ namespace NLog.Extensions.Logging
                         var configKey = GetConfigKey(child);
                         var configValue = child.Value;
                         if (_topElement && IgnoreTopElementChildNullValue(configKey, configValue))
-                            continue;   // Complex object without any properties has no children and null-value (Ex. empty targets-section)
+                            continue;   // Complex object without any properties has no children and null-value (Ex. empty targets-section / variables-section)
 
                         yield return new KeyValuePair<string, string>(configKey, configValue);
                     }
@@ -229,13 +229,24 @@ namespace NLog.Extensions.Logging
             {
                 if (configValue is null)
                 {
-                    if (string.Equals(TargetsKey, configKey, StringComparison.OrdinalIgnoreCase)
-                        || string.Equals(VariablesKey, configKey, StringComparison.OrdinalIgnoreCase)
-                        || string.Equals(TargetDefaultParameters, configKey, StringComparison.OrdinalIgnoreCase)
-                        || string.Equals(DefaultTargetParameters, configKey, StringComparison.OrdinalIgnoreCase)
-                        || string.Equals(RulesKey, configKey, StringComparison.OrdinalIgnoreCase)
-                        || string.Equals(ExtensionsKey, configKey, StringComparison.OrdinalIgnoreCase))
-                        return true;    // Only accept known section-names as being empty (when no children and null value)
+                    // Only accept known section-names as being empty (when no children and null value)
+                    if (string.Equals(TargetDefaultParameters, configKey, StringComparison.OrdinalIgnoreCase))
+                        return true;
+
+                    if (string.Equals(DefaultTargetParameters, configKey, StringComparison.OrdinalIgnoreCase))
+                        return true;
+
+                    if (string.Equals(RulesKey, configKey, StringComparison.OrdinalIgnoreCase))
+                        return true;
+
+                    if (string.Equals(ExtensionsKey, configKey, StringComparison.OrdinalIgnoreCase))
+                        return true;
+
+                    if (string.Equals(VariablesKey, configKey, StringComparison.OrdinalIgnoreCase))
+                        return true;
+
+                    if (string.Equals(TargetsKey, configKey, StringComparison.OrdinalIgnoreCase))
+                        return true;
                 }
 
                 return false;
@@ -246,7 +257,7 @@ namespace NLog.Extensions.Logging
                 var variables = GetVariablesSection();
                 if (variables != null)
                 {
-                    foreach (var variable in variables.GetChildren())
+                    foreach (var variable in GetVariablesChildren(variables))
                     {
                         yield return new LoggingConfigurationElement(variable, VariableKey);
                     }
@@ -307,6 +318,59 @@ namespace NLog.Extensions.Logging
                     else
                     {
                         yield return new LoggingConfigurationElement(child, isTargetsSection ? TargetKey : null);
+                    }
+                }
+            }
+
+            private IEnumerable<IConfigurationSection> GetVariablesChildren(IConfigurationSection variables)
+            {
+                List<KeyValuePair<string, IConfigurationSection>> sortVariables = null;
+                foreach (var variable in variables.GetChildren())
+                {
+                    var configKey = GetConfigKey(variable);
+                    var configValue = variable.Value;
+                    if (string.IsNullOrEmpty(configKey) || string.IsNullOrEmpty(configValue) || !configValue.Contains('$'))
+                        yield return variable;
+
+                    sortVariables ??= new List<KeyValuePair<string, IConfigurationSection>>();
+                    sortVariables.Insert(0, new KeyValuePair<string, IConfigurationSection>(configKey, variable));
+                }
+
+                bool foundIndependentVariable = true;
+                while (sortVariables?.Count > 0 && foundIndependentVariable)
+                {
+                    foundIndependentVariable = false;
+
+                    // Enumerate all variables that doesn't reference other variables
+                    for (int i = sortVariables.Count - 1; i >= 0; i--)
+                    {
+                        var configValue = sortVariables[i].Value.Value;
+                        var independentVariable = true;
+                        for (int j = i - 1; j >= 0; j--)
+                        {
+                            var otherConfigKey = sortVariables[j].Key;
+                            var referenceVariable = $"${{{otherConfigKey}}}";
+                            if (configValue.IndexOf(referenceVariable, StringComparison.OrdinalIgnoreCase) >= 0)
+                            {
+                                independentVariable = false;
+                                break;
+                            }
+                        }
+                        if (independentVariable)
+                        {
+                            foundIndependentVariable = true;
+                            yield return sortVariables[i].Value;
+                            sortVariables.RemoveAt(i);
+                        }
+                    }
+                }
+
+                if (sortVariables?.Count > 0)
+                {
+                    // Give up and just return the variables in their sorted order
+                    for (int i = sortVariables.Count - 1; i >= 0; i--)
+                    {
+                        yield return sortVariables[i].Value;
                     }
                 }
             }
