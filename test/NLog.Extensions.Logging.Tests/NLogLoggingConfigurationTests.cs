@@ -188,6 +188,25 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Fact]
+        public void LoadVariablesSortedConfig()
+        {
+            var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
+            memoryConfig["NLog:Targets:file:type"] = "File";
+            memoryConfig["NLog:Targets:file:fileName"] = "${var_file}";
+            memoryConfig["NLog:Variables:var_folder"] = "hello";
+            memoryConfig["NLog:Variables:var_file"] = "${var_folder}/world.txt";
+
+            var logConfig = CreateNLogLoggingConfigurationWithNLogSection(memoryConfig);
+
+            Assert.Single(logConfig.LoggingRules);
+            Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
+            Assert.Equal(2, logConfig.AllTargets.Count);
+            Assert.Single(logConfig.AllTargets.Where(t => t is FileTarget));
+            Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
+            Assert.Equal("hello/world.txt", (logConfig.FindTargetByName("file") as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
+        }
+
+        [Fact]
         public void LoadVariableJsonLayoutConfig()
         {
             var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
