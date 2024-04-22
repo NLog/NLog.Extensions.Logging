@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using NLog.Targets;
 using NLog.Targets.Wrappers;
 using Xunit;
+using Xunit.Sdk;
 
 namespace NLog.Extensions.Logging.Tests
 {
@@ -13,6 +14,11 @@ namespace NLog.Extensions.Logging.Tests
     {
         const string DefaultSectionName = "NLog";
         const string CustomSectionName = "MyCustomSection";
+
+        public NLogLoggingConfigurationTests()
+        {
+            LogManager.ThrowConfigExceptions = true;
+        }
 
         [Fact]
         public void LoadSimpleConfig()
@@ -188,7 +194,7 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Fact]
-        public void LoadVariablesSortedConfig()
+        public void LoadVariablesDependentConfig()
         {
             var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
             memoryConfig["NLog:Targets:file:type"] = "File";
@@ -212,18 +218,43 @@ namespace NLog.Extensions.Logging.Tests
             var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
             memoryConfig["NLog:Targets:file:type"] = "File";
             memoryConfig["NLog:Targets:file:fileName"] = "hello.txt";
-            memoryConfig["NLog:Targets:file:layout"] = "${my_json}";
-            memoryConfig["NLog:Targets:console:layout"] = "${my_json}";
-            memoryConfig["NLog:Variables:my_json:type"] = "JsonLayout";
-            memoryConfig["NLog:Variables:my_json:attributes:0:name"] = "message";
-            memoryConfig["NLog:Variables:my_json:attributes:0:layout"] = "${message}";
-            memoryConfig["NLog:Variables:my_json:attributes:1:name"] = "logger";
-            memoryConfig["NLog:Variables:my_json:attributes:1:layout"] = "${logger}";
+            memoryConfig["NLog:Targets:file:layout"] = "${var_json}";
+            memoryConfig["NLog:Targets:console:layout"] = "${var_json}";
+            memoryConfig["NLog:Variables:var_json:type"] = "JsonLayout";
+            memoryConfig["NLog:Variables:var_json:attributes:0:name"] = "message";
+            memoryConfig["NLog:Variables:var_json:attributes:0:layout"] = "${message}";
+            memoryConfig["NLog:Variables:var_json:attributes:1:name"] = "logger";
+            memoryConfig["NLog:Variables:var_json:attributes:1:layout"] = "${logger}";
 
             var logConfig = CreateNLogLoggingConfigurationWithNLogSection(memoryConfig);
 
             Assert.Single(logConfig.LoggingRules);
             Assert.Single(logConfig.Variables);
+            Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
+            Assert.Equal(2, logConfig.AllTargets.Count);
+            Assert.Single(logConfig.AllTargets.Where(t => t is FileTarget));
+            Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
+            Assert.Equal(2, logConfig.AllTargets.Count(t => (t as TargetWithLayout)?.Layout is NLog.Layouts.JsonLayout));
+        }
+
+        [Fact]
+        public void LoadVariableDependentJsonLayoutConfig()
+        {
+            var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
+            memoryConfig["NLog:Targets:file:type"] = "File";
+            memoryConfig["NLog:Targets:file:fileName"] = "hello.txt";
+            memoryConfig["NLog:Targets:file:layout"] = "${var_json}";
+            memoryConfig["NLog:Targets:console:layout"] = "${var_json}";
+            memoryConfig["NLog:Variables:var_folder"] = "hello";
+            memoryConfig["NLog:Variables:var_file"] = "${var_folder}/world.txt";
+            memoryConfig["NLog:Variables:var_json:type"] = "JsonLayout";
+            memoryConfig["NLog:Variables:var_json:attributes:0:name"] = "file";
+            memoryConfig["NLog:Variables:var_json:attributes:0:layout"] = "${var_file}";
+
+            var logConfig = CreateNLogLoggingConfigurationWithNLogSection(memoryConfig);
+
+            Assert.Single(logConfig.LoggingRules);
+            Assert.Equal(3, logConfig.Variables.Count);
             Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
             Assert.Equal(2, logConfig.AllTargets.Count);
             Assert.Single(logConfig.AllTargets.Where(t => t is FileTarget));
