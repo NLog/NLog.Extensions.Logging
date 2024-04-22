@@ -329,7 +329,7 @@ namespace NLog.Extensions.Logging
                 {
                     var configKey = GetConfigKey(variable);
                     var configValue = variable.Value;
-                    if (string.IsNullOrEmpty(configKey) || string.IsNullOrEmpty(configValue) || !configValue.Contains('$'))
+                    if (string.IsNullOrEmpty(configKey) || configValue?.Contains('$') == false)
                         yield return variable;
 
                     sortVariables ??= new List<KeyValuePair<string, IConfigurationSection>>();
@@ -345,6 +345,9 @@ namespace NLog.Extensions.Logging
                     for (int i = sortVariables.Count - 1; i >= 0; i--)
                     {
                         var configValue = sortVariables[i].Value.Value;
+                        if (configValue is null)
+                            continue;
+
                         var independentVariable = true;
                         for (int j = i - 1; j >= 0; j--)
                         {
