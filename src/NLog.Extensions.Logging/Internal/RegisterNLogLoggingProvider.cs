@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using System.Reflection;
     using Microsoft.Extensions.Configuration;
 #if !NETCORE1_0
     using Microsoft.Extensions.DependencyInjection;
@@ -91,8 +92,43 @@
         internal static IConfiguration SetupNLogConfigSettings(this IServiceProvider serviceProvider, IConfiguration configuration, LogFactory logFactory)
         {
             configuration = configuration ?? (serviceProvider?.GetService(typeof(IConfiguration)) as IConfiguration);
-            logFactory.Setup().SetupExtensions(ext => ext.RegisterConfigSettings(configuration));
+            logFactory.Setup()
+                .SetupExtensions(ext => ext.RegisterConfigSettings(configuration))
+                .SetupLogFactory(ext =>
+                {
+                    ext.AddCallSiteHiddenAssembly(typeof(NLogLoggerProvider).GetTypeInfo().Assembly);
+                    ext.AddCallSiteHiddenAssembly(typeof(Microsoft.Extensions.Logging.ILogger).GetTypeInfo().Assembly);
+#if !NETCORE1_0
+                    ext.AddCallSiteHiddenAssembly(typeof(Microsoft.Extensions.Logging.LoggerFactory).GetTypeInfo().Assembly);
+#else
+                    var loggingAssembly = SafeLoadHiddenAssembly("Microsoft.Logging");
+                    ext.AddCallSiteHiddenAssembly(loggingAssembly ?? typeof(NLogLoggerProvider).GetTypeInfo().Assembly);
+                    var extensionAssembly = SafeLoadHiddenAssembly("Microsoft.Extensions.Logging");
+                    ext.AddCallSiteHiddenAssembly(extensionAssembly ?? typeof(NLogLoggerProvider).GetTypeInfo().Assembly);
+                    var filterAssembly = SafeLoadHiddenAssembly("Microsoft.Extensions.Logging.Filter", false);
+                    ext.AddCallSiteHiddenAssembly(filterAssembly ?? typeof(NLogLoggerProvider).GetTypeInfo().Assembly);
+#endif
+                });
             return configuration;
         }
+
+#if NETCORE1_0
+        private static Assembly SafeLoadHiddenAssembly(string assemblyName, bool logOnException = true)
+        {
+            try
+            {
+                Common.InternalLogger.Debug("Loading Assembly {0} to mark it as hidden for callsite", assemblyName);
+                return Assembly.Load(new AssemblyName(assemblyName));
+            }
+            catch (Exception ex)
+            {
+                if (logOnException)
+                {
+                    Common.InternalLogger.Debug(ex, "Failed loading Loading Assembly {0} to mark it as hidden for callsite", assemblyName);
+                }
+                return null;
+            }
+        }
+#endif
     }
 }
