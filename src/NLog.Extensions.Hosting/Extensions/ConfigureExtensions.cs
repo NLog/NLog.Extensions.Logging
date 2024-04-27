@@ -46,7 +46,6 @@ namespace NLog.Extensions.Hosting
 
         private static void AddNLogLoggerProvider(IServiceCollection services, IConfiguration hostConfiguration, IHostEnvironment hostEnvironment, NLogProviderOptions options, Func<IServiceProvider, IConfiguration, IHostEnvironment, NLogProviderOptions, NLogLoggerProvider> factory)
         {
-            LogManager.AddHiddenAssembly(typeof(ConfigureExtensions).GetTypeInfo().Assembly);
             services.TryAddNLogLoggingProvider((svc, addlogging) => svc.AddLogging(addlogging), hostConfiguration, options, (provider, cfg, opt) => factory(provider, cfg, hostEnvironment, opt));
         }
 
@@ -60,6 +59,7 @@ namespace NLog.Extensions.Hosting
                 TryLoadConfigurationFromContentRootPath(provider.LogFactory, contentRootPath, hostEnvironment?.EnvironmentName);
             }
 
+            provider.LogFactory.Setup().SetupLogFactory(ext => ext.AddCallSiteHiddenAssembly(typeof(ConfigureExtensions).Assembly));
             return provider;
         }
 

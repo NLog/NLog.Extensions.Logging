@@ -29,7 +29,7 @@ namespace NLog.Extensions.Logging
         public NLogLoggerFactory(NLogProviderOptions options)
             :this(new NLogLoggerProvider(options))
         {
-            SetupExtensionsBuilderExtensions.RegisterHiddenAssembliesForCallSite();
+            RegisterNLogLoggingProvider.SetupNLogConfigSettings(null, null, _provider.LogFactory);
         }
 
         /// <summary>
