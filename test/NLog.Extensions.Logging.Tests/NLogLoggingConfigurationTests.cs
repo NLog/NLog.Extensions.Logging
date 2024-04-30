@@ -201,6 +201,7 @@ namespace NLog.Extensions.Logging.Tests
             memoryConfig["NLog:Targets:file:fileName"] = "${var_file}";
             memoryConfig["NLog:Variables:var_folder"] = "hello";
             memoryConfig["NLog:Variables:var_file"] = "${var_folder}/world.txt";
+            memoryConfig["NLog:Variables:var_logpath"] = "${var_file}";
 
             var logConfig = CreateNLogLoggingConfigurationWithNLogSection(memoryConfig);
 
