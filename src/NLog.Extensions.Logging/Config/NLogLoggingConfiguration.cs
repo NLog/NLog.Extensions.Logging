@@ -349,7 +349,7 @@ namespace NLog.Extensions.Logging
                             continue;
 
                         var independentVariable = true;
-                        for (int j = i - 1; j >= 0; j--)
+                        for (int j = sortVariables.Count - 1; j >= 0; j--)
                         {
                             var otherConfigKey = sortVariables[j].Key;
                             var referenceVariable = $"${{{otherConfigKey}}}";
