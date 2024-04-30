@@ -2,6 +2,11 @@
 
 Date format: (year/month/day)
 
+### Version 5.3.10 (2024/04/30)
+**Improvements**
+- [#742](https://github.com/NLog/NLog.Extensions.Logging/pull/742): Improve auto ordering of variables-section when dependent variables (#742) (@snakefoot)
+- [#743](https://github.com/NLog/NLog.Extensions.Logging/pull/743): Updated to NLog v5.3.2 (#743) (@snakefoot)
+
 ### Version 5.3.9 (2024/04/27)
 **Improvements**
 - [#724](https://github.com/NLog/NLog.Extensions.Logging/pull/724): Skipping empty config sections without throwing exceptions (#724) (@RodionovDmitry)
