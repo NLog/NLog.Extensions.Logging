@@ -9,8 +9,10 @@
     <Product>NLog.Extensions.Hosting v$(ProductVersion)</Product>
     <InformationalVersion>$(ProductVersion)</InformationalVersion>
 
-    <Company>NLog</Company>
     <Authors>Julian Verdurmen;Bryan Gonzalez</Authors>
+    <Company>NLog</Company>
+    <CurrentYear>$([System.DateTime]::Now.ToString(yyyy))</CurrentYear>
+    <Copyright>Copyright (c) 2004-$(CurrentYear) NLog Project - https://nlog-project.org/ </Copyright>
     <Description>NLog extension for Microsoft.Extensions.Hosting for logging in .NET Standard libraries and .NET Core applications using IHostBuilder.
     
 For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore

@@ -8,8 +8,10 @@
     <Product>NLog.Extensions.Logging v$(ProductVersion)</Product>
     <InformationalVersion>$(ProductVersion)</InformationalVersion>
 
-    <Authors>Microsoft;Julian Verdurmen</Authors>
+    <Authors>Julian Verdurmen</Authors>
     <Company>NLog</Company>
+    <CurrentYear>$([System.DateTime]::Now.ToString(yyyy))</CurrentYear>
+    <Copyright>Copyright (c) 2004-$(CurrentYear) NLog Project - https://nlog-project.org/ </Copyright>
     <Description>NLog LoggerProvider for Microsoft.Extensions.Logging for logging in .NET Standard libraries and .NET Core applications.
 
 For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
