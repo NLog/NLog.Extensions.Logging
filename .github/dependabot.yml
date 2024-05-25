@@ -13,7 +13,3 @@ updates:
   - dependency-name: Microsoft.Extensions.Hosting.Abstractions
   - dependency-name: Microsoft.Extensions.Logging
   - dependency-name: Microsoft.Extensions.Logging.Abstractions
-  - dependency-name: Microsoft.NET.Test.Sdk
-    versions:
-    - "> 16.2.0, < 17"
-  - dependency-name: xunit.runner.visualstudio
