@@ -348,18 +348,8 @@ namespace NLog.Extensions.Logging
                         if (configValue is null)
                             continue;
 
-                        var independentVariable = true;
-                        for (int j = sortVariables.Count - 1; j >= 0; j--)
-                        {
-                            var otherConfigKey = sortVariables[j].Key;
-                            var referenceVariable = $"${{{otherConfigKey}}}";
-                            if (configValue.IndexOf(referenceVariable, StringComparison.OrdinalIgnoreCase) >= 0)
-                            {
-                                independentVariable = false;
-                                break;
-                            }
-                        }
-                        if (independentVariable)
+                        bool usingOtherVariables = IsNLogConfigVariableValueUsingOthers(configValue, sortVariables);
+                        if (!usingOtherVariables)
                         {
                             foundIndependentVariable = true;
                             yield return sortVariables[i].Value;
@@ -376,6 +366,21 @@ namespace NLog.Extensions.Logging
                         yield return sortVariables[i].Value;
                     }
                 }
+            }
+
+            private static bool IsNLogConfigVariableValueUsingOthers(string variableValue, List<KeyValuePair<string, IConfigurationSection>> allVariables)
+            {
+                foreach (var otherConfigVariable in allVariables)
+                {
+                    var otherConfigKey = otherConfigVariable.Key;
+                    var referenceVariable = $"${{{otherConfigKey}}}";
+                    if (variableValue.IndexOf(referenceVariable, StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
             }
 
             private static string GetConfigKey(IConfigurationSection child)
