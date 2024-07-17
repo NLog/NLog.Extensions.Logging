@@ -97,7 +97,6 @@ namespace NLog.Extensions.Logging
             string parameterName;
 
             var parameterCount = parameterList.Count;
-
             for (int i = 0; i < parameterCount; ++i)
             {
                 if (!TryGetParameterName(parameterList, i, out parameterName))
@@ -188,13 +187,19 @@ namespace NLog.Extensions.Logging
                     index += 1;
 
                 var parameter = _parameterList[index];
-                var parameterName = parameter.Key;
-                var capture = GetCaptureType(parameterName[0]);
-                if (capture != CaptureType.Normal)
-                    parameterName = parameterName.Substring(1);
-                return new MessageTemplateParameter(parameterName, parameter.Value, null, capture);
+                return _hasMessageTemplateCapture ?
+                    GetMessageTemplateParameter(parameter.Key, parameter.Value) :
+                    new MessageTemplateParameter(parameter.Key, parameter.Value, null, CaptureType.Normal);
             }
             set => throw new NotSupportedException();
+        }
+
+        private static MessageTemplateParameter GetMessageTemplateParameter(string parameterName, object parameterValue)
+        {
+            var capture = GetCaptureType(parameterName[0]);
+            if (capture != CaptureType.Normal)
+                parameterName = parameterName.Substring(1);
+            return new MessageTemplateParameter(parameterName, parameterValue, null, capture);
         }
 
         private static CaptureType GetCaptureType(char firstChar)
