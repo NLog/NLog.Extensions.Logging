@@ -10,27 +10,26 @@ namespace NLog.Extensions.Logging
     /// </summary>
     internal class NLogMessageParameterList : IList<MessageTemplateParameter>
     {
-        private static readonly NLogMessageParameterList EmptyList = new NLogMessageParameterList(Array.Empty<KeyValuePair<string, object>>(), default, default, default, default);
-        private static readonly NLogMessageParameterList EmptyPositionalList = new NLogMessageParameterList(Array.Empty<KeyValuePair<string, object>>(), default, default, default, isPositional: true);
-        private static readonly NLogMessageParameterList OriginalMessageList = new NLogMessageParameterList(new[] { new KeyValuePair<string, object>(NLogLogger.OriginalFormatPropertyName, string.Empty) }, 0, default, default, default);
+        private static readonly NLogMessageParameterList EmptyList = new NLogMessageParameterList(Array.Empty<KeyValuePair<string, object>>(), default, default, default);
+        private static readonly NLogMessageParameterList PositionalParameterList = new NLogMessageParameterList(Array.Empty<KeyValuePair<string, object>>(), default, hasComplexParameters: false, isPositional: true);
+        private static readonly NLogMessageParameterList PositionalComplexParameterList = new NLogMessageParameterList(Array.Empty<KeyValuePair<string, object>>(), default, hasComplexParameters: true, isPositional: true);
+        private static readonly NLogMessageParameterList OriginalMessageList = new NLogMessageParameterList(new[] { new KeyValuePair<string, object>(NLogLogger.OriginalFormatPropertyName, string.Empty) }, 0, default, default);
 
         private readonly IReadOnlyList<KeyValuePair<string, object>> _parameterList;
         private readonly int? _originalMessageIndex;
-        private readonly bool _hasMessageTemplateCapture;
-        private readonly bool _isMixedPositional;
+        private readonly bool _hasComplexParameters;
         private readonly bool _isPositional;
 
-        public bool HasComplexParameters => _hasMessageTemplateCapture || _isMixedPositional;
+        public bool HasComplexParameters => _hasComplexParameters;
         public bool IsPositional => _isPositional;
         public int Count => _parameterList.Count - (_originalMessageIndex.HasValue ? 1 : 0);
         public bool IsReadOnly => true;
 
-        private NLogMessageParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList, int? originalMessageIndex, bool hasMessageTemplateCapture, bool isMixedPositional, bool isPositional)
+        private NLogMessageParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList, int? originalMessageIndex, bool hasComplexParameters, bool isPositional)
         {
             _parameterList = parameterList;
             _originalMessageIndex = originalMessageIndex;
-            _hasMessageTemplateCapture = hasMessageTemplateCapture;
-            _isMixedPositional = isMixedPositional;
+            _hasComplexParameters = hasComplexParameters;
             _isPositional = isPositional;
         }
 
@@ -45,21 +44,21 @@ namespace NLog.Extensions.Logging
             var parameterCount = parameterList.Count;
             if (parameterCount > 1 || (parameterCount == 1 && !NLogLogger.OriginalFormatPropertyName.Equals(parameterList[0].Key)))
             {
-                if (IsValidParameterList(parameterList, out var originalMessageIndex, out var hasMessageTemplateCapture, out var isMixedPositional, out var isPositional))
+                if (IsValidParameterList(parameterList, out var originalMessageIndex, out var hasComplexParameters, out var isPositional))
                 {
                     if (isPositional)
                     {
-                        return EmptyPositionalList;   // Skip allocation, not needed to create Parameters-array
+                        return hasComplexParameters ? PositionalComplexParameterList : PositionalParameterList;   // Skip allocation, not needed to create Parameters-array
                     }
                     else
                     {
-                        return new NLogMessageParameterList(parameterList, originalMessageIndex, hasMessageTemplateCapture, isMixedPositional, isPositional);
+                        return new NLogMessageParameterList(parameterList, originalMessageIndex, hasComplexParameters, isPositional);
                     }
                 }
                 else
                 {
-                    return new NLogMessageParameterList(CreateValidParameterList(parameterList), originalMessageIndex, hasMessageTemplateCapture, isMixedPositional || isPositional, isPositional);
-                }      
+                    return new NLogMessageParameterList(CreateValidParameterList(parameterList), originalMessageIndex, hasComplexParameters, isPositional);
+                }
             }
             else if (parameterCount == 1)
             {
@@ -88,12 +87,12 @@ namespace NLog.Extensions.Logging
         /// <summary>
         /// Verify that the input parameterList contains non-empty key-values and the original-format-property at the end
         /// </summary>
-        private static bool IsValidParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList, out int? originalMessageIndex, out bool hasMessageTemplateCapture, out bool isMixedPositional, out bool isPositional)
+        private static bool IsValidParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList, out int? originalMessageIndex, out bool hasComplexParameters, out bool isPositional)
         {
-            hasMessageTemplateCapture = false;
-            isMixedPositional = false;
+            hasComplexParameters = false;
             originalMessageIndex = null;
             isPositional = false;
+            bool isMixedPositional = false;
             string parameterName;
 
             var parameterCount = parameterList.Count;
@@ -110,26 +109,23 @@ namespace NLog.Extensions.Logging
                 {
                     if (!isPositional)
                         isMixedPositional = i != 0;
-                    isMixedPositional |= i != (firstChar - '0');
+                    hasComplexParameters |= i != (firstChar - '0');
                     isPositional = true;
+                }
+                else if (NLogLogger.OriginalFormatPropertyName.Equals(parameterName))
+                {
+                    if (originalMessageIndex.HasValue)
+                    {
+                        originalMessageIndex = null;
+                        return false;
+                    }
+
+                    originalMessageIndex = i;
                 }
                 else
                 {
-                    if (NLogLogger.OriginalFormatPropertyName.Equals(parameterName))
-                    {
-                        if (originalMessageIndex.HasValue)
-                        {
-                            originalMessageIndex = null;
-                            return false;
-                        }
-
-                        originalMessageIndex = i;
-                    }
-                    else
-                    {
-                        isMixedPositional = isPositional;
-                        hasMessageTemplateCapture |= GetCaptureType(firstChar) != CaptureType.Normal;
-                    }
+                    isMixedPositional = isPositional;
+                    hasComplexParameters |= GetCaptureType(firstChar) != CaptureType.Normal;
                 }
             }
 
@@ -187,7 +183,7 @@ namespace NLog.Extensions.Logging
                     index += 1;
 
                 var parameter = _parameterList[index];
-                return _hasMessageTemplateCapture ?
+                return _hasComplexParameters ?
                     GetMessageTemplateParameter(parameter.Key, parameter.Value) :
                     new MessageTemplateParameter(parameter.Key, parameter.Value, null, CaptureType.Normal);
             }

@@ -88,11 +88,9 @@ namespace NLog.Extensions.Logging.Tests
             };
             var list = NLogMessageParameterList.TryParse(items);
 
-            Assert.Equal(3, list.Count);
-            Assert.Equal(new MessageTemplateParameter("2", 1, null, CaptureType.Normal), list[0]);
-            Assert.Equal(new MessageTemplateParameter("1", 2, null, CaptureType.Normal), list[1]);
-            Assert.Equal(new MessageTemplateParameter("0", 3, null, CaptureType.Normal), list[2]);
+            Assert.Empty(list);
             Assert.True(list.HasComplexParameters);
+            Assert.True(list.IsPositional);
         }
 
         [Fact]
