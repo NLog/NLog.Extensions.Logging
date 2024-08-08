@@ -63,7 +63,7 @@ namespace NLog.Extensions.Logging
                             ?? CaputureBasicLogEvent(nLogLogLevel, formatter(state, exception), messagePropertyList, messageParameters);
                         CaptureEventIdProperties(logEvent, eventId);
                         return logEvent;
-}
+                    }
                     else
                     {
                         var logEvent = TryParseMessageTemplate(nLogLogLevel, messagePropertyList, messageParameters)
@@ -122,7 +122,7 @@ namespace NLog.Extensions.Logging
 
         private LogEventInfo TryParsePostionalMessageTemplate(LogLevel nLogLogLevel, IReadOnlyList<KeyValuePair<string, object>> messageProperties, NLogMessageParameterList messageParameters)
         {
-            if (messageParameters.IsPositional && _options.ParseMessageTemplates)
+            if (messageParameters.IsPositional && (messageParameters.HasComplexParameters || _options.ParseMessageTemplates))
             {
                 string originalMessage = TryParsePositionalParameters(messageProperties, out var parameters);
                 if (originalMessage != null)
@@ -258,7 +258,7 @@ namespace NLog.Extensions.Logging
             for (int i = 0; i < messageParameterCount; ++i)
             {
                 var propertyName = messageParameters[i].Name;
-                
+
                 bool extraProperty = true;
                 for (int j = startPos; j < messageTemplateParameters.Count; ++j)
                 {

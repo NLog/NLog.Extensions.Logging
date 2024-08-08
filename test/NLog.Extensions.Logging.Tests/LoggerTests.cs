@@ -220,9 +220,25 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void TestInvalidFormatString2()
         {
-            var runner = GetRunner<Runner>(new NLogProviderOptions { CaptureMessageTemplates = false });
+            var runner = GetRunner<Runner>(new NLogProviderOptions { CaptureMessageTemplates = true });
             var ex = Assert.Throws<AggregateException>(() => runner.Logger.LogDebug("{0}{1}", "Test"));
             Assert.IsType<FormatException>(ex.InnerException);
+        }
+
+        [Fact]
+        public void TestInvalidMixFormatString()
+        {
+            var runner = GetRunner<Runner>();
+            runner.Logger.LogDebug("{0}{Mix}", "Mix", "Test");
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|MixTest|0=Mix, Mix=Test", runner.LastTargetMessage);
+        }
+
+        [Fact]
+        public void TestInvalidMixFormatString2()
+        {
+            var runner = GetRunner<Runner>(new NLogProviderOptions { CaptureMessageTemplates = true });
+            runner.Logger.LogDebug("{0}{Mix}", "Mix", "Test");
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|MixTest|0=Mix, Mix=Test", runner.LastTargetMessage);
         }
 
         [Fact]
