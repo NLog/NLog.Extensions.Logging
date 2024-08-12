@@ -2,6 +2,15 @@
 
 Date format: (year/month/day)
 
+### Version 5.3.12 (2024/08/12)
+
+**Improvements**
+- [#756](https://github.com/NLog/NLog.Extensions.Logging/pull/756): Fallback to Microsoft Logging Formatter when mixing positional with structured (#756) (@snakefoot)
+- [#755](https://github.com/NLog/NLog.Extensions.Logging/pull/755): NLogMessageParameterList - Optimize check of CaptureType for index operator (#755) (@snakefoot)
+- [#751](https://github.com/NLog/NLog.Extensions.Logging/pull/751): NLogLoggingConfiguration - Refactor to reduce code complexity (#751) (@snakefoot)
+- [#747](https://github.com/NLog/NLog.Extensions.Logging/pull/747): Added Copyright to nuget-package (#747) (@snakefoot)
+- [#758](https://github.com/NLog/NLog.Extensions.Logging/pull/758): Updated to NLog v5.3.3 (#758) (@snakefoot)
+
 ### Version 5.3.11 (2024/05/07)
 
 **Improvements**
