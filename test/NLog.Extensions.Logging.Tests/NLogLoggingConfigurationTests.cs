@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -384,6 +385,28 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Equal(2, logFactory.Configuration.LoggingRules[0].Targets.Count);
             logFactory.Dispose();
             configuration.Reload(); // Nothing should happen
+        }
+
+        [Fact]
+        public void ReloadLogFactoryConfigurationWithoutLeak()
+        {
+            var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
+            memoryConfig["NLog:Targets:file:type"] = "File";
+            memoryConfig["NLog:Targets:file:fileName"] = "hello.txt";
+            memoryConfig["NLog:AutoReload"] = "true";
+            var configuration = new ConfigurationBuilder().AddInMemoryCollection(memoryConfig).Build();
+            var logFactory = new LogFactory();
+            var newConfig = CreateConfiguration(logFactory, configuration);
+            configuration.Reload();
+            GC.Collect();
+            Assert.False(newConfig.TryGetTarget(out _));
+        }
+
+        static WeakReference<NLogLoggingConfiguration> CreateConfiguration(LogFactory logFactory, IConfigurationRoot config)
+        {
+            var nlogConfig = new NLogLoggingConfiguration(config.GetSection("NLog"), logFactory);
+            logFactory.Configuration = nlogConfig;
+            return new WeakReference<NLogLoggingConfiguration>(nlogConfig);
         }
 
         [Fact]
