@@ -14,7 +14,6 @@ namespace NLog.Extensions.Logging
     {
         private readonly IConfigurationSection _originalConfigSection;
         private bool _autoReload;
-        private Action<object> _reloadConfiguration;
         private IDisposable _registerChangeCallback;
         private const string RootSectionKey = "NLog";
 
@@ -48,28 +47,30 @@ namespace NLog.Extensions.Logging
             _originalConfigSection = nlogConfig;
         }
 
-        /// <summary>
-        /// Gets the collection of file names which should be watched for changes by NLog.
-        /// </summary>
-        public override IEnumerable<string> FileNamesToWatch
-        {
-            get
-            {
-                if (_autoReload && _reloadConfiguration is null)
-                {
-                    // Prepare for setting up reload notification handling
-                    _reloadConfiguration = state => ReloadConfigurationSection((IConfigurationSection)state);
-                    LogFactory.ConfigurationChanged += LogFactory_ConfigurationChanged;
-                }
-
-                return Enumerable.Empty<string>();
-            }
-        }
-
         /// <inheritdoc />
         public override LoggingConfiguration Reload()
         {
             return ReloadLoggingConfiguration(_originalConfigSection);
+        }
+
+        /// <inheritdoc />
+        protected override void OnConfigurationAssigned(LogFactory logFactory)
+        {
+            _registerChangeCallback?.Dispose();
+
+            if (_autoReload)
+            {
+                if (logFactory is null)
+                {
+                    _autoReload = false;
+                }
+                else
+                {
+                    MonitorForReload(_originalConfigSection);
+                }
+            }
+
+            base.OnConfigurationAssigned(logFactory);
         }
 
         private LoggingConfiguration ReloadLoggingConfiguration(IConfigurationSection nlogConfig)
@@ -85,26 +86,6 @@ namespace NLog.Extensions.Logging
             var configElement = new LoggingConfigurationElement(nlogConfig, RootSectionKey);
             LoadConfig(configElement, null);
             _autoReload = configElement.AutoReload;
-        }
-
-        private void LogFactory_ConfigurationChanged(object sender, LoggingConfigurationChangedEventArgs e)
-        {
-            if (ReferenceEquals(e.DeactivatedConfiguration, this))
-            {
-                if (_autoReload)
-                {
-                    _autoReload = false; // Cannot unsubscribe to reload event, but we can stop reacting to it
-                    LogFactory.ConfigurationChanged -= LogFactory_ConfigurationChanged;
-                    _registerChangeCallback?.Dispose();
-                    _registerChangeCallback = null;
-                }
-            }
-            else if (ReferenceEquals(e.ActivatedConfiguration, this) && _autoReload && _reloadConfiguration != null)
-            {
-                // Setup reload notification
-                LogFactory.ConfigurationChanged += LogFactory_ConfigurationChanged;
-                MonitorForReload(_originalConfigSection);
-            }
         }
 
         private void ReloadConfigurationSection(IConfigurationSection nlogConfig)
@@ -135,7 +116,7 @@ namespace NLog.Extensions.Logging
         {
             _registerChangeCallback?.Dispose();
             _registerChangeCallback = null;
-            _registerChangeCallback = nlogConfig.GetReloadToken().RegisterChangeCallback(_reloadConfiguration, nlogConfig);
+            _registerChangeCallback = new AutoReloadConfigChangeMonitor(nlogConfig, this);
         }
 
         /// <inheritdoc />
@@ -487,6 +468,31 @@ namespace NLog.Extensions.Logging
             public override string ToString()
             {
                 return Name;
+            }
+        }
+
+        private sealed class AutoReloadConfigChangeMonitor : IDisposable
+        {
+            private NLogLoggingConfiguration _nlogConfig;
+            private IDisposable _registerChangeCallback;
+
+            public AutoReloadConfigChangeMonitor(IConfigurationSection configSection, NLogLoggingConfiguration nlogConfig)
+            {
+                _nlogConfig = nlogConfig;
+                _registerChangeCallback = configSection.GetReloadToken().RegisterChangeCallback((s) => ReloadConfigurationSection((IConfigurationSection)s), configSection);
+            }
+
+            private void ReloadConfigurationSection(IConfigurationSection configSection)
+            {
+                _nlogConfig?.ReloadConfigurationSection(configSection);
+            }
+
+            public void Dispose()
+            {
+                _nlogConfig = null; // Disconnect to allow garbage collection
+                var registerChangeCallback = _registerChangeCallback;
+                _registerChangeCallback = null;
+                registerChangeCallback?.Dispose();
             }
         }
     }
