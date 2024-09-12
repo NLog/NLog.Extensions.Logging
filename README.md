@@ -20,7 +20,7 @@
 
 ## NLog.Extensions.Logging
 
-[NLog.Extensions.Logging](https://www.nuget.org/packages/NLog.Extensions.Logging) makes it possible to use NLog together with [Microsoft ILogger](https://github.com/NLog/NLog.Extensions.Logging/wiki/NLog-GetCurrentClassLogger-and-Microsoft-ILogger)-abstraction and Dependency Injection.
+[NLog.Extensions.Logging](https://www.nuget.org/packages/NLog.Extensions.Logging) enables NLog as Logging Provider for [Microsoft ILogger](https://github.com/NLog/NLog.Extensions.Logging/wiki/NLog-GetCurrentClassLogger-and-Microsoft-ILogger)-abstraction and Dependency Injection.
 
 - Introduces `AddNLog()` extension methods to register NLog as LoggingProvider for Microsoft Extension Logging.
 - Introduces [${configsetting}](https://github.com/NLog/NLog/wiki/ConfigSetting-Layout-Renderer) for doing lookup of appsettings.json configuration settings.
