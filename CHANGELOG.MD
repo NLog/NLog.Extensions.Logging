@@ -2,6 +2,12 @@
 
 Date format: (year/month/day)
 
+### Version 5.3.13 (2024/09/12)
+
+**Improvements**
+- [#761](https://github.com/NLog/NLog.Extensions.Logging/pull/761): NLogLoggingConfiguration - Fix memory-leak when using AutoReload (#761) (@snakefoot)
+- [#761](https://github.com/NLog/NLog.Extensions.Logging/pull/761): Updated to NLog v5.3.4 (#761) (@snakefoot)
+
 ### Version 5.3.12 (2024/08/12)
 
 **Improvements**

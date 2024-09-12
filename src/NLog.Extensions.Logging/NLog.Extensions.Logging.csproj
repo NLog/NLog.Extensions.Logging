@@ -20,11 +20,8 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     <PackageReleaseNotes>
 ChangeLog:
 
-- Fallback to Microsoft Logging Formatter when mixing positional with structured (#756) (@snakefoot)
-- NLogMessageParameterList - Optimize check of CaptureType for index operator (#755) (@snakefoot)
-- NLogLoggingConfiguration - Refactor to reduce code complexity (#751) (@snakefoot)
-- Added Copyright to nuget-package (#747) (@snakefoot)
-- Updated to NLog v5.3.3 (#758) (@snakefoot)
+- NLogLoggingConfiguration - Fix memory-leak when using AutoReload (#761) (@snakefoot)
+- Updated to NLog v5.3.3 (#761) (@snakefoot)
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
 
