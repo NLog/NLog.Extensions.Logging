@@ -76,15 +76,13 @@ namespace NLog.Extensions.Hosting
                         LoadXmlLoggingConfigurationFromPath(contentRootPath, $"nlog.{environmentName}.config", config.LogFactory) ??
                         LoadXmlLoggingConfigurationFromPath(contentRootPath, "NLog.config", config.LogFactory) ??
                         LoadXmlLoggingConfigurationFromPath(contentRootPath, "nlog.config", config.LogFactory);
-                    if (nlogConfig != null)
-                        config.Configuration = nlogConfig;
+                    config.Configuration = nlogConfig;
                 }
                 else
                 {
                     var nlogConfig = LoadXmlLoggingConfigurationFromPath(contentRootPath, "NLog.config", config.LogFactory) ??
                         LoadXmlLoggingConfigurationFromPath(contentRootPath, "nlog.config", config.LogFactory);
-                    if (nlogConfig != null)
-                        config.Configuration = nlogConfig;
+                    config.Configuration = nlogConfig;
                 }
             });
         }
