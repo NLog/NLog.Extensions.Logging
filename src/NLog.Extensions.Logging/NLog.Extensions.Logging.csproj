@@ -20,8 +20,9 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     <PackageReleaseNotes>
 ChangeLog:
 
+- UseNLog should fallback after checking ContentRoot for NLog.config (#765) (@snakefoot)
 - NLogLoggingConfiguration - Fix memory-leak when using AutoReload (#761) (@snakefoot)
-- Updated to NLog v5.3.3 (#761) (@snakefoot)
+- Updated to NLog v5.3.4 (#761) (@snakefoot)
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
 
