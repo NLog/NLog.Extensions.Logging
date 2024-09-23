@@ -2,7 +2,7 @@
 
 Date format: (year/month/day)
 
-### Version 5.3.14 (2024/09/12)
+### Version 5.3.14 (2024/09/23)
 
 **Improvements**
 - [#765](https://github.com/NLog/NLog.Extensions.Logging/pull/765): UseNLog should fallback after checking ContentRoot for NLog.config (#765) (@snakefoot)
