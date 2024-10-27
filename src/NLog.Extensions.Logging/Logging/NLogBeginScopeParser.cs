@@ -45,6 +45,12 @@ namespace NLog.Extensions.Logging
                     else
                         return ScopeContext.PushNestedStateProperties(scopeProperties, scopeProperties);
                 }
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER || NET471_OR_GREATER
+                else if (state is System.Runtime.CompilerServices.ITuple tuple && tuple.Length == 2 && tuple[0] is string)
+                {
+                    return ScopeContext.PushProperty(tuple[0].ToString(), tuple[1]);
+                }
+#endif
 
                 if (!(state is string))
                 {
