@@ -33,8 +33,8 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Single(logConfig.LoggingRules);
             Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
             Assert.Equal(2, logConfig.AllTargets.Count);
-            Assert.Single(logConfig.AllTargets.Where(t => t is FileTarget));
-            Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
+            Assert.Single(logConfig.AllTargets, (t) => t is FileTarget);
+            Assert.Single(logConfig.AllTargets, (t) => t is ConsoleTarget);
             Assert.Equal("hello.txt", (logConfig.FindTargetByName("file") as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
         }
         
@@ -100,8 +100,8 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Single(logConfig.LoggingRules);
             Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
             Assert.Equal(2, logConfig.AllTargets.Count);
-            Assert.Single(logConfig.AllTargets.Where(t => t is FileTarget));
-            Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
+            Assert.Single(logConfig.AllTargets, (t) => t is FileTarget);
+            Assert.Single(logConfig.AllTargets, (t) => t is ConsoleTarget);
             Assert.Equal("hello.txt", (logConfig.FindTargetByName("file") as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
         }
 
@@ -117,8 +117,8 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Single(logConfig.LoggingRules);
             Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
             Assert.Equal(2, logConfig.AllTargets.Count);
-            Assert.Single(logConfig.AllTargets.Where(t => t is FileTarget));
-            Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
+            Assert.Single(logConfig.AllTargets, (t) => t is FileTarget);
+            Assert.Single(logConfig.AllTargets, (t) => t is ConsoleTarget);
             Assert.Equal("hello.txt", (logConfig.FindTargetByName("file") as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
         }
 
@@ -135,9 +135,9 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Single(logConfig.LoggingRules);
             Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
             Assert.Equal(3, logConfig.AllTargets.Count);
-            Assert.Single(logConfig.AllTargets.Where(t => t is AsyncTargetWrapper));
-            Assert.Single(logConfig.AllTargets.Where(t => t is FileTarget));
-            Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
+            Assert.Single(logConfig.AllTargets, (t) => t is AsyncTargetWrapper);
+            Assert.Single(logConfig.AllTargets, (t) => t is FileTarget);
+            Assert.Single(logConfig.AllTargets, (t) => t is ConsoleTarget);
             Assert.Equal("hello.txt", (logConfig.FindTargetByName("wrappedFile") as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
         }
 
@@ -154,9 +154,9 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Single(logConfig.LoggingRules);
             Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
             Assert.Equal(3, logConfig.AllTargets.Count);
-            Assert.Single(logConfig.AllTargets.Where(t => t is AsyncTargetWrapper));
-            Assert.Single(logConfig.AllTargets.Where(t => t is MemoryTarget));
-            Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
+            Assert.Single(logConfig.AllTargets, (t) => t is AsyncTargetWrapper);
+            Assert.Single(logConfig.AllTargets, (t) => t is MemoryTarget);
+            Assert.Single(logConfig.AllTargets, (t) => t is ConsoleTarget);
             Assert.NotNull(logConfig.FindTargetByName("wrappedMem") as MemoryTarget);
         }
 
@@ -171,8 +171,8 @@ namespace NLog.Extensions.Logging.Tests
 
             Assert.Single(logConfig.LoggingRules);
             Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
-            Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
-            Assert.Single(logConfig.AllTargets.Where(t => t is AsyncTargetWrapper));
+            Assert.Single(logConfig.AllTargets, (t) => t is ConsoleTarget);
+            Assert.Single(logConfig.AllTargets, (t) => t is AsyncTargetWrapper);
             Assert.True(logConfig.FindTargetByName<AsyncTargetWrapper>("file")?.WrappedTarget is MemoryTarget);
         }
 
@@ -189,8 +189,8 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Single(logConfig.LoggingRules);
             Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
             Assert.Equal(2, logConfig.AllTargets.Count);
-            Assert.Single(logConfig.AllTargets.Where(t => t is FileTarget));
-            Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
+            Assert.Single(logConfig.AllTargets, (t) => t is FileTarget);
+            Assert.Single(logConfig.AllTargets, (t) => t is ConsoleTarget);
             Assert.Equal("hello.txt", (logConfig.FindTargetByName("file") as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
         }
 
@@ -209,8 +209,8 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Single(logConfig.LoggingRules);
             Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
             Assert.Equal(2, logConfig.AllTargets.Count);
-            Assert.Single(logConfig.AllTargets.Where(t => t is FileTarget));
-            Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
+            Assert.Single(logConfig.AllTargets, (t) => t is FileTarget);
+            Assert.Single(logConfig.AllTargets, (t) => t is ConsoleTarget);
             Assert.Equal("hello/world.txt", (logConfig.FindTargetByName("file") as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
         }
 
@@ -234,8 +234,8 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Single(logConfig.Variables);
             Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
             Assert.Equal(2, logConfig.AllTargets.Count);
-            Assert.Single(logConfig.AllTargets.Where(t => t is FileTarget));
-            Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
+            Assert.Single(logConfig.AllTargets, (t) => t is FileTarget);
+            Assert.Single(logConfig.AllTargets, (t) => t is ConsoleTarget);
             Assert.Equal(2, logConfig.AllTargets.Count(t => (t as TargetWithLayout)?.Layout is NLog.Layouts.JsonLayout));
         }
 
@@ -259,8 +259,8 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Equal(3, logConfig.Variables.Count);
             Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
             Assert.Equal(2, logConfig.AllTargets.Count);
-            Assert.Single(logConfig.AllTargets.Where(t => t is FileTarget));
-            Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
+            Assert.Single(logConfig.AllTargets, (t) => t is FileTarget);
+            Assert.Single(logConfig.AllTargets, (t) => t is ConsoleTarget);
             Assert.Equal(2, logConfig.AllTargets.Count(t => (t as TargetWithLayout)?.Layout is NLog.Layouts.JsonLayout));
         }
 
@@ -278,8 +278,8 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Single(logConfig.LoggingRules);
             Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
             Assert.Equal(2, (logConfig.AllTargets.Count(t => t is AsyncTargetWrapper asyncTarget && asyncTarget.BatchSize == 1)));
-            Assert.Single(logConfig.AllTargets.Where(t => t is AsyncTargetWrapper asyncTarget && asyncTarget.WrappedTarget is FileTarget));
-            Assert.Single(logConfig.AllTargets.Where(t => t is AsyncTargetWrapper asyncTarget && asyncTarget.WrappedTarget is ConsoleTarget));
+            Assert.Single(logConfig.AllTargets, (t) => t is AsyncTargetWrapper asyncTarget && asyncTarget.WrappedTarget is FileTarget);
+            Assert.Single(logConfig.AllTargets, (t) => t is AsyncTargetWrapper asyncTarget && asyncTarget.WrappedTarget is ConsoleTarget);
             Assert.Equal("hello.txt", ((logConfig.FindTargetByName("file") as AsyncTargetWrapper)?.WrappedTarget as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
         }
 
@@ -297,8 +297,8 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Single(logConfig.LoggingRules);
             Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
             Assert.Equal(2, (logConfig.AllTargets.Count(t => t is AsyncTargetWrapper asyncTarget && asyncTarget.BatchSize == 1)));
-            Assert.Single(logConfig.AllTargets.Where(t => t is AsyncTargetWrapper asyncTarget && asyncTarget.WrappedTarget is FileTarget));
-            Assert.Single(logConfig.AllTargets.Where(t => t is AsyncTargetWrapper asyncTarget && asyncTarget.WrappedTarget is ConsoleTarget));
+            Assert.Single(logConfig.AllTargets, (t) => t is AsyncTargetWrapper asyncTarget && asyncTarget.WrappedTarget is FileTarget);
+            Assert.Single(logConfig.AllTargets, (t) => t is AsyncTargetWrapper asyncTarget && asyncTarget.WrappedTarget is ConsoleTarget);
             Assert.Equal("hello.txt", ((logConfig.FindTargetByName("file") as AsyncTargetWrapper)?.WrappedTarget as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
         }
 
@@ -315,8 +315,8 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Single(logConfig.LoggingRules);
             Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
             Assert.Equal(2, logConfig.AllTargets.Count);
-            Assert.Single(logConfig.AllTargets.Where(t => t is FileTarget));
-            Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
+            Assert.Single(logConfig.AllTargets, (t) => t is FileTarget);
+            Assert.Single(logConfig.AllTargets, (t) => t is ConsoleTarget);
             Assert.Equal("hello.txt", (logConfig.FindTargetByName("file") as FileTarget)?.FileName?.Render(LogEventInfo.CreateNullEvent()));
             Assert.True((logConfig.FindTargetByName("console") as ConsoleTarget)?.StdErr);
         }
@@ -334,8 +334,8 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Single(logConfig.LoggingRules);
             Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
             Assert.Equal(2, logConfig.AllTargets.Count);
-            Assert.Single(logConfig.AllTargets.Where(t => t is FileTarget));
-            Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
+            Assert.Single(logConfig.AllTargets, (t) => t is FileTarget);
+            Assert.Single(logConfig.AllTargets, (t) => t is ConsoleTarget);
             Assert.Equal("hello.txt", (logConfig.FindTargetByName("file") as FileTarget)?.FileName?.Render(LogEventInfo.CreateNullEvent()));
             Assert.True((logConfig.FindTargetByName("console") as ConsoleTarget)?.StdErr);
         }
@@ -359,8 +359,8 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Single(logConfig.LoggingRules);
             Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
             Assert.Equal(2, logConfig.AllTargets.Count);
-            Assert.Single(logConfig.AllTargets.Where(t => t is FileTarget));
-            Assert.Single(logConfig.AllTargets.Where(t => t is ConsoleTarget));
+            Assert.Single(logConfig.AllTargets, (t) => t is FileTarget);
+            Assert.Single(logConfig.AllTargets, (t) => t is ConsoleTarget);
             Assert.Equal("hello.txt", (logConfig.FindTargetByName("file") as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
             Assert.Equal(3, ((logConfig.FindTargetByName("file") as FileTarget)?.Layout as NLog.Layouts.JsonLayout)?.Attributes?.Count);
         }
