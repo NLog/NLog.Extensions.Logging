@@ -10,7 +10,11 @@ namespace NLog.Extensions.Logging
     /// </summary>
     public class NLogLoggerFactory : ILoggerFactory
     {
-        private readonly ConcurrentDictionary<string, Microsoft.Extensions.Logging.ILogger> _loggers = new ConcurrentDictionary<string, Microsoft.Extensions.Logging.ILogger>(StringComparer.Ordinal);
+        /// <summary>
+        /// Environment.ProcessorCount is the default value
+        /// Set a default capacity can improve performance
+        /// </summary>
+        private readonly ConcurrentDictionary<string, Microsoft.Extensions.Logging.ILogger> _loggers = new ConcurrentDictionary<string, Microsoft.Extensions.Logging.ILogger>(Environment.ProcessorCount,16,StringComparer.Ordinal);
 
         private readonly NLogLoggerProvider _provider;
 
@@ -70,14 +74,7 @@ namespace NLog.Extensions.Logging
         {
             if (!_loggers.TryGetValue(categoryName, out var logger))
             {
-                lock (_loggers)
-                {
-                    if (!_loggers.TryGetValue(categoryName, out logger))
-                    {
-                        logger = _provider.CreateLogger(categoryName);
-                        _loggers[categoryName] = logger;
-                    }
-                }
+                logger = _loggers.GetOrAdd(categoryName,key=> _provider.CreateLogger(categoryName));
             }
             return logger;
         }
