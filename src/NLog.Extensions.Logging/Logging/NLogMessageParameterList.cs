@@ -179,10 +179,7 @@ namespace NLog.Extensions.Logging
         {
             get
             {
-                if (index >= _originalMessageIndex)
-                    index += 1;
-
-                var parameter = _parameterList[index];
+                var parameter = _parameterList[index >= _originalMessageIndex ? index + 1 : index];
                 return _hasComplexParameters ?
                     GetMessageTemplateParameter(parameter.Key, parameter.Value) :
                     new MessageTemplateParameter(parameter.Key, parameter.Value, null, CaptureType.Normal);
