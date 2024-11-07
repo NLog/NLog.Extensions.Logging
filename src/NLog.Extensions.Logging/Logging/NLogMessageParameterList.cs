@@ -16,19 +16,19 @@ namespace NLog.Extensions.Logging
         private static readonly NLogMessageParameterList OriginalMessageList = new NLogMessageParameterList(new[] { new KeyValuePair<string, object>(NLogLogger.OriginalFormatPropertyName, string.Empty) }, 0, default, default);
 
         private readonly IReadOnlyList<KeyValuePair<string, object>> _parameterList;
-        private readonly int? _originalMessageIndex;
+        private readonly int _originalMessageIndex;
         private readonly bool _hasComplexParameters;
         private readonly bool _isPositional;
 
         public bool HasComplexParameters => _hasComplexParameters;
         public bool IsPositional => _isPositional;
-        public int Count => _parameterList.Count - (_originalMessageIndex.HasValue ? 1 : 0);
+        public int Count => _originalMessageIndex != int.MaxValue ? _parameterList.Count - 1 : _parameterList.Count;
         public bool IsReadOnly => true;
 
         private NLogMessageParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList, int? originalMessageIndex, bool hasComplexParameters, bool isPositional)
         {
             _parameterList = parameterList;
-            _originalMessageIndex = originalMessageIndex;
+            _originalMessageIndex = originalMessageIndex ?? int.MaxValue;
             _hasComplexParameters = hasComplexParameters;
             _isPositional = isPositional;
         }
@@ -72,14 +72,14 @@ namespace NLog.Extensions.Logging
 
         public bool HasMessageTemplateSyntax(bool parseMessageTemplates)
         {
-            return _originalMessageIndex.HasValue && (HasComplexParameters || (parseMessageTemplates && Count > 0));
+            return _originalMessageIndex != int.MaxValue && (HasComplexParameters || (parseMessageTemplates && _parameterList.Count > 1));
         }
 
         public string GetOriginalMessage(IReadOnlyList<KeyValuePair<string, object>> messageProperties)
         {
             if (_originalMessageIndex < messageProperties?.Count)
             {
-                return messageProperties[_originalMessageIndex.Value].Value as string;
+                return messageProperties[_originalMessageIndex].Value as string;
             }
             return null;
         }
@@ -179,7 +179,7 @@ namespace NLog.Extensions.Logging
         {
             get
             {
-                var parameter = _parameterList[index >= _originalMessageIndex ? index + 1 : index];
+                var parameter = _parameterList[index < _originalMessageIndex ? index : index + 1];
                 return _hasComplexParameters ?
                     GetMessageTemplateParameter(parameter.Key, parameter.Value) :
                     new MessageTemplateParameter(parameter.Key, parameter.Value, null, CaptureType.Normal);
