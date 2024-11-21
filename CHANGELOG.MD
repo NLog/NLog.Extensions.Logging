@@ -2,6 +2,14 @@
 
 Date format: (year/month/day)
 
+### Version 5.3.15 (2024/11/21)
+
+**Improvements**
+- [#773](https://github.com/NLog/NLog.Extensions.Logging/pull/773): UseNLog allow fallback to only EnvironmentName for NLog config (#773) (@snakefoot)
+- [#771](https://github.com/NLog/NLog.Extensions.Logging/pull/771): NLogMessageParameterList - Optimize the index operator (#771) (@snakefoot)
+- [#770](https://github.com/NLog/NLog.Extensions.Logging/pull/770): NLogMessageParameterList - Simplify the index operator (#770) (@snakefoot)
+- [#768](https://github.com/NLog/NLog.Extensions.Logging/pull/768): Recognize ITuple for better AOT support (#768) (@snakefoot)
+
 ### Version 5.3.14 (2024/09/23)
 
 **Improvements**
