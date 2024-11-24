@@ -17,16 +17,16 @@ namespace NLog.Extensions.Logging
     {
         private static readonly string[] EventIdMapper = Enumerable.Range(0, 50).Select(id => id.ToString(System.Globalization.CultureInfo.InvariantCulture)).ToArray();
 
-        private readonly SimpleLayout _timestampLayout = new SimpleLayout("${date:format=o:universalTime=true}");
+        private readonly SimpleLayout _timestampLayout = new SimpleLayout("\"${date:format=o:universalTime=true}\"");
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MicrosoftConsoleJsonLayout" /> class.
         /// </summary>
         public MicrosoftConsoleJsonLayout()
         {
-            Attributes.Add(new JsonAttribute("Timestamp", _timestampLayout));
+            Attributes.Add(new JsonAttribute("Timestamp", _timestampLayout) { Encode = false });
             Attributes.Add(new JsonAttribute("EventId", Layout.FromMethod(evt => LookupEventId(evt), LayoutRenderOptions.ThreadAgnostic)) { Encode = false });
-            Attributes.Add(new JsonAttribute("LogLevel", Layout.FromMethod(evt => ConvertLogLevel(evt.Level), LayoutRenderOptions.ThreadAgnostic)));
+            Attributes.Add(new JsonAttribute("LogLevel", Layout.FromMethod(evt => ConvertLogLevel(evt.Level), LayoutRenderOptions.ThreadAgnostic)) { Encode = false });
             Attributes.Add(new JsonAttribute("Category", "${logger}"));
             Attributes.Add(new JsonAttribute("Message", "${message}"));
             Attributes.Add(new JsonAttribute("Exception", "${replace-newlines:${exception:format=tostring,data}}"));
@@ -79,7 +79,7 @@ namespace NLog.Extensions.Logging
             get
             {
                 var index = LookupNamedAttributeIndex("Timestamp");
-                return index >= 0 ? ((Attributes[index].Layout as SimpleLayout)?.LayoutRenderers?.FirstOrDefault() as DateLayoutRenderer)?.Format : null;
+                return index >= 0 ? ((Attributes[index].Layout as SimpleLayout)?.LayoutRenderers?.OfType<DateLayoutRenderer>().FirstOrDefault())?.Format : null;
             }
             set
             {
@@ -91,9 +91,9 @@ namespace NLog.Extensions.Logging
                 
                 if (!string.IsNullOrEmpty(value))
                 {
-                    var dateLayoutRenderer = _timestampLayout.LayoutRenderers.First() as DateLayoutRenderer;
+                    var dateLayoutRenderer = _timestampLayout.LayoutRenderers.OfType<DateLayoutRenderer>().First();
                     dateLayoutRenderer.Format = value;
-                    Attributes.Insert(0, new JsonAttribute("Timestamp", _timestampLayout));
+                    Attributes.Insert(0, new JsonAttribute("Timestamp", _timestampLayout) { Encode = false });
                 }
             }
         }
@@ -144,17 +144,17 @@ namespace NLog.Extensions.Logging
         private static string ConvertLogLevel(LogLevel logLevel)
         {
             if (logLevel == LogLevel.Trace)
-                return nameof(Microsoft.Extensions.Logging.LogLevel.Trace);
+                return "\"" + nameof(Microsoft.Extensions.Logging.LogLevel.Trace) + "\"";
             else if (logLevel == LogLevel.Debug)
-                return nameof(Microsoft.Extensions.Logging.LogLevel.Debug);
+                return "\"" + nameof(Microsoft.Extensions.Logging.LogLevel.Debug) + "\"";
             else if (logLevel == LogLevel.Info)
-                return nameof(Microsoft.Extensions.Logging.LogLevel.Information);
+                return "\"" + nameof(Microsoft.Extensions.Logging.LogLevel.Information) + "\"";
             else if (logLevel == LogLevel.Warn)
-                return nameof(Microsoft.Extensions.Logging.LogLevel.Warning);
+                return "\"" + nameof(Microsoft.Extensions.Logging.LogLevel.Warning) + "\"";
             else if (logLevel == LogLevel.Error)
-                return nameof(Microsoft.Extensions.Logging.LogLevel.Error);
+                return "\"" + nameof(Microsoft.Extensions.Logging.LogLevel.Error) + "\"";
             else
-                return nameof(Microsoft.Extensions.Logging.LogLevel.Critical);
+                return "\"" + nameof(Microsoft.Extensions.Logging.LogLevel.Critical) + "\"";
         }
     }
 }
