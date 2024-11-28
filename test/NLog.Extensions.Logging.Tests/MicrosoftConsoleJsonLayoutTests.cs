@@ -18,6 +18,15 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Fact]
+        public void MicrosoftConsoleJsonLayout_TimestampFormat()
+        {
+            var layout = new MicrosoftConsoleJsonLayout() { TimestampFormat = "R" };
+            var logEvent = new LogEventInfo(LogLevel.Error, "MyLogger", "Hello World");
+            var result = layout.Render(logEvent);
+            Assert.Equal($"{{ \"Timestamp\": \"{logEvent.TimeStamp.ToUniversalTime().ToString("R")}\", \"EventId\": {0}, \"LogLevel\": \"Error\", \"Category\": \"MyLogger\", \"Message\": \"Hello World\", \"State\": {{ \"{{OriginalFormat}}\": \"Hello World\" }} }}", result);
+        }
+
+        [Fact]
         public void MicrosoftConsoleJsonLayout_ExceptionEvent()
         {
             var layout = new MicrosoftConsoleJsonLayout();
