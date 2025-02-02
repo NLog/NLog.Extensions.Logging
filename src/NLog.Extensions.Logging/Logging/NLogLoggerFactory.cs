@@ -27,7 +27,17 @@ namespace NLog.Extensions.Logging
         /// </summary>
         /// <param name="options"></param>
         public NLogLoggerFactory(NLogProviderOptions options)
-            :this(new NLogLoggerProvider(options))
+            :this(options, LogManager.LogFactory)
+        {
+        }
+
+        /// <summary>
+        /// New factory with options and isolated LogFactory
+        /// </summary>
+        /// <param name="options"></param>
+        /// <param name="logFactory"></param>
+        public NLogLoggerFactory(NLogProviderOptions options, LogFactory logFactory)
+            : this(new NLogLoggerProvider(options, logFactory))
         {
             RegisterNLogLoggingProvider.SetupNLogConfigSettings(null, null, _provider.LogFactory);
         }

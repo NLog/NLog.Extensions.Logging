@@ -2,6 +2,13 @@
 
 Date format: (year/month/day)
 
+### Version 5.4 (2025/02/02)
+
+**Improvements**
+- [#775](https://github.com/NLog/NLog.Extensions.Logging/pull/775): MicrosoftConsoleJsonLayout - TimestampLayout replaced by DateLayoutRenderer (#775) (@snakefoot)
+- [#778](https://github.com/NLog/NLog.Extensions.Logging/pull/778): NLogLoggerFactory - New constructor with isolated NLog LogFactory as input parameter (#778) (@snakefoot)
+- [#778](https://github.com/NLog/NLog.Extensions.Logging/pull/778): Updated to NLog v5.4 (#778) (@snakefoot)
+
 ### Version 5.3.15 (2024/11/21)
 
 **Improvements**
