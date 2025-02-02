@@ -20,10 +20,9 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     <PackageReleaseNotes>
 ChangeLog:
 
-- UseNLog allow fallback to only EnvironmentName for NLog config (#773) (@snakefoot)
-- NLogMessageParameterList - Optimize the index operator (#771) (@snakefoot)
-- NLogMessageParameterList - Simplify the index operator (#770) (@snakefoot)
-- Recognize ITuple for better AOT support (#768) (@snakefoot)
+- MicrosoftConsoleJsonLayout - TimestampLayout replaced by DateLayoutRenderer (#775) (@snakefoot)
+- NLogLoggerFactory - New constructor with isolated NLog LogFactory as input parameter (#778) (@snakefoot)
+- Updated to NLog v5.4 (#778) (@snakefoot)
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
 
@@ -86,7 +85,7 @@ List of major changes in NLog 5.0: https://nlog-project.org/2021/08/25/nlog-5-0-
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="NLog" Version="5.3.4" />
+    <PackageReference Include="NLog" Version="5.4.0" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
