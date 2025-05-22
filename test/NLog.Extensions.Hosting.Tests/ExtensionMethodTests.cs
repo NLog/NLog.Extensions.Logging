@@ -128,6 +128,8 @@ namespace NLog.Extensions.Hosting.Tests
 
             Assert.Single(logged);
             Assert.Equal("logger1|error1|Memory", logged[0]);
+            //Reset
+            LogManager.Configuration = null;
         }
 
 #if NET8_0_OR_GREATER
@@ -253,6 +255,8 @@ namespace NLog.Extensions.Hosting.Tests
 
             Assert.Single(logged);
             Assert.Equal("logger1|error1|Memory", logged[0]);
+            //Reset
+            LogManager.Configuration = null;
         }
 #endif
     }
