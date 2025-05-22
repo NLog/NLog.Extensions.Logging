@@ -45,6 +45,32 @@ namespace NLog.Extensions.Hosting
             return builder;
         }
 
+#if NET8_0_OR_GREATER
+        /// <summary>
+        /// Enable NLog as logging provider for Microsoft Extension Logging
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <returns>IHostApplicationBuilder for chaining</returns>
+        public static IHostApplicationBuilder UseNLog(this IHostApplicationBuilder builder)
+        {
+            Guard.ThrowIfNull(builder);
+            return builder.UseNLog(null);
+        }
+
+        /// <summary>
+        /// Enable NLog as logging provider for Microsoft Extension Logging
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="options">NLogProviderOptions object to configure NLog behavior</param>
+        /// <returns>IHostApplicationBuilder for chaining</returns>
+        public static IHostApplicationBuilder UseNLog(this IHostApplicationBuilder builder, NLogProviderOptions options)
+        {
+            Guard.ThrowIfNull(builder);
+            builder.Services.TryAddNLogLoggingProvider((svc, addlogging) => svc.AddLogging(addlogging), builder.Configuration, options, (provider, cfg, opt) => CreateNLogLoggerProvider(provider, cfg, builder.Environment, opt));
+            return builder;
+        }
+#endif
+
         private static void AddNLogLoggerProvider(IServiceCollection services, IConfiguration hostConfiguration, IHostEnvironment hostEnvironment, NLogProviderOptions options, Func<IServiceProvider, IConfiguration, IHostEnvironment, NLogProviderOptions, NLogLoggerProvider> factory)
         {
             services.TryAddNLogLoggingProvider((svc, addlogging) => svc.AddLogging(addlogging), hostConfiguration, options, (provider, cfg, opt) => factory(provider, cfg, hostEnvironment, opt));
@@ -73,7 +99,7 @@ namespace NLog.Extensions.Hosting
             {
                 provider.LogFactory.Setup().LoadConfigurationFromFile(nlogConfigFile, optional: true);
             }
-            
+
             provider.LogFactory.Setup().SetupLogFactory(ext => ext.AddCallSiteHiddenAssembly(typeof(ConfigureExtensions).Assembly));
             return provider;
         }

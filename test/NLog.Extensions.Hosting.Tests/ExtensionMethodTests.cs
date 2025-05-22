@@ -129,5 +129,131 @@ namespace NLog.Extensions.Hosting.Tests
             Assert.Single(logged);
             Assert.Equal("logger1|error1|Memory", logged[0]);
         }
+
+#if NET8_0_OR_GREATER
+        [Fact]
+        public void IHostApplicationBuilder_UseNLog_ArgumentNullException()
+        {
+            IHostApplicationBuilder hostBuilder = null;
+            var argNulLException = Assert.Throws<ArgumentNullException>(() => hostBuilder.UseNLog());
+            Assert.Equal("builder", argNulLException.ParamName);
+        }
+
+        [Fact]
+        public void IHostApplicationBuilder_UseNLog_noParams_WorksWithNLog()
+        {
+            var builder = new HostApplicationBuilder();
+            builder.UseNLog();
+
+            var actual = builder.Build();
+            TestHostingResult(actual, true);
+        }
+
+        [Fact]
+        public void IHostApplicationBuilder_UseNLog_withOptionsParam_WorksWithNLog()
+        {
+            var someParam = new NLogProviderOptions { CaptureMessageProperties = false, CaptureMessageTemplates = false };
+
+            var builder = new HostApplicationBuilder();
+            builder.UseNLog(someParam);
+
+            var actual = builder.Build();
+            TestHostingResult(actual, true);
+        }
+
+        [Fact]
+        public void IHostApplicationBuilder_UseNLog_withConfiguration_WorksWithNLog()
+        {
+            var memoryConfig = new Dictionary<string, string>();
+            memoryConfig["NLog:CaptureMessageProperties"] = "true";
+            memoryConfig["NLog:CaptureMessageTemplates"] = "false";
+            memoryConfig["NLog:IgnoreScopes"] = "false";
+
+            var someParam = new NLogProviderOptions { CaptureMessageProperties = false, CaptureMessageTemplates = false };
+
+            var builder = new HostApplicationBuilder();
+            builder.Configuration.AddInMemoryCollection(memoryConfig);
+            builder.UseNLog(someParam);
+
+            var actual = builder.Build();
+            TestHostingResult(actual, true);
+        }
+
+        [Fact]
+        public void IHostApplicationBuilder_AddNLog_withShutdownOnDispose_worksWithNLog()
+        {
+            var someParam = new NLogProviderOptions { ShutdownOnDispose = true };
+
+            var builder = new HostApplicationBuilder();
+            builder.Logging.AddNLog(someParam);
+
+            var actual = builder.Build();
+            try
+            {
+                TestHostingResult(actual, false);
+                Assert.NotNull(LogManager.Configuration);
+            }
+            finally
+            {
+                actual.Dispose();
+                Assert.Null(LogManager.Configuration);
+            }
+        }
+
+        [Fact]
+        public void IHostApplicationBuilder_UseNLog_withAddNLog_worksWithNLog()
+        {
+            var builder = new HostApplicationBuilder();
+            builder.UseNLog();
+            builder.Logging.AddNLog();
+
+            var actual = builder.Build();
+            TestHostingResult(actual, true);
+        }
+
+        [Fact]
+        public void IHostApplicationBuilder_UseNLog_ReplaceLoggerFactory()
+        {
+            var builder = new HostApplicationBuilder();
+            builder.Services.AddLogging();
+            builder.UseNLog(new NLogProviderOptions() { ReplaceLoggerFactory = true, RemoveLoggerFactoryFilter = true });
+
+            var actual = builder.Build();
+
+            var loggerFactory = actual.Services.GetService<ILoggerFactory>();
+
+            Assert.Equal(typeof(NLogLoggerFactory), loggerFactory.GetType());
+        }
+
+        [Fact]
+        public void IHostApplicationBuilder_UseNLog_LoadConfigurationFromSection()
+        {
+            var memoryConfig = new Dictionary<string, string>();
+            memoryConfig["NLog:Rules:0:logger"] = "*";
+            memoryConfig["NLog:Rules:0:minLevel"] = "Trace";
+            memoryConfig["NLog:Rules:0:writeTo"] = "inMemory";
+            memoryConfig["NLog:Targets:inMemory:type"] = "Memory";
+            memoryConfig["NLog:Targets:inMemory:layout"] = "${logger}|${message}|${configsetting:NLog.Targets.inMemory.type}";
+
+            var builder = new HostApplicationBuilder();
+            builder.Configuration.AddInMemoryCollection(memoryConfig);
+            builder.UseNLog(new NLogProviderOptions() { LoggingConfigurationSectionName = "NLog", ReplaceLoggerFactory = true });
+
+            var host = builder.Build();
+
+            var loggerFact = host.Services.GetService<ILoggerFactory>();
+            var logger = loggerFact.CreateLogger("logger1");
+
+            ConfigSettingLayoutRenderer.DefaultConfiguration = null;    // See dependency resolving is working
+
+            logger.LogError("error1");
+
+            var loggerProvider = host.Services.GetService<ILoggerProvider>() as NLogLoggerProvider;
+            var logged = loggerProvider.LogFactory.Configuration.FindTargetByName<Targets.MemoryTarget>("inMemory").Logs;
+
+            Assert.Single(logged);
+            Assert.Equal("logger1|error1|Memory", logged[0]);
+        }
+#endif
     }
 }
