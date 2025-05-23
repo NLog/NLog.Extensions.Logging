@@ -35,6 +35,24 @@ namespace NLog.Extensions.Hosting.Tests
         }
 
         [Fact]
+        public void UseNLog_ShouldLogToNLog()
+        {
+            var nlogTarget = new Targets.MemoryTarget() { Name = "Output" };
+            var builder = new HostBuilder().UseNLog(null, (serviceProvider) =>
+            {
+                var nLogFactory = new LogFactory().Setup().LoadConfiguration(c => c.ForLogger().WriteTo(nlogTarget)).LogFactory;
+                return nLogFactory;
+            });
+
+            var loggerFactory = builder.Build().Services.GetService<ILoggerFactory>();
+            Assert.NotNull(loggerFactory);
+
+            var logger = loggerFactory.CreateLogger("Hello");
+            logger.LogCritical("World");
+            Assert.Single(nlogTarget.Logs);
+        }
+
+        [Fact]
         public void UseNLog_withConfiguration_WorksWithNLog()
         {
             var memoryConfig = new Dictionary<string, string>();
@@ -257,6 +275,27 @@ namespace NLog.Extensions.Hosting.Tests
             Assert.Equal("logger1|error1|Memory", logged[0]);
             //Reset
             LogManager.Configuration = null;
+        }
+
+        [Fact]
+        public void IHostApplicationBuilder_UseNLog_ShouldLogToNLog()
+        {
+            var nlogTarget = new Targets.MemoryTarget() { Name = "Output" };
+            var builder = new HostApplicationBuilder();
+            builder.UseNLog(null, (ServiceProvider) =>
+            {
+                var nLogFactory = new LogFactory().Setup().LoadConfiguration(c => c.ForLogger().WriteTo(nlogTarget)).LogFactory;
+                return nLogFactory;
+            });
+
+            var actual = builder.Build();
+
+            var loggerFactory = actual.Services.GetService<ILoggerFactory>();
+            Assert.NotNull(loggerFactory);
+
+            var logger = loggerFactory.CreateLogger("Hello");
+            logger.LogCritical("World");
+            Assert.Single(nlogTarget.Logs);
         }
 #endif
     }
