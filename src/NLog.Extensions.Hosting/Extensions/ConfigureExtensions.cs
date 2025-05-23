@@ -45,6 +45,32 @@ namespace NLog.Extensions.Hosting
             return builder;
         }
 
+        /// <summary>
+        /// Enable NLog as logging provider for Microsoft Extension Logging
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="options">NLogProviderOptions object to configure NLog behavior</param>
+        /// <param name="factoryBuilder">Initialize NLog LogFactory with NLog LoggingConfiguration.</param>
+        /// <returns>IHostBuilder for chaining</returns>
+        public static IHostBuilder UseNLog(this IHostBuilder builder, NLogProviderOptions options, Func<IServiceProvider, LogFactory> factoryBuilder)
+        {
+            Guard.ThrowIfNull(builder);
+#if NETSTANDARD2_0
+            builder.ConfigureServices((builderContext, services) => AddNLogLoggerProvider(services, builderContext.Configuration, null, options, (serviceProvider, config, hostEnv, opt) =>
+#else
+            builder.ConfigureServices((builderContext, services) => AddNLogLoggerProvider(services, builderContext.Configuration, builderContext.HostingEnvironment, options, (serviceProvider, config, hostEnv, opt) =>
+#endif
+            {
+                config = serviceProvider.SetupNLogConfigSettings(config, LogManager.LogFactory);
+
+                // Delay initialization of targets until we have loaded config-settings
+                var logFactory = factoryBuilder(serviceProvider);
+                var provider = CreateNLogLoggerProvider(serviceProvider, config, hostEnv, opt, logFactory);
+                return provider;
+            }));
+            return builder;
+        }
+
 #if NET8_0_OR_GREATER
         /// <summary>
         /// Enable NLog as logging provider for Microsoft Extension Logging
@@ -66,7 +92,29 @@ namespace NLog.Extensions.Hosting
         public static IHostApplicationBuilder UseNLog(this IHostApplicationBuilder builder, NLogProviderOptions options)
         {
             Guard.ThrowIfNull(builder);
-            builder.Services.TryAddNLogLoggingProvider((svc, addlogging) => svc.AddLogging(addlogging), builder.Configuration, options, (provider, cfg, opt) => CreateNLogLoggerProvider(provider, cfg, builder.Environment, opt));
+            builder.Services.TryAddNLogLoggingProvider((svc, addlogging) => svc.AddLogging(addlogging), builder.Configuration, options, (serviceProvider, config, opt) => CreateNLogLoggerProvider(serviceProvider, config, builder.Environment, opt));
+            return builder;
+        }
+
+        /// <summary>
+        /// Enable NLog as logging provider for Microsoft Extension Logging
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="options">NLogProviderOptions object to configure NLog behavior</param>
+        /// <param name="factoryBuilder">Initialize NLog LogFactory with NLog LoggingConfiguration.</param>
+        /// <returns>IHostApplicationBuilder for chaining</returns>
+        public static IHostApplicationBuilder UseNLog(this IHostApplicationBuilder builder, NLogProviderOptions options, Func<IServiceProvider, LogFactory> factoryBuilder)
+        {
+            Guard.ThrowIfNull(builder);
+            builder.Services.TryAddNLogLoggingProvider((svc, addlogging) => svc.AddLogging(addlogging), builder.Configuration, options, (serviceProvider, config, opt) =>
+            {
+                config = serviceProvider.SetupNLogConfigSettings(config, LogManager.LogFactory);
+
+                // Delay initialization of targets until we have loaded config-settings
+                var logFactory = factoryBuilder(serviceProvider);
+                var provider = CreateNLogLoggerProvider(serviceProvider, config, builder.Environment, opt, logFactory);
+                return provider;
+            });
             return builder;
         }
 #endif
@@ -78,7 +126,12 @@ namespace NLog.Extensions.Hosting
 
         private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration hostConfiguration, IHostEnvironment hostEnvironment, NLogProviderOptions options)
         {
-            NLogLoggerProvider provider = serviceProvider.CreateNLogLoggerProvider(hostConfiguration, options, null);
+            return serviceProvider.CreateNLogLoggerProvider(hostConfiguration, options, LogManager.LogFactory);
+        }
+
+        private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration hostConfiguration, IHostEnvironment hostEnvironment, NLogProviderOptions options, LogFactory logFactory)
+        {
+            NLogLoggerProvider provider = serviceProvider.CreateNLogLoggerProvider(hostConfiguration, options, logFactory);
 
             string nlogConfigFile = string.Empty;
             string contentRootPath = hostEnvironment?.ContentRootPath;
