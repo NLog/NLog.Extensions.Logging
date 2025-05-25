@@ -303,7 +303,7 @@ namespace NLog.Extensions.Logging
                 }
             }
 
-            private IEnumerable<IConfigurationSection> GetVariablesChildren(IConfigurationSection variables)
+            private static IEnumerable<IConfigurationSection> GetVariablesChildren(IConfigurationSection variables)
             {
                 List<KeyValuePair<string, IConfigurationSection>> sortVariables = null;
                 foreach (var variable in variables.GetChildren())

@@ -159,6 +159,46 @@ namespace NLog.Extensions.Logging.Tests.Extensions
         }
 
         [Fact]
+        public void AddNLog_ServiceCollection_ReplaceLoggerFactory()
+        {
+            // Arrange
+            var collection = new ServiceCollection();
+
+            // Act
+            collection.AddNLog(new NLogProviderOptions() { ReplaceLoggerFactory = true });
+
+            // Assert
+            using var provider = collection.BuildServiceProvider();
+            var loggerFactory = provider.GetService<ILoggerFactory>();
+            Assert.NotNull(loggerFactory);
+            Assert.Equal(typeof(NLogLoggerFactory), loggerFactory.GetType());
+        }
+
+        [Fact]
+        public void AddNLog_ServiceCollection_ShouldLog()
+        {
+            // Arrange
+            var collection = new ServiceCollection();
+
+            // Act
+            var nlogTarget = new Targets.MemoryTarget() { Name = "Output" };
+            collection.AddNLog(new NLogProviderOptions(), (ServiceProvider) =>
+            {
+                var nLogFactory = new LogFactory().Setup().LoadConfiguration(c => c.ForLogger().WriteTo(nlogTarget)).LogFactory;
+                return nLogFactory;
+            });
+
+            // Assert
+            using var provider = collection.BuildServiceProvider();
+            var loggerFactory = provider.GetService<ILoggerFactory>();
+            Assert.NotNull(loggerFactory);
+
+            var logger = loggerFactory.CreateLogger("Hello");
+            logger.LogCritical("World");
+            Assert.Single(nlogTarget.Logs);
+        }
+
+        [Fact]
         public void AddNLog_ArgumentNullException()
         {
             ILoggingBuilder loggingBuilder = null;

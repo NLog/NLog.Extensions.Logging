@@ -4,7 +4,6 @@ using System.Reflection;
 using Microsoft.Extensions.Configuration;
 #if !NETCORE1_0
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 #endif
 using Microsoft.Extensions.Logging;
 using NLog.Common;
@@ -195,6 +194,52 @@ namespace NLog.Extensions.Logging
                 return provider;
             });
             return builder;
+        }
+
+        /// <summary>
+        /// Enable NLog as logging provider for Microsoft Extension Logging
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <returns>IServiceCollection for chaining</returns>
+        public static IServiceCollection AddNLog(this IServiceCollection collection)
+        {
+            return AddNLog(collection, NLogProviderOptions.Default);
+        }
+
+        /// <summary>
+        /// Enable NLog as logging provider for Microsoft Extension Logging
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <param name="options">NLog Logging Provider options</param>
+        /// <returns>IServiceCollection for chaining</returns>
+        public static IServiceCollection AddNLog(this IServiceCollection collection, NLogProviderOptions options)
+        {
+            Guard.ThrowIfNull(collection);
+            collection.TryAddNLogLoggingProvider((svc, addlogging) => svc.AddLogging(addlogging), null, options, CreateNLogLoggerProvider);
+            return collection;
+        }
+
+        /// <summary>
+        /// Enable NLog as logging provider for Microsoft Extension Logging
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <param name="options">NLog Logging Provider options</param>
+        /// <param name="factoryBuilder">Initialize NLog LogFactory with NLog LoggingConfiguration.</param>
+        /// <returns>IServiceCollection for chaining</returns>
+        public static IServiceCollection AddNLog(this IServiceCollection collection, NLogProviderOptions options, Func<IServiceProvider, LogFactory> factoryBuilder)
+        {
+            Guard.ThrowIfNull(collection);
+            Guard.ThrowIfNull(factoryBuilder);
+            collection.TryAddNLogLoggingProvider((svc, addlogging) => svc.AddLogging(addlogging), null, options, (serviceProvider, config, opt) =>
+            {
+                config = serviceProvider.SetupNLogConfigSettings(config, LogManager.LogFactory);
+
+                // Delay initialization of targets until we have loaded config-settings
+                var logFactory = factoryBuilder(serviceProvider);
+                var provider = CreateNLogLoggerProvider(serviceProvider, config, opt, logFactory);
+                return provider;
+            });
+            return collection;
         }
 
         private static void AddNLogLoggerProvider(ILoggingBuilder builder, IConfiguration hostConfiguration, NLogProviderOptions options, Func<IServiceProvider, IConfiguration, NLogProviderOptions, NLogLoggerProvider> factory)
