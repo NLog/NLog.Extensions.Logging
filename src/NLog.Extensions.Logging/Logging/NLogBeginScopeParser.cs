@@ -29,7 +29,7 @@ namespace NLog.Extensions.Logging
         {
             if (_options.CaptureMessageProperties)
             {
-                if (state is IReadOnlyList<KeyValuePair<string, object>> scopePropertyList)
+                if (state is IReadOnlyList<KeyValuePair<string, object?>> scopePropertyList)
                 {
                     if (scopePropertyList is IList)
                         return ScopeContext.PushNestedStateProperties(null, scopePropertyList);  // Probably List/Array without nested state
@@ -38,7 +38,7 @@ namespace NLog.Extensions.Logging
                     scopePropertyList = ParseScopeProperties(scopePropertyList);
                     return ScopeContext.PushNestedStateProperties(scopeObject, scopePropertyList);
                 }
-                else if (state is IReadOnlyCollection<KeyValuePair<string, object>> scopeProperties)
+                else if (state is IReadOnlyCollection<KeyValuePair<string, object?>> scopeProperties)
                 {
                     if (scopeProperties is IDictionary)
                         return ScopeContext.PushNestedStateProperties(null, scopeProperties);    // Probably Dictionary without nested state
@@ -48,7 +48,7 @@ namespace NLog.Extensions.Logging
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER || NET471_OR_GREATER
                 else if (state is System.Runtime.CompilerServices.ITuple tuple && tuple.Length == 2 && tuple[0] is string)
                 {
-                    return ScopeContext.PushProperty(tuple[0].ToString(), tuple[1]);
+                    return ScopeContext.PushProperty(tuple[0]?.ToString() ?? string.Empty, tuple[1]);
                 }
 #endif
 
@@ -66,7 +66,7 @@ namespace NLog.Extensions.Logging
             return ScopeContext.PushNestedState(state);
         }
 
-        private IReadOnlyList<KeyValuePair<string, object>> ParseScopeProperties(IReadOnlyList<KeyValuePair<string, object>> scopePropertyList)
+        private IReadOnlyList<KeyValuePair<string, object?>> ParseScopeProperties(IReadOnlyList<KeyValuePair<string, object?>> scopePropertyList)
         {
             var scopePropertyCount = scopePropertyList.Count;
             if (scopePropertyCount == 0)
@@ -75,7 +75,7 @@ namespace NLog.Extensions.Logging
             if (!NLogLogger.OriginalFormatPropertyName.Equals(scopePropertyList[scopePropertyCount - 1].Key))
                 return IncludeActivityIdsProperties(scopePropertyList);
             else if (scopePropertyCount == 1)
-                return Array.Empty<KeyValuePair<string, object>>();
+                return Array.Empty<KeyValuePair<string, object?>>();
             else
                 scopePropertyCount -= 1;    // Handle BeginScope("Hello {World}", "Earth")
 
@@ -86,7 +86,7 @@ namespace NLog.Extensions.Logging
             }
             else
             {
-                var propertyList = new List<KeyValuePair<string, object>>(scopePropertyCount);
+                var propertyList = new List<KeyValuePair<string, object?>>(scopePropertyCount);
                 for (var i = 0; i < scopePropertyCount; ++i)
                 {
                     var property = scopePropertyList[i];
@@ -101,7 +101,7 @@ namespace NLog.Extensions.Logging
         }
 
 #if NET5_0_OR_GREATER
-        private IReadOnlyList<KeyValuePair<string, object>> IncludeActivityIdsProperties(IReadOnlyList<KeyValuePair<string, object>> scopePropertyList)
+        private IReadOnlyList<KeyValuePair<string, object?>> IncludeActivityIdsProperties(IReadOnlyList<KeyValuePair<string, object?>> scopePropertyList)
         {
             if (_options.IncludeActivityIdsWithBeginScope && "RequestId".Equals(scopePropertyList[0].Key))
             {
@@ -116,18 +116,18 @@ namespace NLog.Extensions.Logging
             return scopePropertyList;
         }
 
-        private class ScopePropertiesWithActivityIds : IReadOnlyList<KeyValuePair<string, object>>
+        private sealed class ScopePropertiesWithActivityIds : IReadOnlyList<KeyValuePair<string, object?>>
         {
-            private readonly IReadOnlyList<KeyValuePair<string, object>> _originalPropertyList;
+            private readonly IReadOnlyList<KeyValuePair<string, object?>> _originalPropertyList;
             private readonly System.Diagnostics.Activity _currentActivity;
 
-            public ScopePropertiesWithActivityIds(IReadOnlyList<KeyValuePair<string, object>> originalPropertyList, System.Diagnostics.Activity currentActivity)
+            public ScopePropertiesWithActivityIds(IReadOnlyList<KeyValuePair<string, object?>> originalPropertyList, System.Diagnostics.Activity currentActivity)
             {
                 _originalPropertyList = originalPropertyList;
                 _currentActivity = currentActivity;
             }
 
-            public KeyValuePair<string, object> this[int index]
+            public KeyValuePair<string, object?> this[int index]
             {
                 get
                 {
@@ -140,9 +140,9 @@ namespace NLog.Extensions.Logging
                     {
                         switch (offset)
                         {
-                            case 0: return new KeyValuePair<string, object>(nameof(_currentActivity.SpanId), _currentActivity.GetSpanId());
-                            case 1: return new KeyValuePair<string, object>(nameof(_currentActivity.TraceId), _currentActivity.GetTraceId());
-                            case 2: return new KeyValuePair<string, object>(nameof(_currentActivity.ParentId), _currentActivity.GetParentId());
+                            case 0: return new KeyValuePair<string, object?>(nameof(_currentActivity.SpanId), _currentActivity.GetSpanId());
+                            case 1: return new KeyValuePair<string, object?>(nameof(_currentActivity.TraceId), _currentActivity.GetTraceId());
+                            case 2: return new KeyValuePair<string, object?>(nameof(_currentActivity.ParentId), _currentActivity.GetParentId());
                         }
                     }
 
@@ -152,7 +152,7 @@ namespace NLog.Extensions.Logging
 
             public int Count => _originalPropertyList.Count + 3;
 
-            public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
+            public IEnumerator<KeyValuePair<string, object?>> GetEnumerator()
             {
                 for (int i = 0; i < Count; ++i)
                     yield return this[i];
@@ -164,7 +164,7 @@ namespace NLog.Extensions.Logging
             }
         }
 #else
-        private static IReadOnlyList<KeyValuePair<string, object>> IncludeActivityIdsProperties(IReadOnlyList<KeyValuePair<string, object>> scopePropertyList)
+        private static IReadOnlyList<KeyValuePair<string, object?>> IncludeActivityIdsProperties(IReadOnlyList<KeyValuePair<string, object?>> scopePropertyList)
         {
             return scopePropertyList;   // Not supported
         }
@@ -172,7 +172,7 @@ namespace NLog.Extensions.Logging
 
         public static IDisposable CaptureScopeProperties(IEnumerable scopePropertyCollection, ExtractorDictionary stateExtractor)
         {
-            List<KeyValuePair<string, object>> propertyList = null;
+            List<KeyValuePair<string, object?>>? propertyList = null;
 
             var keyValueExtractor = default(KeyValuePair<Func<object, object>, Func<object, object>>);
             foreach (var property in scopePropertyCollection)
@@ -193,7 +193,7 @@ namespace NLog.Extensions.Logging
                     continue;
                 }
 
-                propertyList = propertyList ?? new List<KeyValuePair<string, object>>((scopePropertyCollection as ICollection)?.Count ?? 0);
+                propertyList = propertyList ?? new List<KeyValuePair<string, object?>>((scopePropertyCollection as ICollection)?.Count ?? 0);
                 propertyList.Add(propertyValue.Value);
             }
 
@@ -205,31 +205,34 @@ namespace NLog.Extensions.Logging
 
         public static IDisposable CaptureScopeProperty<TState>(TState scopeProperty, ExtractorDictionary stateExtractor)
         {
-            if (!TryLookupExtractor(stateExtractor, scopeProperty.GetType(), out var keyValueExtractor))
+            if (!TryLookupExtractor(stateExtractor, scopeProperty?.GetType() ?? typeof(TState), out var keyValueExtractor))
             {
                 return ScopeContext.PushNestedState(scopeProperty);
             }
 
-            object scopePropertyValue = scopeProperty;
+            object? scopePropertyValue = scopeProperty;
             var propertyValue = TryParseKeyValueProperty(keyValueExtractor, scopePropertyValue);
             if (propertyValue.HasValue)
             {
-                return ScopeContext.PushNestedStateProperties(scopePropertyValue, new[] { new KeyValuePair<string, object>(propertyValue.Value.Key, propertyValue.Value.Value) });
+                return ScopeContext.PushNestedStateProperties(scopePropertyValue, new[] { new KeyValuePair<string, object?>(propertyValue.Value.Key, propertyValue.Value.Value) });
             }
 
             return ScopeContext.PushNestedState(scopeProperty);
         }
 
-        private static KeyValuePair<string, object>? TryParseKeyValueProperty(KeyValuePair<Func<object, object>, Func<object, object>> keyValueExtractor, object property)
+        private static KeyValuePair<string, object?>? TryParseKeyValueProperty(KeyValuePair<Func<object, object>, Func<object, object>> keyValueExtractor, object? property)
         {
-            string propertyName = null;
+            if (property is null)
+                return default;
+
+            string? propertyName = null;
 
             try
             {
                 var propertyKey = keyValueExtractor.Key.Invoke(property);
                 propertyName = propertyKey?.ToString() ?? string.Empty;
                 var propertyValue = keyValueExtractor.Value.Invoke(property);
-                return new KeyValuePair<string, object>(propertyName, propertyValue);
+                return new KeyValuePair<string, object?>(propertyName, propertyValue);
             }
             catch (Exception ex)
             {
@@ -284,7 +287,6 @@ namespace NLog.Extensions.Logging
                 return BuildKeyValueExtractor(keyValuePairObjParam, propertyKeyAccess, propertyValueAccess, out keyValueExtractor);
             }
 
-#if !NETSTANDARD1_3 && !NETSTANDARD1_5
             if (itemType.GetGenericTypeDefinition() == typeof(ValueTuple<,>))
             {
                 var keyPropertyInfo = typeof(ValueTuple<,>).MakeGenericType(itemType.GenericTypeArguments).GetTypeInfo().GetDeclaredField("Item1");
@@ -300,7 +302,7 @@ namespace NLog.Extensions.Logging
                 var propertyValueAccess = Expression.Field(keyValuePairTypeParam, valuePropertyInfo);
                 return BuildKeyValueExtractor(keyValuePairObjParam, propertyKeyAccess, propertyValueAccess, out keyValueExtractor);
             }
-#endif
+
             return false;
         }
 

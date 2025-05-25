@@ -24,6 +24,7 @@ namespace NLog.Extensions.Logging
         /// </summary>
         public MicrosoftConsoleJsonLayout()
         {
+            SuppressSpaces = false;
             Attributes.Add(new JsonAttribute("Timestamp", _timestampLayout) { Encode = false });
             Attributes.Add(new JsonAttribute("EventId", Layout.FromMethod(evt => LookupEventId(evt), LayoutRenderOptions.ThreadAgnostic)) { Encode = false });
             Attributes.Add(new JsonAttribute("LogLevel", Layout.FromMethod(evt => ConvertLogLevel(evt.Level), LayoutRenderOptions.ThreadAgnostic)) { Encode = false });
@@ -41,7 +42,7 @@ namespace NLog.Extensions.Logging
         /// Gets the array of attributes for the "state"-section
         /// </summary>
         [ArrayParameter(typeof(JsonAttribute), "state")]
-        public IList<JsonAttribute> StateAttributes
+        public IList<JsonAttribute>? StateAttributes
         {
             get
             {
@@ -74,7 +75,7 @@ namespace NLog.Extensions.Logging
         /// <summary>
         /// Gets or sets whether to include "Timestamp"-section
         /// </summary>
-        public string TimestampFormat
+        public string? TimestampFormat
         {
             get
             {
@@ -89,7 +90,7 @@ namespace NLog.Extensions.Logging
                     Attributes.RemoveAt(index);
                 }
                 
-                if (!string.IsNullOrEmpty(value))
+                if (value != null && !string.IsNullOrEmpty(value))
                 {
                     var dateLayoutRenderer = _timestampLayout.LayoutRenderers.OfType<DateLayoutRenderer>().First();
                     dateLayoutRenderer.Format = value;

@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Reflection;
 using Microsoft.Extensions.Logging;
-using NLog.Common;
 
 namespace NLog.Extensions.Logging
 {
     /// <summary>
     /// Provider logger for NLog + Microsoft.Extensions.Logging
     /// </summary>
-#if !NETCORE1_0
     [ProviderAlias("NLog")]
-#endif
     public class NLogLoggerProvider : ILoggerProvider
     {
         private readonly NLogBeginScopeParser _beginScopeParser;
@@ -29,7 +25,7 @@ namespace NLog.Extensions.Logging
         /// New provider with default options, see <see cref="Options"/>
         /// </summary>
         public NLogLoggerProvider()
-            : this(null)
+            : this(NLogProviderOptions.Default)
         {
         }
 
@@ -38,7 +34,7 @@ namespace NLog.Extensions.Logging
         /// </summary>
         /// <param name="options"></param>
         public NLogLoggerProvider(NLogProviderOptions options)
-            : this(options, null)
+            : this(options, LogManager.LogFactory)
         {
         }
 
@@ -51,7 +47,7 @@ namespace NLog.Extensions.Logging
         {
             LogFactory = logFactory ?? LogManager.LogFactory;
             Options = options ?? NLogProviderOptions.Default;
-            _beginScopeParser = new NLogBeginScopeParser(options);
+            _beginScopeParser = new NLogBeginScopeParser(Options);
         }
 
         /// <summary>

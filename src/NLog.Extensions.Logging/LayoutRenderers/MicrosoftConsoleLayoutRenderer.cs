@@ -24,11 +24,11 @@ namespace NLog.Extensions.Logging
             set
             {
                 _timestampFormat = value;
-                _timestampFormatString = string.IsNullOrEmpty(value) ? null : $"{{0:{value}}}";
+                _timestampFormatString = string.IsNullOrEmpty(value) ? string.Empty : $"{{0:{value}}}";
             }
         }
-        private string _timestampFormat;
-        private string _timestampFormatString;
+        private string _timestampFormat = string.Empty;
+        private string _timestampFormatString = string.Empty;
 
         /// <summary>
         /// Gets or sets indication whether or not UTC timezone should be used to format timestamps in logging messages. Defaults to <c>false</c>.
@@ -39,7 +39,7 @@ namespace NLog.Extensions.Logging
         protected override void Append(StringBuilder builder, LogEventInfo logEvent)
         {
             string timestampFormatString = _timestampFormatString;
-            if (timestampFormatString != null)
+            if (!string.IsNullOrEmpty(timestampFormatString))
             {
                 var timestamp = UseUtcTimestamp ? logEvent.TimeStamp.ToUniversalTime() : logEvent.TimeStamp;
                 builder.AppendFormat(UseUtcTimestamp ? System.Globalization.CultureInfo.InvariantCulture : System.Globalization.CultureInfo.CurrentCulture, timestampFormatString, timestamp);
