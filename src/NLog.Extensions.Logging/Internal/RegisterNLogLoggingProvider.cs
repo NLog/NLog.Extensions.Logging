@@ -2,7 +2,6 @@
 {
     using System;
     using System.Linq;
-    using System.Reflection;
     using Microsoft.Extensions.Configuration;
 #if !NETCORE1_0
     using Microsoft.Extensions.DependencyInjection;
