@@ -20,9 +20,10 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     <PackageReleaseNotes>
 ChangeLog:
 
-- MicrosoftConsoleJsonLayout - TimestampLayout replaced by DateLayoutRenderer (#775) (@snakefoot)
-- NLogLoggerFactory - New constructor with isolated NLog LogFactory as input parameter (#778) (@snakefoot)
-- Updated to NLog v5.4 (#778) (@snakefoot)
+- Added UseNLog extension method for IHostApplicationBuilder (#780) (@mikezw)
+- Added UseNLog extension method with isolated LogFactory support (#782) (@snakefoot)
+- Added AddNLog extension method for IServiceCollection (#783) (@snakefoot)
+- Updated to NLog v5.5 (#785) (@snakefoot)
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
 
@@ -85,7 +86,7 @@ List of major changes in NLog 5.0: https://nlog-project.org/2021/08/25/nlog-5-0-
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="NLog" Version="5.4.0" />
+    <PackageReference Include="NLog" Version="5.5.0" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">

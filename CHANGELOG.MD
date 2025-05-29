@@ -2,6 +2,14 @@
 
 Date format: (year/month/day)
 
+### Version 5.5 (2025/05/29)
+
+**Improvements**
+- [#780](https://github.com/NLog/NLog.Extensions.Logging/pull/780): Added UseNLog extension method for IHostApplicationBuilder (#780) (@mikezw)
+- [#782](https://github.com/NLog/NLog.Extensions.Logging/pull/782): Added UseNLog extension method with isolated LogFactory support (#782) (@snakefoot)
+- [#783](https://github.com/NLog/NLog.Extensions.Logging/pull/783): Added AddNLog extension method for IServiceCollection (#783) (@snakefoot)
+- [#785](https://github.com/NLog/NLog.Extensions.Logging/pull/785): Updated to NLog v5.5 (#785) (@snakefoot)
+
 ### Version 5.4 (2025/02/02)
 
 **Improvements**
