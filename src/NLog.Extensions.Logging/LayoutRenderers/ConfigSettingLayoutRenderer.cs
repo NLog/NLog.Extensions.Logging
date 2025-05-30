@@ -33,17 +33,16 @@ namespace NLog.Extensions.Logging
     [ThreadAgnostic]
     public class ConfigSettingLayoutRenderer : LayoutRenderer
     {
-        private IConfiguration _serviceConfiguration;
+        private IConfiguration? _serviceConfiguration;
 
         /// <summary>
         /// Global Configuration Container
         /// </summary>
-        public static IConfiguration DefaultConfiguration { get; set; }
+        public static IConfiguration? DefaultConfiguration { get; set; }
 
         ///<summary>
         /// Item in the setting container
         ///</summary>
-        [RequiredParameter]
         [DefaultParameter]
         public string Item
         {
@@ -51,11 +50,11 @@ namespace NLog.Extensions.Logging
             set
             {
                 _item = value;
-                _itemLookup = value?.Replace("\\.", "::").Replace(".", ":").Replace("::", ".");
+                _itemLookup = value?.Replace("\\.", "::").Replace(".", ":").Replace("::", ".") ?? string.Empty;
             }
         }
-        private string _item;
-        private string _itemLookup;
+        private string _item = string.Empty;
+        private string _itemLookup = string.Empty;
 
         /// <summary>
         /// Name of the Item
@@ -66,7 +65,7 @@ namespace NLog.Extensions.Logging
         ///<summary>
         /// The default value to render if the setting value is null.
         ///</summary>
-        public string Default { get; set; }
+        public string Default { get; set; } = string.Empty;
 
         /// <inheritdoc/>
         protected override void InitializeLayoutRenderer()
@@ -94,7 +93,7 @@ namespace NLog.Extensions.Logging
             if (string.IsNullOrEmpty(_itemLookup))
                 return;
 
-            string value = null;
+            string? value = null;
             var configurationRoot = _serviceConfiguration ?? DefaultConfiguration;
             if (configurationRoot != null)
             {
@@ -102,11 +101,7 @@ namespace NLog.Extensions.Logging
             }
             else
             {
-#if NETCORE1_0
-                InternalLogger.Debug("Missing DefaultConfiguration. Remember to provide IConfiguration when calling AddNLog");
-#else
                 InternalLogger.Debug("Missing DefaultConfiguration. Remember to register IConfiguration by calling UseNLog");
-#endif
             }
 
             builder.Append(value ?? Default);

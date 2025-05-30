@@ -16,35 +16,31 @@ namespace NLog.Extensions.Logging
     [Target("MicrosoftILogger")]
     public class MicrosoftILoggerTarget : TargetWithContext
     {
-        private readonly Microsoft.Extensions.Logging.ILoggerFactory _loggerFactory;
-        private readonly Microsoft.Extensions.Logging.ILogger _logger;
+        private readonly Microsoft.Extensions.Logging.ILoggerFactory? _loggerFactory;
+        private readonly Microsoft.Extensions.Logging.ILogger? _logger;
         private readonly System.Collections.Concurrent.ConcurrentDictionary<string, Microsoft.Extensions.Logging.ILogger> _loggers = new System.Collections.Concurrent.ConcurrentDictionary<string, Microsoft.Extensions.Logging.ILogger>();
 
         /// <summary>
         /// EventId forwarded to ILogger
         /// </summary>
-        public Layout EventId { get; set; }
+        public Layout EventId { get; set; } = Layout.Empty;
 
         /// <summary>
         /// EventId-Name forwarded to ILogger
         /// </summary>
-        public Layout EventName { get; set; }
+        public Layout EventName { get; set; } = Layout.Empty;
 
         /// <summary>
         /// Override name of ILogger, when target has been initialized with <see cref="Microsoft.Extensions.Logging.ILoggerFactory"/>
         /// </summary>
-        public Layout LoggerName { get; set; }
+        public Layout LoggerName { get; set; } = Layout.Empty;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MicrosoftILoggerTarget" /> class.
         /// </summary>
         public MicrosoftILoggerTarget()
         {
-#if !NETSTANDARD1_3 && !NETSTANDARD1_5
             _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
-#else
-            _logger = new NLog.Extensions.Logging.NLogLogger(NLog.LogManager.CreateNullLogger(), null, new NLogBeginScopeParser(null));
-#endif
         }
 
         /// <summary>
@@ -101,7 +97,7 @@ namespace NLog.Extensions.Logging
 
             var layoutMessage = RenderLogEvent(Layout, logEvent);
 
-            IDictionary<string, object> contextProperties = null;
+            IDictionary<string, object?>? contextProperties = null;
             if (ContextProperties.Count > 0 || IncludeScopeProperties || IncludeGdc)
             {
                 contextProperties = GetContextProperties(logEvent);
@@ -137,28 +133,31 @@ namespace NLog.Extensions.Logging
         private Microsoft.Extensions.Logging.ILogger CreateFromLoggerFactory(LogEventInfo logEvent)
         {
             var loggerName = logEvent.LoggerName;
-            if (!ReferenceEquals(LoggerName, null))
+            if (!ReferenceEquals(LoggerName, null) && !ReferenceEquals(LoggerName, Layout.Empty))
                 loggerName = RenderLogEvent(LoggerName, logEvent);
             if (string.IsNullOrEmpty(loggerName))
                 loggerName = "NLog";
 
             if (!_loggers.TryGetValue(loggerName, out var logger))
             {
-                logger = _loggerFactory.CreateLogger(loggerName);
+                logger = _loggerFactory?.CreateLogger(loggerName);
+                if (logger is null)
+                    throw new NLogRuntimeException($"Failed to create Microsoft Logger with category: {loggerName}");
+
                 _loggers.TryAdd(loggerName, logger);                // Local caching of Loggers to reduce chance of congestions and deadlock
             }
             return logger;
         }
 
-        private struct LogState : IReadOnlyList<KeyValuePair<string, object>>, IEquatable<LogState>
+        private struct LogState : IReadOnlyList<KeyValuePair<string, object?>>, IEquatable<LogState>
         {
             private readonly LogEventInfo _logEvent;
             public readonly string LayoutMessage;
-            private readonly IDictionary<string, object> _contextProperties;
+            private readonly IDictionary<string, object?>? _contextProperties;
 
             public int Count => (_logEvent.HasProperties ? _logEvent.Properties.Count : 0) + (_contextProperties?.Count ?? 0) + 1;
 
-            public KeyValuePair<string, object> this[int index]
+            public KeyValuePair<string, object?> this[int index]
             {
                 get
                 {
@@ -176,17 +175,17 @@ namespace NLog.Extensions.Logging
                 }
             }
 
-            public LogState(LogEventInfo logEvent, string layoutMessage, IDictionary<string, object> contextProperties)
+            public LogState(LogEventInfo logEvent, string layoutMessage, IDictionary<string, object?>? contextProperties)
             {
                 _logEvent = logEvent;
                 LayoutMessage = layoutMessage;
                 _contextProperties = contextProperties;
             }
 
-            public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
+            public IEnumerator<KeyValuePair<string, object?>> GetEnumerator()
             {
-                IList<KeyValuePair<string, object>> originalMessage = new[] { CreateOriginalFormatProperty() };
-                IEnumerable<KeyValuePair<string, object>> allProperties = _contextProperties?.Concat(originalMessage) ?? originalMessage;
+                IList<KeyValuePair<string, object?>> originalMessage = new[] { CreateOriginalFormatProperty() };
+                IEnumerable<KeyValuePair<string, object?>> allProperties = _contextProperties?.Concat(originalMessage) ?? originalMessage;
                 if (_logEvent.HasProperties)
                 {
                     allProperties = _logEvent.Properties.Select(p => CreateLogEventProperty(p)).Concat(allProperties);
@@ -199,9 +198,9 @@ namespace NLog.Extensions.Logging
                 return GetEnumerator();
             }
 
-            private KeyValuePair<string, object> CreateOriginalFormatProperty()
+            private KeyValuePair<string, object?> CreateOriginalFormatProperty()
             {
-                return new KeyValuePair<string, object>(NLogLogger.OriginalFormatPropertyName, _logEvent.Message);
+                return new KeyValuePair<string, object?>(NLogLogger.OriginalFormatPropertyName, _logEvent.Message);
             }
 
             public bool Equals(LogState other)
@@ -209,7 +208,7 @@ namespace NLog.Extensions.Logging
                 return ReferenceEquals(_logEvent, other._logEvent);
             }
 
-            public override bool Equals(object obj)
+            public override bool Equals(object? obj)
             {
                 return obj is LogState other && Equals(other);
             }
@@ -220,17 +219,17 @@ namespace NLog.Extensions.Logging
             }
         }
 
-        private static bool TryGetContextProperty(IDictionary<string, object> contextProperties, ref int index, out KeyValuePair<string, object> contextProperty)
+        private static bool TryGetContextProperty(IDictionary<string, object?> contextProperties, ref int index, out KeyValuePair<string, object?> contextProperty)
         {
             return TryGetPropertyFromIndex(contextProperties, p => p, ref index, out contextProperty);
         }
 
-        private static bool TryGetLogEventProperty(IDictionary<object, object> logEventProperties, ref int index, out KeyValuePair<string, object> logEventProperty)
+        private static bool TryGetLogEventProperty(IDictionary<object, object?> logEventProperties, ref int index, out KeyValuePair<string, object?> logEventProperty)
         {
             return TryGetPropertyFromIndex(logEventProperties, p => CreateLogEventProperty(p), ref index, out logEventProperty);
         }
 
-        private static bool TryGetPropertyFromIndex<TKey, TValue>(ICollection<KeyValuePair<TKey, TValue>> properties, Func<KeyValuePair<TKey, TValue>, KeyValuePair<string, object>> converter, ref int index, out KeyValuePair<string, object> property) where TKey : class
+        private static bool TryGetPropertyFromIndex<TKey, TValue>(ICollection<KeyValuePair<TKey, TValue>> properties, Func<KeyValuePair<TKey, TValue>, KeyValuePair<string, object?>> converter, ref int index, out KeyValuePair<string, object?> property) where TKey : class
         {
             if (index < properties.Count)
             {
@@ -252,9 +251,9 @@ namespace NLog.Extensions.Logging
             return false;
         }
 
-        private static KeyValuePair<string, object> CreateLogEventProperty(KeyValuePair<object, object> prop)
+        private static KeyValuePair<string, object?> CreateLogEventProperty(KeyValuePair<object, object?> prop)
         {
-            return new KeyValuePair<string, object>(prop.Key.ToString(), prop.Value);
+            return new KeyValuePair<string, object?>(prop.Key?.ToString() ?? string.Empty, prop.Value);
         }
 
         private static string LogStateFormatter(LogState logState)

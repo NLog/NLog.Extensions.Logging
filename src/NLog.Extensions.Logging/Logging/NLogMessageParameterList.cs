@@ -10,12 +10,12 @@ namespace NLog.Extensions.Logging
     /// </summary>
     internal class NLogMessageParameterList : IList<MessageTemplateParameter>
     {
-        private static readonly NLogMessageParameterList EmptyList = new NLogMessageParameterList(Array.Empty<KeyValuePair<string, object>>(), default, default, default);
-        private static readonly NLogMessageParameterList PositionalParameterList = new NLogMessageParameterList(Array.Empty<KeyValuePair<string, object>>(), default, hasComplexParameters: false, isPositional: true);
-        private static readonly NLogMessageParameterList PositionalComplexParameterList = new NLogMessageParameterList(Array.Empty<KeyValuePair<string, object>>(), default, hasComplexParameters: true, isPositional: true);
-        private static readonly NLogMessageParameterList OriginalMessageList = new NLogMessageParameterList(new[] { new KeyValuePair<string, object>(NLogLogger.OriginalFormatPropertyName, string.Empty) }, 0, default, default);
+        private static readonly NLogMessageParameterList EmptyList = new NLogMessageParameterList(Array.Empty<KeyValuePair<string, object?>>(), default, default, default);
+        private static readonly NLogMessageParameterList PositionalParameterList = new NLogMessageParameterList(Array.Empty<KeyValuePair<string, object?>>(), default, hasComplexParameters: false, isPositional: true);
+        private static readonly NLogMessageParameterList PositionalComplexParameterList = new NLogMessageParameterList(Array.Empty<KeyValuePair<string, object?>>(), default, hasComplexParameters: true, isPositional: true);
+        private static readonly NLogMessageParameterList OriginalMessageList = new NLogMessageParameterList(new[] { new KeyValuePair<string, object?>(NLogLogger.OriginalFormatPropertyName, string.Empty) }, 0, default, default);
 
-        private readonly IReadOnlyList<KeyValuePair<string, object>> _parameterList;
+        private readonly IReadOnlyList<KeyValuePair<string, object?>> _parameterList;
         private readonly int _originalMessageIndex;
         private readonly bool _hasComplexParameters;
         private readonly bool _isPositional;
@@ -25,7 +25,7 @@ namespace NLog.Extensions.Logging
         public int Count => _originalMessageIndex != int.MaxValue ? _parameterList.Count - 1 : _parameterList.Count;
         public bool IsReadOnly => true;
 
-        private NLogMessageParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList, int? originalMessageIndex, bool hasComplexParameters, bool isPositional)
+        private NLogMessageParameterList(IReadOnlyList<KeyValuePair<string, object?>> parameterList, int? originalMessageIndex, bool hasComplexParameters, bool isPositional)
         {
             _parameterList = parameterList;
             _originalMessageIndex = originalMessageIndex ?? int.MaxValue;
@@ -39,7 +39,7 @@ namespace NLog.Extensions.Logging
         /// <remarks>
         /// The LogMessageParameterList-constructor initiates all the parsing/scanning
         /// </remarks>
-        public static NLogMessageParameterList TryParse(IReadOnlyList<KeyValuePair<string, object>> parameterList)
+        public static NLogMessageParameterList TryParse(IReadOnlyList<KeyValuePair<string, object?>> parameterList)
         {
             var parameterCount = parameterList.Count;
             if (parameterCount > 1 || (parameterCount == 1 && !NLogLogger.OriginalFormatPropertyName.Equals(parameterList[0].Key)))
@@ -75,7 +75,7 @@ namespace NLog.Extensions.Logging
             return _originalMessageIndex != int.MaxValue && (HasComplexParameters || (parseMessageTemplates && _parameterList.Count > 1));
         }
 
-        public string GetOriginalMessage(IReadOnlyList<KeyValuePair<string, object>> messageProperties)
+        public string? GetOriginalMessage(IReadOnlyList<KeyValuePair<string, object?>> messageProperties)
         {
             if (_originalMessageIndex < messageProperties?.Count)
             {
@@ -87,7 +87,7 @@ namespace NLog.Extensions.Logging
         /// <summary>
         /// Verify that the input parameterList contains non-empty key-values and the original-format-property at the end
         /// </summary>
-        private static bool IsValidParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList, out int? originalMessageIndex, out bool hasComplexParameters, out bool isPositional)
+        private static bool IsValidParameterList(IReadOnlyList<KeyValuePair<string, object?>> parameterList, out int? originalMessageIndex, out bool hasComplexParameters, out bool isPositional)
         {
             hasComplexParameters = false;
             originalMessageIndex = null;
@@ -133,7 +133,7 @@ namespace NLog.Extensions.Logging
             return true;
         }
 
-        private static bool TryGetParameterName(IReadOnlyList<KeyValuePair<string, object>> parameterList, int i, out string parameterKey)
+        private static bool TryGetParameterName(IReadOnlyList<KeyValuePair<string, object?>> parameterList, int i, out string parameterKey)
         {
             try
             {
@@ -156,10 +156,10 @@ namespace NLog.Extensions.Logging
         /// <summary>
         /// Extract all valid properties from the input parameterList, and return them in a newly allocated list
         /// </summary>
-        private static IReadOnlyList<KeyValuePair<string, object>> CreateValidParameterList(IReadOnlyList<KeyValuePair<string, object>> parameterList)
+        private static IReadOnlyList<KeyValuePair<string, object?>> CreateValidParameterList(IReadOnlyList<KeyValuePair<string, object?>> parameterList)
         {
             var parameterCount = parameterList.Count;
-            var validParameterList = new List<KeyValuePair<string, object>>(parameterCount);
+            var validParameterList = new List<KeyValuePair<string, object?>>(parameterCount);
 
             for (int i = 0; i < parameterCount; ++i)
             {
@@ -187,7 +187,7 @@ namespace NLog.Extensions.Logging
             set => throw new NotSupportedException();
         }
 
-        private static MessageTemplateParameter GetMessageTemplateParameter(string parameterName, object parameterValue)
+        private static MessageTemplateParameter GetMessageTemplateParameter(string parameterName, object? parameterValue)
         {
             var capture = GetCaptureType(parameterName[0]);
             if (capture != CaptureType.Normal)

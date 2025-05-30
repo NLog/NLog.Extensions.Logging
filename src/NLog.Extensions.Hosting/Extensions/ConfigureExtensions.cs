@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -34,7 +33,7 @@ namespace NLog.Extensions.Hosting
         /// <param name="builder"></param>
         /// <param name="options">NLogProviderOptions object to configure NLog behavior</param>
         /// <returns>IHostBuilder for chaining</returns>
-        public static IHostBuilder UseNLog(this IHostBuilder builder, NLogProviderOptions options)
+        public static IHostBuilder UseNLog(this IHostBuilder builder, NLogProviderOptions? options)
         {
             Guard.ThrowIfNull(builder);
 #if NETSTANDARD2_0
@@ -89,7 +88,7 @@ namespace NLog.Extensions.Hosting
         /// <param name="builder"></param>
         /// <param name="options">NLogProviderOptions object to configure NLog behavior</param>
         /// <returns>IHostApplicationBuilder for chaining</returns>
-        public static IHostApplicationBuilder UseNLog(this IHostApplicationBuilder builder, NLogProviderOptions options)
+        public static IHostApplicationBuilder UseNLog(this IHostApplicationBuilder builder, NLogProviderOptions? options)
         {
             Guard.ThrowIfNull(builder);
             builder.Services.TryAddNLogLoggingProvider((svc, addlogging) => svc.AddLogging(addlogging), builder.Configuration, options, (serviceProvider, config, opt) => CreateNLogLoggerProvider(serviceProvider, config, builder.Environment, opt));
@@ -119,23 +118,23 @@ namespace NLog.Extensions.Hosting
         }
 #endif
 
-        private static void AddNLogLoggerProvider(IServiceCollection services, IConfiguration hostConfiguration, IHostEnvironment hostEnvironment, NLogProviderOptions options, Func<IServiceProvider, IConfiguration, IHostEnvironment, NLogProviderOptions, NLogLoggerProvider> factory)
+        private static void AddNLogLoggerProvider(IServiceCollection services, IConfiguration? hostConfiguration, IHostEnvironment? hostEnvironment, NLogProviderOptions? options, Func<IServiceProvider, IConfiguration?, IHostEnvironment?, NLogProviderOptions, NLogLoggerProvider> factory)
         {
             services.TryAddNLogLoggingProvider((svc, addlogging) => svc.AddLogging(addlogging), hostConfiguration, options, (provider, cfg, opt) => factory(provider, cfg, hostEnvironment, opt));
         }
 
-        private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration hostConfiguration, IHostEnvironment hostEnvironment, NLogProviderOptions options)
+        private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration? hostConfiguration, IHostEnvironment? hostEnvironment, NLogProviderOptions options)
         {
             return serviceProvider.CreateNLogLoggerProvider(hostConfiguration, options, LogManager.LogFactory);
         }
 
-        private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration hostConfiguration, IHostEnvironment hostEnvironment, NLogProviderOptions options, LogFactory logFactory)
+        private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration? hostConfiguration, IHostEnvironment? hostEnvironment, NLogProviderOptions options, LogFactory logFactory)
         {
             NLogLoggerProvider provider = serviceProvider.CreateNLogLoggerProvider(hostConfiguration, options, logFactory);
 
             string nlogConfigFile = string.Empty;
-            string contentRootPath = hostEnvironment?.ContentRootPath;
-            string environmentName = hostEnvironment?.EnvironmentName;
+            var contentRootPath = hostEnvironment?.ContentRootPath;
+            var environmentName = hostEnvironment?.EnvironmentName;
             if (!string.IsNullOrWhiteSpace(contentRootPath) || !string.IsNullOrWhiteSpace(environmentName))
             {
                 provider.LogFactory.Setup().LoadConfiguration(cfg =>
@@ -143,7 +142,9 @@ namespace NLog.Extensions.Hosting
                     if (!IsLoggingConfigurationLoaded(cfg.Configuration))
                     {
                         nlogConfigFile = ResolveEnvironmentNLogConfigFile(contentRootPath, environmentName);
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
                         cfg.Configuration = null;
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
                     }
                 });
             }
@@ -157,7 +158,7 @@ namespace NLog.Extensions.Hosting
             return provider;
         }
 
-        private static string ResolveEnvironmentNLogConfigFile(string basePath, string environmentName)
+        private static string ResolveEnvironmentNLogConfigFile(string? basePath, string? environmentName)
         {
             if (!string.IsNullOrWhiteSpace(basePath))
             {
@@ -182,7 +183,7 @@ namespace NLog.Extensions.Hosting
             if (!string.IsNullOrWhiteSpace(environmentName))
                 return $"nlog.{environmentName}.config";
 
-            return null;
+            return string.Empty;
         }
 
         private static bool IsLoggingConfigurationLoaded(LoggingConfiguration cfg)

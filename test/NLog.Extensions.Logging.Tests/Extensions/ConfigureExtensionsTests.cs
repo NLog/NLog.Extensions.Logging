@@ -13,50 +13,6 @@ namespace NLog.Extensions.Logging.Tests.Extensions
 {
     public class ConfigureExtensionsTests
     {
-        [Fact]
-        [Obsolete("Instead use ILoggingBuilder.AddNLog() or IHostBuilder.UseNLog()")]
-        public void AddNLog_LoggerFactory_LogInfo_ShouldLogToNLog()
-        {
-            // Arrange
-            var loggerFactory = new LoggerFactory();
-            var config = CreateConfigWithMemoryTarget(out var memoryTarget);
-
-            // Act
-            loggerFactory.AddNLog();
-            LogManager.Configuration = config;
-            var logger = loggerFactory.CreateLogger("logger1");
-            logger.LogInformation("test message with {0} arg", 1);
-
-            // Assert
-            AssertSingleMessage(memoryTarget, "Info|test message with 1 arg");
-        }
-
-        [Theory]
-        [InlineData("EventId", "eventId_2", true)]
-        [InlineData("EventName", "", true)]
-        [InlineData("EventId_Id", "2", true)]
-        [InlineData("EventId_Name", "eventId_2", true)]
-        [InlineData("EventId", "2", false)]
-        [InlineData("EventName", "eventId_2", false)]
-        [InlineData("EventId_Id", "", false)]
-        [InlineData("EventId_Name", "", false)]
-        [Obsolete("Instead use ILoggingBuilder.AddNLog() or IHostBuilder.UseNLog()")]
-        public void AddNLog_LoggerFactory_LogInfoWithEventId_ShouldLogToNLogWithEventId(string eventPropery, string expectedEventInLog, bool captureEntireEventId)
-        {
-            // Arrange
-            var loggerFactory = new LoggerFactory();
-            var config = CreateConfigWithMemoryTarget(out var memoryTarget, $"${{event-properties:{eventPropery}}} - ${{message}}");
-
-            // Act
-            loggerFactory.AddNLog(new NLogProviderOptions { EventIdSeparator = "_", CaptureEventId = captureEntireEventId ? EventIdCaptureType.Legacy : (EventIdCaptureType.EventId | EventIdCaptureType.EventName) });
-            LogManager.Configuration = config;
-            var logger = loggerFactory.CreateLogger("logger1");
-            logger.LogInformation(new EventId(2, "eventId_2"), "test message with {0} arg", 1);
-
-            // Assert
-            AssertSingleMessage(memoryTarget, $"{expectedEventInLog} - test message with 1 arg");
-        }
-
 #if NET5_0_OR_GREATER
         [Fact]
         public void AddNLog_LoggerFactory_IncludeActivityIdsWithBeginScope()

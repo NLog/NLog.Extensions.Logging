@@ -308,7 +308,7 @@ namespace NLog.Extensions.Logging.Tests
             var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
             memoryConfig["NLog:Targets:file:type"] = "File";
             memoryConfig["NLog:Default-target-parameters:file:filename"] = "hello.txt";
-            memoryConfig["NLog:Default-target-parameters:console:error"] = "true";
+            memoryConfig["NLog:Default-target-parameters:console:detectConsoleAvailable"] = "true";
 
             var logConfig = CreateNLogLoggingConfigurationWithNLogSection(memoryConfig);
 
@@ -318,7 +318,7 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Single(logConfig.AllTargets, (t) => t is FileTarget);
             Assert.Single(logConfig.AllTargets, (t) => t is ConsoleTarget);
             Assert.Equal("hello.txt", (logConfig.FindTargetByName("file") as FileTarget)?.FileName?.Render(LogEventInfo.CreateNullEvent()));
-            Assert.True((logConfig.FindTargetByName("console") as ConsoleTarget)?.StdErr);
+            Assert.True((logConfig.FindTargetByName("console") as ConsoleTarget)?.DetectConsoleAvailable);
         }
 
         [Fact]
@@ -327,7 +327,7 @@ namespace NLog.Extensions.Logging.Tests
             var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
             memoryConfig["NLog:Targets:file:type"] = "File";
             memoryConfig["NLog:TargetDefaultParameters:file:filename"] = "hello.txt";
-            memoryConfig["NLog:TargetDefaultParameters:console:error"] = "true";
+            memoryConfig["NLog:TargetDefaultParameters:console:detectConsoleAvailable"] = "true";
 
             var logConfig = CreateNLogLoggingConfigurationWithNLogSection(memoryConfig);
 
@@ -337,7 +337,7 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Single(logConfig.AllTargets, (t) => t is FileTarget);
             Assert.Single(logConfig.AllTargets, (t) => t is ConsoleTarget);
             Assert.Equal("hello.txt", (logConfig.FindTargetByName("file") as FileTarget)?.FileName?.Render(LogEventInfo.CreateNullEvent()));
-            Assert.True((logConfig.FindTargetByName("console") as ConsoleTarget)?.StdErr);
+            Assert.True((logConfig.FindTargetByName("console") as ConsoleTarget)?.DetectConsoleAvailable);
         }
 
         [Fact]

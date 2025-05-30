@@ -2,9 +2,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
-#if !NETCORE1_0
 using Microsoft.Extensions.DependencyInjection;
-#endif
 using Microsoft.Extensions.Logging;
 using NLog.Common;
 using NLog.Config;
@@ -16,53 +14,6 @@ namespace NLog.Extensions.Logging
     /// </summary>
     public static class ConfigureExtensions
     {
-        /// <summary>
-        /// Enable NLog as logging provider for Microsoft Extension Logging
-        /// </summary>
-        /// <param name="factory"></param>
-        /// <returns>ILoggerFactory for chaining</returns>
-#if !NETCORE1_0
-        [Obsolete("Instead use ILoggingBuilder.AddNLog() or IHostBuilder.UseNLog()")]
-#endif
-        public static ILoggerFactory AddNLog(this ILoggerFactory factory)
-        {
-            return factory.AddNLog(NLogProviderOptions.Default);
-        }
-
-        /// <summary>
-        /// Enable NLog as logging provider for Microsoft Extension Logging
-        /// </summary>
-        /// <param name="factory"></param>
-        /// <param name="options">NLog Logging Provider options</param>
-        /// <returns>ILoggerFactory for chaining</returns>
-#if !NETCORE1_0
-        [Obsolete("Instead use ILoggingBuilder.AddNLog() or IHostBuilder.UseNLog()")]
-#endif
-        public static ILoggerFactory AddNLog(this ILoggerFactory factory, NLogProviderOptions options)
-        {
-            Guard.ThrowIfNull(factory);
-            factory.AddProvider(new NLogLoggerProvider(options));
-            return factory;
-        }
-
-        /// <summary>
-        /// Enable NLog as logging provider for Microsoft Extension Logging
-        /// </summary>
-        /// <param name="factory"></param>
-        /// <param name="configuration">Host Configuration for ${configsetting}</param>
-        /// <returns>ILoggerFactory for chaining</returns>
-#if !NETCORE1_0
-        [Obsolete("Instead use ILoggingBuilder.AddNLog() or IHostBuilder.UseNLog()")]
-#endif
-        public static ILoggerFactory AddNLog(this ILoggerFactory factory, IConfiguration configuration)
-        {
-            Guard.ThrowIfNull(factory);
-            var provider = CreateNLogLoggerProvider(null, configuration, null);
-            factory.AddProvider(provider);
-            return factory;
-        }
-
-#if !NETCORE1_0
         /// <summary>
         /// Enable NLog as logging provider for Microsoft Extension Logging
         /// </summary>
@@ -81,7 +32,7 @@ namespace NLog.Extensions.Logging
         /// <returns>ILoggingBuilder for chaining</returns>
         public static ILoggingBuilder AddNLog(this ILoggingBuilder builder, IConfiguration configuration)
         {
-            return AddNLog(builder, configuration, null);
+            return AddNLog(builder, configuration, NLogProviderOptions.Default);
         }
 
         /// <summary>
@@ -119,7 +70,7 @@ namespace NLog.Extensions.Logging
         /// <returns>ILoggingBuilder for chaining</returns>
         public static ILoggingBuilder AddNLog(this ILoggingBuilder builder, LoggingConfiguration configuration)
         {
-            return AddNLog(builder, configuration, null);
+            return AddNLog(builder, configuration, NLogProviderOptions.Default);
         }
 
         /// <summary>
@@ -152,7 +103,7 @@ namespace NLog.Extensions.Logging
         public static ILoggingBuilder AddNLog(this ILoggingBuilder builder, string configFileRelativePath)
         {
             Guard.ThrowIfNull(builder);
-            AddNLogLoggerProvider(builder, null, null, (serviceProvider, config, options) =>
+            AddNLogLoggerProvider(builder, null, NLogProviderOptions.Default, (serviceProvider, config, options) =>
             {
                 var provider = CreateNLogLoggerProvider(serviceProvider, config, options);
                 // Delay initialization of targets until we have loaded config-settings
@@ -170,7 +121,7 @@ namespace NLog.Extensions.Logging
         /// <returns>ILoggingBuilder for chaining</returns>
         public static ILoggingBuilder AddNLog(this ILoggingBuilder builder, Func<IServiceProvider, LogFactory> factoryBuilder)
         {
-            return AddNLog(builder, null, factoryBuilder);
+            return AddNLog(builder, NLogProviderOptions.Default, factoryBuilder);
         }
 
         /// <summary>
@@ -242,37 +193,9 @@ namespace NLog.Extensions.Logging
             return collection;
         }
 
-        private static void AddNLogLoggerProvider(ILoggingBuilder builder, IConfiguration hostConfiguration, NLogProviderOptions options, Func<IServiceProvider, IConfiguration, NLogProviderOptions, NLogLoggerProvider> factory)
+        private static void AddNLogLoggerProvider(ILoggingBuilder builder, IConfiguration? hostConfiguration, NLogProviderOptions options, Func<IServiceProvider, IConfiguration?, NLogProviderOptions, NLogLoggerProvider> factory)
         {
             builder.Services.TryAddNLogLoggingProvider((svc, addlogging) => addlogging(builder), hostConfiguration, options, factory);
-        }
-#endif
-
-        /// <summary>
-        /// Apply NLog configuration from XML config.
-        /// </summary>
-        /// <param name="loggerFactory"></param>
-        /// <param name="configFileRelativePath">relative path to NLog configuration file.</param>
-        /// <returns>Current configuration for chaining.</returns>
-        [Obsolete("Instead use NLog.LogManager.Setup().LoadConfigurationFromFile()")]
-        public static LoggingConfiguration ConfigureNLog(this ILoggerFactory loggerFactory, string configFileRelativePath)
-        {
-            LogManager.AddHiddenAssembly(typeof(NLogLoggerProvider).GetTypeInfo().Assembly);
-            return LogManager.LoadConfiguration(configFileRelativePath).Configuration;
-        }
-
-        /// <summary>
-        /// Apply NLog configuration from config object.
-        /// </summary>
-        /// <param name="loggerFactory"></param>
-        /// <param name="config">New NLog config.</param>
-        /// <returns>Current configuration for chaining.</returns>
-        [Obsolete("Instead assign property NLog.LogManager.Configuration")]
-        public static LoggingConfiguration ConfigureNLog(this ILoggerFactory loggerFactory, LoggingConfiguration config)
-        {
-            LogManager.AddHiddenAssembly(typeof(NLogLoggerProvider).GetTypeInfo().Assembly);
-            LogManager.Configuration = config;
-            return config;
         }
 
         /// <summary>
@@ -281,7 +204,7 @@ namespace NLog.Extensions.Logging
         /// <param name="nlogProvider"></param>
         /// <param name="configurationSection">Microsoft Extension Configuration</param>
         /// <returns></returns>
-        public static NLogLoggerProvider Configure(this NLogLoggerProvider nlogProvider, IConfigurationSection configurationSection)
+        public static NLogLoggerProvider? Configure(this NLogLoggerProvider? nlogProvider, IConfigurationSection configurationSection)
         {
             if (nlogProvider is null || configurationSection is null)
                 return nlogProvider;
@@ -296,7 +219,7 @@ namespace NLog.Extensions.Logging
         /// <param name="options"></param>
         /// <param name="configurationSection">Microsoft Extension Configuration</param>
         /// <returns></returns>
-        public static NLogProviderOptions Configure(this NLogProviderOptions options, IConfigurationSection configurationSection)
+        public static NLogProviderOptions Configure(this NLogProviderOptions? options, IConfigurationSection? configurationSection)
         {
             options = options ?? NLogProviderOptions.Default;
 
@@ -311,7 +234,7 @@ namespace NLog.Extensions.Logging
                     try
                     {
                         var result = Convert.ChangeType(configValue.Value, propertyInfo.PropertyType, System.Globalization.CultureInfo.InvariantCulture);
-                        propertyInfo.SetMethod.Invoke(options, new[] { result });
+                        propertyInfo?.SetMethod?.Invoke(options, new[] { result });
                     }
                     catch (Exception ex)
                     {
@@ -322,12 +245,12 @@ namespace NLog.Extensions.Logging
             return options;
         }
 
-        private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration hostConfiguration, NLogProviderOptions options)
+        private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration? hostConfiguration, NLogProviderOptions options)
         {
-            return CreateNLogLoggerProvider(serviceProvider, hostConfiguration, options, null);
+            return CreateNLogLoggerProvider(serviceProvider, hostConfiguration, options, LogManager.LogFactory);
         }
 
-        private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration hostConfiguration, NLogProviderOptions options, LogFactory logFactory)
+        private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration? hostConfiguration, NLogProviderOptions options, LogFactory logFactory)
         {
             return serviceProvider.CreateNLogLoggerProvider(hostConfiguration, options, logFactory);
         }
