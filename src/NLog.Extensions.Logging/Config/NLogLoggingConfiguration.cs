@@ -157,9 +157,7 @@ namespace NLog.Extensions.Logging
             public bool AutoReload { get; }
 
             public string Name => _nameOverride ?? GetConfigKey(_configurationSection);
-#pragma warning disable CS8613 // Nullability of reference types in return type doesn't match implicitly implemented member.
             public IEnumerable<KeyValuePair<string, string?>> Values => GetValues();
-#pragma warning restore CS8613 // Nullability of reference types in return type doesn't match implicitly implemented member.
             public IEnumerable<ILoggingConfigurationElement> Children => GetChildren();
 
             private IEnumerable<KeyValuePair<string, string?>> GetValues()

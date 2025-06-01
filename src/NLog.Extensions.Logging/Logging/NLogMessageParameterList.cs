@@ -141,7 +141,7 @@ namespace NLog.Extensions.Logging
             }
             catch (IndexOutOfRangeException ex)
             {
-                // Catch a issue in MEL
+                // Catch an issue in MEL
                 throw new FormatException($"Invalid format string. Expected {parameterList.Count - 1} format parameters, but failed to lookup parameter index {i}", ex);
             }
 
@@ -185,6 +185,18 @@ namespace NLog.Extensions.Logging
                     new MessageTemplateParameter(parameter.Key, parameter.Value, null, CaptureType.Normal);
             }
             set => throw new NotSupportedException();
+        }
+
+        internal static MessageTemplateParameter GetMessageTemplateParameter(in KeyValuePair<string, object?> propertyValue)
+        {
+            var propertyName = propertyValue.Key;
+            if (propertyName is null || propertyName.Length == 0)
+                return default;
+            var firstChar = propertyName[0];
+            if (char.IsDigit(firstChar) || GetCaptureType(firstChar) != CaptureType.Normal)
+                return default;
+
+            return new MessageTemplateParameter(propertyName, propertyValue.Value, null, CaptureType.Normal);
         }
 
         private static MessageTemplateParameter GetMessageTemplateParameter(string parameterName, object? parameterValue)

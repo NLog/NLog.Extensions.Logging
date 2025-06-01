@@ -2,6 +2,17 @@
 
 Date format: (year/month/day)
 
+### Version 6.0 RC2 (2025/06/02)
+
+- Updated to NLog v6.0-RC2
+- Removed support for NetStandard 1.3 + 1.5
+- Enabled nullable references
+- Avoid boxing when extracting LogEvent properties from struct
+- Reduce allocation when creating LogEvent with properties by using ReadOnlySpan
+- Enabled &lt;IsAotCompatible&gt;
+
+List of major changes in NLog 6.0: https://nlog-project.org/2025/04/29/nlog-6-0-major-changes.html
+
 ### Version 5.5 (2025/05/29)
 
 **Improvements**

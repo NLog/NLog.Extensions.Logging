@@ -18,16 +18,16 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     <PackageReleaseNotes>
 ChangeLog:
 
-- Added UseNLog extension method for IHostApplicationBuilder (#780) (@mikezw)
-- Added UseNLog extension method with isolated LogFactory support (#782) (@snakefoot)
-- Added AddNLog extension method for IServiceCollection (#783) (@snakefoot)
-- Updated to NLog v5.5 (#785) (@snakefoot)
+- Updated to NLog v6.0-RC2
+- Removed support for NetStandard 1.3 + 1.5
+- Enabled nullable references
+- Avoid boxing when extracting LogEvent properties from struct
+- Reduce allocation when creating LogEvent with properties by using ReadOnlySpan
+- Enabled &lt;IsAotCompatible&gt;
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
 
-NLog v5.2 changes how to load extensions: https://nlog-project.org/2023/05/30/nlog-5-2-trim-warnings.html
-
-List of major changes in NLog 5.0: https://nlog-project.org/2021/08/25/nlog-5-0-preview1-ready.html
+List of major changes in NLog 6.0: https://nlog-project.org/2025/04/29/nlog-6-0-major-changes.html
     </PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/NLog/NLog.Extensions.Logging</PackageProjectUrl>
     <RepositoryUrl>https://github.com/NLog/NLog.Extensions.Logging.git</RepositoryUrl>
@@ -48,6 +48,7 @@ List of major changes in NLog 5.0: https://nlog-project.org/2021/08/25/nlog-5-0-
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Nullable>enable</Nullable>
     <LangVersion>9</LangVersion>
+    <LangVersion Condition=" '$(TargetFramework)' != 'net461' AND '$(TargetFramework)' != 'netstandard2.0' ">12</LangVersion>
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
     <IsTrimmable Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net6.0'))">true</IsTrimmable>
     <IsAotCompatible Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net7.0'))">true</IsAotCompatible>
@@ -74,7 +75,7 @@ List of major changes in NLog 5.0: https://nlog-project.org/2021/08/25/nlog-5-0-
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="NLog" Version="6.0.0-rc1" />
+    <PackageReference Include="NLog" Version="6.0.0-rc2" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
@@ -97,12 +98,6 @@ List of major changes in NLog 5.0: https://nlog-project.org/2021/08/25/nlog-5-0-
   <ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="ILLink.Descriptors.xml">
-      <LogicalName>ILLink.Descriptors.xml</LogicalName>
-    </EmbeddedResource>
   </ItemGroup>
 
   <Target Name="DownloadMissingContent" BeforeTargets="GenerateNuspec">

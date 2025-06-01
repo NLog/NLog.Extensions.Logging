@@ -18,7 +18,7 @@ namespace NLog.Extensions.Logging
 
         internal const string OriginalFormatPropertyName = "{OriginalFormat}";
         private static readonly object ZeroEventId = default(EventId).Id;  // Cache boxing of zero EventId-Value
-        private static readonly object[] EventIdBoxing = Enumerable.Range(0, 50).Select(v => (object)v).ToArray();  // Most EventIds in the ASP.NET Core Engine is below 50
+        private static readonly object[] EventIdBoxing = Enumerable.Range(0, 512).Select(v => (object)v).ToArray();  // Most EventIds in the ASP.NET Core Engine is below 50
         private Tuple<string, string, string>? _eventIdPropertyNames;
 
         public NLogLogger(Logger logger, NLogProviderOptions options, NLogBeginScopeParser beginScopeParser)
@@ -50,32 +50,181 @@ namespace NLog.Extensions.Logging
             _logger.Log(typeof(Microsoft.Extensions.Logging.ILogger), eventInfo);
         }
 
-        private LogEventInfo CreateLogEventInfo<TState>(LogLevel nLogLogLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+        LogEventInfo? GetMessageParametersWithoutBoxing<TState>(LogLevel nLogLogLevel, in EventId eventId, in TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
-            if (_options.CaptureMessageProperties && state is IReadOnlyList<KeyValuePair<string, object?>> messagePropertyList)
+            if (state is IReadOnlyList<KeyValuePair<string, object?>>)
             {
-                if (_options.CaptureMessageTemplates)
+                int parameterCount = 0;
+
+                var captureEventId = _options.CaptureEventId != EventIdCaptureType.None && IncludeEventIdProperties(eventId) && (_options.CaptureEventId & EventIdCaptureType.Legacy) == 0;
+
+                try
                 {
-                    var messageParameters = NLogMessageParameterList.TryParse(messagePropertyList);
-                    if (messageParameters.Count == 0)
+                    switch (((IReadOnlyList<KeyValuePair<string, object?>>)state).Count)
                     {
-                        var logEvent = TryParsePostionalMessageTemplate(nLogLogLevel, messagePropertyList, messageParameters)
-                            ?? CaputureBasicLogEvent(nLogLogLevel, formatter(state, exception), messagePropertyList, messageParameters);
-                        CaptureEventIdProperties(logEvent, eventId);
-                        return logEvent;
+                        case 0:
+                            if (captureEventId)
+                            {
+                                var formattedMessage = formatter(state, exception);
+                                var eventIdParameterCount = GetEventIdMessageParameters(eventId, out var eventIdArg1, out var eventIdArg2);
+                                if (eventIdParameterCount == 0)
+                                    return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage);
+                                else if (eventIdParameterCount == 1)
+                                    return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, formattedMessage, [eventIdArg1]);
+                                else
+                                    return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, formattedMessage, [eventIdArg1, eventIdArg2]);
+                            }
+                            return new LogEventInfo(nLogLogLevel, _logger.Name, formatter(state, exception));
+                        case 1:
+                            parameterCount = 1;
+                            if (OriginalFormatPropertyName.Equals(((IReadOnlyList<KeyValuePair<string, object?>>)state)[0].Key))
+                            {
+                                var formattedMessage = formatter(state, exception);
+                                if (captureEventId)
+                                {
+                                    var eventIdParameterCount = GetEventIdMessageParameters(eventId, out var eventIdArg1, out var eventIdArg2);
+                                    if (eventIdParameterCount == 0)
+                                        return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage);
+                                    else if (eventIdParameterCount == 1)
+                                        return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, formattedMessage, [eventIdArg1]);
+                                    else
+                                        return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, formattedMessage, [eventIdArg1, eventIdArg2]);
+                                }
+                                return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage);
+                            }
+                            break;
+                        case 2:
+                            parameterCount = 2;
+                            if (_options.CaptureMessageTemplates && !_options.CaptureMessageParameters && !_options.ParseMessageTemplates && OriginalFormatPropertyName.Equals(((IReadOnlyList<KeyValuePair<string, object?>>)state)[1].Key))
+                            {
+                                var arg1 = NLogMessageParameterList.GetMessageTemplateParameter(((IReadOnlyList<KeyValuePair<string, object?>>)state)[0]);
+                                if (arg1.Name is not null)
+                                {
+                                    var formattedMessage = formatter(state, exception);
+                                    if (captureEventId)
+                                    {
+                                        var eventIdParameterCount = GetEventIdMessageParameters(eventId, out var eventIdArg1, out var eventIdArg2);
+                                        if (eventIdParameterCount == 0)
+                                            return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage);
+                                        else if (eventIdParameterCount == 1)
+                                            return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, formattedMessage, [arg1, eventIdArg1]);
+                                        else
+                                            return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, formattedMessage, [arg1, eventIdArg1, eventIdArg2]);
+                                    }
+                                    return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, [arg1]);
+                                }
+                            }
+                            break;
+                        case 3:
+                            parameterCount = 3;
+                            if (_options.CaptureMessageTemplates && !_options.CaptureMessageParameters && !_options.ParseMessageTemplates && OriginalFormatPropertyName.Equals(((IReadOnlyList<KeyValuePair<string, object?>>)state)[1].Key))
+                            {
+                                var arg1 = NLogMessageParameterList.GetMessageTemplateParameter(((IReadOnlyList<KeyValuePair<string, object?>>)state)[0]);
+                                var arg2 = NLogMessageParameterList.GetMessageTemplateParameter(((IReadOnlyList<KeyValuePair<string, object?>>)state)[1]);
+                                if (arg1.Name is not null && arg2.Name is not null)
+                                {
+                                    var formattedMessage = formatter(state, exception);
+                                    if (captureEventId)
+                                    {
+                                        var eventIdParameterCount = GetEventIdMessageParameters(eventId, out var eventIdArg1, out var eventIdArg2);
+                                        if (eventIdParameterCount == 0)
+                                            return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage);
+                                        else if (eventIdParameterCount == 1)
+                                            return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, formattedMessage, [arg1, arg2, eventIdArg1]);
+                                        else
+                                            return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, formattedMessage, [arg1, arg2, eventIdArg1, eventIdArg2]);
+                                    }
+                                    return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, [arg1, arg2]);
+                                }
+                            }
+                            break;
+
+                        case 4:
+                            parameterCount = 4;
+                            if (_options.CaptureMessageTemplates && !_options.CaptureMessageParameters && !_options.ParseMessageTemplates && OriginalFormatPropertyName.Equals(((IReadOnlyList<KeyValuePair<string, object?>>)state)[3].Key))
+                            {
+                                var arg1 = NLogMessageParameterList.GetMessageTemplateParameter(((IReadOnlyList<KeyValuePair<string, object?>>)state)[0]);
+                                var arg2 = NLogMessageParameterList.GetMessageTemplateParameter(((IReadOnlyList<KeyValuePair<string, object?>>)state)[1]);
+                                var arg3 = NLogMessageParameterList.GetMessageTemplateParameter(((IReadOnlyList<KeyValuePair<string, object?>>)state)[1]);
+                                if (arg1.Name is not null && arg2.Name is not null && arg3.Name is not null)
+                                {
+                                    var formattedMessage = formatter(state, exception);
+                                    if (captureEventId)
+                                    {
+                                        var eventIdParameterCount = GetEventIdMessageParameters(eventId, out var eventIdArg1, out var eventIdArg2);
+                                        if (eventIdParameterCount == 0)
+                                            return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage);
+                                        else if (eventIdParameterCount == 1)
+                                            return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, formattedMessage, [arg1, arg2, arg3, eventIdArg1]);
+                                        else
+                                            return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, formattedMessage, [arg1, arg2, arg3, eventIdArg1, eventIdArg2]);
+                                    }
+                                    return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, [arg1, arg2, arg3]);
+                                }
+                            }
+                            break;
                     }
-                    else
-                    {
-                        var logEvent = TryParseMessageTemplate(nLogLogLevel, messagePropertyList, messageParameters)
-                            ?? CaptureMessageTemplate(nLogLogLevel, formatter(state, exception), messagePropertyList, messageParameters);
-                        CaptureEventIdProperties(logEvent, eventId);
-                        return logEvent;
-                    }
+                }
+                catch (IndexOutOfRangeException ex)
+                {
+                    // Catch an issue in MEL
+                    throw new FormatException($"Invalid format string. Expected {parameterCount - 1} format parameters, but failed to lookup parameter.", ex);
+                }
+            }
+
+            return null;
+        }
+#endif
+
+        private LogEventInfo CreateLogEventInfo<TState>(LogLevel nLogLogLevel, in EventId eventId, in TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+        {
+            if (_options.CaptureMessageProperties)
+            {
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+                var logEventWithoutBoxing = GetMessageParametersWithoutBoxing(nLogLogLevel, eventId, state, exception, formatter);
+                if (logEventWithoutBoxing is not null)
+                {
+                    if ((_options.CaptureEventId & EventIdCaptureType.Legacy) != 0)
+                        CaptureEventIdProperties(logEventWithoutBoxing, eventId);
+                    return logEventWithoutBoxing;
+                }
+#endif
+
+                // Boxing when struct
+                if (state is IReadOnlyList<KeyValuePair<string, object?>> messagePropertyList)
+                {
+                    return CaptureMessageTemplates(nLogLogLevel, eventId, state, exception, formatter, messagePropertyList);
                 }
                 else
                 {
                     var logEvent = LogEventInfo.Create(nLogLogLevel, _logger.Name, formatter(state, exception));
-                    CaptureMessagePropertiesList(logEvent, messagePropertyList);
+                    if (state is IEnumerable<KeyValuePair<string, object>> messageProperties)
+                        CaptureMessageProperties(logEvent, messageProperties);
+                    CaptureEventIdProperties(logEvent, eventId);
+                    return logEvent;
+                }
+            }
+
+            return LogEventInfo.Create(nLogLogLevel, _logger.Name, formatter(state, exception));
+        }
+
+        private LogEventInfo CaptureMessageTemplates<TState>(LogLevel nLogLogLevel, in EventId eventId, in TState state, Exception? exception, Func<TState, Exception?, string> formatter, IReadOnlyList<KeyValuePair<string, object?>> messagePropertyList)
+        {
+            if (_options.CaptureMessageTemplates)
+            {
+                var messageParameters = NLogMessageParameterList.TryParse(messagePropertyList);
+                if (messageParameters.Count == 0)
+                {
+                    var logEvent = TryParsePostionalMessageTemplate(nLogLogLevel, messagePropertyList, messageParameters)
+                        ?? CaputureBasicLogEvent(nLogLogLevel, formatter(state, exception), messagePropertyList, messageParameters);
+                    CaptureEventIdProperties(logEvent, eventId);
+                    return logEvent;
+                }
+                else
+                {
+                    var logEvent = TryParseMessageTemplate(nLogLogLevel, messagePropertyList, messageParameters)
+                        ?? CaptureMessageTemplate(nLogLogLevel, formatter(state, exception), messagePropertyList, messageParameters);
                     CaptureEventIdProperties(logEvent, eventId);
                     return logEvent;
                 }
@@ -83,12 +232,8 @@ namespace NLog.Extensions.Logging
             else
             {
                 var logEvent = LogEventInfo.Create(nLogLogLevel, _logger.Name, formatter(state, exception));
-                if (_options.CaptureMessageProperties)
-                {
-                    if (state is IEnumerable<KeyValuePair<string, object>> messageProperties)
-                        CaptureMessageProperties(logEvent, messageProperties);
-                    CaptureEventIdProperties(logEvent, eventId);
-                }
+                CaptureMessagePropertiesList(logEvent, messagePropertyList);
+                CaptureEventIdProperties(logEvent, eventId);
                 return logEvent;
             }
         }
@@ -124,7 +269,7 @@ namespace NLog.Extensions.Logging
         {
             if (messageParameters.IsPositional && (messageParameters.HasComplexParameters || _options.ParseMessageTemplates))
             {
-                string? originalMessage = TryParsePositionalParameters(messageProperties, out var parameters);
+                var originalMessage = TryParsePositionalParameters(messageProperties, out var parameters);
                 if (originalMessage != null)
                 {
                     return new LogEventInfo(nLogLogLevel, _logger.Name, null, originalMessage, parameters);
@@ -157,14 +302,14 @@ namespace NLog.Extensions.Logging
         {
             if (messageParameters.IsPositional && _options.CaptureMessageParameters)
             {
-                string? originalMessage = TryParsePositionalParameters(messageProperties, out var parameters);
-                var logEvent = new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, originalMessage ?? formattedMessage, Array.Empty<MessageTemplateParameter>());
+                var originalMessage = TryParsePositionalParameters(messageProperties, out var parameters);
+                var logEvent = new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, originalMessage ?? formattedMessage, (IList<MessageTemplateParameter>)Array.Empty<MessageTemplateParameter>());
                 logEvent.Parameters = parameters;
                 return logEvent;
             }
             else
             {
-                return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, formattedMessage, Array.Empty<MessageTemplateParameter>());
+                return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, formattedMessage, (IList<MessageTemplateParameter>)Array.Empty<MessageTemplateParameter>());
             }
         }
 
@@ -342,7 +487,7 @@ namespace NLog.Extensions.Logging
             return maxIndex;
         }
 
-        private void CaptureEventIdProperties(LogEventInfo logEvent, EventId eventId)
+        private void CaptureEventIdProperties(LogEventInfo logEvent, in EventId eventId)
         {
             var captureEventId = _options.CaptureEventId;
             if (captureEventId != EventIdCaptureType.None && IncludeEventIdProperties(eventId))
@@ -376,7 +521,35 @@ namespace NLog.Extensions.Logging
             }
         }
 
-        private bool IncludeEventIdProperties(EventId eventId)
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+        int GetEventIdMessageParameters(in EventId eventId, out MessageTemplateParameter arg1, out MessageTemplateParameter arg2)
+        {
+            var captureEventId = _options.CaptureEventId;
+            if ((captureEventId & EventIdCaptureType.EventId) != 0)
+            {
+                arg1 = new MessageTemplateParameter(nameof(EventIdCaptureType.EventId), GetEventId(eventId.Id), null, CaptureType.Normal);
+                if ((captureEventId & EventIdCaptureType.EventName) != 0 && eventId.Name != null)
+                {
+                    arg2 = new MessageTemplateParameter(nameof(EventIdCaptureType.EventName), eventId.Name, null, CaptureType.Normal);
+                    return 2;
+                }
+                arg2 = default;
+                return 1;
+            }
+            else if ((captureEventId & EventIdCaptureType.EventName) != 0 && eventId.Name != null)
+            {
+                arg1 = new MessageTemplateParameter(nameof(EventIdCaptureType.EventName), eventId.Name, null, CaptureType.Normal);
+                arg2 = default;
+                return 1;
+            }
+
+            arg1 = default;
+            arg2 = default;
+            return 0;
+        }
+#endif
+
+        private bool IncludeEventIdProperties(in EventId eventId)
         {
             return !eventId.Equals(default) || !_options.IgnoreEmptyEventId;
         }
