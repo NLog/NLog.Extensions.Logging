@@ -234,7 +234,7 @@ namespace NLog.Extensions.Logging
                     try
                     {
                         var result = Convert.ChangeType(configValue.Value, propertyInfo.PropertyType, System.Globalization.CultureInfo.InvariantCulture);
-                        propertyInfo?.SetMethod?.Invoke(options, new[] { result });
+                        propertyInfo.SetMethod?.Invoke(options, new[] { result });
                     }
                     catch (Exception ex)
                     {
