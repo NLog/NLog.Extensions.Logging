@@ -3,16 +3,13 @@
     using System;
     using System.Linq;
     using Microsoft.Extensions.Configuration;
-#if !NETCORE1_0
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
     using Microsoft.Extensions.Logging;
-#endif
 
     internal static class RegisterNLogLoggingProvider
     {
-#if !NETCORE1_0
-        internal static void TryAddNLogLoggingProvider(this IServiceCollection services, Action<IServiceCollection, Action<ILoggingBuilder>> addLogging, IConfiguration hostConfiguration, NLogProviderOptions options, Func<IServiceProvider, IConfiguration, NLogProviderOptions, NLogLoggerProvider> factory)
+        internal static void TryAddNLogLoggingProvider(this IServiceCollection services, Action<IServiceCollection, Action<ILoggingBuilder>> addLogging, IConfiguration? hostConfiguration, NLogProviderOptions? options, Func<IServiceProvider, IConfiguration?, NLogProviderOptions, NLogLoggerProvider> factory)
         {
             var sharedFactory = factory;
 
@@ -20,7 +17,7 @@
 
             if (options.ReplaceLoggerFactory)
             {
-                NLogLoggerProvider singleInstance = null;   // Ensure that registration of ILoggerFactory and ILoggerProvider shares the same single instance
+                NLogLoggerProvider? singleInstance = null;   // Ensure that registration of ILoggerFactory and ILoggerProvider shares the same single instance
                 sharedFactory = (provider, cfg, opt) => singleInstance ?? (singleInstance = factory(provider, cfg, opt));
 
                 addLogging?.Invoke(services, (builder) => builder?.ClearProviders());  // Cleanup the existing LoggerFactory, before replacing it with NLogLoggerFactory
@@ -35,7 +32,6 @@
                 addLogging?.Invoke(services, (builder) => builder?.AddFilter<NLogLoggerProvider>(null, Microsoft.Extensions.Logging.LogLevel.Trace));
             }
         }
-#endif
 
         internal static void TryLoadConfigurationFromSection(this NLogLoggerProvider loggerProvider, IConfiguration configuration)
         {
@@ -59,7 +55,7 @@
             }
         }
 
-        internal static NLogLoggerProvider CreateNLogLoggerProvider(this IServiceProvider serviceProvider, IConfiguration hostConfiguration, NLogProviderOptions options, LogFactory logFactory)
+        internal static NLogLoggerProvider CreateNLogLoggerProvider(this IServiceProvider serviceProvider, IConfiguration? hostConfiguration, NLogProviderOptions options, LogFactory logFactory)
         {
             var provider = new NLogLoggerProvider(options, logFactory);
 
@@ -88,7 +84,7 @@
             return provider;
         }
 
-        internal static IConfiguration SetupNLogConfigSettings(this IServiceProvider serviceProvider, IConfiguration configuration, LogFactory logFactory)
+        internal static IConfiguration? SetupNLogConfigSettings(this IServiceProvider? serviceProvider, IConfiguration? configuration, LogFactory logFactory)
         {
             configuration = configuration ?? (serviceProvider?.GetService(typeof(IConfiguration)) as IConfiguration);
             logFactory.Setup().SetupExtensions(ext => ext.RegisterConfigSettings(configuration));

@@ -1,5 +1,0 @@
-<linker>
-  <assembly fullname="NLog" preserve="all" />
-  <assembly fullname="NLog.Extensions.Logging" preserve="all" />
-  <assembly fullname="NLog.Extensions.Hosting" preserve="all" />
-</linker>

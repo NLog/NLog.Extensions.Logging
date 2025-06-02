@@ -82,7 +82,7 @@ namespace NLog.Extensions.Logging.Tests
             logger.Info("Hello {Planet}", "Earth");
 
             // Assert
-            Assert.Equal("Hello \"Earth\"", mock.LastLogMessage);
+            Assert.Equal("Hello Earth", mock.LastLogMessage);
             Assert.Equal(2, mock.LastLogProperties.Count);
             Assert.Equal("Planet", mock.LastLogProperties[0].Key);
             Assert.Equal("Earth", mock.LastLogProperties[0].Value);
@@ -102,7 +102,7 @@ namespace NLog.Extensions.Logging.Tests
             logger.Info("Hello {Planet}", "Earth");
 
             // Assert
-            Assert.Equal("Hello \"Earth\"", mock.LastLogMessage);
+            Assert.Equal("Hello Earth", mock.LastLogMessage);
             Assert.Equal(3, mock.LastLogProperties.Count);
             Assert.Equal("Planet", mock.LastLogProperties[0].Key);
             Assert.Equal("Earth", mock.LastLogProperties[0].Value);

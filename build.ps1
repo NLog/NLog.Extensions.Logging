@@ -2,8 +2,8 @@
 # creates NuGet package at \artifacts
 dotnet --version
 
-$versionPrefix = "5.5.0"
-$versionSuffix = ""
+$versionPrefix = "6.0.0"
+$versionSuffix = "rc2"
 $versionFile = $versionPrefix + "." + ${env:APPVEYOR_BUILD_NUMBER}
 $versionProduct = $versionPrefix;
 
@@ -26,7 +26,7 @@ if (-Not $LastExitCode -eq 0) {
     exit $LastExitCode 
 }
 
-msbuild /t:Pack .\src\NLog.Extensions.Logging\ /p:targetFrameworks='"net461;netstandard1.3;netstandard1.5;netstandard2.0;netstandard2.1;net6.0;net8.0"' /p:VersionPrefix=$versionPrefix /p:VersionSuffix=$versionSuffix /p:FileVersion=$versionFile /p:ProductVersion=$versionProduct /p:Configuration=Release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=..\..\artifacts /verbosity:minimal /p:ContinuousIntegrationBuild=true
+msbuild /t:Pack .\src\NLog.Extensions.Logging\ /p:targetFrameworks='"net461;netstandard2.0;netstandard2.1;net6.0;net8.0"' /p:VersionPrefix=$versionPrefix /p:VersionSuffix=$versionSuffix /p:FileVersion=$versionFile /p:ProductVersion=$versionProduct /p:Configuration=Release /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:PackageOutputPath=..\..\artifacts /verbosity:minimal /p:ContinuousIntegrationBuild=true
 if (-Not $LastExitCode -eq 0) {
     exit $LastExitCode 
 }

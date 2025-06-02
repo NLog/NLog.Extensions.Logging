@@ -14,7 +14,7 @@ namespace NLog.Extensions.Logging
     {
         private readonly IConfigurationSection _originalConfigSection;
         private bool _autoReload;
-        private IDisposable _registerChangeCallback;
+        private IDisposable? _registerChangeCallback;
         private const string RootSectionKey = "NLog";
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace NLog.Extensions.Logging
         }
 
         /// <inheritdoc />
-        protected override void OnConfigurationAssigned(LogFactory logFactory)
+        protected override void OnConfigurationAssigned(LogFactory? logFactory)
         {
             _registerChangeCallback?.Dispose();
 
@@ -138,12 +138,12 @@ namespace NLog.Extensions.Logging
             private const string DefaultWrapper = "Default-wrapper";
             private const string TargetDefaultWrapper = "TargetDefaultWrapper";
             private readonly IConfigurationSection _configurationSection;
-            private IConfigurationSection TargetDefaultParametersSection { get; set; }
-            private IConfigurationSection TargetDefaultWrapperSection { get; set; }
-            private readonly string _nameOverride;
+            private IConfigurationSection? TargetDefaultParametersSection { get; set; }
+            private IConfigurationSection? TargetDefaultWrapperSection { get; set; }
+            private readonly string? _nameOverride;
             private readonly bool _topElement;
 
-            public LoggingConfigurationElement(IConfigurationSection configurationSection, string nameOverride = null)
+            public LoggingConfigurationElement(IConfigurationSection configurationSection, string? nameOverride = null)
             {
                 _configurationSection = configurationSection;
                 _nameOverride = nameOverride;
@@ -157,36 +157,36 @@ namespace NLog.Extensions.Logging
             public bool AutoReload { get; }
 
             public string Name => _nameOverride ?? GetConfigKey(_configurationSection);
-            public IEnumerable<KeyValuePair<string, string>> Values => GetValues();
+            public IEnumerable<KeyValuePair<string, string?>> Values => GetValues();
             public IEnumerable<ILoggingConfigurationElement> Children => GetChildren();
 
-            private IEnumerable<KeyValuePair<string, string>> GetValues()
+            private IEnumerable<KeyValuePair<string, string?>> GetValues()
             {
                 if (_nameOverride != null)
                 {
                     if (ReferenceEquals(_nameOverride, DefaultTargetParameters))
                     {
-                        yield return new KeyValuePair<string, string>("type", GetConfigKey(_configurationSection));
+                        yield return new KeyValuePair<string, string?>("type", GetConfigKey(_configurationSection));
                     }
                     else if (ReferenceEquals(_nameOverride, VariableKey))
                     {
                         var configValue = _configurationSection.Value;
-                        yield return new KeyValuePair<string, string>("name", GetConfigKey(_configurationSection));
+                        yield return new KeyValuePair<string, string?>("name", GetConfigKey(_configurationSection));
                         if (configValue is null)
                             yield break;    // Signal to NLog Config Parser to check GetChildren() for variable layout
                         else
-                            yield return new KeyValuePair<string, string>("value", configValue);
+                            yield return new KeyValuePair<string, string?>("value", configValue);
                     }
                     else if (!_topElement)
                     {
                         var configValue = _configurationSection.Value;
                         if (configValue is null)
                         {
-                            yield return new KeyValuePair<string, string>("name", GetConfigKey(_configurationSection));
+                            yield return new KeyValuePair<string, string?>("name", GetConfigKey(_configurationSection));
                         }
                         else
                         {
-                            yield return new KeyValuePair<string, string>(GetConfigKey(_configurationSection), configValue);
+                            yield return new KeyValuePair<string, string?>(GetConfigKey(_configurationSection), configValue);
                         }
                     }
                 }
@@ -201,12 +201,12 @@ namespace NLog.Extensions.Logging
                         if (_topElement && IgnoreTopElementChildNullValue(configKey, configValue))
                             continue;   // Complex object without any properties has no children and null-value (Ex. empty targets-section / variables-section)
 
-                        yield return new KeyValuePair<string, string>(configKey, configValue);
+                        yield return new KeyValuePair<string, string?>(configKey, configValue);
                     }
                 }
             }
             
-            private static bool IgnoreTopElementChildNullValue(string configKey, object configValue)
+            private static bool IgnoreTopElementChildNullValue(string configKey, object? configValue)
             {
                 if (configValue is null)
                 {
@@ -267,18 +267,18 @@ namespace NLog.Extensions.Logging
                 }
             }
 
-            private IEnumerable<ILoggingConfigurationElement> GetChildren(IEnumerable<IConfigurationSection> children, IConfigurationSection variables, bool isTargetsSection)
+            private IEnumerable<ILoggingConfigurationElement> GetChildren(IEnumerable<IConfigurationSection> children, IConfigurationSection? variables, bool isTargetsSection)
             {
                 var targetDefaultWrapper = GetTargetDefaultWrapperSection();
                 var targetDefaultParameters = GetTargetDefaultParametersSection();
                 foreach (var child in children)
                 {
-                    if (AlreadyReadChild(child, variables, targetDefaultWrapper, targetDefaultParameters))
+                    if (child is null || AlreadyReadChild(child, variables, targetDefaultWrapper, targetDefaultParameters))
                     {
                         continue;
                     }
 
-                    var firstChildValue = child?.GetChildren()?.FirstOrDefault();
+                    var firstChildValue = child.GetChildren()?.FirstOrDefault();
                     if (firstChildValue is null)
                     {
                         continue; // Simple value without children
@@ -305,7 +305,7 @@ namespace NLog.Extensions.Logging
 
             private static IEnumerable<IConfigurationSection> GetVariablesChildren(IConfigurationSection variables)
             {
-                List<KeyValuePair<string, IConfigurationSection>> sortVariables = null;
+                List<KeyValuePair<string, IConfigurationSection>>? sortVariables = null;
                 foreach (var variable in variables.GetChildren())
                 {
                     var configKey = GetConfigKey(variable);
@@ -396,7 +396,7 @@ namespace NLog.Extensions.Logging
                 }
             }
 
-            private bool AlreadyReadChild(IConfigurationSection child, IConfigurationSection variables, IConfigurationSection targetDefaultWrapper, IConfigurationSection targetDefaultParameters)
+            private bool AlreadyReadChild(IConfigurationSection child, IConfigurationSection? variables, IConfigurationSection? targetDefaultWrapper, IConfigurationSection? targetDefaultParameters)
             {
                 if (_topElement)
                 {
@@ -419,13 +419,13 @@ namespace NLog.Extensions.Logging
                 return false;
             }
 
-            private IConfigurationSection GetVariablesSection()
+            private IConfigurationSection? GetVariablesSection()
             {
                 var variables = _topElement ? _configurationSection.GetSection(VariablesKey) : null;
                 return variables;
             }
 
-            private IConfigurationSection GetTargetDefaultParametersSection()
+            private IConfigurationSection? GetTargetDefaultParametersSection()
             {
                 if (_topElement)
                 {
@@ -445,7 +445,7 @@ namespace NLog.Extensions.Logging
                 return null;
             }
 
-            private IConfigurationSection GetTargetDefaultWrapperSection()
+            private IConfigurationSection? GetTargetDefaultWrapperSection()
             {
                 if (_topElement)
                 {
@@ -473,18 +473,19 @@ namespace NLog.Extensions.Logging
 
         private sealed class AutoReloadConfigChangeMonitor : IDisposable
         {
-            private NLogLoggingConfiguration _nlogConfig;
-            private IDisposable _registerChangeCallback;
+            private NLogLoggingConfiguration? _nlogConfig;
+            private IDisposable? _registerChangeCallback;
 
             public AutoReloadConfigChangeMonitor(IConfigurationSection configSection, NLogLoggingConfiguration nlogConfig)
             {
                 _nlogConfig = nlogConfig;
-                _registerChangeCallback = configSection.GetReloadToken().RegisterChangeCallback((s) => ReloadConfigurationSection((IConfigurationSection)s), configSection);
+                _registerChangeCallback = configSection.GetReloadToken().RegisterChangeCallback((s) => ReloadConfigurationSection(s as IConfigurationSection), configSection);
             }
 
-            private void ReloadConfigurationSection(IConfigurationSection configSection)
+            private void ReloadConfigurationSection(IConfigurationSection? configSection)
             {
-                _nlogConfig?.ReloadConfigurationSection(configSection);
+                if (configSection != null)
+                    _nlogConfig?.ReloadConfigurationSection(configSection);
             }
 
             public void Dispose()
