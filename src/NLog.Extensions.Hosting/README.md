@@ -21,7 +21,7 @@ Supported platforms:
 
  - .NET 5, 6, 7, 8 and 9
  - .NET Core 2 and 3
- - .NET Standard 2.0+
+ - .NET Standard 2.0 and 2.1
 
 Registration of NLog as logging provider:
 
