@@ -19,7 +19,7 @@ If using ASP.NET Core then check [NLog.Web.AspNetCore](https://www.nuget.org/pac
 
 Supported platforms:
 
- - .NET 5, 6, 7 and 8
+ - .NET 5, 6, 7, 8 and 9
  - .NET Core 2 and 3
  - .NET Standard 2.0+
 
