@@ -19,9 +19,9 @@ If using ASP.NET Core then consider using [NLog.Web.AspNetCore](https://www.nuge
 
 Supported platforms:
 
- - .NET 5, 6, 7 and 8
- - .NET Core 1, 2 and 3
- - .NET Standard 1.3+ and 2.0+
+ - .NET 5, 6, 7, 8 and 9
+ - .NET 2 and 3
+ - .NET Standard 2.0 and 2.1
  - .NET 4.6.1 - 4.8
 
 Registration of NLog as logging provider:
