@@ -56,6 +56,15 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Fact]
+        public void TestThreeParameters()
+        {
+            var runner = GetRunner();
+            runner.Logger.LogDebug("message with {0} and {1} and {2} parameters", "id", "username", 3);
+
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and username and 3 parameters|", runner.LastTargetMessage);
+        }
+
+        [Fact]
         public void TestStructuredLogging()
         {
             var runner = GetRunner();
