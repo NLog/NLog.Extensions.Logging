@@ -187,13 +187,16 @@ namespace NLog.Extensions.Logging
             set => throw new NotSupportedException();
         }
 
-        internal static MessageTemplateParameter GetMessageTemplateParameter(in KeyValuePair<string, object?> propertyValue)
+        internal static MessageTemplateParameter GetMessageTemplateParameter(in KeyValuePair<string, object?> propertyValue, int index)
         {
             var propertyName = propertyValue.Key;
             if (propertyName is null || propertyName.Length == 0)
                 return default;
             var firstChar = propertyName[0];
-            if (char.IsDigit(firstChar) || GetCaptureType(firstChar) != CaptureType.Normal)
+            if (char.IsDigit(firstChar) && (propertyName.Length != 1 || (firstChar - '0') != index))
+                return default;
+
+            if (GetCaptureType(firstChar) != CaptureType.Normal)
                 return default;
 
             return new MessageTemplateParameter(propertyName, propertyValue.Value, null, CaptureType.Normal);
