@@ -496,34 +496,37 @@ namespace NLog.Extensions.Logging
         private void CaptureEventIdProperties(LogEventInfo logEvent, in EventId eventId)
         {
             var captureEventId = _options.CaptureEventId;
-            if (captureEventId != EventIdCaptureType.None && IncludeEventIdProperties(eventId))
+            if (captureEventId == EventIdCaptureType.None)
+                return;
+
+            if (!IncludeEventIdProperties(eventId))
+                return;
+
+            if ((captureEventId & EventIdCaptureType.EventId) != 0)
+                logEvent.Properties[nameof(EventIdCaptureType.EventId)] = GetEventId(eventId.Id);
+
+            if ((captureEventId & EventIdCaptureType.EventName) != 0 && eventId.Name is not null)
+                logEvent.Properties[nameof(EventIdCaptureType.EventName)] = eventId.Name;
+
+            if ((captureEventId & EventIdCaptureType.Legacy) != 0)
             {
-                if ((captureEventId & EventIdCaptureType.EventId) != 0)
-                    logEvent.Properties[nameof(EventIdCaptureType.EventId)] = GetEventId(eventId.Id);
-
-                if ((captureEventId & EventIdCaptureType.EventName) != 0 && eventId.Name != null)
-                    logEvent.Properties[nameof(EventIdCaptureType.EventName)] = eventId.Name;
-
-                if ((captureEventId & EventIdCaptureType.Legacy) != 0)
+                // Attempt to reuse the same string-allocations based on the current <see cref="NLogProviderOptions.EventIdSeparator"/>
+                var eventIdPropertyNames = _eventIdPropertyNames;
+                var eventIdSeparator = _options.EventIdSeparator ?? String.Empty;
+                if (!ReferenceEquals(eventIdPropertyNames?.Item1, eventIdSeparator))
                 {
-                    // Attempt to reuse the same string-allocations based on the current <see cref="NLogProviderOptions.EventIdSeparator"/>
-                    var eventIdPropertyNames = _eventIdPropertyNames;
-                    var eventIdSeparator = _options.EventIdSeparator ?? String.Empty;
-                    if (!ReferenceEquals(eventIdPropertyNames?.Item1, eventIdSeparator))
-                    {
-                        // Perform atomic cache update of the string-allocations matching the current separator
-                        _eventIdPropertyNames = eventIdPropertyNames = CreateEventIdPropertyNames(eventIdSeparator);
-                    }
-
-                    if ((captureEventId & EventIdCaptureType.EventId_Id) != 0)
-                        logEvent.Properties[eventIdPropertyNames.Item2] = GetEventId(eventId.Id);
-
-                    if ((captureEventId & EventIdCaptureType.EventId_Name) != 0 && eventId.Name != null)
-                        logEvent.Properties[eventIdPropertyNames.Item3] = eventId.Name;
-
-                    if ((captureEventId & EventIdCaptureType.EventIdStruct) != 0)
-                        logEvent.Properties[nameof(EventIdCaptureType.EventId)] = eventId;
+                    // Perform atomic cache update of the string-allocations matching the current separator
+                    _eventIdPropertyNames = eventIdPropertyNames = CreateEventIdPropertyNames(eventIdSeparator);
                 }
+
+                if ((captureEventId & EventIdCaptureType.EventId_Id) != 0)
+                    logEvent.Properties[eventIdPropertyNames.Item2] = GetEventId(eventId.Id);
+
+                if ((captureEventId & EventIdCaptureType.EventId_Name) != 0 && eventId.Name is not null)
+                    logEvent.Properties[eventIdPropertyNames.Item3] = eventId.Name;
+
+                if ((captureEventId & EventIdCaptureType.EventIdStruct) != 0)
+                    logEvent.Properties[nameof(EventIdCaptureType.EventId)] = eventId;
             }
         }
 
