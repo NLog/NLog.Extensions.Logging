@@ -17,7 +17,7 @@ namespace NLog.Extensions.Hosting
         {
             setupBuilder.RegisterConfigSettings(configuration);
             return setupBuilder.RegisterLayoutRenderer<HostAppNameLayoutRenderer>("host-appname")
-                        .RegisterLayoutRenderer<HostBaseDirLayoutRenderer>("host-basedir")
+                        .RegisterLayoutRenderer<HostRootDirLayoutRenderer>("host-rootdir")
                         .RegisterLayoutRenderer<HostEnvironmentLayoutRenderer>("host-environment");
         }
     }
