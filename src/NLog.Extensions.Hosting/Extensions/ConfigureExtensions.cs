@@ -60,6 +60,7 @@ namespace NLog.Extensions.Hosting
             builder.ConfigureServices((builderContext, services) => AddNLogLoggerProvider(services, builderContext.Configuration, builderContext.HostingEnvironment, options, (serviceProvider, config, hostEnv, opt) =>
 #endif
             {
+                RegisterHostNLogExtensions(LogManager.LogFactory, serviceProvider, hostEnv);
                 config = serviceProvider.SetupNLogConfigSettings(config, LogManager.LogFactory);
 
                 // Delay initialization of targets until we have loaded config-settings
@@ -107,6 +108,7 @@ namespace NLog.Extensions.Hosting
             Guard.ThrowIfNull(builder);
             builder.Services.TryAddNLogLoggingProvider((svc, addlogging) => svc.AddLogging(addlogging), builder.Configuration, options, (serviceProvider, config, opt) =>
             {
+                RegisterHostNLogExtensions(LogManager.LogFactory, serviceProvider, builder.Environment);
                 config = serviceProvider.SetupNLogConfigSettings(config, LogManager.LogFactory);
 
                 // Delay initialization of targets until we have loaded config-settings
@@ -125,11 +127,13 @@ namespace NLog.Extensions.Hosting
 
         private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration? hostConfiguration, IHostEnvironment? hostEnvironment, NLogProviderOptions options)
         {
-            return serviceProvider.CreateNLogLoggerProvider(hostConfiguration, options, LogManager.LogFactory);
+            return CreateNLogLoggerProvider(serviceProvider, hostConfiguration, hostEnvironment, options, LogManager.LogFactory);
         }
 
         private static NLogLoggerProvider CreateNLogLoggerProvider(IServiceProvider serviceProvider, IConfiguration? hostConfiguration, IHostEnvironment? hostEnvironment, NLogProviderOptions options, LogFactory logFactory)
         {
+            RegisterHostNLogExtensions(logFactory, serviceProvider, hostEnvironment);
+
             NLogLoggerProvider provider = serviceProvider.CreateNLogLoggerProvider(hostConfiguration, options, logFactory);
 
             string nlogConfigFile = string.Empty;
@@ -156,6 +160,20 @@ namespace NLog.Extensions.Hosting
 
             provider.LogFactory.Setup().SetupLogFactory(ext => ext.AddCallSiteHiddenAssembly(typeof(ConfigureExtensions).Assembly));
             return provider;
+        }
+
+        private static void RegisterHostNLogExtensions(LogFactory logFactory, IServiceProvider serviceProvider, IHostEnvironment? hostingEnvironment)
+        {
+            (logFactory ?? LogManager.LogFactory).Setup().SetupExtensions(ext =>
+            {
+                if (serviceProvider != null)
+                    ext.RegisterServiceProvider(serviceProvider);
+                if (hostingEnvironment != null)
+                    ext.RegisterSingletonService(hostingEnvironment);
+                ext.RegisterLayoutRenderer<HostEnvironmentLayoutRenderer>("host-environment");
+                ext.RegisterLayoutRenderer<HostBaseDirLayoutRenderer>("host-basedir");
+                ext.RegisterLayoutRenderer<HostAppNameLayoutRenderer>("host-appname");
+            });
         }
 
         private static string ResolveEnvironmentNLogConfigFile(string? basePath, string? environmentName)
