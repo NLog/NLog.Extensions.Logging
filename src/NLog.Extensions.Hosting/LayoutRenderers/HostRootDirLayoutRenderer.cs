@@ -15,12 +15,12 @@ namespace Microsoft.Extensions.Hosting
     /// Rendering Application Host <see cref="IHostEnvironment.ContentRootPath" />
     /// </summary>
     /// <remarks>
-    /// <code>${host-basedir}</code>
+    /// <code>${host-rootdir}</code>
     /// </remarks>
-    /// <seealso href="https://github.com/NLog/NLog/wiki/Host-BaseDir-layout-renderer">Documentation on NLog Wiki</seealso>
-    [LayoutRenderer("host-basedir")]
+    /// <seealso href="https://github.com/NLog/NLog/wiki/Host-RootDir-layout-renderer">Documentation on NLog Wiki</seealso>
+    [LayoutRenderer("host-rootdir")]
     [ThreadAgnostic]
-    public class HostBaseDirLayoutRenderer : LayoutRenderer
+    public class HostRootDirLayoutRenderer : LayoutRenderer
     {
         /// <summary>
         /// Provides access to the current IHostEnvironment

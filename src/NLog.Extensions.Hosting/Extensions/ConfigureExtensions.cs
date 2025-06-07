@@ -171,7 +171,7 @@ namespace NLog.Extensions.Hosting
                 if (hostingEnvironment != null)
                     ext.RegisterSingletonService(hostingEnvironment);
                 ext.RegisterLayoutRenderer<HostEnvironmentLayoutRenderer>("host-environment");
-                ext.RegisterLayoutRenderer<HostBaseDirLayoutRenderer>("host-basedir");
+                ext.RegisterLayoutRenderer<HostRootDirLayoutRenderer>("host-rootdir");
                 ext.RegisterLayoutRenderer<HostAppNameLayoutRenderer>("host-appname");
             });
         }
