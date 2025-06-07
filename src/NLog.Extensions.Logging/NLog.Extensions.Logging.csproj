@@ -18,12 +18,16 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     <PackageReleaseNotes>
 ChangeLog:
 
-- Updated to NLog v6.0-RC2
+- Updated to NLog v6.0-RC3
 - Removed support for NetStandard 1.3 + 1.5
 - Enabled nullable references
 - Avoid boxing when extracting LogEvent properties from struct
 - Reduce allocation when creating LogEvent with properties by using ReadOnlySpan
 - Enabled &lt;IsAotCompatible&gt;
+- Updated NLog.Extensions.Hosting to support ${host-environment}
+- Updated NLog.Extensions.Hosting to support ${host-rootdir}
+- Updated NLog.Extensions.Hosting to support ${host-appname}
+- Updated NLog.Extensions.Hosting to support .NET Framework 4.6.2 using NET8-nuget-dependencies
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
 
@@ -75,7 +79,7 @@ List of major changes in NLog 6.0: https://nlog-project.org/2025/04/29/nlog-6-0-
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="NLog" Version="6.0.0-rc2" />
+    <PackageReference Include="NLog" Version="6.0.0-rc3" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">

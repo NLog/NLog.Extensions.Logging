@@ -2,6 +2,15 @@
 
 Date format: (year/month/day)
 
+### Version 6.0 RC3 (2025/06/08)
+
+- Updated to NLog v6.0-RC3
+- Avoid boxing when extracting LogEvent properties from struct
+- Updated NLog.Extensions.Hosting to support ${host-environment}
+- Updated NLog.Extensions.Hosting to support ${host-rootdir}
+- Updated NLog.Extensions.Hosting to support ${host-appname}
+- Updated NLog.Extensions.Hosting to support .NET Framework 4.6.2 using NET8-nuget-dependencies
+
 ### Version 6.0 RC2 (2025/06/02)
 
 - Updated to NLog v6.0-RC2
