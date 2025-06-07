@@ -18,7 +18,7 @@ namespace HostingExample
             var config = new ConfigurationBuilder().Build();
 
             var logger = LogManager.Setup()
-                                   .SetupExtensions(ext => ext.RegisterConfigSettings(config))
+                                   .SetupExtensions(ext => ext.RegisterHostSettings(config))
                                    .GetCurrentClassLogger();
 
             try
