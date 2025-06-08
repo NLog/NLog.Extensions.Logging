@@ -350,20 +350,29 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Equal("S", messageParameters[1].Format);
         }
 
-        [Fact]
-        public void TestParseMessageTemplates()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void TestParseMessageTemplates(bool parseMessageTemplates)
         {
             LogEventInfo logEvent = null;
             var debugTarget = new MethodCallTarget("output", (l, args) => logEvent = l);
-            var runner = GetRunner<Runner>(new NLogProviderOptions() { ParseMessageTemplates = true }, debugTarget);
+            var runner = GetRunner<Runner>(new NLogProviderOptions() { ParseMessageTemplates = parseMessageTemplates }, debugTarget);
             var messageTemplate = "message with {ParameterCount} parameters";
             runner.Logger.LogDebug(messageTemplate, "1");
 
             Assert.NotNull(logEvent);
             Assert.Equal(messageTemplate, logEvent.Message);
-            Assert.NotNull(logEvent.Parameters);
-            Assert.Single(logEvent.Parameters);
-            Assert.Equal("1", logEvent.Parameters[0]);
+            if (parseMessageTemplates)
+            {
+                Assert.NotNull(logEvent.Parameters);
+                Assert.Single(logEvent.Parameters);
+                Assert.Equal("1", logEvent.Parameters[0]);
+            }
+            else
+            {
+                Assert.Null(logEvent.Parameters);
+            }
 
             var messageParameters = logEvent.MessageTemplateParameters;
             Assert.False(messageParameters.IsPositional);
