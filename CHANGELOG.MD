@@ -2,6 +2,11 @@
 
 Date format: (year/month/day)
 
+### Version 6.0 RC4 (2025/06/15)
+
+- Updated to NLog v6.0-RC4
+- Fixed capture of original message template when extracing LogEvent properties without boxing.
+
 ### Version 6.0 RC3 (2025/06/08)
 
 - Updated to NLog v6.0-RC3
