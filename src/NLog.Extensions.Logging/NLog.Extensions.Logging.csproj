@@ -18,7 +18,7 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     <PackageReleaseNotes>
 ChangeLog:
 
-- Updated to NLog v6.0-RC3
+- Updated to NLog v6.0-RC4
 - Removed support for NetStandard 1.3 + 1.5
 - Enabled nullable references
 - Avoid boxing when extracting LogEvent properties from struct
@@ -80,7 +80,7 @@ List of major changes in NLog 6.0: https://nlog-project.org/2025/04/29/nlog-6-0-
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="NLog" Version="6.0.0-rc3" />
+    <PackageReference Include="NLog" Version="6.0.0-rc4" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
