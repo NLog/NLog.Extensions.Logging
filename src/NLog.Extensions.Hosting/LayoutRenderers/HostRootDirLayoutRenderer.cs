@@ -5,10 +5,6 @@ using NLog;
 using NLog.Config;
 using NLog.LayoutRenderers;
 
-#if NETSTANDARD2_0
-using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
-#endif
-
 namespace Microsoft.Extensions.Hosting
 {
     /// <summary>
