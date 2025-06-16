@@ -5,9 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NLog.Config;
 using NLog.Extensions.Logging;
-#if NETSTANDARD2_0
-using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
-#endif
 
 namespace NLog.Extensions.Hosting
 {
@@ -36,11 +33,7 @@ namespace NLog.Extensions.Hosting
         public static IHostBuilder UseNLog(this IHostBuilder builder, NLogProviderOptions? options)
         {
             Guard.ThrowIfNull(builder);
-#if NETSTANDARD2_0
-            builder.ConfigureServices((builderContext, services) => AddNLogLoggerProvider(services, builderContext.Configuration, null, options, CreateNLogLoggerProvider));
-#else
             builder.ConfigureServices((builderContext, services) => AddNLogLoggerProvider(services, builderContext.Configuration, builderContext.HostingEnvironment, options, CreateNLogLoggerProvider));
-#endif
             return builder;
         }
 
@@ -54,11 +47,7 @@ namespace NLog.Extensions.Hosting
         public static IHostBuilder UseNLog(this IHostBuilder builder, NLogProviderOptions options, Func<IServiceProvider, LogFactory> factoryBuilder)
         {
             Guard.ThrowIfNull(builder);
-#if NETSTANDARD2_0
-            builder.ConfigureServices((builderContext, services) => AddNLogLoggerProvider(services, builderContext.Configuration, null, options, (serviceProvider, config, hostEnv, opt) =>
-#else
             builder.ConfigureServices((builderContext, services) => AddNLogLoggerProvider(services, builderContext.Configuration, builderContext.HostingEnvironment, options, (serviceProvider, config, hostEnv, opt) =>
-#endif
             {
                 RegisterHostNLogExtensions(LogManager.LogFactory, serviceProvider, hostEnv);
                 config = serviceProvider.SetupNLogConfigSettings(config, LogManager.LogFactory);
