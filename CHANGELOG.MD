@@ -2,6 +2,22 @@
 
 Date format: (year/month/day)
 
+### Version 6.0 (2025/06/21)
+
+- Updated to NLog v6.0
+- Removed support for NetStandard 1.3 + 1.5
+- Updated .NET Framework 4.6.2 with NET8-nuget-dependencies
+- Enabled nullable references
+- Avoid boxing when extracting LogEvent properties from struct
+- Reduce allocation when creating LogEvent with properties by using ReadOnlySpan
+- Enabled &lt;IsAotCompatible&gt;
+- Added ${host-environment} for NLog.Extensions.Hosting
+- Added ${host-rootdir} for NLog.Extensions.Hosting
+- Added ${host-appname} for NLog.Extensions.Hosting
+- Added RegisterHostSettings for NLog.Extensions.Hosting
+
+List of major changes in NLog 6.0: https://nlog-project.org/2025/04/29/nlog-6-0-major-changes.html
+
 ### Version 6.0 RC4 (2025/06/15)
 
 - Updated to NLog v6.0-RC4

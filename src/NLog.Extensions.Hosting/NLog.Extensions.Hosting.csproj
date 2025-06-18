@@ -15,7 +15,7 @@
     
 For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     </Description>
-    <PackageTags>NLog;Microsoft.Extensions.Hosting;log;logging;logfiles;netcore</PackageTags>
+    <PackageTags>NLog;Microsoft.Extensions.Hosting;log;logging;logfiles;hosting</PackageTags>
     <PackageReleaseNotes>
       Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
     </PackageReleaseNotes>
