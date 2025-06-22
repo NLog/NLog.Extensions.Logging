@@ -1,11 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using NLog;
+using Microsoft.Extensions.Hosting;
 using NLog.Config;
 using NLog.LayoutRenderers;
 
-namespace Microsoft.Extensions.Hosting
+namespace NLog.Extensions.Hosting
 {
     /// <summary>
     /// Rendering Application Host <see cref="IHostEnvironment.ContentRootPath" />
