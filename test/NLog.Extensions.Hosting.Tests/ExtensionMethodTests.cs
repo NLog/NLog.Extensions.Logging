@@ -150,7 +150,7 @@ namespace NLog.Extensions.Hosting.Tests
             LogManager.Configuration = null;
         }
 
-#if NET8_0_OR_GREATER
+#if !NET6_0
         [Fact]
         public void IHostApplicationBuilder_UseNLog_ArgumentNullException()
         {

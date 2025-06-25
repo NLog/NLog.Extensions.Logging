@@ -60,7 +60,7 @@ namespace NLog.Extensions.Hosting
             return builder;
         }
 
-#if NET8_0_OR_GREATER
+#if !NET6_0
         /// <summary>
         /// Enable NLog as logging provider for Microsoft Extension Logging
         /// </summary>
