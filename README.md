@@ -2,7 +2,6 @@
 
 # NLog.Extensions.Logging & NLog.Extensions.Hosting
 
-
 [![NuGet Release](https://img.shields.io/nuget/v/NLog.Extensions.Logging.svg?label=NLog.Extensions.Logging)](https://www.nuget.org/packages/NLog.Extensions.Logging)
 <!--[![NuGet Pre Release](https://img.shields.io/nuget/vpre/NLog.Extensions.Logging.svg?label=NLog.Extensions.Logging)](https://www.nuget.org/packages/NLog.Extensions.Logging)-->
 
