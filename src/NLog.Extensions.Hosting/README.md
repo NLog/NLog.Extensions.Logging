@@ -4,7 +4,7 @@
 [![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=sqale_rating)](https://sonarcloud.io/dashboard/?id=nlog.extensions.logging&branch=master) 
 [![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=vulnerabilities)](https://sonarcloud.io/dashboard/?id=nlog.extensions.logging&branch=master) 
 
-Integrates NLog as Logging provider for Microsoft.Extensions.Logging, by just calling `UseNLog()` on the application-IHostBuilder.
+Integrates NLog as Logging provider for Microsoft.Extensions.Logging, by just calling `UseNLog()` on the application HostBuilder.
 
 Providing features like:
 
