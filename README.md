@@ -30,7 +30,7 @@ Just add `NLog.config` file to the project, and follow the [tutorial](https://gi
 
 ## NLog.Extensions.Hosting
 
-[NLog.Extensions.Hosting](https://www.nuget.org/packages/NLog.Extensions.Hosting) only introduces `UseNLog()` as extension-method for the `IHostBuilder`.
+[NLog.Extensions.Hosting](https://www.nuget.org/packages/NLog.Extensions.Hosting) only introduces `UseNLog()` as extension-method for the `IHostBuilder` / `IHostApplicationBuilder`.
 
 > Note if using **ASP.NET Core** then instead install [NLog.Web.AspNetCore](https://www.nuget.org/packages/NLog.web.aspnetcore).
 
