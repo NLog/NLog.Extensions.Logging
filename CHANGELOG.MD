@@ -2,6 +2,12 @@
 
 Date format: (year/month/day)
 
+### Version 6.0.1 (2025/06/28)
+
+- Updated to NLog v6.0.1 (#802) (@snakefoot)
+- .NET Framework v4.6.2 with UseNLog for IHostApplicationBuilder (#801) (@snakefoot)
+- Fixed namespace for HostRootDirLayoutRenderer (#799) (@snakefoot)
+
 ### Version 6.0 (2025/06/21)
 
 - Updated to NLog v6.0

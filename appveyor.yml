@@ -1,4 +1,4 @@
-version: 6.0.0-{build} # Only change for mayor versions (e.g. 6.0)
+version: 6.0.0-{build} # Only change for major versions (e.g. 6.0)
 image: Visual Studio 2022
 configuration: Release
 skip_tags: true
