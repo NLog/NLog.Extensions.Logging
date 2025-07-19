@@ -18,17 +18,9 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     <PackageReleaseNotes>
 ChangeLog:
 
-- Updated to NLog v6.0
-- Removed support for NetStandard 1.3 + 1.5
-- Updated .NET Framework 4.6.2 with NET8-nuget-dependencies
-- Enabled nullable references
-- Avoid boxing when extracting LogEvent properties from struct
-- Reduce allocation when creating LogEvent with properties by using ReadOnlySpan
-- Enabled &lt;IsAotCompatible&gt;
-- Added ${host-environment} for NLog.Extensions.Hosting
-- Added ${host-rootdir} for NLog.Extensions.Hosting
-- Added ${host-appname} for NLog.Extensions.Hosting
-- Added RegisterHostSettings for NLog.Extensions.Hosting
+- Updated to NLog v6.0.1 (#802) (@snakefoot)
+- .NET Framework v4.6.2 with UseNLog for IHostApplicationBuilder (#801) (@snakefoot)
+- Fixed namespace for HostRootDirLayoutRenderer (#799) (@snakefoot)
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
 
