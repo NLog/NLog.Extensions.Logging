@@ -14,7 +14,7 @@ namespace ConsoleExample
                 .AddTransient<Runner>() // Runner is the custom class
                 .AddLogging(loggingBuilder =>
                 {
-                    // configure Logging with NLog
+                    // Setup NLog for logging
                     loggingBuilder.ClearProviders();
                     loggingBuilder.AddNLog();
                 }).BuildServiceProvider();
