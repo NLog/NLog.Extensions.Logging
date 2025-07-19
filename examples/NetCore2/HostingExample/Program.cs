@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -14,37 +13,19 @@ namespace HostingExample
     {
         private static async Task Main()
         {
-            var config = new ConfigurationBuilder().Build();
-
-            var logger = LogManager.Setup()
-                                   .SetupExtensions(ext => ext.RegisterHostSettings(config))
-                                   .GetCurrentClassLogger();
-
-            try
-            {
-                var hostBuilder = new HostBuilder()
-                    .ConfigureLogging(builder => builder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace))
+            // Disposing the Host will also flush / dispose / shutdown the NLog Logging Provider
+            using var host = new HostBuilder()
                     .ConfigureServices((hostContext, services) => services.AddHostedService<ConsoleHostedService>())
-                    .UseNLog();
+                    .UseNLog()  // Setup NLog for logging
+                    .UseConsoleLifetime()
+                    .Build();
 
-                // Build and run the host in one go; .RCA is specialized for running it in a console.
-                // It registers SIGTERM(Ctrl-C) to the CancellationTokenSource that's shared with all services in the container.
-                await hostBuilder.RunConsoleAsync();
+            // Build and run the host in one go; .RCA is specialized for running it in a console.
+            // It registers SIGTERM(Ctrl-C) to the CancellationTokenSource that's shared with all services in the container.
+            await host.RunAsync();
 
-                Console.WriteLine("The host container has terminated. Press ANY key to exit the console.");
-                Console.ReadKey();
-            }
-            catch (Exception ex)
-            {
-                // NLog: catch setup errors (exceptions thrown inside of any containers may not necessarily be caught)
-                logger.Fatal(ex, "Stopped program because of exception");
-                throw;
-            }
-            finally
-            {
-                // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
-                LogManager.Shutdown();
-            }
+            Console.WriteLine("The host container has terminated. Press ANY key to exit the console.");
+            Console.ReadKey();
         }
 
         public class ConsoleHostedService : BackgroundService
