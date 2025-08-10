@@ -18,7 +18,7 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     <PackageReleaseNotes>
 ChangeLog:
 
-- Updated to NLog v6.0.2 (#805) (@snakefoot)
+- Updated to NLog v6.0.3 (#806) (@snakefoot)
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
 
@@ -70,7 +70,7 @@ List of major changes in NLog 6.0: https://nlog-project.org/2025/04/29/nlog-6-0-
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="NLog" Version="6.0.2" />
+    <PackageReference Include="NLog" Version="6.0.3" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
