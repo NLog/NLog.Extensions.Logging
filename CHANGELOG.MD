@@ -2,6 +2,10 @@
 
 Date format: (year/month/day)
 
+### Version 6.0.3 (2025/08/10)
+
+- [#806](https://github.com/NLog/NLog.Extensions.Logging/pull/806) Updated to NLog v6.0.3 (@snakefoot)
+
 ### Version 6.0.2 (2025/07/20)
 
 - [#805](https://github.com/NLog/NLog.Extensions.Logging/pull/805) Updated to NLog v6.0.2 (@snakefoot)
