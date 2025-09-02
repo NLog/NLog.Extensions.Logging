@@ -268,7 +268,7 @@ namespace NLog.Extensions.Logging
             return keyValueExtractor != null;
         }
 
-        private static bool TryBuildExtractor(Type propertyType, out Func<object , KeyValuePair<string, object?>>? keyValueExtractor)
+        private static bool TryBuildExtractor(Type propertyType, out Func<object, KeyValuePair<string, object?>>? keyValueExtractor)
         {
             keyValueExtractor = null;
 

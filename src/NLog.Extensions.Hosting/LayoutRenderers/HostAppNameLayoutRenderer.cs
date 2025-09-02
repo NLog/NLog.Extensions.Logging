@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using Microsoft.Extensions.Hosting;
 using NLog.Config;
 using NLog.LayoutRenderers;

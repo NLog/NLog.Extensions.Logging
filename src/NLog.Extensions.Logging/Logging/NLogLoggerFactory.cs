@@ -18,7 +18,7 @@ namespace NLog.Extensions.Logging
         /// New factory with default options
         /// </summary>
         public NLogLoggerFactory()
-            :this(NLogProviderOptions.Default)
+            : this(NLogProviderOptions.Default)
         {
         }
 
@@ -27,7 +27,7 @@ namespace NLog.Extensions.Logging
         /// </summary>
         /// <param name="options"></param>
         public NLogLoggerFactory(NLogProviderOptions options)
-            :this(options, LogManager.LogFactory)
+            : this(options, LogManager.LogFactory)
         {
         }
 

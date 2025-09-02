@@ -1,10 +1,10 @@
 ﻿namespace NLog.Extensions.Logging.Tests
 {
     using System;
-    using System.Linq;
-    using System.Text;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reflection;
+    using System.Text;
     using NLog.Config;
     using NLog.Extensions.Logging;
     using NLog.LayoutRenderers;

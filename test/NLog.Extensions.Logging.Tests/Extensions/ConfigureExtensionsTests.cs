@@ -1,13 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog.Config;
-using NLog.Extensions.Logging;
-using System;
-using System.Linq;
 using NLog.Targets;
 using Xunit;
-using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Generic;
-using Microsoft.Extensions.Configuration;
 
 namespace NLog.Extensions.Logging.Tests.Extensions
 {

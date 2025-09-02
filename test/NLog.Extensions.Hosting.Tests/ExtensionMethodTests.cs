@@ -85,7 +85,7 @@ namespace NLog.Extensions.Hosting.Tests
         [Fact]
         public void UseNLog_withAddNLog_worksWithNLog()
         {
-            var actual = new HostBuilder().UseNLog().ConfigureServices((h,s) => s.AddLogging(l => l.AddNLog())).Build();
+            var actual = new HostBuilder().UseNLog().ConfigureServices((h, s) => s.AddLogging(l => l.AddNLog())).Build();
             TestHostingResult(actual, true);
         }
 

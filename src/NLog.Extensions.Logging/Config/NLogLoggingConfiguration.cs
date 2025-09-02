@@ -205,7 +205,7 @@ namespace NLog.Extensions.Logging
                     }
                 }
             }
-            
+
             private static bool IgnoreTopElementChildNullValue(string configKey, object? configValue)
             {
                 if (configValue is null)
