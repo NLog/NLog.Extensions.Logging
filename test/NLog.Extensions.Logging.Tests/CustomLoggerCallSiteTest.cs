@@ -15,7 +15,7 @@ namespace NLog.Extensions.Logging.Tests
             var runner = GetRunner(target: target);
 
             runner.SayHello();
-            
+
             Assert.Single(target.Logs);
             Assert.Contains("SayHello", target.Logs[0]);
             Assert.Contains("stuff", target.Logs[0]);

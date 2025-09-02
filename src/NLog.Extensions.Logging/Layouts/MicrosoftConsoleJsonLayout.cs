@@ -89,7 +89,7 @@ namespace NLog.Extensions.Logging
                 {
                     Attributes.RemoveAt(index);
                 }
-                
+
                 if (value != null && !string.IsNullOrEmpty(value))
                 {
                     var dateLayoutRenderer = _timestampLayout.LayoutRenderers.OfType<DateLayoutRenderer>().First();

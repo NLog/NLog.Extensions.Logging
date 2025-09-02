@@ -68,7 +68,7 @@ namespace NLog.Extensions.Logging.Tests
             Assert.True(runner.SaySomething().Wait(5000));
             Assert.Single(target.Logs);
             Assert.Equal("SaySomething", target.Logs[0]);
-        }     
+        }
 
         public sealed class CustomBeginScopeTestRunner
         {
@@ -110,7 +110,7 @@ namespace NLog.Extensions.Logging.Tests
 
             public async Task SayNothing()
             {
-                using (var scopeState = _logger.BeginScope(new Dictionary<string,string>()))
+                using (var scopeState = _logger.BeginScope(new Dictionary<string, string>()))
                 {
                     await Task.Yield();
                     _logger.LogInformation("Nothing");

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using NLog.MessageTemplates;
 using Xunit;
 
@@ -40,8 +39,8 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Equal(2, list.Count);
             Assert.Equal(new MessageTemplateParameter("a", 2, null, CaptureType.Normal), list[0]);
             Assert.Equal(new MessageTemplateParameter("b", 3, null, CaptureType.Normal), list[1]);
-        }      
-        
+        }
+
         [Fact]
         public void CreateNLogMessageParameterDifferentCaptureTypes()
         {
@@ -96,7 +95,7 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void TryParseShouldReturnEmptyListWhenInputIsEmpty()
         {
-            var items = new List<KeyValuePair<string, object>>{};
+            var items = new List<KeyValuePair<string, object>> { };
             NLogMessageParameterList parsedList = NLogMessageParameterList.TryParse(items);
 
             var expectedCount = 0;

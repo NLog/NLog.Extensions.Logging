@@ -7,7 +7,6 @@ using Microsoft.Extensions.Configuration;
 using NLog.Targets;
 using NLog.Targets.Wrappers;
 using Xunit;
-using Xunit.Sdk;
 
 namespace NLog.Extensions.Logging.Tests
 {
@@ -27,7 +26,7 @@ namespace NLog.Extensions.Logging.Tests
             var memoryConfig = CreateMemoryConfigConsoleTargetAndRule();
             memoryConfig["NLog:Targets:file:type"] = "File";
             memoryConfig["NLog:Targets:file:fileName"] = "hello.txt";
-           
+
             var logConfig = CreateNLogLoggingConfigurationWithNLogSection(memoryConfig);
 
             Assert.Single(logConfig.LoggingRules);
@@ -37,7 +36,7 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Single(logConfig.AllTargets, (t) => t is ConsoleTarget);
             Assert.Equal("hello.txt", (logConfig.FindTargetByName("file") as FileTarget)?.FileName.Render(LogEventInfo.CreateNullEvent()));
         }
-        
+
         [Fact]
         public void LoadConfigShouldIgnoreWellKnownEmptySections()
         {
@@ -52,12 +51,12 @@ namespace NLog.Extensions.Logging.Tests
   }
 }";
             var logConfig = CreateNLogLoggingConfigurationWithNLogSection(appSettings);
-            
+
             Assert.False(logConfig.LoggingRules.Any());
             Assert.False(logConfig.AllTargets.Any());
             Assert.False(logConfig.Variables.Any());
         }
-        
+
         [Fact]
         public void LoadConfigShouldThrowForUnrecognisedSections()
         {
@@ -70,9 +69,9 @@ namespace NLog.Extensions.Logging.Tests
 }";
             var ex = Assert.Throws<NLog.NLogConfigurationException>(() =>
                 CreateNLogLoggingConfigurationWithNLogSection(appSettings));
-            Assert.Equal("Unrecognized value 'someRandomKey'='' for element 'NLog'", ex.Message); 
+            Assert.Equal("Unrecognized value 'someRandomKey'='' for element 'NLog'", ex.Message);
         }
-        
+
         [Fact]
         public void LoadConfigShouldThrowForUnrecognisedComplexSections()
         {
@@ -85,7 +84,7 @@ namespace NLog.Extensions.Logging.Tests
 }";
             var ex = Assert.Throws<NLog.NLogConfigurationException>(() =>
                 CreateNLogLoggingConfigurationWithNLogSection(appSettings));
-            Assert.Equal("Unrecognized value 'someRandomKey'='' for element 'NLog'", ex.Message); 
+            Assert.Equal("Unrecognized value 'someRandomKey'='' for element 'NLog'", ex.Message);
         }
 
         [Fact]
@@ -129,9 +128,9 @@ namespace NLog.Extensions.Logging.Tests
             memoryConfig["NLog:Targets:file:type"] = "AsyncWrapper";
             memoryConfig["NLog:Targets:file:target:wrappedFile:type"] = "File";
             memoryConfig["NLog:Targets:file:target:wrappedFile:fileName"] = "hello.txt";
-            
+
             var logConfig = CreateNLogLoggingConfigurationWithNLogSection(memoryConfig);
-            
+
             Assert.Single(logConfig.LoggingRules);
             Assert.Equal(2, logConfig.LoggingRules[0].Targets.Count);
             Assert.Equal(3, logConfig.AllTargets.Count);
@@ -450,7 +449,7 @@ namespace NLog.Extensions.Logging.Tests
             var logConfig = new NLogLoggingConfiguration(configuration.GetSection(sectionName), logFactory);
             return logConfig;
         }
-        
+
         private static NLogLoggingConfiguration CreateNLogLoggingConfigurationWithNLogSection(string appSettingsContent, string sectionName = DefaultSectionName)
         {
             var configuration = new ConfigurationBuilder().AddJsonStream(new MemoryStream(Encoding.UTF8.GetBytes(appSettingsContent))).Build();
