@@ -2,6 +2,7 @@ version: 6.0.0-{build} # Only change for major versions (e.g. 6.0)
 image: Visual Studio 2022
 configuration: Release
 skip_tags: true
+skip_branch_with_pr: true
 
 environment:
   github_auth_token:
