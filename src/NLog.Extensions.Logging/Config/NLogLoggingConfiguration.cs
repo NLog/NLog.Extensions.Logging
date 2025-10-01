@@ -122,7 +122,10 @@ namespace NLog.Extensions.Logging
         /// <inheritdoc />
         public override string ToString()
         {
-            return base.ToString() + $" ConfigSection={_originalConfigSection?.Key}";
+            if (_autoReload)
+                return $"{base.ToString()}, AutoReload=true, ConfigSection={_originalConfigSection?.Key}";
+            else
+                return $"{base.ToString()}, ConfigSection={_originalConfigSection?.Key}";
         }
 
         private sealed class LoggingConfigurationElement : ILoggingConfigurationElement
