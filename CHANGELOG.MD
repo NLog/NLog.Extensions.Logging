@@ -2,6 +2,11 @@
 
 Date format: (year/month/day)
 
+### Version 6.0.5 (2025/10/09)
+
+- [#811](https://github.com/NLog/NLog.Extensions.Logging/pull/811) Updated to NLog v6.0.5 (@snakefoot)
+- [#809](https://github.com/NLog/NLog.Extensions.Logging/pull/809) NLogLoggingConfiguration - ToString includes AutoReload=true (@snakefoot)
+
 ### Version 6.0.4 (2025/09/11)
 
 - [#808](https://github.com/NLog/NLog.Extensions.Logging/pull/808) Updated to NLog v6.0.4 (@snakefoot)
