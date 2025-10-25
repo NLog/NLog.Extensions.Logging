@@ -9,7 +9,7 @@ Integrates NLog as Logging provider for Microsoft.Extensions.Logging, by just ca
 Providing features like:
 
 - Capture [structured message properties](https://github.com/NLog/NLog.Extensions.Logging/wiki/NLog-properties-with-Microsoft-Extension-Logging) from the [Microsoft ILogger](https://github.com/NLog/NLog.Extensions.Logging/wiki/NLog-GetCurrentClassLogger-and-Microsoft-ILogger)
-- Capture scope context properties from the Microsoft ILogger `BeginScope`
+- Capture [scope context properties](https://github.com/NLog/NLog/wiki/ScopeProperty-Layout-Renderer) from the Microsoft ILogger `BeginScope`
 - Load NLog configuration from [appsettings.json](https://github.com/NLog/NLog.Extensions.Logging/wiki/NLog-configuration-with-appsettings.json)
 - Routing logging output to multiple destinations via the available [NLog Targets](https://nlog-project.org/config/?tab=targets)
 - Enrich logging output with additional context details via the available [NLog LayoutRenderers](https://nlog-project.org/config/?tab=layout-renderers)
