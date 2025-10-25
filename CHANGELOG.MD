@@ -139,6 +139,7 @@ List of major changes in NLog 6.0: https://nlog-project.org/2025/04/29/nlog-6-0-
 
 **Improvements**
 - [#705](https://github.com/NLog/NLog.Extensions.Logging/pull/705): Added target platform for NET 8.0 (#705) (@snakefoot)
+- [#698](https://github.com/NLog/NLog.Extensions.Logging/pull/698): Parse ValueTuple as Scope Context Property (#698) (@snakefoot)
 - [#710](https://github.com/NLog/NLog.Extensions.Logging/pull/710): Improve XML docs for AddNLog and UseNLog (#710) (@snakefoot)
 - [#713](https://github.com/NLog/NLog.Extensions.Logging/pull/713): Updated to NLog v5.2.7 (#713) (@snakefoot)
 
