@@ -15,14 +15,13 @@ Providing features like:
 - Enrich logging output with additional context details via the available [NLog LayoutRenderers](https://nlog-project.org/config/?tab=layout-renderers)
 - Rendering logging output into standard formats like JSON, CVS, W3C ELF and XML using [NLog Layouts](https://nlog-project.org/config/?tab=layouts).
 
-If using ASP.NET Core then consider using [NLog.Web.AspNetCore](https://www.nuget.org/packages/NLog.Web.AspNetCore).
+If using ASP.NET Core then check [NLog.Web.AspNetCore](https://www.nuget.org/packages/NLog.Web.AspNetCore).
 
 Supported platforms:
 
- - .NET 5, 6, 7, 8 and 9
- - .NET 2 and 3
+ - .NET 6, 7, 8, 9 and 10
  - .NET Standard 2.0 and 2.1
- - .NET 4.6.1 - 4.8
+ - .NET 4.6.2 - 4.8
 
 Registration of NLog as logging provider:
 
