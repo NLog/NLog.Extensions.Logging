@@ -240,7 +240,7 @@ namespace NLog.Extensions.Logging
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER || NET471_OR_GREATER
             if (propertyValue is System.Runtime.CompilerServices.ITuple tuple && tuple.Length == 2 && tuple[0] is string)
             {
-                keyValueExtractor = (obj) => new KeyValuePair<string, object?>(
+                keyValueExtractor = static (obj) => new KeyValuePair<string, object?>(
                     ((System.Runtime.CompilerServices.ITuple)obj)[0]?.ToString() ?? string.Empty,
                     ((System.Runtime.CompilerServices.ITuple)obj)[1]);
                 return true;
@@ -279,8 +279,8 @@ namespace NLog.Extensions.Logging
             if (itemType.GetGenericTypeDefinition() == typeof(KeyValuePair<,>))
             {
 #if NETSTANDARD || NETFRAMEWORK
-                var keyPropertyInfo = typeof(KeyValuePair<,>).MakeGenericType(itemType.GenericTypeArguments).GetTypeInfo().GetDeclaredProperty("Key");
-                var valuePropertyInfo = typeof(KeyValuePair<,>).MakeGenericType(itemType.GenericTypeArguments).GetTypeInfo().GetDeclaredProperty("Value");
+                var keyPropertyInfo = typeof(KeyValuePair<,>).MakeGenericType(itemType.GenericTypeArguments).GetTypeInfo().GetDeclaredProperty(nameof(KeyValuePair<string, object>.Key));
+                var valuePropertyInfo = typeof(KeyValuePair<,>).MakeGenericType(itemType.GenericTypeArguments).GetTypeInfo().GetDeclaredProperty(nameof(KeyValuePair<string, object>.Value));
                 if (valuePropertyInfo is null || keyPropertyInfo is null)
                 {
                     return false;
@@ -294,22 +294,7 @@ namespace NLog.Extensions.Logging
 #else
                 if (itemType.GenericTypeArguments[0] == typeof(string))
                 {
-                    if (itemType.GenericTypeArguments[1] == typeof(object))
-                        return BuildKeyValueExtractor<string, object>(propertyType, out keyValueExtractor);
-                    if (itemType.GenericTypeArguments[1] == typeof(string))
-                        return BuildKeyValueExtractor<string, string>(propertyType, out keyValueExtractor);
-                    if (itemType.GenericTypeArguments[1] == typeof(int))
-                        return BuildKeyValueExtractor<string, int>(propertyType, out keyValueExtractor);
-                    if (itemType.GenericTypeArguments[1] == typeof(long))
-                        return BuildKeyValueExtractor<string, long>(propertyType, out keyValueExtractor);
-                    if (itemType.GenericTypeArguments[1] == typeof(decimal))
-                        return BuildKeyValueExtractor<string, decimal>(propertyType, out keyValueExtractor);
-                    if (itemType.GenericTypeArguments[1] == typeof(double))
-                        return BuildKeyValueExtractor<string, double>(propertyType, out keyValueExtractor);
-                    if (itemType.GenericTypeArguments[1] == typeof(bool))
-                        return BuildKeyValueExtractor<string, bool>(propertyType, out keyValueExtractor);
-                    if (itemType.GenericTypeArguments[1] == typeof(Guid))
-                        return BuildKeyValueExtractor<string, Guid>(propertyType, out keyValueExtractor);
+                    return BuildKeyValueExtractor(propertyType, out keyValueExtractor);
                 }
 #endif
             }
@@ -335,10 +320,74 @@ namespace NLog.Extensions.Logging
         }
 
 #if !NETSTANDARD && !NETFRAMEWORK
-        private static bool BuildKeyValueExtractor<TKey, TValue>(Type propertyType, out Func<object, KeyValuePair<string, object?>>? keyValueExtractor)
+        private static KeyValuePair<string, object?> TypedKeyValueExtractor<TKey, TValue>(object value)
         {
-            var keyPropertyInfo = typeof(KeyValuePair<TKey, TValue>).GetTypeInfo().GetDeclaredProperty("Key");
-            var valuePropertyInfo = typeof(KeyValuePair<TKey, TValue>).GetTypeInfo().GetTypeInfo().GetDeclaredProperty("Value");
+            var keyValuePair = (KeyValuePair<TKey, TValue>)value;
+            return new KeyValuePair<string, object?>(keyValuePair.Key?.ToString() ?? string.Empty, keyValuePair.Value);
+        }
+
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming - Allow reflection of BeginScope args", "IL2070")]
+        private static bool BuildKeyValueExtractor(Type propertyType, out Func<object, KeyValuePair<string, object?>>? keyValueExtractor)
+        {
+            var itemType = propertyType.GetTypeInfo();
+            if (itemType.GenericTypeArguments[1] == typeof(object))
+            {
+                keyValueExtractor = TypedKeyValueExtractor<string, object>;
+                return true;
+            }
+            if (itemType.GenericTypeArguments[1] == typeof(string))
+            {
+                keyValueExtractor = TypedKeyValueExtractor<string, string>;
+                return true;
+            }
+            if (itemType.GenericTypeArguments[1] == typeof(int))
+            {
+                keyValueExtractor = TypedKeyValueExtractor<string, int>;
+                return true;
+            }
+            if (itemType.GenericTypeArguments[1] == typeof(long))
+            {
+                keyValueExtractor = TypedKeyValueExtractor<string, long>;
+                return true;
+            }
+            if (itemType.GenericTypeArguments[1] == typeof(decimal))
+            {
+                keyValueExtractor = TypedKeyValueExtractor<string, decimal>;
+                return true;
+            }
+            if (itemType.GenericTypeArguments[1] == typeof(double))
+            {
+                keyValueExtractor = TypedKeyValueExtractor<string, double>;
+                return true;
+            }
+            if (itemType.GenericTypeArguments[1] == typeof(bool))
+            {
+                keyValueExtractor = TypedKeyValueExtractor<string, bool>;
+                return true;
+            }
+            if (itemType.GenericTypeArguments[1] == typeof(Guid))
+            {
+                keyValueExtractor = TypedKeyValueExtractor<string, Guid>;
+                return true;
+            }
+            if (itemType.GenericTypeArguments[1] == typeof(DateTime))
+            {
+                keyValueExtractor = TypedKeyValueExtractor<string, DateTime>;
+                return true;
+            }
+            if (itemType.GenericTypeArguments[1] == typeof(DateTimeOffset))
+            {
+                keyValueExtractor = TypedKeyValueExtractor<string, DateTimeOffset>;
+                return true;
+            }
+            if (itemType.GenericTypeArguments[1] == typeof(TimeSpan))
+            {
+                keyValueExtractor = TypedKeyValueExtractor<string, TimeSpan>;
+                return true;
+            }
+
+            var keyPropertyInfo = propertyType.GetTypeInfo().GetDeclaredProperty(nameof(KeyValuePair<string,object>.Key));
+            var valuePropertyInfo = propertyType.GetTypeInfo().GetDeclaredProperty(nameof(KeyValuePair<string, object>.Value));
             if (valuePropertyInfo is null || keyPropertyInfo is null)
             {
                 keyValueExtractor = default;
