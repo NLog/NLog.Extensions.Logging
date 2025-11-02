@@ -46,9 +46,9 @@ namespace NLog.Extensions.Logging
                         return ScopeContext.PushNestedStateProperties(scopeProperties, scopeProperties);
                 }
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER || NET471_OR_GREATER
-                else if (state is System.Runtime.CompilerServices.ITuple && ((System.Runtime.CompilerServices.ITuple)state).Length == 2 && ((System.Runtime.CompilerServices.ITuple)state)[0] is string)
+                else if (state is System.Runtime.CompilerServices.ITuple && ((System.Runtime.CompilerServices.ITuple)state).Length == 2 && ((System.Runtime.CompilerServices.ITuple)state)[0] is string propertyName)
                 {
-                    return ScopeContext.PushProperty(((System.Runtime.CompilerServices.ITuple)state)[0]?.ToString() ?? string.Empty, ((System.Runtime.CompilerServices.ITuple)state)[1]);
+                    return ScopeContext.PushProperty(propertyName, ((System.Runtime.CompilerServices.ITuple)state)[1]);
                 }
 #endif
 
