@@ -29,8 +29,9 @@ namespace NLog.Extensions.Logging
         {
             if (_options.CaptureMessageProperties)
             {
-                if (state is IReadOnlyList<KeyValuePair<string, object?>> scopePropertyList)
+                if (state is IReadOnlyList<KeyValuePair<string, object?>>)
                 {
+                    var scopePropertyList = (IReadOnlyList<KeyValuePair<string, object?>>)state;
                     if (scopePropertyList is IList)
                         return ScopeContext.PushNestedStateProperties(null, scopePropertyList);  // Probably List/Array without nested state
 
@@ -38,25 +39,26 @@ namespace NLog.Extensions.Logging
                     scopePropertyList = ParseScopeProperties(scopePropertyList);
                     return ScopeContext.PushNestedStateProperties(scopeObject, scopePropertyList);
                 }
-                else if (state is IReadOnlyCollection<KeyValuePair<string, object?>> scopeProperties)
-                {
-                    if (scopeProperties is IDictionary)
-                        return ScopeContext.PushNestedStateProperties(null, scopeProperties);    // Probably Dictionary without nested state
-                    else
-                        return ScopeContext.PushNestedStateProperties(scopeProperties, scopeProperties);
-                }
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER || NET471_OR_GREATER
                 else if (state is System.Runtime.CompilerServices.ITuple && ((System.Runtime.CompilerServices.ITuple)state).Length == 2 && ((System.Runtime.CompilerServices.ITuple)state)[0] is string propertyName)
                 {
                     return ScopeContext.PushProperty(propertyName, ((System.Runtime.CompilerServices.ITuple)state)[1]);
                 }
 #endif
+                else if (state is IReadOnlyCollection<KeyValuePair<string, object?>>)
+                {
+                    var scopeProperties = (IReadOnlyCollection<KeyValuePair<string, object?>>)state;
+                    if (state is IDictionary)
+                        return ScopeContext.PushNestedStateProperties(null, scopeProperties);    // Probably Dictionary without nested state
+                    else
+                        return ScopeContext.PushNestedStateProperties(scopeProperties, scopeProperties);
+                }
 
                 if (!(state is string))
                 {
-                    if (state is IEnumerable scopePropertyCollection)
+                    if (state is IEnumerable)
                     {
-                        return CaptureScopeProperties(scopePropertyCollection, _scopeStateExtractors);
+                        return CaptureScopeProperties((IEnumerable)state, _scopeStateExtractors);
                     }
 
                     return CaptureScopeProperty(state, _scopeStateExtractors);
