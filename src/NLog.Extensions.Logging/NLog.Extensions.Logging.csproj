@@ -18,8 +18,9 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     <PackageReleaseNotes>
 ChangeLog:
 
-- Updated to NLog v6.0.5 (#811) (@snakefoot)
-- NLogLoggingConfiguration - ToString includes AutoReload=true (#809) (@snakefoot)
+- [#817] Updated to NLog v6.0.6 (@snakefoot)
+- [#814] Avoid boxing ITuple when used for BeginScope (@snakefoot)
+- [#813] Allow BeginScope to perform reflection of KeyValuePair (@snakefoot)
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
 
@@ -71,7 +72,7 @@ List of major changes in NLog 6.0: https://nlog-project.org/2025/04/29/nlog-6-0-
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="NLog" Version="6.0.5" />
+    <PackageReference Include="NLog" Version="6.0.6" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">

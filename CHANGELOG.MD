@@ -2,6 +2,12 @@
 
 Date format: (year/month/day)
 
+### Version 6.0.6 (2025/11/09)
+
+- [#817](https://github.com/NLog/NLog.Extensions.Logging/pull/817) Updated to NLog v6.0.6 (@snakefoot)
+- [#814](https://github.com/NLog/NLog.Extensions.Logging/pull/814) Avoid boxing ITuple when used for BeginScope (@snakefoot)
+- [#813](https://github.com/NLog/NLog.Extensions.Logging/pull/813) Allow BeginScope to perform reflection of KeyValuePair (@snakefoot)
+
 ### Version 6.0.5 (2025/10/09)
 
 - [#811](https://github.com/NLog/NLog.Extensions.Logging/pull/811) Updated to NLog v6.0.5 (@snakefoot)
