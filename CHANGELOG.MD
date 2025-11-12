@@ -2,6 +2,10 @@
 
 Date format: (year/month/day)
 
+### Version 6.1.0 (2025/11/12)
+
+- [#818](https://github.com/NLog/NLog.Extensions.Logging/pull/818) Added TargetFramework .NET 10 (@snakefoot)
+
 ### Version 6.0.6 (2025/11/09)
 
 - [#817](https://github.com/NLog/NLog.Extensions.Logging/pull/817) Updated to NLog v6.0.6 (@snakefoot)
