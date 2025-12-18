@@ -66,14 +66,14 @@ namespace NLog.Extensions.Logging
                         case 0:
                             {
                                 var formattedMessage = formatter(state, exception);
-                                return CreateLogEventWithoutParameters(nLogLogLevel, eventId, captureEventId, formattedMessage);
+                                return CreateLogEventWithoutParameters(nLogLogLevel, formattedMessage, eventId, captureEventId);
                             }
                         case 1:
                             parameterCount = 1;
                             if (OriginalFormatPropertyName.Equals(((IReadOnlyList<KeyValuePair<string, object?>>)state)[0].Key))
                             {
                                 var formattedMessage = formatter(state, exception);
-                                return CreateLogEventWithoutParameters(nLogLogLevel, eventId, captureEventId, formattedMessage);
+                                return CreateLogEventWithoutParameters(nLogLogLevel, formattedMessage, eventId, captureEventId);
                             }
                             break;
                         case 2:
@@ -85,17 +85,17 @@ namespace NLog.Extensions.Logging
                                 {
                                     var formattedMessage = formatter(state, exception);
                                     if ("0".Equals(arg1.Name))
-                                        return CreateLogEventWithoutParameters(nLogLogLevel, eventId, captureEventId, formattedMessage);
+                                        return CreateLogEventWithoutParameters(nLogLogLevel, formattedMessage, eventId, captureEventId);
 
                                     var originalMessage = ((IReadOnlyList<KeyValuePair<string, object?>>)state)[1].Value?.ToString() ?? formattedMessage;
 
                                     if (captureEventId)
                                     {
                                         var eventIdParameterCount = GetEventIdMessageParameters(eventId, out var eventIdArg1, out var eventIdArg2);
-                                        if (eventIdParameterCount == 1)
-                                            return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, originalMessage, [arg1, eventIdArg1]);
-                                        else if (eventIdParameterCount != 0)
+                                        if (eventIdParameterCount == 2)
                                             return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, originalMessage, [arg1, eventIdArg1, eventIdArg2]);
+                                        else if (eventIdParameterCount != 0)
+                                            return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, originalMessage, [arg1, eventIdArg1]);
                                     }
                                     return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, originalMessage, [arg1]);
                                 }
@@ -111,17 +111,17 @@ namespace NLog.Extensions.Logging
                                 {
                                     var formattedMessage = formatter(state, exception);
                                     if ("0".Equals(arg1.Name) && "1".Equals(arg2.Name))
-                                        return CreateLogEventWithoutParameters(nLogLogLevel, eventId, captureEventId, formattedMessage);
+                                        return CreateLogEventWithoutParameters(nLogLogLevel, formattedMessage, eventId, captureEventId);
 
                                     var originalMessage = ((IReadOnlyList<KeyValuePair<string, object?>>)state)[2].Value?.ToString() ?? formattedMessage;
 
                                     if (captureEventId)
                                     {
                                         var eventIdParameterCount = GetEventIdMessageParameters(eventId, out var eventIdArg1, out var eventIdArg2);
-                                        if (eventIdParameterCount == 1)
-                                            return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, originalMessage, [arg1, arg2, eventIdArg1]);
-                                        else if (eventIdParameterCount != 0)
+                                        if (eventIdParameterCount == 2)
                                             return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, originalMessage, [arg1, arg2, eventIdArg1, eventIdArg2]);
+                                        else if (eventIdParameterCount != 0)
+                                            return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, originalMessage, [arg1, arg2, eventIdArg1]);
                                     }
                                     return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, originalMessage, [arg1, arg2]);
                                 }
@@ -139,17 +139,17 @@ namespace NLog.Extensions.Logging
                                 {
                                     var formattedMessage = formatter(state, exception);
                                     if ("0".Equals(arg1.Name) && "1".Equals(arg2.Name) && "2".Equals(arg3.Name))
-                                        return CreateLogEventWithoutParameters(nLogLogLevel, eventId, captureEventId, formattedMessage);
+                                        return CreateLogEventWithoutParameters(nLogLogLevel, formattedMessage, eventId, captureEventId);
 
                                     var originalMessage = ((IReadOnlyList<KeyValuePair<string, object?>>)state)[3].Value?.ToString() ?? formattedMessage;
 
                                     if (captureEventId)
                                     {
                                         var eventIdParameterCount = GetEventIdMessageParameters(eventId, out var eventIdArg1, out var eventIdArg2);
-                                        if (eventIdParameterCount == 1)
-                                            return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, originalMessage, [arg1, arg2, arg3, eventIdArg1]);
-                                        else if (eventIdParameterCount != 0)
+                                        if (eventIdParameterCount == 2)
                                             return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, originalMessage, [arg1, arg2, arg3, eventIdArg1, eventIdArg2]);
+                                        else if (eventIdParameterCount != 0)
+                                            return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, originalMessage, [arg1, arg2, arg3, eventIdArg1]);
                                     }
                                     return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, originalMessage, [arg1, arg2, arg3]);
                                 }
@@ -167,17 +167,15 @@ namespace NLog.Extensions.Logging
             return null;
         }
 
-        private LogEventInfo CreateLogEventWithoutParameters(LogLevel nLogLogLevel, in EventId eventId, bool captureEventId, string formattedMessage)
+        private LogEventInfo CreateLogEventWithoutParameters(LogLevel nLogLogLevel, string formattedMessage, in EventId eventId, bool captureEventId)
         {
             if (captureEventId)
             {
                 var eventIdParameterCount = GetEventIdMessageParameters(eventId, out var eventIdArg1, out var eventIdArg2);
-                if (eventIdParameterCount == 0)
-                    return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage);
-                else if (eventIdParameterCount == 1)
-                    return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, formattedMessage, [eventIdArg1]);
-                else
+                if (eventIdParameterCount == 2)
                     return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, formattedMessage, [eventIdArg1, eventIdArg2]);
+                else if (eventIdParameterCount != 0)
+                    return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, formattedMessage, [eventIdArg1]);                   
             }
             return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage);
         }
