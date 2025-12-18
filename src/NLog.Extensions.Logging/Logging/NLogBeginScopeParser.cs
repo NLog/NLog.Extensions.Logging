@@ -279,7 +279,8 @@ namespace NLog.Extensions.Logging
 
             if (propertyType.GetGenericTypeDefinition() == typeof(KeyValuePair<,>))
             {
-                return BuildKeyValueExtractor(propertyType, out keyValueExtractor);
+                keyValueExtractor = BuildKeyValueExtractor(propertyType);
+                return keyValueExtractor != null;
             }
 
 #if !NETSTANDARD2_1_OR_GREATER && !NETCOREAPP3_1_OR_GREATER && !NET471_OR_GREATER
@@ -297,7 +298,8 @@ namespace NLog.Extensions.Logging
                 var keyValuePairTypeParam = Expression.Convert(keyValuePairObjParam, propertyType);
                 var propertyKeyAccess = Expression.Field(keyValuePairTypeParam, keyPropertyInfo);
                 var propertyValueAccess = Expression.Field(keyValuePairTypeParam, valuePropertyInfo);
-                return BuildKeyValueExtractor(keyValuePairObjParam, propertyKeyAccess, propertyValueAccess, out keyValueExtractor);
+                keyValueExtractor = BuildKeyValueExtractor(keyValuePairObjParam, propertyKeyAccess, propertyValueAccess);
+                return keyValueExtractor != null;
             }
 #endif
 
@@ -313,97 +315,60 @@ namespace NLog.Extensions.Logging
 
         [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming - Allow reflection of BeginScope args", "IL2070")]
 #endif
-        private static bool BuildKeyValueExtractor(Type propertyType, TypeInfo itemType, out Func<object, KeyValuePair<string, object?>>? keyValueExtractor)
+        private static Func<object, KeyValuePair<string, object?>>? BuildKeyValueExtractor(Type propertyType, TypeInfo itemType)
         {
             var keyPropertyInfo = itemType.GetDeclaredProperty(nameof(KeyValuePair<string, object>.Key));
             var valuePropertyInfo = itemType.GetDeclaredProperty(nameof(KeyValuePair<string, object>.Value));
             if (valuePropertyInfo is null || keyPropertyInfo is null)
-            {
-                keyValueExtractor = null;
-                return false;
-            }
+                return null;
 
             var keyValuePairObjParam = Expression.Parameter(typeof(object), "KeyValuePair");
             var keyValuePairTypeParam = Expression.Convert(keyValuePairObjParam, propertyType);
             var propertyKeyAccess = Expression.Property(keyValuePairTypeParam, keyPropertyInfo);
             var propertyValueAccess = Expression.Property(keyValuePairTypeParam, valuePropertyInfo);
-            return BuildKeyValueExtractor(keyValuePairObjParam, propertyKeyAccess, propertyValueAccess, out keyValueExtractor);
+            return BuildKeyValueExtractor(keyValuePairObjParam, propertyKeyAccess, propertyValueAccess);
         }
 
-        private static bool BuildKeyValueExtractor(Type propertyType, out Func<object, KeyValuePair<string, object?>>? keyValueExtractor)
+        private static Func<object, KeyValuePair<string, object?>>? BuildKeyValueExtractor(Type propertyType)
         {
 #if NETSTANDARD || NETFRAMEWORK
             var itemType = propertyType.GetTypeInfo();
-            return BuildKeyValueExtractor(propertyType, itemType, out keyValueExtractor);
+            return BuildKeyValueExtractor(propertyType, itemType);
 #else
             if (propertyType.GenericTypeArguments[0] == typeof(string))
             {
                 if (propertyType.GenericTypeArguments[1] == typeof(object))
-                {
-                    keyValueExtractor = TypedKeyValueExtractor<string, object>;
-                    return true;
-                }
+                    return TypedKeyValueExtractor<string, object>;
                 if (propertyType.GenericTypeArguments[1] == typeof(string))
-                {
-                    keyValueExtractor = TypedKeyValueExtractor<string, string>;
-                    return true;
-                }
+                    return TypedKeyValueExtractor<string, string>;
                 if (propertyType.GenericTypeArguments[1] == typeof(int))
-                {
-                    keyValueExtractor = TypedKeyValueExtractor<string, int>;
-                    return true;
-                }
+                    return TypedKeyValueExtractor<string, int>;
                 if (propertyType.GenericTypeArguments[1] == typeof(long))
-                {
-                    keyValueExtractor = TypedKeyValueExtractor<string, long>;
-                    return true;
-                }
+                    return TypedKeyValueExtractor<string, long>;
                 if (propertyType.GenericTypeArguments[1] == typeof(decimal))
-                {
-                    keyValueExtractor = TypedKeyValueExtractor<string, decimal>;
-                    return true;
-                }
+                    return TypedKeyValueExtractor<string, decimal>;
                 if (propertyType.GenericTypeArguments[1] == typeof(double))
-                {
-                    keyValueExtractor = TypedKeyValueExtractor<string, double>;
-                    return true;
-                }
+                    return TypedKeyValueExtractor<string, double>;
                 if (propertyType.GenericTypeArguments[1] == typeof(bool))
-                {
-                    keyValueExtractor = TypedKeyValueExtractor<string, bool>;
-                    return true;
-                }
+                    return TypedKeyValueExtractor<string, bool>;
                 if (propertyType.GenericTypeArguments[1] == typeof(Guid))
-                {
-                    keyValueExtractor = TypedKeyValueExtractor<string, Guid>;
-                    return true;
-                }
+                    return TypedKeyValueExtractor<string, Guid>;
                 if (propertyType.GenericTypeArguments[1] == typeof(DateTime))
-                {
-                    keyValueExtractor = TypedKeyValueExtractor<string, DateTime>;
-                    return true;
-                }
+                    return TypedKeyValueExtractor<string, DateTime>;
                 if (propertyType.GenericTypeArguments[1] == typeof(DateTimeOffset))
-                {
-                    keyValueExtractor = TypedKeyValueExtractor<string, DateTimeOffset>;
-                    return true;
-                }
+                    return TypedKeyValueExtractor<string, DateTimeOffset>;
                 if (propertyType.GenericTypeArguments[1] == typeof(TimeSpan))
-                {
-                    keyValueExtractor = TypedKeyValueExtractor<string, TimeSpan>;
-                    return true;
-                }
+                    return TypedKeyValueExtractor<string, TimeSpan>;
 
                 var itemType = propertyType.GetTypeInfo();
-                return BuildKeyValueExtractor(propertyType, itemType, out keyValueExtractor);
+                return BuildKeyValueExtractor(propertyType, itemType);
             }
 
-            keyValueExtractor = null;
-            return false;
+            return null;
 #endif
         }
 
-        private static bool BuildKeyValueExtractor(ParameterExpression keyValuePairObjParam, MemberExpression propertyKeyAccess, MemberExpression propertyValueAccess, out Func<object, KeyValuePair<string, object?>> keyValueExtractor)
+        private static Func<object, KeyValuePair<string, object?>> BuildKeyValueExtractor(ParameterExpression keyValuePairObjParam, MemberExpression propertyKeyAccess, MemberExpression propertyValueAccess)
         {
             var propertyKeyAccessObj = Expression.Convert(propertyKeyAccess, typeof(object));
             var propertyKeyLambda = Expression.Lambda<Func<object, object>>(propertyKeyAccessObj, keyValuePairObjParam).Compile();
@@ -411,13 +376,12 @@ namespace NLog.Extensions.Logging
             var propertyValueAccessObj = Expression.Convert(propertyValueAccess, typeof(object));
             var propertyValueLambda = Expression.Lambda<Func<object, object?>>(propertyValueAccessObj, keyValuePairObjParam).Compile();
 
-            keyValueExtractor = (obj) =>
+            return (obj) =>
             {
                 return new KeyValuePair<string, object?>(
                     propertyKeyLambda.Invoke(obj)?.ToString() ?? string.Empty,
                     propertyValueLambda.Invoke(obj));
             };
-            return true;
         }
     }
 }
