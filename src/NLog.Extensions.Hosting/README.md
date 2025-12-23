@@ -23,7 +23,7 @@ Supported platforms:
  - .NET Standard 2.0 and 2.1
  - .NET 4.6.2 - 4.8
 
-Registration of NLog as logging provider:
+Register NLog as logging provider:
 
 ```csharp
 var hostBuilder = new HostBuilder().UseNLog();
