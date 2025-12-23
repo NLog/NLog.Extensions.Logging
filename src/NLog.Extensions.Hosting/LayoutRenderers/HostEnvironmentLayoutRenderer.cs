@@ -7,7 +7,7 @@ using NLog.LayoutRenderers;
 namespace NLog.Extensions.Hosting
 {
     /// <summary>
-    /// Rendering development environment. <see cref="IHostingEnvironment.EnvironmentName" />
+    /// Rendering development environment. <see cref="IHostEnvironment.EnvironmentName" />
     /// </summary>
     /// <remarks>
     /// <code>${host-environment}</code>
