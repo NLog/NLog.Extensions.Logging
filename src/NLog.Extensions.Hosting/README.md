@@ -29,7 +29,7 @@ Register NLog as logging provider:
 var hostBuilder = new HostBuilder().UseNLog();
 ```
 
-Useful Links
+Useful Links:
 
 - [Home Page](https://nlog-project.org/)
 - [Change Log](https://github.com/NLog/NLog.Extensions.Logging/releases)
