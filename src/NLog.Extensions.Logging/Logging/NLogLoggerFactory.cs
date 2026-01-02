@@ -96,6 +96,7 @@ namespace NLog.Extensions.Logging
         /// <summary>
         /// Cleanup
         /// </summary>
+        /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
