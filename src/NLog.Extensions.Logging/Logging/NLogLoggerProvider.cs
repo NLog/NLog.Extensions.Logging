@@ -8,6 +8,9 @@ namespace NLog.Extensions.Logging
     /// </summary>
     [ProviderAlias("NLog")]
     public class NLogLoggerProvider : ILoggerProvider
+#if NETSTANDARD2_1_OR_GREATER || NET
+        , IAsyncDisposable
+#endif
     {
         private readonly NLogBeginScopeParser _beginScopeParser;
 
@@ -87,6 +90,24 @@ namespace NLog.Extensions.Logging
                 }
             }
         }
+
+#if NETSTANDARD2_1_OR_GREATER || NET
+        /// <summary>
+        /// Cleanup
+        /// </summary>
+        public async System.Threading.Tasks.ValueTask DisposeAsync()
+        {
+            if (Options.ShutdownOnDispose)
+            {
+                await LogFactory.DisposeAsync().ConfigureAwait(false);
+            }
+            else
+            {
+                await LogFactory.FlushAsync(System.Threading.CancellationToken.None).ConfigureAwait(false);
+            }
+            GC.SuppressFinalize(this);
+        }
+#endif
     }
 }
 
