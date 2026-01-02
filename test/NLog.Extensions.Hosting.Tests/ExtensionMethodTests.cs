@@ -68,17 +68,18 @@ namespace NLog.Extensions.Hosting.Tests
         [Fact]
         public void AddNLog_withShutdownOnDispose_worksWithNLog()
         {
+            var logFactory = new LogFactory();  // Isolated to avoid disposing global LogManager
             var someParam = new NLogProviderOptions { ShutdownOnDispose = true };
-            var actual = new HostBuilder().ConfigureLogging(l => l.AddNLog(someParam)).Build();
+            var actual = new HostBuilder().ConfigureLogging(l => l.AddNLog(someParam, svc => logFactory)).Build();
             try
             {
-                TestHostingResult(actual, false);
-                Assert.NotNull(LogManager.Configuration);
+                TestHostingResult(actual, false, logFactory);
+                Assert.NotNull(logFactory.Configuration);
             }
             finally
             {
                 actual.Dispose();
-                Assert.Null(LogManager.Configuration);
+                Assert.Null(logFactory.Configuration);
             }
         }
 
@@ -89,12 +90,14 @@ namespace NLog.Extensions.Hosting.Tests
             TestHostingResult(actual, true);
         }
 
-        private static void TestHostingResult(IHost host, bool resetConfiguration)
+        private static void TestHostingResult(IHost host, bool resetConfiguration, LogFactory logFactory = null)
         {
+            logFactory ??= LogManager.LogFactory;
+
             try
             {
                 var nlogTarget = new Targets.MemoryTarget() { Name = "Output" };
-                NLog.LogManager.Setup().LoadConfiguration(c => c.ForLogger().WriteTo(nlogTarget));
+                logFactory.Setup().LoadConfiguration(c => c.ForLogger().WriteTo(nlogTarget));
 
                 var loggerFactory = host.Services.GetService<ILoggerFactory>();
                 Assert.NotNull(loggerFactory);
@@ -106,7 +109,7 @@ namespace NLog.Extensions.Hosting.Tests
             finally
             {
                 if (resetConfiguration)
-                    LogManager.Configuration = null;
+                    logFactory.Configuration = null;
             }
         }
 
@@ -202,21 +205,22 @@ namespace NLog.Extensions.Hosting.Tests
         [Fact]
         public void IHostApplicationBuilder_AddNLog_withShutdownOnDispose_worksWithNLog()
         {
+            var logFactory = new LogFactory();  // Isolated to avoid disposing global LogManager
             var someParam = new NLogProviderOptions { ShutdownOnDispose = true };
 
             var builder = new HostApplicationBuilder();
-            builder.Logging.AddNLog(someParam);
+            builder.Logging.AddNLog(someParam, svc => logFactory);
 
             var actual = builder.Build();
             try
             {
-                TestHostingResult(actual, false);
-                Assert.NotNull(LogManager.Configuration);
+                TestHostingResult(actual, false, logFactory);
+                Assert.NotNull(logFactory.Configuration);
             }
             finally
             {
                 actual.Dispose();
-                Assert.Null(LogManager.Configuration);
+                Assert.Null(logFactory.Configuration);
             }
         }
 
