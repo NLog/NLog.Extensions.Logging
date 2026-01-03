@@ -13,7 +13,9 @@ namespace NLog.Extensions.Logging
     [ThreadAgnostic]
     class MicrosoftConsoleLayoutRenderer : LayoutRenderer
     {
+#if NETFRAMEWORK
         private static readonly string[] EventIdMapper = Enumerable.Range(0, 512).Select(id => id.ToString(System.Globalization.CultureInfo.InvariantCulture)).ToArray();
+#endif
 
         /// <summary>
         /// Gets or sets format string used to format timestamp in logging messages. Defaults to <c>null</c>.
@@ -65,11 +67,13 @@ namespace NLog.Extensions.Logging
 
         private static void AppendEventId(int eventId, StringBuilder builder)
         {
+#if NETFRAMEWORK
             if (eventId == 0)
                 builder.Append('0');
             else if (eventId > 0 && eventId < EventIdMapper.Length)
                 builder.Append(EventIdMapper[eventId]);
             else
+#endif
                 builder.Append(eventId);    // .NET5 (and newer) can append integer without string-allocation (using span)
         }
 
