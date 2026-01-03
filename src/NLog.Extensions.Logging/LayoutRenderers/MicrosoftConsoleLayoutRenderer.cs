@@ -13,7 +13,7 @@ namespace NLog.Extensions.Logging
     [ThreadAgnostic]
     class MicrosoftConsoleLayoutRenderer : LayoutRenderer
     {
-        private static readonly string[] EventIdMapper = Enumerable.Range(0, 50).Select(id => id.ToString(System.Globalization.CultureInfo.InvariantCulture)).ToArray();
+        private static readonly string[] EventIdMapper = Enumerable.Range(0, 512).Select(id => id.ToString(System.Globalization.CultureInfo.InvariantCulture)).ToArray();
 
         /// <summary>
         /// Gets or sets format string used to format timestamp in logging messages. Defaults to <c>null</c>.

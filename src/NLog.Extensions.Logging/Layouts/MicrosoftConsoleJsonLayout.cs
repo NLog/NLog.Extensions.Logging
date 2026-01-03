@@ -15,7 +15,7 @@ namespace NLog.Extensions.Logging
     [ThreadAgnostic]
     public class MicrosoftConsoleJsonLayout : JsonLayout
     {
-        private static readonly string[] EventIdMapper = Enumerable.Range(0, 50).Select(id => id.ToString(System.Globalization.CultureInfo.InvariantCulture)).ToArray();
+        private static readonly string[] EventIdMapper = Enumerable.Range(0, 512).Select(id => id.ToString(System.Globalization.CultureInfo.InvariantCulture)).ToArray();
 
         private readonly SimpleLayout _timestampLayout = new SimpleLayout("\"${date:format=o:universalTime=true}\"");
 
@@ -47,7 +47,7 @@ namespace NLog.Extensions.Logging
             get
             {
                 var index = LookupNamedAttributeIndex("State");
-                return index >= 0 ? (Attributes[index]?.Layout as JsonLayout)?.Attributes : null;
+                return index >= 0 ? (Attributes[index]?.Layout as JsonLayout)?.Attributes : new List<JsonAttribute>();
             }
         }
 
@@ -97,6 +97,31 @@ namespace NLog.Extensions.Logging
                     Attributes.Insert(0, new JsonAttribute("Timestamp", _timestampLayout) { Encode = false });
                 }
             }
+        }
+
+        /// <inheritdoc />
+        protected override void InitializeLayout()
+        {
+            IncludeEventProperties = false;
+            IncludeScopeProperties = false;
+
+            var stateIndex = LookupNamedAttributeIndex("State");
+            var stateJsonLayout = stateIndex >= 0 ? Attributes[stateIndex]?.Layout as JsonLayout : null;
+            if (stateJsonLayout != null)
+            {
+                stateJsonLayout.MaxRecursionLimit = MaxRecursionLimit;
+                stateJsonLayout.ExcludeEmptyProperties = ExcludeEmptyProperties;
+                stateJsonLayout.SuppressSpaces = SuppressSpaces && !IndentJson;
+                if (ExcludeProperties?.Count > 0)
+                {
+                    foreach (var excludeProperty in ExcludeProperties)
+                    {
+                        stateJsonLayout.ExcludeProperties.Add(excludeProperty);
+                    }
+                }
+            }
+
+            base.InitializeLayout();
         }
 
         private int LookupNamedAttributeIndex(string attributeName)
