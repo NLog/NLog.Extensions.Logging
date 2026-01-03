@@ -24,6 +24,16 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Fact]
+        public void MicrosoftConsoleJsonLayout_MaxRecursionLimit()
+        {
+            var layout = new MicrosoftConsoleJsonLayout() { MaxRecursionLimit = 0, TimestampFormat = null };
+            var logEvent = new LogEventInfo(LogLevel.Error, "MyLogger", "Hello World");
+            logEvent.Properties["Planet"] = new { Name = "Earth", Location = new { Galaxy = "Milky Way" } };
+            var result = layout.Render(logEvent);
+            Assert.Equal("{ \"EventId\": 0, \"LogLevel\": \"Error\", \"Category\": \"MyLogger\", \"Message\": \"Hello World\", \"State\": { \"{OriginalFormat}\": \"Hello World\", \"Planet\": \"{ Name = Earth, Location = { Galaxy = Milky Way } }\" } }", result);
+        }
+
+        [Fact]
         public void MicrosoftConsoleJsonLayout_ExceptionEvent()
         {
             var layout = new MicrosoftConsoleJsonLayout();
