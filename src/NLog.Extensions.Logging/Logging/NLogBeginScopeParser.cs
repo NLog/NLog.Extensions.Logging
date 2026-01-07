@@ -39,7 +39,7 @@ namespace NLog.Extensions.Logging
                     scopePropertyList = ParseScopeProperties(scopePropertyList);
                     return ScopeContext.PushNestedStateProperties(scopeObject, scopePropertyList);
                 }
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER || NET471_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NET || NET471_OR_GREATER
                 else if (state is System.Runtime.CompilerServices.ITuple && ((System.Runtime.CompilerServices.ITuple)state).Length == 2 && ((System.Runtime.CompilerServices.ITuple)state)[0] is string propertyName)
                 {
                     return ScopeContext.PushProperty(propertyName, ((System.Runtime.CompilerServices.ITuple)state)[1]);
@@ -239,7 +239,7 @@ namespace NLog.Extensions.Logging
         private static bool TryLookupExtractor<TState>(ExtractorDictionary stateExtractor, TState propertyValue,
             out Func<object, KeyValuePair<string, object?>>? keyValueExtractor)
         {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER || NET471_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NET || NET471_OR_GREATER
             if (propertyValue is System.Runtime.CompilerServices.ITuple && ((System.Runtime.CompilerServices.ITuple)propertyValue).Length == 2 && ((System.Runtime.CompilerServices.ITuple)propertyValue)[0] is string)
             {
                 keyValueExtractor = static (obj) => new KeyValuePair<string, object?>(
@@ -283,7 +283,7 @@ namespace NLog.Extensions.Logging
                 return keyValueExtractor != null;
             }
 
-#if !NETSTANDARD2_1_OR_GREATER && !NETCOREAPP3_1_OR_GREATER && !NET471_OR_GREATER
+#if !NETSTANDARD2_1_OR_GREATER && !NET && !NET471_OR_GREATER
             if (propertyType.GetGenericTypeDefinition() == typeof(ValueTuple<,>))
             {
                 var itemType = propertyType.GetTypeInfo();
@@ -306,13 +306,15 @@ namespace NLog.Extensions.Logging
             return false;
         }
 
-#if !NETSTANDARD && !NETFRAMEWORK
+#if NETSTANDARD2_1_OR_GREATER || NET
         private static KeyValuePair<string, object?> TypedKeyValueExtractor<TKey, TValue>(object value)
         {
             var keyValuePair = (KeyValuePair<TKey, TValue>)value;
             return new KeyValuePair<string, object?>(keyValuePair.Key?.ToString() ?? string.Empty, keyValuePair.Value);
         }
+#endif
 
+#if NET
         [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming - Allow reflection of BeginScope args", "IL2070")]
 #endif
         private static Func<object, KeyValuePair<string, object?>>? BuildKeyValueExtractor(Type propertyType, TypeInfo itemType)
@@ -331,10 +333,7 @@ namespace NLog.Extensions.Logging
 
         private static Func<object, KeyValuePair<string, object?>>? BuildKeyValueExtractor(Type propertyType)
         {
-#if NETSTANDARD || NETFRAMEWORK
-            var itemType = propertyType.GetTypeInfo();
-            return BuildKeyValueExtractor(propertyType, itemType);
-#else
+#if NETSTANDARD2_1_OR_GREATER || NET
             if (propertyType.GenericTypeArguments[0] == typeof(string))
             {
                 if (propertyType.GenericTypeArguments[1] == typeof(object))
@@ -363,8 +362,10 @@ namespace NLog.Extensions.Logging
                 var itemType = propertyType.GetTypeInfo();
                 return BuildKeyValueExtractor(propertyType, itemType);
             }
-
             return null;
+#else
+            var itemType = propertyType.GetTypeInfo();
+            return BuildKeyValueExtractor(propertyType, itemType);
 #endif
         }
 
