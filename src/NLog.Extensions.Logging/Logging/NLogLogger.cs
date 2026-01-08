@@ -50,7 +50,7 @@ namespace NLog.Extensions.Logging
             _logger.Log(typeof(Microsoft.Extensions.Logging.ILogger), eventInfo);
         }
 
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NET
         LogEventInfo? GetMessageParametersWithoutBoxing<TState>(LogLevel nLogLogLevel, in EventId eventId, in TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
             if (state is IReadOnlyList<KeyValuePair<string, object?>>)
@@ -185,7 +185,7 @@ namespace NLog.Extensions.Logging
         {
             if (_options.CaptureMessageProperties)
             {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NET
                 var logEventWithoutBoxing = GetMessageParametersWithoutBoxing(nLogLogLevel, eventId, state, exception, formatter);
                 if (logEventWithoutBoxing is not null)
                 {
@@ -528,7 +528,7 @@ namespace NLog.Extensions.Logging
             }
         }
 
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NET
         int GetEventIdMessageParameters(in EventId eventId, out MessageTemplateParameter arg1, out MessageTemplateParameter arg2)
         {
             var captureEventId = _options.CaptureEventId;
