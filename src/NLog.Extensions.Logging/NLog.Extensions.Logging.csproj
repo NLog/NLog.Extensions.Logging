@@ -18,7 +18,13 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     <PackageReleaseNotes>
 ChangeLog:
 
-- [#818] Added TargetFramework .NET 10
+- [#822] NLogLogger - Optimize for default EventId capture (@snakefoot)
+- [#824] Introduced WriteToJsonConsole for fluent API to match AddJsonConsole (@snakefoot)
+- [#825] NLogLoggerProvider - Implement IAsyncDisposable (@snakefoot)
+- [#826] MicrosoftConsoleJsonLayout - Forward MaxRecursionLimit to State-JsonLayout (@snakefoot)
+- [#827] MicrosoftConsoleLayoutRenderer - Apply Span for EventId (@snakefoot)
+- [#828] Replace NETCOREAPP3_1_OR_GREATER with new NET (@snakefoot)
+- [#830] Updated to NLog v6.1 (@snakefoot)
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
 
@@ -73,7 +79,7 @@ List of major changes in NLog 6.0: https://nlog-project.org/2025/04/29/nlog-6-0-
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="NLog" Version="6.0.6" />
+    <PackageReference Include="NLog" Version="6.1.0" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">

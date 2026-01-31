@@ -2,6 +2,16 @@
 
 Date format: (year/month/day)
 
+### Version 6.1.1 (2026/01/31)
+
+- [#822](https://github.com/NLog/NLog.Extensions.Logging/pull/822) NLogLogger - Optimize for default EventId capture (@snakefoot)
+- [#824](https://github.com/NLog/NLog.Extensions.Logging/pull/824) Introduced WriteToJsonConsole for fluent API to match AddJsonConsole (@snakefoot)
+- [#825](https://github.com/NLog/NLog.Extensions.Logging/pull/825) NLogLoggerProvider - Implement IAsyncDisposable (@snakefoot)
+- [#826](https://github.com/NLog/NLog.Extensions.Logging/pull/826) MicrosoftConsoleJsonLayout - Forward MaxRecursionLimit to State-JsonLayout (@snakefoot)
+- [#827](https://github.com/NLog/NLog.Extensions.Logging/pull/827) MicrosoftConsoleLayoutRenderer - Apply Span for EventId (@snakefoot)
+- [#828](https://github.com/NLog/NLog.Extensions.Logging/pull/828) Replace NETCOREAPP3_1_OR_GREATER with new NET (@snakefoot)
+- [#830](https://github.com/NLog/NLog.Extensions.Logging/pull/830) Updated to NLog v6.1 (@snakefoot)
+
 ### Version 6.1.0 (2025/11/12)
 
 - [#818](https://github.com/NLog/NLog.Extensions.Logging/pull/818) Added TargetFramework .NET 10 (@snakefoot)
