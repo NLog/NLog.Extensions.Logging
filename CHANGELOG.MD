@@ -2,6 +2,10 @@
 
 Date format: (year/month/day)
 
+### Version 6.1.2 (2026/03/01)
+- [#831](https://github.com/NLog/NLog.Extensions.Logging/pull/831) MicrosoftConsoleJsonLayout - Forward DottedRecursion to State-JsonLayout (@snakefoot)
+- [#832](https://github.com/NLog/NLog.Extensions.Logging/pull/832) Updated to NLog v6.1.1 (@snakefoot)
+
 ### Version 6.1.1 (2026/01/31)
 
 - [#822](https://github.com/NLog/NLog.Extensions.Logging/pull/822) NLogLogger - Optimize for default EventId capture (@snakefoot)

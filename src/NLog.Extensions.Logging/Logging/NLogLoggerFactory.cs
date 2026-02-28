@@ -109,7 +109,7 @@ namespace NLog.Extensions.Logging
         /// <summary>
         /// Cleanup
         /// </summary>
-        async System.Threading.Tasks.ValueTask IAsyncDisposable.DisposeAsync()
+        public async System.Threading.Tasks.ValueTask DisposeAsync()
         {
             await _provider.DisposeAsync();
             GC.SuppressFinalize(this);
