@@ -10,7 +10,7 @@ namespace NLog.Extensions.Logging
     /// <summary>
     /// Layout renderer that can lookup values from Microsoft Extension Configuration Container (json, xml, ini)
     /// </summary>
-    /// <remarks>Not to be confused with NLog.AppConfig that includes ${appsetting}</remarks>
+    /// <remarks>Not to be confused with ${appsetting} for lookup of .NET Framework App Settings configuration (app.config / web.config)</remarks>
     /// <example>
     /// Example: appsettings.json
     /// {
