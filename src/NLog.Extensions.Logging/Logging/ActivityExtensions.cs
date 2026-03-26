@@ -1,6 +1,4 @@
-﻿#if NET5_0_OR_GREATER
-
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace NLog.Extensions.Logging
 {
@@ -9,36 +7,49 @@ namespace NLog.Extensions.Logging
     /// </summary>
     internal static class ActivityExtensions
     {
-        public static string GetSpanId(this Activity activity)
+        private static readonly string EmptySpanIdToHexString = default(System.Diagnostics.ActivitySpanId).ToHexString();
+        private static readonly string EmptyTraceIdToHexString = default(System.Diagnostics.ActivityTraceId).ToHexString();
+
+        public static string GetSpanId(this Activity? activity)
         {
-            return activity.IdFormat switch
+            return activity?.IdFormat switch
             {
                 ActivityIdFormat.Hierarchical => activity.Id,
-                ActivityIdFormat.W3C => activity.SpanId.ToHexString(),
+                ActivityIdFormat.W3C => SpanIdToHexString(activity.SpanId),
                 _ => null,
             } ?? string.Empty;
         }
 
-        public static string GetTraceId(this Activity activity)
+        public static string GetTraceId(this Activity? activity)
         {
-            return activity.IdFormat switch
+            return activity?.IdFormat switch
             {
                 ActivityIdFormat.Hierarchical => activity.RootId,
-                ActivityIdFormat.W3C => activity.TraceId.ToHexString(),
+                ActivityIdFormat.W3C => TraceIdToHexString(activity.TraceId),
                 _ => null,
             } ?? string.Empty;
         }
 
-        public static string GetParentId(this Activity activity)
+        public static string GetParentId(this Activity? activity)
         {
-            return activity.IdFormat switch
+            return activity?.IdFormat switch
             {
                 ActivityIdFormat.Hierarchical => activity.ParentId,
-                ActivityIdFormat.W3C => activity.ParentSpanId.ToHexString(),
+                ActivityIdFormat.W3C => SpanIdToHexString(activity.ParentSpanId),
                 _ => null,
             } ?? string.Empty;
+        }
+
+        private static string SpanIdToHexString(ActivitySpanId spanId)
+        {
+            var spanIdString = spanId.ToHexString();
+            return EmptySpanIdToHexString.Equals(spanIdString, System.StringComparison.Ordinal) ? string.Empty : spanIdString;
+        }
+
+        private static string TraceIdToHexString(ActivityTraceId traceId)
+        {
+            var traceIdString = traceId.ToHexString();
+            return EmptyTraceIdToHexString.Equals(traceIdString, System.StringComparison.Ordinal) ? string.Empty : traceIdString;
         }
     }
 }
-
-#endif

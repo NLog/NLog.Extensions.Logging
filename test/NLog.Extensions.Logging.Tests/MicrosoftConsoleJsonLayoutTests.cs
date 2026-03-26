@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -67,6 +68,28 @@ namespace NLog.Extensions.Logging.Tests
             logger.Log(logEvent);
             var result = logFactory.Configuration.FindTargetByName<NLog.Targets.MemoryTarget>("test")?.Logs?.FirstOrDefault();
             Assert.Equal($"{{ \"Timestamp\": \"{logEvent.TimeStamp.ToUniversalTime().ToString("O")}\", \"EventId\": {eventId}, \"LogLevel\": \"Error\", \"Category\": \"{typeof(MicrosoftConsoleJsonLayoutTests).FullName}\", \"Message\": \"Alert {eventId}\", \"Exception\": \"{exception.ToString()}\", \"State\": {{ \"{{OriginalFormat}}\": \"Alert {{EventId}}\" }}, \"Scopes\": [ \"Request Started\", \"Activity Started\" ] }}", result);
+        }
+
+        [Fact]
+        public void MicrosoftConsoleJsonLayout_IncludeTrackingIds()
+        {
+            // Arrange
+            var logFactory = new LogFactory().Setup().LoadConfiguration(builder =>
+            {
+                var layout = new MicrosoftConsoleJsonLayout() { IncludeTrackingIds = true };
+                builder.ForLogger().WriteTo(new NLog.Targets.MemoryTarget("test") { Layout = layout });
+            }).LogFactory;
+            var logger = logFactory.GetCurrentClassLogger();
+
+            // Act
+            var _ = new System.Diagnostics.Activity("TestActivity").SetParentId("42").Start();
+            var eventId = 42;
+            var logEvent = new LogEventInfo(LogLevel.Info, "MyLogger", null, "Alert {EventId}", new object[] { eventId });
+            logger.Info(logEvent);
+
+            // Assert
+            var result = logFactory.Configuration.FindTargetByName<NLog.Targets.MemoryTarget>("test")?.Logs?.FirstOrDefault();
+            Assert.StartsWith($"{{ \"Timestamp\": \"{logEvent.TimeStamp.ToUniversalTime().ToString("O")}\", \"EventId\": {eventId}, \"LogLevel\": \"Information\", \"Category\": \"{typeof(MicrosoftConsoleJsonLayoutTests).FullName}\", \"Message\": \"Alert {eventId}\", \"State\": {{ \"{{OriginalFormat}}\": \"Alert {{EventId}}\" }}, \"TraceId\": \"42\", \"SpanId\": \"|42", result);
         }
     }
 }
