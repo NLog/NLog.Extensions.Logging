@@ -12,7 +12,6 @@ namespace NLog.Extensions.Logging.Tests.Extensions
 {
     public class ConfigureExtensionsTests
     {
-#if NET5_0_OR_GREATER
         [Fact]
         public void AddNLog_LoggerFactory_IncludeActivityIdsWithBeginScope()
         {
@@ -23,7 +22,7 @@ namespace NLog.Extensions.Logging.Tests.Extensions
             // Act
             LogManager.Configuration = config;
             var logger = loggerFactory.CreateLogger(nameof(AddNLog_LoggerFactory_IncludeActivityIdsWithBeginScope));
-            var activity = new System.Diagnostics.Activity("TestActivity").SetParentId("42").Start();
+            var _ = new System.Diagnostics.Activity("TestActivity").SetParentId("42").Start();
             var scopeProperties = new Dictionary<string, object> { { "RequestId", "123" }, { "RequestPath", "Unknown" } };
             using (logger.BeginScope(new ArraySegment<KeyValuePair<string, object>>(scopeProperties.ToArray())))
             {
@@ -33,7 +32,6 @@ namespace NLog.Extensions.Logging.Tests.Extensions
             // Assert
             AssertSingleMessage(memoryTarget, "42 - test message with 1 arg");
         }
-#endif
 
         [Fact]
         public void AddNLog_LoggingBuilder_LogInfo_ShouldLogToNLog()

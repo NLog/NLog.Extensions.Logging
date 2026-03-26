@@ -73,6 +73,42 @@ namespace NLog.Extensions.Logging
         }
 
         /// <summary>
+        /// Gets or sets whether to include "TraceId" + "SpanId" + "ParentId" in the output.
+        /// </summary>
+        /// <remarks>
+        /// Similar to ActivityTrackingOptions.TraceId | ActivityTrackingOptions.SpanId | ActivityTrackingOptions.ParentId .
+        ///
+        /// For additional Activity properties, use <see cref="StateAttributes"/> together with NLog.DiagnosticSource-nuget-package.
+        /// </remarks>
+        public bool IncludeTrackingIds
+        {
+            get => LookupNamedAttributeIndex("TraceId") >= 0;
+            set
+            {
+                var index_traceId = LookupNamedAttributeIndex("TraceId");
+                if (index_traceId >= 0)
+                {
+                    if (!value)
+                    {
+                        Attributes.RemoveAt(index_traceId);
+                        var index_spanId = LookupNamedAttributeIndex("SpanId");
+                        if (index_spanId >= 0)
+                            Attributes.RemoveAt(index_spanId);
+                        var index_parentId = LookupNamedAttributeIndex("ParentId");
+                        if (index_parentId >= 0)
+                            Attributes.RemoveAt(index_parentId);
+                    }
+                }
+                else if (value)
+                {
+                    Attributes.Add(new JsonAttribute("TraceId", Layout.FromMethod(l => ActivityExtensions.GetTraceId(System.Diagnostics.Activity.Current))));
+                    Attributes.Add(new JsonAttribute("SpanId", Layout.FromMethod(l => ActivityExtensions.GetSpanId(System.Diagnostics.Activity.Current))));
+                    Attributes.Add(new JsonAttribute("ParentId", Layout.FromMethod(l => ActivityExtensions.GetParentId(System.Diagnostics.Activity.Current))));
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets or sets whether to include "Timestamp"-section
         /// </summary>
         public string? TimestampFormat

@@ -102,7 +102,6 @@ namespace NLog.Extensions.Logging
             }
         }
 
-#if NET5_0_OR_GREATER
         private IReadOnlyList<KeyValuePair<string, object?>> IncludeActivityIdsProperties(IReadOnlyList<KeyValuePair<string, object?>> scopePropertyList)
         {
             if (_options.IncludeActivityIdsWithBeginScope && "RequestId".Equals(scopePropertyList[0].Key))
@@ -165,12 +164,6 @@ namespace NLog.Extensions.Logging
                 return ((IEnumerable)_originalPropertyList).GetEnumerator();
             }
         }
-#else
-        private static IReadOnlyList<KeyValuePair<string, object?>> IncludeActivityIdsProperties(IReadOnlyList<KeyValuePair<string, object?>> scopePropertyList)
-        {
-            return scopePropertyList;   // Not supported
-        }
-#endif
 
         public static IDisposable CaptureScopeProperties(IEnumerable scopePropertyCollection, ExtractorDictionary stateExtractor)
         {
