@@ -16,7 +16,7 @@ namespace NLog.Extensions.Logging
             {
                 ActivityIdFormat.Hierarchical => activity.Id,
                 ActivityIdFormat.W3C => SpanIdToHexString(activity.SpanId),
-                _ => null,
+                _ => string.Empty,
             } ?? string.Empty;
         }
 
@@ -26,7 +26,7 @@ namespace NLog.Extensions.Logging
             {
                 ActivityIdFormat.Hierarchical => activity.RootId,
                 ActivityIdFormat.W3C => TraceIdToHexString(activity.TraceId),
-                _ => null,
+                _ => string.Empty,
             } ?? string.Empty;
         }
 
@@ -36,7 +36,7 @@ namespace NLog.Extensions.Logging
             {
                 ActivityIdFormat.Hierarchical => activity.ParentId,
                 ActivityIdFormat.W3C => SpanIdToHexString(activity.ParentSpanId),
-                _ => null,
+                _ => string.Empty,
             } ?? string.Empty;
         }
 

@@ -71,12 +71,12 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Fact]
-        public void MicrosoftConsoleJsonLayout_IncludeTrackingIds()
+        public void MicrosoftConsoleJsonLayout_IncludeActivityIds()
         {
             // Arrange
             var logFactory = new LogFactory().Setup().LoadConfiguration(builder =>
             {
-                var layout = new MicrosoftConsoleJsonLayout() { IncludeTrackingIds = true };
+                var layout = new MicrosoftConsoleJsonLayout() { IncludeActivityIds = true };
                 builder.ForLogger().WriteTo(new NLog.Targets.MemoryTarget("test") { Layout = layout });
             }).LogFactory;
             var logger = logFactory.GetCurrentClassLogger();
