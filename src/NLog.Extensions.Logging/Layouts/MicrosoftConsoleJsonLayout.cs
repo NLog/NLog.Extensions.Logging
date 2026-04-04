@@ -73,14 +73,14 @@ namespace NLog.Extensions.Logging
         }
 
         /// <summary>
-        /// Gets or sets whether to include "TraceId" + "SpanId" + "ParentId" in the output.
+        /// Gets or sets whether to include "TraceId" + "SpanId" + "ParentId" from <see cref="System.Diagnostics.Activity.Current"/>
         /// </summary>
         /// <remarks>
         /// Similar to ActivityTrackingOptions.TraceId | ActivityTrackingOptions.SpanId | ActivityTrackingOptions.ParentId .
         ///
         /// For additional Activity properties, use <see cref="StateAttributes"/> together with NLog.DiagnosticSource-nuget-package.
         /// </remarks>
-        public bool IncludeTrackingIds
+        public bool IncludeActivityIds
         {
             get => LookupNamedAttributeIndex("TraceId") >= 0;
             set
