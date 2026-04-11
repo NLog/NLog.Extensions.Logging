@@ -10,11 +10,13 @@ namespace NLog.Extensions.Logging
         /// <summary>
         /// Control capture of <see cref="Microsoft.Extensions.Logging.EventId"/> as "EventId"-property.
         /// </summary>
+        /// <remarks>Default: <see cref="EventIdCaptureType.EventId"/> | <see cref="EventIdCaptureType.EventName"/></remarks>
         public EventIdCaptureType CaptureEventId { get; set; } = EventIdCaptureType.EventId | EventIdCaptureType.EventName;
 
         /// <summary>
         /// Skip capture of <see cref="Microsoft.Extensions.Logging.EventId"/> in <see cref="LogEventInfo.Properties" /> when <c>default(EventId)</c>
         /// </summary>
+        /// <remarks>Default: <see langword="true"/></remarks>
         public bool IgnoreEmptyEventId { get; set; } = true;
 
         /// <summary>
@@ -28,36 +30,43 @@ namespace NLog.Extensions.Logging
         /// <summary>
         /// Enable structured logging by capturing message template parameters with support for "@" and "$". Enables use of ${message:raw=true}
         /// </summary>
+        /// <remarks>Default: <see langword="true"/></remarks>
         public bool CaptureMessageTemplates { get; set; } = true;
 
         /// <summary>
         /// Enable capture of properties from the ILogger-State-object, both in <see cref="Microsoft.Extensions.Logging.ILogger.Log{TState}"/> and <see cref="Microsoft.Extensions.Logging.ILogger.BeginScope{TState}"/>
         /// </summary>
+        /// <remarks>Default: <see langword="true"/></remarks>
         public bool CaptureMessageProperties { get; set; } = true;
 
         /// <summary>
         /// Enable capture of <see cref="LogEventInfo.Parameters"/> from the ILogger-State-object. Only relevant when <see cref="CaptureMessageTemplates"/> = true
         /// </summary>
+        /// <remarks>Default: <see langword="false"/></remarks>
         public bool CaptureMessageParameters { get; set; }
 
         /// <summary>
         /// Use the NLog engine for parsing the message template (again) and format using the NLog formatter
         /// </summary>
+        /// <remarks>Default: <see langword="false"/></remarks>
         public bool ParseMessageTemplates { get; set; }
 
         /// <summary>
         /// Enable capture of scope information and inject into <see cref="NLog.ScopeContext" />
         /// </summary>
+        /// <remarks>Default: <see langword="true"/></remarks>
         public bool IncludeScopes { get; set; } = true;
 
         /// <summary>
         /// Shutdown NLog on dispose of the <see cref="NLogLoggerProvider"/>
         /// </summary>
+        /// <remarks>Default: <see langword="false"/></remarks>
         public bool ShutdownOnDispose { get; set; }
 
         /// <summary>
         /// Automatically Shutdown NLog on AppDomain.Unload or AppDomain.ProcessExit
         /// </summary>
+        /// <remarks>Default: <see langword="false"/></remarks>
         public bool AutoShutdown { get; set; }
 
         /// <summary>
@@ -68,6 +77,7 @@ namespace NLog.Extensions.Logging
         /// 
         /// Consider using <a href="https://www.nuget.org/packages/NLog.DiagnosticSource/">${activity}</a> as alternative
         /// </remarks>
+        /// <remarks>Default: <see langword="false"/></remarks>
         public bool IncludeActivityIdsWithBeginScope { get; set; }
 
         /// <summary>
@@ -79,22 +89,28 @@ namespace NLog.Extensions.Logging
         /// <summary>
         /// Resets the default Microsoft LoggerFactory Filter for the <see cref="NLogLoggerProvider"/>, and instead only uses NLog LoggingRules.
         /// </summary>
+        /// <remarks>Default: <see langword="true"/></remarks>
         public bool RemoveLoggerFactoryFilter { get; set; } = true;
 
         /// <summary>
         /// Replace Microsoft LoggerFactory with a pure <see cref="NLogLoggerFactory" />, and disables Microsoft Filter Logic and removes other LoggingProviders.
+        ///
+        /// Can be used as an alternative to calling ILoggingBuilder.ClearProviders(), when only wanting NLog target output.
         /// </summary>
+        /// <remarks>Default: <see langword="false"/></remarks>
         public bool ReplaceLoggerFactory { get; set; }
 
         /// <summary>
-        /// Checks the Host Configuration for the specified section-name, and tries to load NLog-LoggingConfiguration after creation of NLogLoggerProvider
+        /// Checks the Host Configuration for the specified section-name, and tries to load NLog-LoggingConfiguration after creation of NLogLoggerProvider.
+        /// Will only attempt to load NLog-LoggingConfiguration if valid section-name, and NLog-LoggingConfiguration has not been loaded already.
         /// </summary>
-        /// <remarks>Will only attempt to load NLog-LoggingConfiguration if valid section-name, and NLog-LoggingConfiguration has not been loaded already.</remarks>
+        /// <remarks>Default: NLog</remarks>
         public string LoggingConfigurationSectionName { get; set; } = "NLog";
 
         /// <summary>
         /// Enable NLog Targets and Layouts to perform dependency lookup using the Microsoft Dependency Injection IServiceProvider
         /// </summary>
+        /// <remarks>Default: <see langword="true"/></remarks>
         public bool RegisterServiceProvider { get; set; } = true;
 
         /// <summary>Initializes a new instance NLogProviderOptions with default values.</summary>
