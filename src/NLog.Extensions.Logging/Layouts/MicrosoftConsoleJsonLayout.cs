@@ -30,7 +30,7 @@ namespace NLog.Extensions.Logging
             Attributes.Add(new JsonAttribute("LogLevel", Layout.FromMethod(evt => ConvertLogLevel(evt.Level), LayoutRenderOptions.ThreadAgnostic)) { Encode = false });
             Attributes.Add(new JsonAttribute("Category", "${logger}"));
             Attributes.Add(new JsonAttribute("Message", "${message}"));
-            Attributes.Add(new JsonAttribute("Exception", "${replace-newlines:${exception:format=tostring,data}}"));
+            Attributes.Add(new JsonAttribute("Exception", "${exception:format=tostring,data}"));
             var stateJsonLayout = new JsonLayout() { IncludeEventProperties = true };
             stateJsonLayout.ExcludeProperties.Add(nameof(EventIdCaptureType.EventId));
             stateJsonLayout.ExcludeProperties.Add(nameof(EventIdCaptureType.EventId_Id));
