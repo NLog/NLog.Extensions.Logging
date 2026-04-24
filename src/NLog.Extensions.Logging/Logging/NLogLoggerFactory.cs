@@ -111,7 +111,7 @@ namespace NLog.Extensions.Logging
         /// </summary>
         public async System.Threading.Tasks.ValueTask DisposeAsync()
         {
-            await _provider.DisposeAsync();
+            await _provider.DisposeAsync().ConfigureAwait(false);
             GC.SuppressFinalize(this);
         }
 #endif
