@@ -1,5 +1,5 @@
 version: 6.0.0-{build} # Only change for major versions (e.g. 6.0)
-image: Visual Studio 2022
+image: Visual Studio 2026
 configuration: Release
 skip_tags: true
 skip_branch_with_pr: true
@@ -14,11 +14,6 @@ environment:
     secure: OUI/jCbBF75TwKMPT+IfewdgwCgx9nQkRg3cYOEQNJeX5J2++oWS3dmpwO51XduP
   JAVA_HOME: C:\Program Files\Java\jdk17
 
-install:
-- ps: |
-    Invoke-WebRequest -Uri 'https://dot.net/v1/dotnet-install.ps1' -UseBasicParsing -OutFile "$env:temp\dotnet-install.ps1"
-    & $env:temp\dotnet-install.ps1 -Architecture x64 -Version '10.0.102' -InstallDir "$env:ProgramFiles\dotnet"
-
 build_script:
   - ps: .\build.ps1
 
@@ -30,15 +25,6 @@ artifacts:
   - path: 'artifacts\*.snupkg'
 
 test_script:
-  - nuget.exe install OpenCover -ExcludeVersion -DependencyVersion Ignore
-  - OpenCover\tools\OpenCover.Console.exe -register:user -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test -f net462  -c debug NLog.Extensions.Logging.Tests" -filter:"+[NLog.Extensions.Logging]* +[NLog.Extensions.Hosting]* -[NLog.Extensions.Logging.Tests]* -[NLog.Extensions.Hosting.Tests]*" -output:"coverage.xml" -oldstyle -targetdir:"test"
-  - OpenCover\tools\OpenCover.Console.exe -register:user -mergeoutput -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test -f net6.0         -c debug NLog.Extensions.Logging.Tests" -filter:"+[NLog.Extensions.Logging]* -[NLog.Extensions.Logging.Tests]*" -output:"coverage.xml" -oldstyle -targetdir:"test"
-  - OpenCover\tools\OpenCover.Console.exe -register:user -mergeoutput -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test -f net8.0         -c debug NLog.Extensions.Logging.Tests" -filter:"+[NLog.Extensions.Logging]* -[NLog.Extensions.Logging.Tests]*" -output:"coverage.xml" -oldstyle -targetdir:"test"
-  - OpenCover\tools\OpenCover.Console.exe -register:user -mergeoutput -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test -f net462         -c debug NLog.Extensions.Hosting.Tests" -filter:"+[NLog.Extensions.Logging]* +[NLog.Extensions.Hosting]* -[NLog.Extensions.Logging.Tests]* -[NLog.Extensions.Hosting.Tests]*" -output:"coverage.xml" -oldstyle -targetdir:"test"
-  - OpenCover\tools\OpenCover.Console.exe -register:user -mergeoutput -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test -f net6.0         -c debug NLog.Extensions.Hosting.Tests" -filter:"+[NLog.Extensions.Logging]* +[NLog.Extensions.Hosting]* -[NLog.Extensions.Logging.Tests]* -[NLog.Extensions.Hosting.Tests]*" -output:"coverage.xml" -oldstyle -targetdir:"test"
-  - OpenCover\tools\OpenCover.Console.exe -register:user -mergeoutput -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test -f net8.0         -c debug NLog.Extensions.Hosting.Tests" -filter:"+[NLog.Extensions.Logging]* +[NLog.Extensions.Hosting]* -[NLog.Extensions.Logging.Tests]* -[NLog.Extensions.Hosting.Tests]*" -output:"coverage.xml" -oldstyle -targetdir:"test"
-  - pip install codecov
-  - codecov -f "coverage.xml"
   - set PATH=%JAVA_HOME%\bin;%PATH%
   - ps: .\run-sonar.ps1
   - ps: .\run-tests.ps1

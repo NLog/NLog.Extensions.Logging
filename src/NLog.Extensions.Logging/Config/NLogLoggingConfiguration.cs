@@ -209,9 +209,9 @@ namespace NLog.Extensions.Logging
                 }
             }
 
-            private static bool IgnoreTopElementChildNullValue(string configKey, object? configValue)
+            private static bool IgnoreTopElementChildNullValue(string configKey, string? configValue)
             {
-                if (configValue is null)
+                if (string.IsNullOrEmpty(configValue))
                 {
                     // Only accept known section-names as being empty (when no children and null value)
                     if (string.Equals(TargetDefaultParameters, configKey, StringComparison.OrdinalIgnoreCase))

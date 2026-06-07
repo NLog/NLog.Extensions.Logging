@@ -1,8 +1,6 @@
-$projectFile = "src\NLog.Extensions.Logging\NLog.Extensions.Logging.csproj"
 $sonarQubeId = "nlog.extensions.logging"
 $github = "nlog/NLog.Extensions.Logging"
 $baseBranch = "master"
-$framework = "netstandard2.0"
 $sonarOrg = "nlog"
 
 
@@ -20,7 +18,7 @@ if ($env:APPVEYOR_REPO_NAME -eq $github) {
         $prMode = $true;
     }
 
-    dotnet tool install --global dotnet-sonarscanner --version 5.13.1
+    dotnet tool install --global dotnet-sonarscanner --version 5.15.1
     if (-Not $LastExitCode -eq 0) {
         exit $LastExitCode 
     }
@@ -48,7 +46,12 @@ if ($env:APPVEYOR_REPO_NAME -eq $github) {
         exit $LastExitCode 
     }
 
-    msbuild /t:Rebuild $projectFile /p:targetFrameworks=$framework /verbosity:minimal
+    dotnet build --configuration release --no-incremental
+    if (-Not $LastExitCode -eq 0) {
+        exit $LastExitCode 
+    }
+
+    dotnet test --configuration release --collect "Code Coverage"
     if (-Not $LastExitCode -eq 0) {
         exit $LastExitCode 
     }

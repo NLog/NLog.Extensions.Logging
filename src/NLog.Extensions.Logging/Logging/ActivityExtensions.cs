@@ -5,6 +5,11 @@ namespace NLog.Extensions.Logging
     /// <summary>
     /// Helpers for getting the right values from Activity no matter the format (w3c or hierarchical)
     /// </summary>
+    /// <remarks>
+    /// W3C format is the recommended format, but hierarchical is still the default in .NET Framework
+    /// - System.Diagnostics.Activity.DefaultIdFormat = System.Diagnostics.ActivityIdFormat.W3C;
+    /// - or by setting the environment variable DOTNET_SYSTEM_DIAGNOSTICS_ACTIVITY_DEFAULTIDFORMAT to W3C
+    /// </remarks>
     internal static class ActivityExtensions
     {
         private static readonly string EmptySpanIdToHexString = default(System.Diagnostics.ActivitySpanId).ToHexString();
