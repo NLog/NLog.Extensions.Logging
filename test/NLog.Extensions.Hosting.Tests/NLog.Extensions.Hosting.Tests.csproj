@@ -8,6 +8,7 @@
     <OutputType>Library</OutputType>
     <IsPackable>false</IsPackable>
     <SonarQubeTestProject>true</SonarQubeTestProject>
+    <DebugType>Full</DebugType>
     <LangVersion>latest</LangVersion>
 
     <SignAssembly>true</SignAssembly>
