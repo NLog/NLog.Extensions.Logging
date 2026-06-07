@@ -46,7 +46,7 @@ if ($env:APPVEYOR_REPO_NAME -eq $github) {
         exit $LastExitCode 
     }
 
-    dotnet build --configuration release --no-incremental
+    dotnet build --configuration release --no-incremental --verbosity:minimal
     if (-Not $LastExitCode -eq 0) {
         exit $LastExitCode 
     }

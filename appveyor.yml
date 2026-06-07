@@ -27,7 +27,7 @@ artifacts:
 test_script:
   - set PATH=%JAVA_HOME%\bin;%PATH%
   - nuget.exe install OpenCover -ExcludeVersion -DependencyVersion Ignore
-  - dotnet build --configuration release
+  - dotnet build --configuration release --verbosity:minimal
   - OpenCover\tools\OpenCover.Console.exe -target:"dotnet.exe" -targetargs:"test --no-build --configuration release" -returntargetcode -output:coverage.xml -register:user
   - ps: .\run-sonar.ps1
   - ps: .\run-tests.ps1
