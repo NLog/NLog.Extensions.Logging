@@ -2,6 +2,11 @@
 
 Date format: (year/month/day)
 
+### Version 6.1.4 (2026/07/08)
+- [#852](https://github.com/NLog/NLog.Extensions.Logging/pull/852) Updated to NLog v6.1.4 (@snakefoot)
+- [#850](https://github.com/NLog/NLog.Extensions.Logging/pull/850) Fix Sonar Code Smells (@snakefoot)
+- [#847](https://github.com/NLog/NLog.Extensions.Logging/pull/847) AppVeyor - Visual Studio 2026 (@snakefoot)
+
 ### Version 6.1.3 (2026/05/04)
 - [#838](https://github.com/NLog/NLog.Extensions.Logging/pull/838) NLogLoggerFactory DisposeAsync with ConfigureAwait(false) (@11v1)
 - [#834](https://github.com/NLog/NLog.Extensions.Logging/pull/834) + [#835](https://github.com/NLog/NLog.Extensions.Logging/pull/835) MicrosoftConsoleJsonLayout - Added IncludeActivityIds to output TraceId + SpanId + ParentId (@snakefoot)
