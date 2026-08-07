@@ -4,9 +4,9 @@
 [![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=sqale_rating)](https://sonarcloud.io/dashboard/?id=nlog.extensions.logging&branch=master) 
 [![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=vulnerabilities)](https://sonarcloud.io/dashboard/?id=nlog.extensions.logging&branch=master) 
 
-Integrates NLog as Logging provider for Microsoft.Extensions.Logging, by just calling `AddNLog()` on the Logging-builder.
+**NLog.Extensions.Logging** integrates NLog as a logging provider for **Microsoft.Extensions.Logging**.
 
-Providing features like:
+Application code can continue using `ILogger<T>`, while NLog provides powerful logging capabilities including:
 
 - Capture [structured message properties](https://github.com/NLog/NLog.Extensions.Logging/wiki/NLog-properties-with-Microsoft-Extension-Logging) from the [Microsoft ILogger](https://github.com/NLog/NLog.Extensions.Logging/wiki/NLog-GetCurrentClassLogger-and-Microsoft-ILogger)
 - Capture [scope context properties](https://github.com/NLog/NLog/wiki/ScopeProperty-Layout-Renderer) from the Microsoft ILogger `BeginScope`
@@ -15,7 +15,7 @@ Providing features like:
 - Enrich logging output with additional context details via the available [NLog LayoutRenderers](https://nlog-project.org/config/?tab=layout-renderers)
 - Rendering logging output into standard formats like JSON, CVS, W3C ELF and XML using [NLog Layouts](https://nlog-project.org/config/?tab=layouts).
 
-If using ASP.NET Core then check [NLog.Web.AspNetCore](https://www.nuget.org/packages/NLog.Web.AspNetCore).
+If using ASP.NET Core, use [NLog.Web.AspNetCore](https://www.nuget.org/packages/NLog.Web.AspNetCore).
 
 Supported platforms:
 
