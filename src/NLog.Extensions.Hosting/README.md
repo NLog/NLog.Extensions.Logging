@@ -4,9 +4,9 @@
 [![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=sqale_rating)](https://sonarcloud.io/dashboard/?id=nlog.extensions.logging&branch=master) 
 [![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=vulnerabilities)](https://sonarcloud.io/dashboard/?id=nlog.extensions.logging&branch=master) 
 
-Integrates NLog as Logging provider for Microsoft.Extensions.Logging, by just calling `UseNLog()` on the application HostBuilder.
+**NLog.Extensions.Hosting** integrates NLog as a logging provider for **Microsoft.Extensions.Logging** by calling `UseNLog()` on the application HostBuilder.
 
-Providing features like:
+Application code can continue using `ILogger<T>`, while NLog provides powerful logging capabilities including:
 
 - Capture [structured message properties](https://github.com/NLog/NLog.Extensions.Logging/wiki/NLog-properties-with-Microsoft-Extension-Logging) from the [Microsoft ILogger](https://github.com/NLog/NLog.Extensions.Logging/wiki/NLog-GetCurrentClassLogger-and-Microsoft-ILogger)
 - Capture [scope context properties](https://github.com/NLog/NLog/wiki/ScopeProperty-Layout-Renderer) from the Microsoft ILogger `BeginScope`
