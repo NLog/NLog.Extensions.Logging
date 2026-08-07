@@ -35,4 +35,5 @@ Useful Links:
 - [Change Log](https://github.com/NLog/NLog.Extensions.Logging/releases)
 - [Tutorial](https://github.com/NLog/NLog/wiki/Tutorial)
 - [Logging Troubleshooting](https://github.com/NLog/NLog/wiki/Logging-troubleshooting)
+- [Change Log](https://github.com/NLog/NLog.Extensions.Logging/releases)
 - [Have a question?](https://stackoverflow.com/questions/tagged/nlog)
