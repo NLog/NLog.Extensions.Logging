@@ -15,7 +15,7 @@ Application code can continue using `ILogger<T>`, while NLog provides powerful l
 - Enrich logging output with additional context details via the available [NLog LayoutRenderers](https://nlog-project.org/config/?tab=layout-renderers)
 - Rendering logging output into standard formats like JSON, CVS, W3C ELF and XML using [NLog Layouts](https://nlog-project.org/config/?tab=layouts).
 
-If using ASP.NET Core then check [NLog.Web.AspNetCore](https://www.nuget.org/packages/NLog.Web.AspNetCore).
+If using ASP.NET Core, use [NLog.Web.AspNetCore](https://www.nuget.org/packages/NLog.Web.AspNetCore).
 
 Supported platforms:
 
