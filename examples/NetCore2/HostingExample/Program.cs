@@ -10,21 +10,17 @@ namespace HostingExample
 {
     public class Program
     {
-        private static async Task Main()
+        public static async Task Main(string[] args)
         {
-            // Disposing the Host will also flush / dispose / shutdown the NLog Logging Provider
-            using var host = new HostBuilder()
-                    .ConfigureServices((hostContext, services) => services.AddHostedService<ConsoleHostedService>())
-                    .UseNLog()  // Setup NLog for logging
-                    .UseConsoleLifetime()
-                    .Build();
+            var builder = Host.CreateApplicationBuilder(args);
 
-            // Build and run the host in one go; .RCA is specialized for running it in a console.
-            // It registers SIGTERM(Ctrl-C) to the CancellationTokenSource that's shared with all services in the container.
+            // Setup NLog and load configuration from appsettings.json
+            builder.Logging.ClearProviders();
+            builder.UseNLog();
+
+            builder.Services.AddHostedService<ConsoleHostedService>();
+            using var host = builder.Build();
             await host.RunAsync();
-
-            Console.WriteLine("The host container has terminated. Press ANY key to exit the console.");
-            Console.ReadKey();
         }
 
         public class ConsoleHostedService : BackgroundService

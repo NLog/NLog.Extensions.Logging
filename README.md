@@ -35,12 +35,10 @@ Just configure NLog using [Fluent Setup API](https://github.com/NLog/NLog/wiki/F
 [NLog.Extensions.Hosting](https://www.nuget.org/packages/NLog.Extensions.Hosting) introduces `UseNLog()` as extension-method for the application HostBuilder,
 and includes the layoutrenderers `${host-rootdir}` + `${host-environment}` + `${host-appname}`.
 
-> Note if using **ASP.NET Core** then instead install [NLog.Web.AspNetCore](https://www.nuget.org/packages/NLog.web.aspnetcore).
+> Note for **ASP.NET Core** use [NLog.Web.AspNetCore](https://www.nuget.org/packages/NLog.Web.AspNetCore).
 
 ### Getting Started Tutorials:
 
-- [Getting started for ASP.NET Core 6](https://github.com/NLog/NLog/wiki/Getting-started-with-ASP.NET-Core-6)
-- [Getting started for ASP.NET Core 5](https://github.com/NLog/NLog/wiki/Getting-started-with-ASP.NET-Core-5)
-- [Getting started for ASP.NET Core 3.1](https://github.com/NLog/NLog/wiki/Getting-started-with-ASP.NET-Core-3)
-- [Getting started for .NET Core Console application](https://github.com/NLog/NLog/wiki/Getting-started-with-.NET-Core-2---Console-application)
+- [Getting started for .NET Core Console application](https://github.com/NLog/NLog/wiki/Getting-started-with-.NET-Core-Console-application)
+- [Getting started for ASP.NET Core](https://github.com/NLog/NLog/wiki/Getting-started-with-ASP.NET-Core-6)
 - [How to use structured logging](https://github.com/NLog/NLog/wiki/How-to-use-structured-logging)
