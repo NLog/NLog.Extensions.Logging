@@ -33,8 +33,7 @@ builder.Logging.AddNLog();
 Useful Links:
 
 - [Home Page](https://nlog-project.org/)
-- [Change Log](https://github.com/NLog/NLog.Extensions.Logging/releases)
-- [Tutorial](https://github.com/NLog/NLog/wiki/Tutorial)
+- [Tutorial for NLog with NET Core](https://github.com/NLog/NLog/wiki/Getting-started-with-.NET-Core-Console-application)
 - [Logging Troubleshooting](https://github.com/NLog/NLog/wiki/Logging-troubleshooting)
 - [Change Log](https://github.com/NLog/NLog.Extensions.Logging/releases)
 - [Have a question?](https://stackoverflow.com/questions/tagged/nlog)
