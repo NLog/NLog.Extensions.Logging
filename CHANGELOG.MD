@@ -2,6 +2,12 @@
 
 Date format: (year/month/day)
 
+### Version 6.2 (2026/08/16)
+- [#859](https://github.com/NLog/NLog.Extensions.Logging/pull/859) Updated to NLog v6.2 (@snakefoot)
+- [#855](https://github.com/NLog/NLog.Extensions.Logging/pull/855) Updated tutorials and examples for using NLog with Microsoft.Extension.Logging (@snakefoot)
+
+Release notes for NLog v6.2: https://nlog-project.org/2026/08/16/nlog-6-2-aot-build-size.html
+
 ### Version 6.1.4 (2026/07/08)
 - [#852](https://github.com/NLog/NLog.Extensions.Logging/pull/852) Updated to NLog v6.1.4 (@snakefoot)
 - [#850](https://github.com/NLog/NLog.Extensions.Logging/pull/850) Fix Sonar Code Smells (@snakefoot)
