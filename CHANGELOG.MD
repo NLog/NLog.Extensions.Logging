@@ -2,6 +2,9 @@
 
 Date format: (year/month/day)
 
+### Version 6.2.1 (2026/09/16)
+- [#864](https://github.com/NLog/NLog.Extensions.Logging/pull/864) Updated to NLog v6.2.1 (@snakefoot)
+
 ### Version 6.2 (2026/08/16)
 - [#859](https://github.com/NLog/NLog.Extensions.Logging/pull/859) Updated to NLog v6.2 (@snakefoot)
 - [#855](https://github.com/NLog/NLog.Extensions.Logging/pull/855) Updated tutorials and examples for using NLog with Microsoft.Extension.Logging (@snakefoot)
