@@ -51,6 +51,8 @@ namespace NLog.Extensions.Logging
         /// <remarks>Default: <see langword="false"/></remarks>
         public bool ParseMessageTemplates { get; set; }
 
+        internal bool FastCaptureMessageTemplates => CaptureMessageTemplates && !CaptureMessageParameters && !ParseMessageTemplates;
+
         /// <summary>
         /// Enable capture of scope information and inject into <see cref="NLog.ScopeContext" />
         /// </summary>
