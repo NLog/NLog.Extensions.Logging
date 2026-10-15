@@ -2,6 +2,10 @@
 
 Date format: (year/month/day)
 
+### Version 6.2.2 (2026/10/15)
+- [#872](https://github.com/NLog/NLog.Extensions.Logging/pull/872) Updated to NLog v6.2.2 (@snakefoot)
+- [#868](https://github.com/NLog/NLog.Extensions.Logging/pull/868) NLogLogger - Change OriginalFormatPropertyName to string.Intern for ReferenceEquals fast-path (@snakefoot)
+
 ### Version 6.2.1 (2026/09/16)
 - [#864](https://github.com/NLog/NLog.Extensions.Logging/pull/864) Updated to NLog v6.2.1 (@snakefoot)
 
