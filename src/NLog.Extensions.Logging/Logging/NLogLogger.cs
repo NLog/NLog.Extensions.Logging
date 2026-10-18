@@ -138,7 +138,7 @@ namespace NLog.Extensions.Logging
                                 if (arg1.Name is not null && arg2.Name is not null && arg3.Name is not null)
                                 {
                                     var positionalFormat = "0".Equals(arg1.Name) && "1".Equals(arg2.Name) && "2".Equals(arg3.Name);
-                                    string ? originalMessage = ((IReadOnlyList<KeyValuePair<string, object?>>)state)[3].Value?.ToString();
+                                    var originalMessage = ((IReadOnlyList<KeyValuePair<string, object?>>)state)[3].Value?.ToString();
                                     var formattedMessage = formatter(state, exception);
                                     if (positionalFormat)
                                         return CreateLogEventWithoutParameters(nLogLogLevel, formattedMessage, eventId, captureEventId);
@@ -175,7 +175,7 @@ namespace NLog.Extensions.Logging
                 if (eventIdParameterCount == 2)
                     return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, formattedMessage, [eventIdArg1, eventIdArg2]);
                 else if (eventIdParameterCount != 0)
-                    return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, formattedMessage, [eventIdArg1]);                   
+                    return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage, formattedMessage, [eventIdArg1]);
             }
             return new LogEventInfo(nLogLogLevel, _logger.Name, formattedMessage);
         }
