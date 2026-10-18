@@ -16,7 +16,7 @@ environment:
   JAVA_HOME: C:\Program Files\Java\jdk21
 
 build_script:
-  - ps: .\build.ps1
+  - ps: dotnet build NLog.Extensions.Logging.sln
 
 nuget:
   disable_publish_on_pr: true
