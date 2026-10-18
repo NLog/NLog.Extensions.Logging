@@ -6,5 +6,8 @@
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	    <Company>NLog</Company>
+	    <CurrentYear>$([System.DateTime]::Now.ToString(yyyy))</CurrentYear>
+	    <Copyright>Copyright (c) 2004-$(CurrentYear) NLog Project - https://nlog-project.org/ </Copyright>
 	</PropertyGroup>
 </Project>
