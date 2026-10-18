@@ -14,7 +14,7 @@ on:
 
 env:
   SOLUTION: NLog.Extensions.Logging.sln
-  DOTNET_VERSION: 8.0.x
+  DOTNET_VERSION: 10.x
 
 jobs:
   build:
