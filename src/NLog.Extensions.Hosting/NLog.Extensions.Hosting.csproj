@@ -6,8 +6,8 @@
     <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' AND '$(VisualStudioVersion)' &lt; '18.0' ">net462;netstandard2.0;netstandard2.1;net6.0;net8.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' ">net462;netstandard2.0;netstandard2.1;net6.0;net8.0;net10.0</TargetFrameworks>
 
-    <Product>NLog.Extensions.Hosting v$(ProductVersion)</Product>
-    <InformationalVersion>$(ProductVersion)</InformationalVersion>
+    <Product>NLog.Extensions.Hosting v$(VersionPrefix)</Product>
+    <InformationalVersion>$(VersionPrefix)</InformationalVersion>
 
     <Authors>Julian Verdurmen;Bryan Gonzalez</Authors>
     <Company>NLog</Company>
