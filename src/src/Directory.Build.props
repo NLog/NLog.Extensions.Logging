@@ -1,0 +1,10 @@
+<Project>
+	<PropertyGroup>
+		<VersionPrefix>6.2.3</VersionPrefix>
+		<AssemblyVersion>6.0.0.0</AssemblyVersion>
+		<FileVersion>$(VersionPrefix).0</FileVersion>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	</PropertyGroup>
+</Project>
