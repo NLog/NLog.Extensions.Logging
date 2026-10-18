@@ -28,9 +28,11 @@ jobs:
           - os: windows-latest
             name: Build, test & NuGet package (Windows)
             create_nuget_package: true
-          # - os: ubuntu-latest
-          #   name: Build & test (Ubuntu)
-          #   create_nuget_package: false
+            framework_args:
+          - os: ubuntu-latest
+            name: Build & test (Ubuntu)
+            create_nuget_package: false
+            framework_args: --framework net10.0
     runs-on: ${{ matrix.os }}
     permissions:
       contents: read
@@ -47,10 +49,10 @@ jobs:
         run: dotnet restore ${{ env.SOLUTION }}
 
       - name: Build
-        run: dotnet build ${{ env.SOLUTION }} --configuration Release --no-restore
+        run: dotnet build ${{ env.SOLUTION }} --configuration Release --no-restore  ${{ matrix.framework_args }}
 
       - name: Test
-        run: dotnet test ${{ env.SOLUTION }} --configuration Release --no-restore --no-build --logger "console;verbosity=normal"
+        run: dotnet test ${{ env.SOLUTION }} --configuration Release --no-restore --no-build ${{ matrix.framework_args }} --logger "console;verbosity=normal"
 
       - name: Publish example (AOT/self-contained check)
         if: matrix.create_nuget_package
