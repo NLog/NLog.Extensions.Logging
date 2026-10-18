@@ -14,7 +14,10 @@ on:
 
 env:
   SOLUTION: NLog.Extensions.Logging.sln
-  DOTNET_VERSION: 10.x
+  DOTNET_VERSION: |
+    8.0.x
+    10.0.x
+  ContinuousIntegrationBuild: true
 
 jobs:
   build:
@@ -49,6 +52,10 @@ jobs:
       - name: Test
         run: dotnet test ${{ env.SOLUTION }} --configuration Release --no-restore --no-build --logger "console;verbosity=normal"
 
+      - name: Publish example (AOT/self-contained check)
+        if: matrix.create_nuget_package
+        run: dotnet publish examples/NetCore2/HostingExample -r win-x64 --configuration Release --self-contained
+
       - name: Determine version suffix
         if: matrix.create_nuget_package
         id: version
@@ -73,9 +80,9 @@ jobs:
           VERSION_SUFFIX: ${{ steps.version.outputs.suffix }}
         run: |
           if ($env:VERSION_SUFFIX) {
-            dotnet pack $env:SOLUTION --no-build --configuration Release --output artifacts --version-suffix "$env:VERSION_SUFFIX"
+            dotnet pack $env:SOLUTION --no-build --configuration Release --output artifacts -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg --version-suffix "$env:VERSION_SUFFIX"
           } else {
-            dotnet pack $env:SOLUTION --no-build --configuration Release --output artifacts
+            dotnet pack $env:SOLUTION --no-build --configuration Release --output artifacts -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
           }
 
       - name: Upload NuGet package
