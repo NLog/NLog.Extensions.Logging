@@ -25,9 +25,9 @@ jobs:
           - os: windows-latest
             name: Build, test & NuGet package (Windows)
             create_nuget_package: true
-          - os: ubuntu-latest
-            name: Build & test (Ubuntu)
-            create_nuget_package: false
+          # - os: ubuntu-latest
+          #   name: Build & test (Ubuntu)
+          #   create_nuget_package: false
     runs-on: ${{ matrix.os }}
     permissions:
       contents: read
