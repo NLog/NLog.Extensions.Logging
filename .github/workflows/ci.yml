@@ -82,9 +82,9 @@ jobs:
           VERSION_SUFFIX: ${{ steps.version.outputs.suffix }}
         run: |
           if ($env:VERSION_SUFFIX) {
-            dotnet pack $env:SOLUTION --no-build --configuration Release --output artifacts -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg --version-suffix "$env:VERSION_SUFFIX"
+            dotnet pack $env:SOLUTION --no-build --configuration Release --output artifacts --version-suffix "$env:VERSION_SUFFIX"
           } else {
-            dotnet pack $env:SOLUTION --no-build --configuration Release --output artifacts -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
+            dotnet pack $env:SOLUTION --no-build --configuration Release --output artifacts
           }
 
       - name: Upload NuGet package
