@@ -1,0 +1,124 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      force_nuget_publish:
+        description: Force NuGet publish # for non-master. The package version gets a suffix. See Create NuGet Package step
+        type: boolean
+        default: false
+
+env:
+  SOLUTION: NLog.Extensions.Logging.sln
+  DOTNET_VERSION: 8.0.x
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            name: Build, test & NuGet package (Windows)
+            create_nuget_package: true
+          - os: ubuntu-latest
+            name: Build & test (Ubuntu)
+            create_nuget_package: false
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore ${{ env.SOLUTION }}
+
+      - name: Build
+        run: dotnet build ${{ env.SOLUTION }} --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test ${{ env.SOLUTION }} --configuration Release --no-restore --no-build --logger "console;verbosity=normal"
+
+      - name: Determine version suffix
+        if: matrix.create_nuget_package
+        id: version
+        shell: pwsh
+        env:
+          REF: ${{ github.ref }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          if ($env:REF -eq "refs/heads/master") {
+            echo "suffix=" >> $env:GITHUB_OUTPUT
+          } elseif ($env:PR_NUMBER) {
+            echo "suffix=pr.$($env:PR_NUMBER).ci.$($env:RUN_NUMBER)" >> $env:GITHUB_OUTPUT
+          } else {
+            echo "suffix=ci.$($env:RUN_NUMBER)" >> $env:GITHUB_OUTPUT
+          }
+
+      - name: Create NuGet package
+        if: matrix.create_nuget_package
+        shell: pwsh
+        env:
+          VERSION_SUFFIX: ${{ steps.version.outputs.suffix }}
+        run: |
+          if ($env:VERSION_SUFFIX) {
+            dotnet pack $env:SOLUTION --no-build --configuration Release --output artifacts --version-suffix "$env:VERSION_SUFFIX"
+          } else {
+            dotnet pack $env:SOLUTION --no-build --configuration Release --output artifacts
+          }
+
+      - name: Upload NuGet package
+        if: matrix.create_nuget_package
+        uses: actions/upload-artifact@v7
+        with:
+          name: NuGetPackages
+          path: |
+            artifacts/*.nupkg
+            artifacts/*.snupkg
+          if-no-files-found: error
+
+  publish:
+    name: Publish NuGet package
+    needs: build
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
+      (github.event_name == 'workflow_dispatch' && inputs.force_nuget_publish)
+    runs-on: windows-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Download NuGet package
+        uses: actions/download-artifact@v7
+        with:
+          name: NuGetPackages
+          path: artifacts
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: NuGet login
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2
+        id: login
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: Push to NuGet.org
+        shell: pwsh
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: dotnet nuget push artifacts\*.nupkg --api-key $env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json --skip-duplicate
