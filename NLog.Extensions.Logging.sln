@@ -18,7 +18,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NLog.Extensions.Logging", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{FBD2E07B-F25B-4D2F-AEF6-6D1E10F1E523}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleExample", "Examples\NetCore2\ConsoleExample\ConsoleExample.csproj", "{CF2D8DDE-5876-4EF0-B99D-3C536E887E18}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleExample", "examples\NetCore2\ConsoleExample\ConsoleExample.csproj", "{CF2D8DDE-5876-4EF0-B99D-3C536E887E18}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NLog.Extensions.Hosting", "src\NLog.Extensions.Hosting\NLog.Extensions.Hosting.csproj", "{548E65CE-0378-4812-AE00-B173F1251D3C}"
 EndProject
