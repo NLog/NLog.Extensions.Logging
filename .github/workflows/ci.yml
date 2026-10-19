@@ -29,10 +29,12 @@ jobs:
             name: Build, test & NuGet package (Windows)
             create_nuget_package: true
             framework_args:
+            aot_test_runtime: win-x64
           - os: ubuntu-latest
             name: Build & test (Ubuntu)
             create_nuget_package: false
             framework_args: --framework net10.0
+            aot_test_runtime: linux-x64
     runs-on: ${{ matrix.os }}
     permissions:
       contents: read
@@ -55,8 +57,7 @@ jobs:
         run: dotnet test ${{ env.SOLUTION }} --configuration Release --no-restore --no-build ${{ matrix.framework_args }} --logger "console;verbosity=normal"
 
       - name: Publish example (AOT/self-contained check)
-        if: matrix.create_nuget_package
-        run: dotnet publish examples/NetCore2/HostingExample -r win-x64 --configuration Release --self-contained
+        run: dotnet publish examples/NetCore2/HostingExample -r ${{ matrix.aot_test_runtime }} --configuration Release --self-contained
 
       - name: Determine version suffix
         if: matrix.create_nuget_package
