@@ -10,4 +10,12 @@
 	    <CurrentYear>$([System.DateTime]::Now.ToString(yyyy))</CurrentYear>
 	    <Copyright>Copyright (c) 2004-$(CurrentYear) NLog Project - https://nlog-project.org/ </Copyright>
 	</PropertyGroup>
+
+<PropertyGroup>
+  <NuGetAudit>true</NuGetAudit>
+  <NuGetAuditMode>all</NuGetAuditMode>
+  <NuGetAuditLevel>low</NuGetAuditLevel>
+  <WarningsAsErrors>$(WarningsAsErrors);NU1900;NU1901;NU1902;NU1903;NU1904</WarningsAsErrors>
+</PropertyGroup>
+
 </Project>
