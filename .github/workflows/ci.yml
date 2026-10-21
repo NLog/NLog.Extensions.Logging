@@ -14,9 +14,6 @@ on:
 
 env:
   SOLUTION: NLog.Extensions.Logging.sln
-  DOTNET_VERSION: |
-    8.0.x
-    10.0.x
   ContinuousIntegrationBuild: true
 
 jobs:
@@ -26,13 +23,11 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            name: Build, test & NuGet package (Windows)
-            create_nuget_package: true
+            name: Build & test (Windows)
             framework_args:
             aot_test_runtime: win-x64
           - os: ubuntu-latest
             name: Build & test (Ubuntu)
-            create_nuget_package: false
             framework_args: --framework net10.0
             aot_test_runtime: linux-x64
     runs-on: ${{ matrix.os }}
@@ -42,13 +37,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-
-
       - name: Restore
         run: dotnet restore ${{ env.SOLUTION }}
 
       - name: Build
-        run: dotnet build ${{ env.SOLUTION }} --configuration Release --no-restore  ${{ matrix.framework_args }}
+        run: dotnet build ${{ env.SOLUTION }} --configuration Release --no-restore ${{ matrix.framework_args }}
 
       - name: Test
         run: dotnet test ${{ env.SOLUTION }} --configuration Release --no-restore --no-build ${{ matrix.framework_args }} --logger "console;verbosity=normal"
@@ -56,8 +49,22 @@ jobs:
       - name: Publish example (AOT/self-contained check)
         run: dotnet publish examples/NetCore2/HostingExample -r ${{ matrix.aot_test_runtime }} --configuration Release --self-contained
 
+  pack:
+    name: Create NuGet package
+    runs-on: windows-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Restore
+        run: dotnet restore ${{ env.SOLUTION }}
+
+      - name: Build
+        run: dotnet build ${{ env.SOLUTION }} --configuration Release --no-restore
+
       - name: Determine version suffix
-        if: matrix.create_nuget_package
         id: version
         shell: pwsh
         env:
@@ -74,7 +81,6 @@ jobs:
           }
 
       - name: Create NuGet package
-        if: matrix.create_nuget_package
         shell: pwsh
         env:
           VERSION_SUFFIX: ${{ steps.version.outputs.suffix }}
@@ -86,7 +92,6 @@ jobs:
           }
 
       - name: Upload NuGet package
-        if: matrix.create_nuget_package
         uses: actions/upload-artifact@v7
         with:
           name: NuGetPackages
@@ -97,7 +102,7 @@ jobs:
 
   publish:
     name: Publish NuGet package
-    needs: build
+    needs: [build, pack]
     if: >-
       (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
       (github.event_name == 'workflow_dispatch' && inputs.force_nuget_publish)
@@ -112,11 +117,6 @@ jobs:
         with:
           name: NuGetPackages
           path: artifacts
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v6
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: NuGet login
         uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2
