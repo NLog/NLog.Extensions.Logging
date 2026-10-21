@@ -18,7 +18,7 @@ if ($env:APPVEYOR_REPO_NAME -eq $github) {
         $prMode = $true;
     }
 
-    dotnet tool install --global dotnet-sonarscanner --version 5.13.1
+    dotnet tool install --global dotnet-sonarscanner --version 12.0.0
     if (-Not $LastExitCode -eq 0) {
         exit $LastExitCode 
     }
