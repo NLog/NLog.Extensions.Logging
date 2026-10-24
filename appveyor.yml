@@ -1,3 +1,4 @@
+# SonarQube Cloud analysis only
 version: 6.0.0-{build} # Only change for major versions (e.g. 6.0)
 image: Visual Studio 2026
 configuration: Release
@@ -15,26 +16,8 @@ environment:
   JAVA_HOME: C:\Program Files\Java\jdk21
 
 build_script:
-  - ps: .\build.ps1
-
-nuget:
-  disable_publish_on_pr: true
-
-artifacts:
-  - path: 'artifacts\*.nupkg'
-  - path: 'artifacts\*.snupkg'
-
-test_script:
   - set PATH=%JAVA_HOME%\bin;%PATH%
   - nuget.exe install OpenCover -ExcludeVersion -DependencyVersion Ignore
   - dotnet build --configuration Debug -v minimal
   - OpenCover\tools\OpenCover.Console.exe -target:"dotnet.exe" -targetargs:"test --no-build --configuration Debug" -returntargetcode -output:coverage.xml -register:user
   - ps: .\run-sonar.ps1
-  - ps: .\run-tests.ps1
-
-deploy:
-- provider: NuGet
-  api_key:
-    secure: FStb6Kr5sjHdPq4EzjHeXkW4DQDlS92kM9ZWDhApT68+j4WN7J7cnvvk3fj/hMxi
-  on:
-    branch: master

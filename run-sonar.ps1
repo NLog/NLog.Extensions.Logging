@@ -33,13 +33,13 @@ if ($env:APPVEYOR_REPO_NAME -eq $github) {
         $pr = $env:APPVEYOR_PULL_REQUEST_NUMBER
         
         Write-Host "Sonar: on PR $pr from $branch to $prBaseBranch" -ForegroundColor DarkGreen -BackgroundColor White
-        dotnet-sonarscanner begin /o:"$sonarOrg" /k:"$sonarQubeId" /d:"sonar.host.url=$sonarUrl" /d:"sonar.login=$sonarToken" /v:"$buildVersion" /d:"sonar.cs.opencover.reportsPaths=coverage.xml" /d:"sonar.pullrequest.key=$pr" /d:"sonar.pullrequest.branch=$branch"  /d:"sonar.pullrequest.base=$prBaseBranch"  /d:"sonar.github.repository=$github" /d:"sonar.github.oauth=$env:github_auth_token"
+        dotnet-sonarscanner begin /o:"$sonarOrg" /k:"$sonarQubeId" /d:sonar.host.url="$sonarUrl" /d:sonar.login="$sonarToken" /v:"$buildVersion" /d:"sonar.cs.opencover.reportsPaths=coverage.xml" /d:"sonar.pullrequest.key=$pr" /d:"sonar.pullrequest.branch=$branch"  /d:"sonar.pullrequest.base=$prBaseBranch"  /d:"sonar.github.repository=$github" /d:"sonar.github.oauth=$env:github_auth_token"
     }
     else {
         $branch = $env:APPVEYOR_REPO_BRANCH;
         
         Write-Host "Sonar: on branch $branch" -ForegroundColor DarkGreen -BackgroundColor White
-        dotnet-sonarscanner begin /o:"$sonarOrg" /k:"$sonarQubeId" /d:"sonar.host.url=$sonarUrl" /d:"sonar.login=$sonarToken" /v:"$buildVersion" /d:"sonar.cs.opencover.reportsPaths=coverage.xml" /d:"sonar.branch.name=$branch"  
+        dotnet-sonarscanner begin /o:"$sonarOrg" /k:"$sonarQubeId" /d:sonar.host.url="$sonarUrl" /d:sonar.login="$sonarToken" /v:"$buildVersion" /d:"sonar.cs.opencover.reportsPaths=coverage.xml" /d:"sonar.branch.name=$branch"  
     }
     
     if (-Not $LastExitCode -eq 0) {
@@ -50,8 +50,8 @@ if ($env:APPVEYOR_REPO_NAME -eq $github) {
     if (-Not $LastExitCode -eq 0) {
         exit $LastExitCode 
     }
-
-    dotnet-sonarscanner end /d:"sonar.login=$env:sonar_token"
+    
+    dotnet-sonarscanner end /d:sonar.login="$sonarToken"
     if (-Not $LastExitCode -eq 0) {
         exit $LastExitCode 
     }
