@@ -61,9 +61,6 @@ jobs:
       - name: Restore
         run: dotnet restore ${{ env.SOLUTION }}
 
-      - name: Build
-        run: dotnet build ${{ env.SOLUTION }} --configuration Release --no-restore
-
       - name: Determine version suffix
         id: version
         shell: pwsh
@@ -84,12 +81,7 @@ jobs:
         shell: pwsh
         env:
           VERSION_SUFFIX: ${{ steps.version.outputs.suffix }}
-        run: |
-          if ($env:VERSION_SUFFIX) {
-            dotnet pack $env:SOLUTION --no-build --configuration Release --output artifacts --version-suffix "$env:VERSION_SUFFIX"
-          } else {
-            dotnet pack $env:SOLUTION --no-build --configuration Release --output artifacts
-          }
+        run: dotnet pack $env:SOLUTION --no-restore --configuration Release --output artifacts -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg -p:EmbedUntrackedSources=true --version-suffix "$env:VERSION_SUFFIX"
 
       - name: Upload NuGet package
         uses: actions/upload-artifact@v7
