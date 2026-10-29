@@ -15,7 +15,7 @@
 [![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=code_smells)](https://sonarcloud.io/project/issues?id=nlog.extensions.logging&branch=master&resolved=false&types=CODE_SMELL) 
 [![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=duplicated_lines_density)](https://sonarcloud.io/component_measures/domain/Duplications?id=nlog.extensions.logging&branch=master) 
 [![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=sqale_debt_ratio)](https://sonarcloud.io/dashboard/?id=nlog.extensions.logging&branch=master) 
-[![](https://sonarcloud.io/api/project_badges/measure?project=nlog.extensions.logging&branch=master&metric=coverage)](https://sonarcloud.io/component_measures?id=nlog.extensions.logging&branch=master&metric=coverage) 
+[![codecov](https://codecov.io/gh/NLog/NLog.Extensions.Logging/graph/badge.svg?token=0ID3gtApjF)](https://codecov.io/gh/NLog/NLog.Extensions.Logging)
 
 ## NLog.Extensions.Logging
 

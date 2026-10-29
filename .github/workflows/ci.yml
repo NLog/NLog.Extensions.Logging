@@ -24,10 +24,13 @@ jobs:
           - os: windows-latest
             name: Build & test (Windows)
             framework_args:
+            upload_coverage: false
             aot_test_runtime: win-x64
           - os: ubuntu-latest
             name: Build & test (Ubuntu)
             framework_args: --framework net10.0
+            coverage_args: --collect:"XPlat Code Coverage"
+            upload_coverage: true
             aot_test_runtime: linux-x64
     runs-on: ${{ matrix.os }}
     permissions:
@@ -43,7 +46,15 @@ jobs:
         run: dotnet build ${{ env.SOLUTION }} --configuration Release --no-restore ${{ matrix.framework_args }}
 
       - name: Test
-        run: dotnet test ${{ env.SOLUTION }} --configuration Release --no-restore --no-build ${{ matrix.framework_args }} --logger GitHubActions
+        run: dotnet test ${{ env.SOLUTION }} --configuration Release --no-restore --no-build ${{ matrix.framework_args }} ${{ matrix.coverage_args }} --logger GitHubActions
+
+      - name: Upload coverage to Codecov
+        if: matrix.upload_coverage
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # https://github.com/codecov/codecov-action/releases/tag/v7.1.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }} # Needed for protected branches
+          files: test/**/TestResults/**/coverage.cobertura.xml
+          fail_ci_if_error: true
 
       - name: Publish example (AOT/self-contained check)
         run: dotnet publish examples/NetCore2/HostingExample -r ${{ matrix.aot_test_runtime }} --configuration Release --self-contained
