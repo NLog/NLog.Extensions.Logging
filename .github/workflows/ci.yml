@@ -43,7 +43,7 @@ jobs:
         run: dotnet build ${{ env.SOLUTION }} --configuration Release --no-restore ${{ matrix.framework_args }}
 
       - name: Test
-        run: dotnet test ${{ env.SOLUTION }} --configuration Release --no-restore --no-build ${{ matrix.framework_args }} --logger "console;verbosity=normal"
+        run: dotnet test ${{ env.SOLUTION }} --configuration Release --no-restore --no-build ${{ matrix.framework_args }} --logger GitHubActions
 
       - name: Publish example (AOT/self-contained check)
         run: dotnet publish examples/NetCore2/HostingExample -r ${{ matrix.aot_test_runtime }} --configuration Release --self-contained
