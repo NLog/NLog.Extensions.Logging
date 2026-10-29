@@ -1,0 +1,9 @@
+coverage:
+  status:
+    project:
+      minimum:
+        target: 70%
+        threshold: 0%
+      change:
+        target: auto
+        threshold: 1%
