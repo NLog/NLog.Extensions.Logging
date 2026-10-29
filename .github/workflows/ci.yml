@@ -50,7 +50,7 @@ jobs:
 
       - name: Upload coverage to Codecov
         if: matrix.upload_coverage
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # Needed for protected branches
           files: test/**/TestResults/**/coverage.cobertura.xml
