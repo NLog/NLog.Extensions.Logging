@@ -1,4 +1,5 @@
 coverage:
+  range: "70...100"
   status:
     project:
       minimum:
