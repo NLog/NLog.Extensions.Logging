@@ -179,6 +179,64 @@ namespace NLog.Extensions.Logging.Tests.Extensions
             Assert.Equal(typeof(NLogLoggerProvider), loggerProvider.GetType());
         }
 
+        [Fact]
+        public void Configure_OptionsFromConfigurationSection()
+        {
+            // Arrange
+            var settings = new Dictionary<string, string>
+            {
+                ["NLog:CaptureMessageTemplates"] = "false",
+                ["NLog:EventIdSeparator"] = ":"
+            };
+            var configuration = new ConfigurationBuilder().AddInMemoryCollection(settings).Build();
+            var options = new NLogProviderOptions();
+
+            // Act
+            var result = options.Configure(configuration.GetSection("NLog"));
+
+            // Assert
+            Assert.Same(options, result);
+            Assert.False(options.CaptureMessageTemplates);
+            Assert.Equal(":", options.EventIdSeparator);
+        }
+
+        [Fact]
+        public void Configure_InvalidOptionValueIsIgnored()
+        {
+            // Arrange
+            var settings = new Dictionary<string, string>
+            {
+                ["NLog:CaptureMessageTemplates"] = "not-a-boolean"
+            };
+            var configuration = new ConfigurationBuilder().AddInMemoryCollection(settings).Build();
+            var options = new NLogProviderOptions();
+
+            // Act
+            options.Configure(configuration.GetSection("NLog"));
+
+            // Assert
+            Assert.True(options.CaptureMessageTemplates);
+        }
+
+        [Fact]
+        public void Configure_LoggerProviderFromConfigurationSection()
+        {
+            // Arrange
+            var settings = new Dictionary<string, string>
+            {
+                ["NLog:IncludeScopes"] = "false"
+            };
+            var configuration = new ConfigurationBuilder().AddInMemoryCollection(settings).Build();
+            using var loggerProvider = new NLogLoggerProvider(new NLogProviderOptions(), new LogFactory());
+
+            // Act
+            var result = loggerProvider.Configure(configuration.GetSection("NLog"));
+
+            // Assert
+            Assert.Same(loggerProvider, result);
+            Assert.False(loggerProvider.Options.IncludeScopes);
+        }
+
         private static ILoggerProvider GetLoggerProvider(ILoggingBuilder builder)
         {
             var services = builder.Services;
