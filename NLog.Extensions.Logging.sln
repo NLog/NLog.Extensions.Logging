@@ -6,7 +6,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C21FD102-21B
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BD106966-02BE-4137-B9DC-4ECE56B4C204}"
 	ProjectSection(SolutionItems) = preProject
-		appveyor.yml = appveyor.yml
+		.github\workflows\ci.yml = .github\workflows\ci.yml
 		build.ps1 = build.ps1
 		CHANGELOG.MD = CHANGELOG.MD
 		README.md = README.md
