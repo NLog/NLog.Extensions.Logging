@@ -43,6 +43,7 @@ jobs:
         uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 11.0.x
+          check-latest: false
 
       - name: Restore
         run: dotnet restore ${{ env.SOLUTION }}
@@ -77,6 +78,7 @@ jobs:
         uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 11.0.x
+          check-latest: false
 
       - name: Restore
         run: dotnet restore ${{ env.SOLUTION }}
