@@ -21,7 +21,7 @@ Please only post issues here related to NLog.Extensions.Logging. If unsure, plea
 
 **NLog.Web.AspNetCore version**: (e.g. 4.5.6) (or not used)
 
-**Platform**: .Net 4.6.1 / .NET Core 1 / .NET Core 2 / .NET Core 3.1 / .NET 6.0
+**Platform**: .NET Framework 4.6.2 / .NET Standard 2.0 or 2.1 / .NET 8, 10 or 11
 
 **Current NLog config** (xml or C#, if relevant)
 

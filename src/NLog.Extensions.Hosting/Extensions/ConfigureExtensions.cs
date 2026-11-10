@@ -60,7 +60,6 @@ namespace NLog.Extensions.Hosting
             return builder;
         }
 
-#if !NET6_0
         /// <summary>
         /// Enable NLog as logging provider for Microsoft Extension Logging
         /// </summary>
@@ -107,8 +106,6 @@ namespace NLog.Extensions.Hosting
             });
             return builder;
         }
-#endif
-
         private static void AddNLogLoggerProvider(IServiceCollection services, IConfiguration? hostConfiguration, IHostEnvironment? hostEnvironment, NLogProviderOptions? options, Func<IServiceProvider, IConfiguration?, IHostEnvironment?, NLogProviderOptions, NLogLoggerProvider> factory)
         {
             services.TryAddNLogLoggingProvider((svc, addlogging) => svc.AddLogging(addlogging), hostConfiguration, options, (provider, cfg, opt) => factory(provider, cfg, hostEnvironment, opt));

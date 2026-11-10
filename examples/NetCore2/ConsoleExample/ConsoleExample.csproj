@@ -5,7 +5,7 @@
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">17.0</VisualStudioVersion>
     <TargetFramework Condition=" '$(TargetFramework)' == '' AND '$(VisualStudioVersion)' &lt; '17.0' ">net462</TargetFramework>
     <TargetFramework Condition=" '$(TargetFramework)' == '' AND '$(VisualStudioVersion)' &lt; '18.0' ">net8.0</TargetFramework>
-    <TargetFramework Condition=" '$(TargetFramework)' == '' ">net10.0</TargetFramework>
+    <TargetFrameworks Condition=" '$(TargetFramework)' == '' AND '$(TargetFrameworks)' == '' ">net10.0;net11.0</TargetFrameworks>
     
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <IsPackable>false</IsPackable>
@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="11.0.0" />
   </ItemGroup>
 
   <ItemGroup>

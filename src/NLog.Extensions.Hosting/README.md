@@ -19,7 +19,7 @@ If using ASP.NET Core, use [NLog.Web.AspNetCore](https://www.nuget.org/packages/
 
 Supported platforms:
 
- - .NET 6, 7, 8, 9 and 10
+ - .NET 8, 10 and 11
  - .NET Standard 2.0 and 2.1
  - .NET 4.6.2 - 4.8
 

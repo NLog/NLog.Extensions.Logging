@@ -679,11 +679,7 @@ namespace NLog.Extensions.Logging
         /// </summary>
         /// <param name="state">The state (message)</param>
         /// <returns></returns>
-#if NET6_0
-        IDisposable Microsoft.Extensions.Logging.ILogger.BeginScope<TState>(TState state)
-#else
         IDisposable? Microsoft.Extensions.Logging.ILogger.BeginScope<TState>(TState state)
-#endif
         {
             if (!_options.IncludeScopes || state is null)
             {
