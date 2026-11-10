@@ -90,10 +90,6 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
   <ItemGroup Condition=" '$(TargetFramework)' == 'net10.0' ">
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.0" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net11.0' ">
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="11.0.0" />
-  </ItemGroup>
-
   <ItemGroup>
     <Compile Include="..\NLog.Extensions.Logging\Internal\Guard.cs" Link="Internal\Guard.cs" />
     <Compile Include="..\NLog.Extensions.Logging\Internal\RegisterNLogLoggingProvider.cs" Link="Internal\RegisterNLogLoggingProvider.cs" />

@@ -105,7 +105,6 @@ List of major changes in NLog 6.0: https://nlog-project.org/2025/04/29/nlog-6-0-
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net11.0' ">
     <PackageReference Include="Microsoft.Extensions.Logging" Version="11.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="11.0.0" />
   </ItemGroup>
 
   <Target Name="DownloadMissingContent" BeforeTargets="GenerateNuspec">
