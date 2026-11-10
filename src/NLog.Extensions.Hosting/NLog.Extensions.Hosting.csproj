@@ -3,8 +3,8 @@
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">17.0</VisualStudioVersion>
     <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' AND '$(VisualStudioVersion)' &lt; '17.0' ">net462;netstandard2.0</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' AND '$(VisualStudioVersion)' &lt; '18.0' ">net462;netstandard2.0;netstandard2.1;net6.0;net8.0</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' ">net462;netstandard2.0;netstandard2.1;net6.0;net8.0;net10.0;net11.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' AND '$(VisualStudioVersion)' &lt; '18.0' ">net462;netstandard2.0;netstandard2.1;net8.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' ">net462;netstandard2.0;netstandard2.1;net8.0;net10.0;net11.0</TargetFrameworks>
 
     <Product>NLog.Extensions.Hosting v$(VersionPrefix)</Product>
     <Authors>Julian Verdurmen;Bryan Gonzalez</Authors>
@@ -36,8 +36,8 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Nullable>enable</Nullable>
     <LangVersion>9</LangVersion>
-    <EnableTrimAnalyzer Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net6.0'))">true</EnableTrimAnalyzer>
-    <IsTrimmable Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net6.0'))">true</IsTrimmable>
+    <EnableTrimAnalyzer Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">true</EnableTrimAnalyzer>
+    <IsTrimmable Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">true</IsTrimmable>
     <IsAotCompatible Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net7.0'))">true</IsAotCompatible>
   </PropertyGroup>
 
@@ -50,9 +50,6 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
     <Title>NLog.Extensions.Hosting for .NET Standard 2.1</Title>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
-    <Title>NLog.Extensions.Hosting for .NET 6</Title>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
     <Title>NLog.Extensions.Hosting for .NET 8</Title>
@@ -77,10 +74,6 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
