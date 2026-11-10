@@ -153,7 +153,6 @@ namespace NLog.Extensions.Hosting.Tests
             LogManager.Configuration = null;
         }
 
-#if !NET6_0
         [Fact]
         public void IHostApplicationBuilder_UseNLog_ArgumentNullException()
         {
@@ -301,6 +300,5 @@ namespace NLog.Extensions.Hosting.Tests
             logger.LogCritical("World");
             Assert.Single(nlogTarget.Logs);
         }
-#endif
     }
 }
