@@ -17,7 +17,10 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     <PackageReleaseNotes>
 ChangeLog:
 
-- Added .NET 11 support and dropped .NET 6 target
+- Added .NET 11 support (#891, @304NotModified)
+- Removed .NET 6 support (#891, @304NotModified)
+- Moved to GitHub Actions (#874, @304NotModified)
+- Moved to Coverlet (#880, @304NotModified)
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
     </PackageReleaseNotes>

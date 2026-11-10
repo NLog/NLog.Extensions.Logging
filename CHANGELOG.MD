@@ -2,6 +2,34 @@
 
 Date format: (year/month/day)
 
+
+### Version 6.3.0 (2026/11/10)
+
+**Platform Support**
+- [#891](https://github.com/NLog/NLog.Extensions.Logging/pull/891) Added .NET 11 support (@304NotModified)
+- [#891](https://github.com/NLog/NLog.Extensions.Logging/pull/891) Removed .NET 6 support (@304NotModified)
+
+**Performance**
+- [#890](https://github.com/NLog/NLog.Extensions.Logging/pull/890) Replace casts with pattern matching for performance and readability (@304NotModified)
+
+**Infrastructure**
+- [#874](https://github.com/NLog/NLog.Extensions.Logging/pull/874) Move to GitHub Actions and enable trusted publishing (@304NotModified)
+- [#878](https://github.com/NLog/NLog.Extensions.Logging/pull/878) Improve ci.yml (@304NotModified)
+- [#879](https://github.com/NLog/NLog.Extensions.Logging/pull/879) Add GitHub Actions unit test report (@304NotModified)
+- [#887](https://github.com/NLog/NLog.Extensions.Logging/pull/887) Remove AppVeyor references (@304NotModified)
+- [#880](https://github.com/NLog/NLog.Extensions.Logging/pull/880) Upload coverage to Codecov and SonarQube automatic analysis (@304NotModified)
+- [#885](https://github.com/NLog/NLog.Extensions.Logging/pull/885) Add Codecov config (@304NotModified)
+- [#884](https://github.com/NLog/NLog.Extensions.Logging/pull/884) Upgrade release-drafter (@304NotModified)
+
+**Maintenance**
+- [#873](https://github.com/NLog/NLog.Extensions.Logging/pull/873) NLogLogger - Minor code adjustment (@snakefoot)
+- [#881](https://github.com/NLog/NLog.Extensions.Logging/pull/881) Remove unneeded Microsoft.SourceLink.GitHub package (@304NotModified)
+- [#882](https://github.com/NLog/NLog.Extensions.Logging/pull/882) Bump coverlet.collector from 6.0.4 to 10.1.0 (@dependabot[bot])
+- [#883](https://github.com/NLog/NLog.Extensions.Logging/pull/883) Add tests (@304NotModified)
+- [#888](https://github.com/NLog/NLog.Extensions.Logging/pull/888) Add tests (@304NotModified)
+- [#889](https://github.com/NLog/NLog.Extensions.Logging/pull/889) Reduce cognitive complexity (@304NotModified)
+- [#892](https://github.com/NLog/NLog.Extensions.Logging/pull/892) Move example projects (@304NotModified)
+
 ### Version 6.2.2 (2026/10/15)
 - [#872](https://github.com/NLog/NLog.Extensions.Logging/pull/872) Updated to NLog v6.2.2 (@snakefoot)
 - [#868](https://github.com/NLog/NLog.Extensions.Logging/pull/868) NLogLogger - Change OriginalFormatPropertyName to string.Intern for ReferenceEquals fast-path (@snakefoot)
