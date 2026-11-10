@@ -6,11 +6,8 @@
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".github/workflows/ci.yml" />
-    <File Path="build.ps1" />
     <File Path="CHANGELOG.MD" />
     <File Path="README.md" />
-    <File Path="run-sonar.ps1" />
-    <File Path="run-tests.ps1" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/NLog.Extensions.Hosting/NLog.Extensions.Hosting.csproj" />
