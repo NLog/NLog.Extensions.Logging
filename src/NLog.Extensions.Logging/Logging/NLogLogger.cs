@@ -53,7 +53,7 @@ namespace NLog.Extensions.Logging
 #if NETSTANDARD2_1_OR_GREATER || NET
         LogEventInfo? GetMessageParametersWithoutBoxing<TState>(LogLevel nLogLogLevel, in EventId eventId, in TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
-            if (state is IReadOnlyList<KeyValuePair<string, object?>>)
+            if (state is IReadOnlyList<KeyValuePair<string, object?>> stateProperties)
             {
                 int parameterCount = 0;
 
@@ -61,7 +61,7 @@ namespace NLog.Extensions.Logging
 
                 try
                 {
-                    switch (((IReadOnlyList<KeyValuePair<string, object?>>)state).Count)
+                    switch (stateProperties.Count)
                     {
                         case 0:
                             {
@@ -70,7 +70,7 @@ namespace NLog.Extensions.Logging
                             }
                         case 1:
                             parameterCount = 1;
-                            if (OriginalFormatPropertyName.Equals(((IReadOnlyList<KeyValuePair<string, object?>>)state)[0].Key))
+                            if (OriginalFormatPropertyName.Equals(stateProperties[0].Key))
                             {
                                 var formattedMessage = formatter(state, exception);
                                 return CreateLogEventWithoutParameters(nLogLogLevel, formattedMessage, eventId, captureEventId);
@@ -78,13 +78,13 @@ namespace NLog.Extensions.Logging
                             break;
                         case 2:
                             parameterCount = 2;
-                            if (_options.FastCaptureMessageTemplates && OriginalFormatPropertyName.Equals(((IReadOnlyList<KeyValuePair<string, object?>>)state)[1].Key))
+                            if (_options.FastCaptureMessageTemplates && OriginalFormatPropertyName.Equals(stateProperties[1].Key))
                             {
-                                var arg1 = NLogMessageParameterList.GetMessageTemplateParameter(((IReadOnlyList<KeyValuePair<string, object?>>)state)[0], 0);
+                                var arg1 = NLogMessageParameterList.GetMessageTemplateParameter(stateProperties[0], 0);
                                 if (arg1.Name is not null)
                                 {
                                     var positionalFormat = "0".Equals(arg1.Name);
-                                    var originalMessage = ((IReadOnlyList<KeyValuePair<string, object?>>)state)[1].Value?.ToString();
+                                    var originalMessage = stateProperties[1].Value?.ToString();
                                     var formattedMessage = formatter(state, exception);
                                     if (positionalFormat)
                                         return CreateLogEventWithoutParameters(nLogLogLevel, formattedMessage, eventId, captureEventId);
@@ -103,14 +103,14 @@ namespace NLog.Extensions.Logging
                             break;
                         case 3:
                             parameterCount = 3;
-                            if (_options.FastCaptureMessageTemplates && OriginalFormatPropertyName.Equals(((IReadOnlyList<KeyValuePair<string, object?>>)state)[2].Key))
+                            if (_options.FastCaptureMessageTemplates && OriginalFormatPropertyName.Equals(stateProperties[2].Key))
                             {
-                                var arg1 = NLogMessageParameterList.GetMessageTemplateParameter(((IReadOnlyList<KeyValuePair<string, object?>>)state)[0], 0);
-                                var arg2 = NLogMessageParameterList.GetMessageTemplateParameter(((IReadOnlyList<KeyValuePair<string, object?>>)state)[1], 1);
+                                var arg1 = NLogMessageParameterList.GetMessageTemplateParameter(stateProperties[0], 0);
+                                var arg2 = NLogMessageParameterList.GetMessageTemplateParameter(stateProperties[1], 1);
                                 if (arg1.Name is not null && arg2.Name is not null)
                                 {
                                     var positionalFormat = "0".Equals(arg1.Name) && "1".Equals(arg2.Name);
-                                    var originalMessage = ((IReadOnlyList<KeyValuePair<string, object?>>)state)[2].Value?.ToString();
+                                    var originalMessage = stateProperties[2].Value?.ToString();
                                     var formattedMessage = formatter(state, exception);
                                     if (positionalFormat)
                                         return CreateLogEventWithoutParameters(nLogLogLevel, formattedMessage, eventId, captureEventId);
@@ -130,15 +130,15 @@ namespace NLog.Extensions.Logging
 
                         case 4:
                             parameterCount = 4;
-                            if (_options.FastCaptureMessageTemplates && OriginalFormatPropertyName.Equals(((IReadOnlyList<KeyValuePair<string, object?>>)state)[3].Key))
+                            if (_options.FastCaptureMessageTemplates && OriginalFormatPropertyName.Equals(stateProperties[3].Key))
                             {
-                                var arg1 = NLogMessageParameterList.GetMessageTemplateParameter(((IReadOnlyList<KeyValuePair<string, object?>>)state)[0], 0);
-                                var arg2 = NLogMessageParameterList.GetMessageTemplateParameter(((IReadOnlyList<KeyValuePair<string, object?>>)state)[1], 1);
-                                var arg3 = NLogMessageParameterList.GetMessageTemplateParameter(((IReadOnlyList<KeyValuePair<string, object?>>)state)[2], 2);
+                                var arg1 = NLogMessageParameterList.GetMessageTemplateParameter(stateProperties[0], 0);
+                                var arg2 = NLogMessageParameterList.GetMessageTemplateParameter(stateProperties[1], 1);
+                                var arg3 = NLogMessageParameterList.GetMessageTemplateParameter(stateProperties[2], 2);
                                 if (arg1.Name is not null && arg2.Name is not null && arg3.Name is not null)
                                 {
                                     var positionalFormat = "0".Equals(arg1.Name) && "1".Equals(arg2.Name) && "2".Equals(arg3.Name);
-                                    var originalMessage = ((IReadOnlyList<KeyValuePair<string, object?>>)state)[3].Value?.ToString();
+                                    var originalMessage = stateProperties[3].Value?.ToString();
                                     var formattedMessage = formatter(state, exception);
                                     if (positionalFormat)
                                         return CreateLogEventWithoutParameters(nLogLogLevel, formattedMessage, eventId, captureEventId);
