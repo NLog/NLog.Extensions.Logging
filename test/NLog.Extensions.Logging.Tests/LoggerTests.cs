@@ -147,6 +147,42 @@ namespace NLog.Extensions.Logging.Tests
         }
 
         [Fact]
+        public void TestScopePropertyShort()
+        {
+            // Arrange
+            var runner = GetRunner();
+
+            // Act
+            using (runner.Logger.BeginScope(new KeyValuePair<string, short>("scope1", 42)))
+            {
+                runner.Logger.LogDebug("message with id and {0} parameters", 1);
+            }
+
+            // Assert
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters|scope1=42", runner.LastTargetMessage);
+        }
+
+        [Fact]
+        public void TestScopePropertyNonStringKey()
+        {
+            // Arrange
+            var runner = GetRunner();
+
+            // Act
+            using (runner.Logger.BeginScope(new KeyValuePair<int, string>(1, "Hello")))
+            {
+                runner.Logger.LogDebug("message with id and {0} parameters", 1);
+            }
+
+            // Assert
+#if NETSTANDARD2_1_OR_GREATER || NET
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters|", runner.LastTargetMessage);
+#else
+            Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters|1=Hello", runner.LastTargetMessage);
+#endif
+        }
+
+        [Fact]
         public void TestScopePropertyList()
         {
             var runner = GetRunner();

@@ -300,6 +300,22 @@ namespace NLog.Extensions.Logging
         }
 
 #if NETSTANDARD2_1_OR_GREATER || NET
+        private static readonly Dictionary<Type, Func<object, KeyValuePair<string, object?>>> TypedKeyValueExtractors =
+            new()
+            {
+                { typeof(object), TypedKeyValueExtractor<string, object> },
+                { typeof(string), TypedKeyValueExtractor<string, string> },
+                { typeof(int), TypedKeyValueExtractor<string, int> },
+                { typeof(long), TypedKeyValueExtractor<string, long> },
+                { typeof(decimal), TypedKeyValueExtractor<string, decimal> },
+                { typeof(double), TypedKeyValueExtractor<string, double> },
+                { typeof(bool), TypedKeyValueExtractor<string, bool> },
+                { typeof(Guid), TypedKeyValueExtractor<string, Guid> },
+                { typeof(DateTime), TypedKeyValueExtractor<string, DateTime> },
+                { typeof(DateTimeOffset), TypedKeyValueExtractor<string, DateTimeOffset> },
+                { typeof(TimeSpan), TypedKeyValueExtractor<string, TimeSpan> },
+            };
+
         private static KeyValuePair<string, object?> TypedKeyValueExtractor<TKey, TValue>(object value)
         {
             var keyValuePair = (KeyValuePair<TKey, TValue>)value;
@@ -329,28 +345,8 @@ namespace NLog.Extensions.Logging
 #if NETSTANDARD2_1_OR_GREATER || NET
             if (propertyType.GenericTypeArguments[0] == typeof(string))
             {
-                if (propertyType.GenericTypeArguments[1] == typeof(object))
-                    return TypedKeyValueExtractor<string, object>;
-                if (propertyType.GenericTypeArguments[1] == typeof(string))
-                    return TypedKeyValueExtractor<string, string>;
-                if (propertyType.GenericTypeArguments[1] == typeof(int))
-                    return TypedKeyValueExtractor<string, int>;
-                if (propertyType.GenericTypeArguments[1] == typeof(long))
-                    return TypedKeyValueExtractor<string, long>;
-                if (propertyType.GenericTypeArguments[1] == typeof(decimal))
-                    return TypedKeyValueExtractor<string, decimal>;
-                if (propertyType.GenericTypeArguments[1] == typeof(double))
-                    return TypedKeyValueExtractor<string, double>;
-                if (propertyType.GenericTypeArguments[1] == typeof(bool))
-                    return TypedKeyValueExtractor<string, bool>;
-                if (propertyType.GenericTypeArguments[1] == typeof(Guid))
-                    return TypedKeyValueExtractor<string, Guid>;
-                if (propertyType.GenericTypeArguments[1] == typeof(DateTime))
-                    return TypedKeyValueExtractor<string, DateTime>;
-                if (propertyType.GenericTypeArguments[1] == typeof(DateTimeOffset))
-                    return TypedKeyValueExtractor<string, DateTimeOffset>;
-                if (propertyType.GenericTypeArguments[1] == typeof(TimeSpan))
-                    return TypedKeyValueExtractor<string, TimeSpan>;
+                if (TypedKeyValueExtractors.TryGetValue(propertyType.GenericTypeArguments[1], out var keyValueExtractor))
+                    return keyValueExtractor;
 
                 var itemType = propertyType.GetTypeInfo();
                 return BuildKeyValueExtractor(propertyType, itemType);
