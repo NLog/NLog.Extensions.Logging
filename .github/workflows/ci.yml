@@ -73,6 +73,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: Setup .NET 11 SDK
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 11.0.x
+
       - name: Restore
         run: dotnet restore ${{ env.SOLUTION }}
 

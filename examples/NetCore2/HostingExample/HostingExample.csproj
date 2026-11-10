@@ -5,7 +5,7 @@
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">17.0</VisualStudioVersion>
     <TargetFramework Condition=" '$(TargetFramework)' == '' AND '$(VisualStudioVersion)' &lt; '17.0' ">net462</TargetFramework>
     <TargetFramework Condition=" '$(TargetFramework)' == '' AND '$(VisualStudioVersion)' &lt; '18.0' ">net8.0</TargetFramework>
-    <TargetFramework Condition=" '$(TargetFramework)' == '' ">net10.0</TargetFramework>
+    <TargetFramework Condition=" '$(TargetFramework)' == '' ">net11.0</TargetFramework>
     
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -25,7 +25,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0" Condition=" '$(TargetFramework)' != 'net11.0' " />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="11.0.0" Condition=" '$(TargetFramework)' == 'net11.0' " />
   </ItemGroup>
 
   <ItemGroup>
