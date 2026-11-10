@@ -4,7 +4,7 @@
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">17.0</VisualStudioVersion>
     <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' AND '$(VisualStudioVersion)' &lt; '17.0' ">net462;netstandard2.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' AND '$(VisualStudioVersion)' &lt; '18.0' ">net462;netstandard2.0;netstandard2.1;net6.0;net8.0</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' ">net462;netstandard2.0;netstandard2.1;net6.0;net8.0;net10.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(TargetFrameworks)' == '' ">net462;netstandard2.0;netstandard2.1;net6.0;net8.0;net10.0;net11.0</TargetFrameworks>
 
     <Product>NLog.Extensions.Hosting v$(VersionPrefix)</Product>
     <Authors>Julian Verdurmen;Bryan Gonzalez</Authors>
@@ -60,6 +60,9 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net10.0' ">
     <Title>NLog.Extensions.Hosting for .NET 10</Title>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net11.0' ">
+    <Title>NLog.Extensions.Hosting for .NET 11</Title>
+  </PropertyGroup>
   <PropertyGroup>
     <AssemblyTitle>$(Title)</AssemblyTitle>
   </PropertyGroup>
@@ -86,6 +89,9 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net10.0' ">
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.0" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net11.0' ">
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="11.0.0" />
   </ItemGroup>
 
   <ItemGroup>

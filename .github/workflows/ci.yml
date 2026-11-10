@@ -28,7 +28,7 @@ jobs:
             aot_test_runtime: win-x64
           - os: ubuntu-latest
             name: Build & test (Ubuntu)
-            framework_args: --framework net10.0
+            framework_args: --framework net11.0
             coverage_args: --collect:"XPlat Code Coverage"
             upload_coverage: true
             aot_test_runtime: linux-x64
