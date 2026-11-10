@@ -1,0 +1,23 @@
+<Solution>
+  <Folder Name="/Examples/">
+    <Project Path="examples/ConsoleExample/ConsoleExample.csproj" />
+    <Project Path="examples/ConsoleExampleJsonConfig/ConsoleExampleJsonConfig.csproj" />
+    <Project Path="examples/HostingExample/HostingExample.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".github/workflows/ci.yml" />
+    <File Path="build.ps1" />
+    <File Path="CHANGELOG.MD" />
+    <File Path="README.md" />
+    <File Path="run-sonar.ps1" />
+    <File Path="run-tests.ps1" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/NLog.Extensions.Hosting/NLog.Extensions.Hosting.csproj" />
+    <Project Path="src/NLog.Extensions.Logging/NLog.Extensions.Logging.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/NLog.Extensions.Hosting.Tests/NLog.Extensions.Hosting.Tests.csproj" />
+    <Project Path="test/NLog.Extensions.Logging.Tests/NLog.Extensions.Logging.Tests.csproj" />
+  </Folder>
+</Solution>
