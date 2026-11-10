@@ -69,7 +69,7 @@ jobs:
           fail_ci_if_error: true
 
       - name: Publish example (AOT/self-contained check)
-        run: dotnet publish examples/NetCore2/HostingExample --framework net11.0 -r ${{ matrix.aot_test_runtime }} --configuration Release --self-contained
+        run: dotnet publish examples/HostingExample --framework net11.0 -r ${{ matrix.aot_test_runtime }} --configuration Release --self-contained
 
   pack:
     name: Create NuGet package

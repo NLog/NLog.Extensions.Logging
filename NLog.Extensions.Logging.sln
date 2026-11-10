@@ -18,7 +18,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NLog.Extensions.Logging", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{FBD2E07B-F25B-4D2F-AEF6-6D1E10F1E523}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleExample", "examples\NetCore2\ConsoleExample\ConsoleExample.csproj", "{CF2D8DDE-5876-4EF0-B99D-3C536E887E18}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleExample", "examples\ConsoleExample\ConsoleExample.csproj", "{CF2D8DDE-5876-4EF0-B99D-3C536E887E18}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NLog.Extensions.Hosting", "src\NLog.Extensions.Hosting\NLog.Extensions.Hosting.csproj", "{548E65CE-0378-4812-AE00-B173F1251D3C}"
 EndProject
@@ -26,9 +26,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NLog.Extensions.Hosting.Tes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NLog.Extensions.Logging.Tests", "test\NLog.Extensions.Logging.Tests\NLog.Extensions.Logging.Tests.csproj", "{DC42BF57-6316-4FCA-AD33-48FFDAFB4712}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HostingExample", "examples\NetCore2\HostingExample\HostingExample.csproj", "{07D358DF-D77A-434B-B034-95785DF7106F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HostingExample", "examples\HostingExample\HostingExample.csproj", "{07D358DF-D77A-434B-B034-95785DF7106F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleExampleJsonConfig", "examples\NetCore2\ConsoleExampleJsonConfig\ConsoleExampleJsonConfig.csproj", "{7C28B706-21F3-45EE-A9C3-B39AC5BB8AB5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleExampleJsonConfig", "examples\ConsoleExampleJsonConfig\ConsoleExampleJsonConfig.csproj", "{7C28B706-21F3-45EE-A9C3-B39AC5BB8AB5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{4C63B329-66F2-473F-ABC3-B1AFE0990F47}"
 EndProject
