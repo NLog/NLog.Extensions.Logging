@@ -17,8 +17,7 @@ For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
     <PackageReleaseNotes>
 ChangeLog:
 
-- [#872] Updated to NLog v6.2.2 (@snakefoot)
-- [#868] NLogLogger - Change OriginalFormatPropertyName to string.Intern for ReferenceEquals fast-path (@snakefoot)
+- Added .NET 11 support and dropped .NET 6 target
 
 Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD
 
