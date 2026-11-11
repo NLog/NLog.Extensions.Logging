@@ -10,62 +10,62 @@ namespace NLog.Extensions.Logging.Tests
     public class CustomBeginScopeTest : NLogTestBase
     {
         [Fact]
-        public void TestNonSerializableSayHello()
+        public async Task TestNonSerializableSayHello()
         {
             var target = new Targets.MemoryTarget { Layout = "${message} ${scopeproperty:World}. Welcome ${scopenested}" };
             var runner = GetRunner<CustomBeginScopeTestRunner>(target: target);
-            Assert.True(runner.SayHello().Wait(5000));
+            await runner.SayHello();
             Assert.Single(target.Logs);
             Assert.Equal("Hello Earth. Welcome Earth People", target.Logs[0]);
         }
 
         [Fact]
-        public void TestNonSerializableSayHelloWithScope()
+        public async Task TestNonSerializableSayHelloWithScope()
         {
             var target = new Targets.MemoryTarget { Layout = "${message} ${scopeproperty:World}. Welcome ${scopenested}" };
             var runner = GetRunner<CustomBeginScopeTestRunner>(new NLogProviderOptions { IncludeScopes = false }, target: target);
-            Assert.True(runner.SayHello().Wait(5000));
+            await runner.SayHello();
             Assert.Single(target.Logs);
             Assert.Equal("Hello . Welcome ", target.Logs[0]);
         }
 
         [Fact]
-        public void TestNonSerializableSayHi()
+        public async Task TestNonSerializableSayHi()
         {
             var target = new Targets.MemoryTarget { Layout = "${message} ${scopeproperty:World}. Welcome ${scopenested}" };
             var runner = GetRunner<CustomBeginScopeTestRunner>(target: target);
-            var scopeString = runner.SayHi().Result;
+            await runner.SayHi();
             Assert.Single(target.Logs);
             Assert.Equal("Hi Earth. Welcome Earth People", target.Logs[0]);
             // Assert.Equal("Earth People", scopeString); <-- Bug https://github.com/aspnet/Logging/issues/893
         }
 
         [Fact]
-        public void TestNonSerializableSayHiToEarth()
+        public async Task TestNonSerializableSayHiToEarth()
         {
             var target = new Targets.MemoryTarget { Layout = "${message} ${scopeproperty:Planet}. Welcome to the ${scopeproperty:Galaxy}" };
             var runner = GetRunner<CustomBeginScopeTestRunner>(target: target);
-            var scopeString = runner.SayHiToEarth().Result;
+            await runner.SayHiToEarth();
             Assert.Single(target.Logs);
             Assert.Equal("Hi Earth. Welcome to the Milky Way", target.Logs[0]);
         }
 
         [Fact]
-        public void TestNonSerializableSayNothing()
+        public async Task TestNonSerializableSayNothing()
         {
             var target = new Targets.MemoryTarget { Layout = "${message}" };
             var runner = GetRunner<CustomBeginScopeTestRunner>(target: target);
-            Assert.True(runner.SayNothing().Wait(5000));
+            await runner.SayNothing();
             Assert.Single(target.Logs);
             Assert.Equal("Nothing", target.Logs[0]);
         }
 
         [Fact]
-        public void TestNonSerializableSaySomething()
+        public async Task TestNonSerializableSaySomething()
         {
             var target = new Targets.MemoryTarget { Layout = "${message}${scopeproperty:Say}" };
             var runner = GetRunner<CustomBeginScopeTestRunner>(target: target);
-            Assert.True(runner.SaySomething().Wait(5000));
+            await runner.SaySomething();
             Assert.Single(target.Logs);
             Assert.Equal("SaySomething", target.Logs[0]);
         }
