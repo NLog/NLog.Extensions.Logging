@@ -76,7 +76,25 @@ jobs:
         run: dotnet publish examples/HostingExample --framework net11.0 -r ${{ matrix.aot_test_runtime }} --configuration Release --self-contained
 
   roslyn-analysis:
-    name: Roslyn analysis
+    name: Roslyn analysis (${{ matrix.name }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: NLog.Extensions.Hosting
+            project: src/NLog.Extensions.Hosting/NLog.Extensions.Hosting.csproj
+          - name: NLog.Extensions.Logging
+            project: src/NLog.Extensions.Logging/NLog.Extensions.Logging.csproj
+          - name: NLog.Extensions.Hosting.Tests
+            project: test/NLog.Extensions.Hosting.Tests/NLog.Extensions.Hosting.Tests.csproj
+          - name: NLog.Extensions.Logging.Tests
+            project: test/NLog.Extensions.Logging.Tests/NLog.Extensions.Logging.Tests.csproj
+          - name: ConsoleExample
+            project: examples/ConsoleExample/ConsoleExample.csproj
+          - name: ConsoleExampleJsonConfig
+            project: examples/ConsoleExampleJsonConfig/ConsoleExampleJsonConfig.csproj
+          - name: HostingExample
+            project: examples/HostingExample/HostingExample.csproj
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -92,20 +110,20 @@ jobs:
           check-latest: false
 
       - name: Restore
-        run: dotnet restore ${{ env.SOLUTION }}
+        run: dotnet restore ${{ matrix.project }}
 
       - name: Prepare Roslyn SARIF directory
         run: mkdir -p '${{ runner.temp }}/roslyn'
 
       - name: Build with Roslyn SARIF output
-        run: dotnet build ${{ env.SOLUTION }} --configuration Release --no-restore -p:RoslynSarif=true -p:TreatWarningsAsErrors=false -p:RoslynSarifDirectory='${{ runner.temp }}/roslyn'
+        run: dotnet build ${{ matrix.project }} --framework net11.0 --configuration Release --no-restore -p:RoslynSarif=true -p:TreatWarningsAsErrors=false -p:RoslynSarifDirectory='${{ runner.temp }}/roslyn'
 
       - name: Upload Roslyn findings
         if: always()
         uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: '${{ runner.temp }}/roslyn'
-          category: roslyn
+          sarif_file: '${{ runner.temp }}/roslyn/${{ matrix.name }}-net11.0.sarif'
+          category: roslyn-${{ matrix.name }}
 
   pack:
     name: Create NuGet package
