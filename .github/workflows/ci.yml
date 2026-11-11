@@ -94,14 +94,17 @@ jobs:
       - name: Restore
         run: dotnet restore ${{ env.SOLUTION }}
 
+      - name: Prepare Roslyn SARIF directory
+        run: mkdir -p '${{ runner.temp }}/roslyn'
+
       - name: Build with Roslyn SARIF output
-        run: dotnet build ${{ env.SOLUTION }} --configuration Release --no-restore -p:RoslynSarif=true -p:TreatWarningsAsErrors=false -p:RoslynSarifDirectory='${{ runner.temp }}'
+        run: dotnet build ${{ env.SOLUTION }} --configuration Release --no-restore -p:RoslynSarif=true -p:TreatWarningsAsErrors=false -p:RoslynSarifDirectory='${{ runner.temp }}/roslyn'
 
       - name: Upload Roslyn findings
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: '${{ runner.temp }}/*.sarif'
+          sarif_file: '${{ runner.temp }}/roslyn'
           category: roslyn
 
   pack:
