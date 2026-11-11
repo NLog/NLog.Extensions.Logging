@@ -12,6 +12,10 @@ on:
         type: boolean
         default: false
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 env:
   SOLUTION: NLog.Extensions.Logging.sln
 
@@ -70,6 +74,35 @@ jobs:
 
       - name: Publish example (AOT/self-contained check)
         run: dotnet publish examples/HostingExample --framework net11.0 -r ${{ matrix.aot_test_runtime }} --configuration Release --self-contained
+
+  roslyn-analysis:
+    name: Roslyn analysis
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup .NET 11 SDK
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 11.0.x
+          check-latest: false
+
+      - name: Restore
+        run: dotnet restore ${{ env.SOLUTION }}
+
+      - name: Build with Roslyn SARIF output
+        run: dotnet build ${{ env.SOLUTION }} --configuration Release --no-restore -p:RoslynSarif=true -p:TreatWarningsAsErrors=false -p:RoslynSarifDirectory='${{ runner.temp }}'
+
+      - name: Upload Roslyn findings
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: '${{ runner.temp }}/*.sarif'
+          category: roslyn
 
   pack:
     name: Create NuGet package
