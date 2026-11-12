@@ -6,7 +6,7 @@
 
 *.cs text diff=csharp
 *.config text
-*.sln text
+*.slnx text
 *.csproj text
 *.md text
 *.sh text
