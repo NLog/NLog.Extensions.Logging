@@ -75,7 +75,7 @@ jobs:
       - name: Publish example (AOT/self-contained check)
         run: dotnet publish examples/HostingExample --framework net11.0 -r ${{ matrix.aot_test_runtime }} --configuration Release --self-contained
 
-  roslyn-analysis:
+  roslyn-analysis: # Run Roslyn analysis and upload to GitHub Code Scanning
     name: Roslyn analysis (.NET 11)
     runs-on: ubuntu-latest
     permissions:
