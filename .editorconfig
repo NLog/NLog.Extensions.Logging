@@ -15,3 +15,11 @@ trim_trailing_whitespace = true
 # .NET formatting rules
 [*.{cs,vb}]
 dotnet_sort_system_directives_first = true
+
+[test/**/*.cs]
+# CA1873: Avoid potentially expensive logging
+dotnet_diagnostic.CA1873.severity = none
+# CA2253: Named placeholders should not be numeric values
+dotnet_diagnostic.CA2253.severity = none
+# CA2254: Template should be a static expression
+dotnet_diagnostic.CA2254.severity = none
