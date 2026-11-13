@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  SOLUTION: NLog.Extensions.Logging.sln
+  SOLUTION: NLog.Extensions.Logging.slnx
 
 jobs:
   build:
@@ -149,6 +149,22 @@ jobs:
           sarif_file: '${{ runner.temp }}/roslyn/HostingExample-net11.0.sarif'
           category: roslyn-HostingExample
 
+  validate-slnx:
+    name: Validate SLNX
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+
+      - name: Validate solution
+        run: |
+          dotnet tool install --tool-path ./.tools slnx-validator --version 0.6.0
+          ./.tools/slnx-validator "$SOLUTION"
+
   pack:
     name: Create NuGet package
     runs-on: windows-latest
@@ -200,7 +216,7 @@ jobs:
 
   publish:
     name: Publish NuGet package
-    needs: [build, pack]
+    needs: [build, pack, validate-slnx]
     if: >-
       (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
       (github.event_name == 'workflow_dispatch' && inputs.force_nuget_publish)
