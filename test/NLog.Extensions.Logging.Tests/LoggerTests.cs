@@ -254,6 +254,7 @@ namespace NLog.Extensions.Logging.Tests
             Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 parameters|scope1=Hello", runner.LastTargetMessage);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2017", Justification = "Test intentionally verifies malformed format strings")]
         [Fact]
         public void TestInvalidFormatString()
         {
@@ -262,6 +263,7 @@ namespace NLog.Extensions.Logging.Tests
             Assert.IsType<FormatException>(ex.InnerException);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2017", Justification = "Test intentionally verifies malformed format strings")]
         [Fact]
         public void TestInvalidFormatString2()
         {
