@@ -1,5 +1,11 @@
 <Project>
 	<PropertyGroup>
+		<EnableNETAnalyzers Condition="'$(RoslynSarif)' == 'true'">true</EnableNETAnalyzers>
+		<AnalysisMode Condition="'$(RoslynSarif)' == 'true'">Recommended</AnalysisMode>
+		<!-- Configure individual analyzer rule severities in .editorconfig. -->
+	</PropertyGroup>
+
+	<PropertyGroup>
 		<VersionPrefix>6.3.0</VersionPrefix>
 		<AssemblyVersion>6.0.0.0</AssemblyVersion>
 		<FileVersion>$(VersionPrefix).0</FileVersion>

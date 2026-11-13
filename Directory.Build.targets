@@ -1,0 +1,5 @@
+<Project>
+	<PropertyGroup Condition="'$(RoslynSarif)' == 'true'">
+		<ErrorLog>$(RoslynSarifDirectory)/$(MSBuildProjectName)-$(TargetFramework).sarif,version=2.1</ErrorLog>
+	</PropertyGroup>
+</Project>

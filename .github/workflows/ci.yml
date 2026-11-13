@@ -12,6 +12,10 @@ on:
         type: boolean
         default: false
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 env:
   SOLUTION: NLog.Extensions.Logging.slnx
 
@@ -70,6 +74,80 @@ jobs:
 
       - name: Publish example (AOT/self-contained check)
         run: dotnet publish examples/HostingExample --framework net11.0 -r ${{ matrix.aot_test_runtime }} --configuration Release --self-contained
+
+  roslyn-analysis: # Run Roslyn analysis and upload to GitHub Code Scanning
+    name: Roslyn analysis (.NET 11)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup .NET 11 SDK
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 11.0.x
+          check-latest: false
+
+      - name: Restore
+        run: dotnet restore ${{ env.SOLUTION }}
+
+      - name: Prepare Roslyn SARIF directory
+        run: mkdir -p '${{ runner.temp }}/roslyn'
+
+      - name: Build with Roslyn SARIF output
+        run: dotnet build ${{ env.SOLUTION }} --framework net11.0 --configuration Release --no-restore -p:RoslynSarif=true -p:TreatWarningsAsErrors=false -p:RoslynSarifDirectory='${{ runner.temp }}/roslyn'
+
+      - name: Upload Roslyn findings (NLog.Extensions.Hosting)
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: '${{ runner.temp }}/roslyn/NLog.Extensions.Hosting-net11.0.sarif'
+          category: roslyn-NLog.Extensions.Hosting
+
+      - name: Upload Roslyn findings (NLog.Extensions.Logging)
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: '${{ runner.temp }}/roslyn/NLog.Extensions.Logging-net11.0.sarif'
+          category: roslyn-NLog.Extensions.Logging
+
+      - name: Upload Roslyn findings (NLog.Extensions.Hosting.Tests)
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: '${{ runner.temp }}/roslyn/NLog.Extensions.Hosting.Tests-net11.0.sarif'
+          category: roslyn-NLog.Extensions.Hosting.Tests
+
+      - name: Upload Roslyn findings (NLog.Extensions.Logging.Tests)
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: '${{ runner.temp }}/roslyn/NLog.Extensions.Logging.Tests-net11.0.sarif'
+          category: roslyn-NLog.Extensions.Logging.Tests
+
+      - name: Upload Roslyn findings (ConsoleExample)
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: '${{ runner.temp }}/roslyn/ConsoleExample-net11.0.sarif'
+          category: roslyn-ConsoleExample
+
+      - name: Upload Roslyn findings (ConsoleExampleJsonConfig)
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: '${{ runner.temp }}/roslyn/ConsoleExampleJsonConfig-net11.0.sarif'
+          category: roslyn-ConsoleExampleJsonConfig
+
+      - name: Upload Roslyn findings (HostingExample)
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: '${{ runner.temp }}/roslyn/HostingExample-net11.0.sarif'
+          category: roslyn-HostingExample
 
   validate-slnx:
     name: Validate SLNX
