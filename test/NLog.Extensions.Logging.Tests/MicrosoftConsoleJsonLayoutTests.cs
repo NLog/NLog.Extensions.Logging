@@ -21,7 +21,7 @@ namespace NLog.Extensions.Logging.Tests
             var layout = new MicrosoftConsoleJsonLayout() { TimestampFormat = "R" };
             var logEvent = new LogEventInfo(LogLevel.Error, "MyLogger", "Hello World");
             var result = layout.Render(logEvent);
-            Assert.Equal($"{{ \"Timestamp\": \"{logEvent.TimeStamp.ToUniversalTime().ToString("R")}\", \"EventId\": {0}, \"LogLevel\": \"Error\", \"Category\": \"MyLogger\", \"Message\": \"Hello World\", \"State\": {{ \"{{OriginalFormat}}\": \"Hello World\" }} }}", result);
+            Assert.Equal($"{{ \"Timestamp\": \"{logEvent.TimeStamp.ToUniversalTime():R}\", \"EventId\": {0}, \"LogLevel\": \"Error\", \"Category\": \"MyLogger\", \"Message\": \"Hello World\", \"State\": {{ \"{{OriginalFormat}}\": \"Hello World\" }} }}", result);
         }
 
         [Fact]
@@ -42,12 +42,12 @@ namespace NLog.Extensions.Logging.Tests
             var eventId = 42;
             var logEvent1 = new LogEventInfo(LogLevel.Error, "MyLogger", null, "Alert {EventId}", [eventId], exception);
             var result1 = layout.Render(logEvent1);
-            Assert.Equal($"{{ \"Timestamp\": \"{logEvent1.TimeStamp.ToUniversalTime().ToString("O")}\", \"EventId\": {eventId}, \"LogLevel\": \"Error\", \"Category\": \"MyLogger\", \"Message\": \"Alert {eventId}\", \"Exception\": \"{exception.ToString()}\", \"State\": {{ \"{{OriginalFormat}}\": \"Alert {{EventId}}\" }} }}", result1);
+            Assert.Equal($"{{ \"Timestamp\": \"{logEvent1.TimeStamp.ToUniversalTime():O}\", \"EventId\": {eventId}, \"LogLevel\": \"Error\", \"Category\": \"MyLogger\", \"Message\": \"Alert {eventId}\", \"Exception\": \"{exception}\", \"State\": {{ \"{{OriginalFormat}}\": \"Alert {{EventId}}\" }} }}", result1);
 
             var eventId2 = 420;
             var logEvent2 = new LogEventInfo(LogLevel.Error, "MyLogger", null, "Alert {EventId_Id}", [eventId2], exception);
             var result2 = layout.Render(logEvent2);
-            Assert.Equal($"{{ \"Timestamp\": \"{logEvent2.TimeStamp.ToUniversalTime().ToString("O")}\", \"EventId\": {eventId2}, \"LogLevel\": \"Error\", \"Category\": \"MyLogger\", \"Message\": \"Alert {eventId2}\", \"Exception\": \"{exception.ToString()}\", \"State\": {{ \"{{OriginalFormat}}\": \"Alert {{EventId_Id}}\" }} }}", result2);
+            Assert.Equal($"{{ \"Timestamp\": \"{logEvent2.TimeStamp.ToUniversalTime():O}\", \"EventId\": {eventId2}, \"LogLevel\": \"Error\", \"Category\": \"MyLogger\", \"Message\": \"Alert {eventId2}\", \"Exception\": \"{exception}\", \"State\": {{ \"{{OriginalFormat}}\": \"Alert {{EventId_Id}}\" }} }}", result2);
         }
 
         [Fact]
@@ -67,7 +67,7 @@ namespace NLog.Extensions.Logging.Tests
             var logEvent = new LogEventInfo(LogLevel.Error, null, null, "Alert {EventId}", [eventId], exception);
             logger.Log(logEvent);
             var result = logFactory.Configuration.FindTargetByName<NLog.Targets.MemoryTarget>("test")?.Logs?.FirstOrDefault();
-            Assert.Equal($"{{ \"Timestamp\": \"{logEvent.TimeStamp.ToUniversalTime().ToString("O")}\", \"EventId\": {eventId}, \"LogLevel\": \"Error\", \"Category\": \"{typeof(MicrosoftConsoleJsonLayoutTests).FullName}\", \"Message\": \"Alert {eventId}\", \"Exception\": \"{exception.ToString()}\", \"State\": {{ \"{{OriginalFormat}}\": \"Alert {{EventId}}\" }}, \"Scopes\": [ \"Request Started\", \"Activity Started\" ] }}", result);
+            Assert.Equal($"{{ \"Timestamp\": \"{logEvent.TimeStamp.ToUniversalTime():O}\", \"EventId\": {eventId}, \"LogLevel\": \"Error\", \"Category\": \"{typeof(MicrosoftConsoleJsonLayoutTests).FullName}\", \"Message\": \"Alert {eventId}\", \"Exception\": \"{exception}\", \"State\": {{ \"{{OriginalFormat}}\": \"Alert {{EventId}}\" }}, \"Scopes\": [ \"Request Started\", \"Activity Started\" ] }}", result);
         }
 
         [Fact]
@@ -89,7 +89,7 @@ namespace NLog.Extensions.Logging.Tests
 
             // Assert
             var result = logFactory.Configuration.FindTargetByName<NLog.Targets.MemoryTarget>("test")?.Logs?.FirstOrDefault();
-            Assert.StartsWith($"{{ \"Timestamp\": \"{logEvent.TimeStamp.ToUniversalTime().ToString("O")}\", \"EventId\": {eventId}, \"LogLevel\": \"Information\", \"Category\": \"{typeof(MicrosoftConsoleJsonLayoutTests).FullName}\", \"Message\": \"Alert {eventId}\", \"State\": {{ \"{{OriginalFormat}}\": \"Alert {{EventId}}\" }}, \"TraceId\": \"42\", \"SpanId\": \"|42", result);
+            Assert.StartsWith($"{{ \"Timestamp\": \"{logEvent.TimeStamp.ToUniversalTime():O}\", \"EventId\": {eventId}, \"LogLevel\": \"Information\", \"Category\": \"{typeof(MicrosoftConsoleJsonLayoutTests).FullName}\", \"Message\": \"Alert {eventId}\", \"State\": {{ \"{{OriginalFormat}}\": \"Alert {{EventId}}\" }}, \"TraceId\": \"42\", \"SpanId\": \"|42", result);
         }
     }
 }
