@@ -40,16 +40,17 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void LoadConfigShouldIgnoreWellKnownEmptySections()
         {
-            var appSettings = @"
-{
-  ""NLog"": {
-    ""throwConfigExceptions"": true,
-    ""variables"": {},
-    ""extensions"": [],
-    ""targets"": {},
-    ""rules"": []
-  }
-}";
+            var appSettings = """
+                {
+                  "NLog": {
+                    "throwConfigExceptions": true,
+                    "variables": {},
+                    "extensions": [],
+                    "targets": {},
+                    "rules": []
+                  }
+                }
+                """;
             var logConfig = CreateNLogLoggingConfigurationWithNLogSection(appSettings);
 
             Assert.Empty(logConfig.LoggingRules);
@@ -60,13 +61,14 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void LoadConfigShouldThrowForUnrecognisedSections()
         {
-            var appSettings = @"
-{
-  ""NLog"": {
-    ""throwConfigExceptions"": true,
-    ""someRandomKey"": null
-  }
-}";
+            var appSettings = """
+                {
+                  "NLog": {
+                    "throwConfigExceptions": true,
+                    "someRandomKey": null
+                  }
+                }
+                """;
             var ex = Assert.Throws<NLog.NLogConfigurationException>(() =>
                 CreateNLogLoggingConfigurationWithNLogSection(appSettings));
             Assert.Equal("Unrecognized value 'someRandomKey'='' for element 'NLog'", ex.Message);
@@ -75,13 +77,14 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void LoadConfigShouldThrowForUnrecognisedComplexSections()
         {
-            var appSettings = @"
-{
-  ""NLog"": {
-    ""throwConfigExceptions"": true,
-    ""someRandomKey"": {}
-  }
-}";
+            var appSettings = """
+                {
+                  "NLog": {
+                    "throwConfigExceptions": true,
+                    "someRandomKey": {}
+                  }
+                }
+                """;
             var ex = Assert.Throws<NLog.NLogConfigurationException>(() =>
                 CreateNLogLoggingConfigurationWithNLogSection(appSettings));
             Assert.Equal("Unrecognized value 'someRandomKey'='' for element 'NLog'", ex.Message);
