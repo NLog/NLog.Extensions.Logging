@@ -18,8 +18,10 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void ConfigSettingSimpleLookup()
         {
-            var memoryConfig = new Dictionary<string, string>();
-            memoryConfig["Mode"] = "Test";
+            var memoryConfig = new Dictionary<string, string>
+            {
+                ["Mode"] = "Test"
+            };
             ConfigSettingLayoutRenderer.DefaultConfiguration = new ConfigurationBuilder().AddInMemoryCollection(memoryConfig).Build();
             var layoutRenderer = new ConfigSettingLayoutRenderer { Item = "Mode" };
             var result = layoutRenderer.Render(LogEventInfo.CreateNullEvent());
@@ -29,8 +31,10 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void ConfigSettingNestedLookup()
         {
-            var memoryConfig = new Dictionary<string, string>();
-            memoryConfig["Options:TableName"] = "Test";
+            var memoryConfig = new Dictionary<string, string>
+            {
+                ["Options:TableName"] = "Test"
+            };
             ConfigSettingLayoutRenderer.DefaultConfiguration = new ConfigurationBuilder().AddInMemoryCollection(memoryConfig).Build();
             var layoutRenderer = new ConfigSettingLayoutRenderer { Item = "Options.TableName" };
             var result = layoutRenderer.Render(LogEventInfo.CreateNullEvent());
@@ -40,8 +44,10 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void ConfigSettingConfigEscapeLookup()
         {
-            var memoryConfig = new Dictionary<string, string>();
-            memoryConfig["Logging:Microsoft.Logging"] = "Test";
+            var memoryConfig = new Dictionary<string, string>
+            {
+                ["Logging:Microsoft.Logging"] = "Test"
+            };
             ConfigSettingLayoutRenderer.DefaultConfiguration = new ConfigurationBuilder().AddInMemoryCollection(memoryConfig).Build();
             var layoutRenderer = new ConfigSettingLayoutRenderer { Item = @"Logging.Microsoft\.Logging" };
             var result = layoutRenderer.Render(LogEventInfo.CreateNullEvent());

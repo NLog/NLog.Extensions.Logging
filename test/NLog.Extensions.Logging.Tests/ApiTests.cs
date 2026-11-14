@@ -17,7 +17,7 @@
     {
         private readonly Type[] allTypes;
         private readonly Assembly nlogExtensionAssembly = typeof(NLogLoggerFactory).Assembly;
-        private readonly Dictionary<Type, int> typeUsageCount = new Dictionary<Type, int>();
+        private readonly Dictionary<Type, int> typeUsageCount = [];
 
         public ApiTests()
         {
@@ -197,10 +197,10 @@
         {
             // These class-names should be repaired with next major version bump
             // Do NOT add more incorrect class-names to this exlusion-list
-            HashSet<string> oldFaultyClassNames = new HashSet<string>()
-            {
+            HashSet<string> oldFaultyClassNames =
+            [
                 "MicrosoftConsoleLayoutRenderer",
-            };
+            ];
             foreach (Type type in allTypes)
             {
                 if (type.IsSubclassOf(typeof(LayoutRenderer)))

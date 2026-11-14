@@ -164,9 +164,11 @@ namespace NLog.Extensions.Logging.Tests.Extensions
         {
             // Arrange
             ILoggingBuilder builder = new LoggingBuilderStub();
-            var memoryConfig = new Dictionary<string, string>();
-            memoryConfig["Logging:NLog:ReplaceLoggerFactory"] = "True";
-            memoryConfig["Logging:NLog:RemoveLoggerFactoryFilter"] = "True";
+            var memoryConfig = new Dictionary<string, string>
+            {
+                ["Logging:NLog:ReplaceLoggerFactory"] = "True",
+                ["Logging:NLog:RemoveLoggerFactoryFilter"] = "True"
+            };
             var configuration = new ConfigurationBuilder().AddInMemoryCollection(memoryConfig).Build();
 
             // Act

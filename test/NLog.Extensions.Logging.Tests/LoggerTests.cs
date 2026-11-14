@@ -335,7 +335,7 @@ namespace NLog.Extensions.Logging.Tests
             var runner = GetRunner();
             runner.Logger.LogDebug(20, (Exception)null, string.Empty);
 
-            var target = runner.GetTarget();
+            var _ = runner.GetTarget();
             Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG||EventId=20", runner.LastTargetMessage);
         }
 

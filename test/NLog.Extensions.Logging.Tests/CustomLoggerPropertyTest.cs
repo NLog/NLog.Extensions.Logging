@@ -105,7 +105,7 @@ namespace NLog.Extensions.Logging.Tests
 
         sealed class MyLogEvent<TState> : IReadOnlyList<KeyValuePair<string, object>>
         {
-            private readonly List<KeyValuePair<string, object>> _properties = new List<KeyValuePair<string, object>>();
+            private readonly List<KeyValuePair<string, object>> _properties = [];
             private readonly Func<TState, Exception, string> _originalFormattter;
             private readonly TState _originalState;
 

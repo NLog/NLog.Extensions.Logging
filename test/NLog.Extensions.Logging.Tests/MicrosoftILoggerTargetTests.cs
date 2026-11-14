@@ -251,7 +251,7 @@ namespace NLog.Extensions.Logging.Tests
 
         sealed class LoggerFactoryMock : Microsoft.Extensions.Logging.ILoggerFactory
         {
-            public readonly Dictionary<string, LoggerMock> Loggers = new Dictionary<string, LoggerMock>();
+            public readonly Dictionary<string, LoggerMock> Loggers = [];
 
             public void AddProvider(ILoggerProvider provider)
             {
