@@ -87,7 +87,7 @@ namespace NLog.Extensions.Logging.Tests
         public void TestSimulateStructuredLogging()
         {
             var runner = GetRunner();
-            runner.Logger.Log(Microsoft.Extensions.Logging.LogLevel.Debug, default, new List<KeyValuePair<string, object>>(new[] { new KeyValuePair<string, object>("{OriginalFormat}", "message with id and {ParameterCount} property"), new KeyValuePair<string, object>("ParameterCount", 1) }), null, (s, ex) => "message with id and 1 property");
+            runner.Logger.Log(Microsoft.Extensions.Logging.LogLevel.Debug, default, new List<KeyValuePair<string, object>>([new KeyValuePair<string, object>("{OriginalFormat}", "message with id and {ParameterCount} property"), new KeyValuePair<string, object>("ParameterCount", 1)]), null, (s, ex) => "message with id and 1 property");
 
             Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 property|ParameterCount=1", runner.LastTargetMessage);
         }
@@ -105,7 +105,7 @@ namespace NLog.Extensions.Logging.Tests
         public void TestMessagePropertiesList()
         {
             var runner = GetRunner();
-            runner.Logger.Log(Microsoft.Extensions.Logging.LogLevel.Debug, default, new List<KeyValuePair<string, object>>(new[] { new KeyValuePair<string, object>("ParameterCount", "1") }), null, (s, ex) => "message with id and 1 property");
+            runner.Logger.Log(Microsoft.Extensions.Logging.LogLevel.Debug, default, new List<KeyValuePair<string, object>>([new KeyValuePair<string, object>("ParameterCount", "1")]), null, (s, ex) => "message with id and 1 property");
 
             Assert.Equal("NLog.Extensions.Logging.Tests.LoggerTests.Runner|DEBUG|message with id and 1 property|ParameterCount=1", runner.LastTargetMessage);
         }

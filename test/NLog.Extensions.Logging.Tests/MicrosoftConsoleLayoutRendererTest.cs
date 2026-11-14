@@ -19,7 +19,7 @@ namespace NLog.Extensions.Logging.Tests
             var layoutRenderer = new MicrosoftConsoleLayoutRenderer();
             var exception = new ArgumentException("Test");
             var eventId = 42;
-            var result = layoutRenderer.Render(new LogEventInfo(LogLevel.Error, "MyLogger", null, "Alert {EventId_Id}", new object[] { eventId }, exception));
+            var result = layoutRenderer.Render(new LogEventInfo(LogLevel.Error, "MyLogger", null, "Alert {EventId_Id}", [eventId], exception));
             Assert.Equal($"fail: MyLogger[{eventId}]{Environment.NewLine}      Alert 42{Environment.NewLine}{exception}", result);
         }
 
@@ -29,7 +29,7 @@ namespace NLog.Extensions.Logging.Tests
             var layoutRenderer = new MicrosoftConsoleLayoutRenderer();
             var exception = new ArgumentException("Test");
             var eventId = 500;
-            var result = layoutRenderer.Render(new LogEventInfo(LogLevel.Error, "MyLogger", null, "Alert {EventId_Id}", new object[] { eventId }, exception));
+            var result = layoutRenderer.Render(new LogEventInfo(LogLevel.Error, "MyLogger", null, "Alert {EventId_Id}", [eventId], exception));
             Assert.Equal($"fail: MyLogger[{eventId}]{Environment.NewLine}      Alert 500{Environment.NewLine}{exception}", result);
         }
 
@@ -41,7 +41,7 @@ namespace NLog.Extensions.Logging.Tests
             var layoutRenderer = new MicrosoftConsoleLayoutRenderer() { TimestampFormat = timestampFormat };
             var exception = new ArgumentException("Test");
             var eventId = 42;
-            var logEvent = new LogEventInfo(LogLevel.Error, "MyLogger", null, "Alert {EventId}", new object[] { eventId }, exception);
+            var logEvent = new LogEventInfo(LogLevel.Error, "MyLogger", null, "Alert {EventId}", [eventId], exception);
             var result1 = layoutRenderer.Render(logEvent);
             Assert.Equal($"{logEvent.TimeStamp.ToString(timestampFormat)} fail: MyLogger[{eventId}]{Environment.NewLine}      Alert 42{Environment.NewLine}{exception}", result1);
         }
