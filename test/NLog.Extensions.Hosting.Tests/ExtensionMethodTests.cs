@@ -55,10 +55,12 @@ namespace NLog.Extensions.Hosting.Tests
         [Fact]
         public void UseNLog_withConfiguration_WorksWithNLog()
         {
-            var memoryConfig = new Dictionary<string, string>();
-            memoryConfig["NLog:CaptureMessageProperties"] = "true";
-            memoryConfig["NLog:CaptureMessageTemplates"] = "false";
-            memoryConfig["NLog:IgnoreScopes"] = "false";
+            var memoryConfig = new Dictionary<string, string>
+            {
+                ["NLog:CaptureMessageProperties"] = "true",
+                ["NLog:CaptureMessageTemplates"] = "false",
+                ["NLog:IgnoreScopes"] = "false"
+            };
 
             var someParam = new NLogProviderOptions { CaptureMessageProperties = false, CaptureMessageTemplates = false };
             var actual = new HostBuilder().ConfigureHostConfiguration(config => config.AddInMemoryCollection(memoryConfig)).UseNLog(someParam).Build();
@@ -128,12 +130,14 @@ namespace NLog.Extensions.Hosting.Tests
         {
             var host = new HostBuilder().ConfigureAppConfiguration((context, config) =>
             {
-                var memoryConfig = new Dictionary<string, string>();
-                memoryConfig["NLog:Rules:0:logger"] = "*";
-                memoryConfig["NLog:Rules:0:minLevel"] = "Trace";
-                memoryConfig["NLog:Rules:0:writeTo"] = "inMemory";
-                memoryConfig["NLog:Targets:inMemory:type"] = "Memory";
-                memoryConfig["NLog:Targets:inMemory:layout"] = "${logger}|${message}|${configsetting:NLog.Targets.inMemory.type}";
+                var memoryConfig = new Dictionary<string, string>
+                {
+                    ["NLog:Rules:0:logger"] = "*",
+                    ["NLog:Rules:0:minLevel"] = "Trace",
+                    ["NLog:Rules:0:writeTo"] = "inMemory",
+                    ["NLog:Targets:inMemory:type"] = "Memory",
+                    ["NLog:Targets:inMemory:layout"] = "${logger}|${message}|${configsetting:NLog.Targets.inMemory.type}"
+                };
                 config.AddInMemoryCollection(memoryConfig);
             }).UseNLog(new NLogProviderOptions() { LoggingConfigurationSectionName = "NLog", ReplaceLoggerFactory = true }).Build();
 
@@ -186,10 +190,12 @@ namespace NLog.Extensions.Hosting.Tests
         [Fact]
         public void IHostApplicationBuilder_UseNLog_withConfiguration_WorksWithNLog()
         {
-            var memoryConfig = new Dictionary<string, string>();
-            memoryConfig["NLog:CaptureMessageProperties"] = "true";
-            memoryConfig["NLog:CaptureMessageTemplates"] = "false";
-            memoryConfig["NLog:IgnoreScopes"] = "false";
+            var memoryConfig = new Dictionary<string, string>
+            {
+                ["NLog:CaptureMessageProperties"] = "true",
+                ["NLog:CaptureMessageTemplates"] = "false",
+                ["NLog:IgnoreScopes"] = "false"
+            };
 
             var someParam = new NLogProviderOptions { CaptureMessageProperties = false, CaptureMessageTemplates = false };
 
@@ -251,12 +257,14 @@ namespace NLog.Extensions.Hosting.Tests
         [Fact]
         public void IHostApplicationBuilder_UseNLog_LoadConfigurationFromSection()
         {
-            var memoryConfig = new Dictionary<string, string>();
-            memoryConfig["NLog:Rules:0:logger"] = "*";
-            memoryConfig["NLog:Rules:0:minLevel"] = "Trace";
-            memoryConfig["NLog:Rules:0:writeTo"] = "inMemory";
-            memoryConfig["NLog:Targets:inMemory:type"] = "Memory";
-            memoryConfig["NLog:Targets:inMemory:layout"] = "${logger}|${message}|${configsetting:NLog.Targets.inMemory.type}";
+            var memoryConfig = new Dictionary<string, string>
+            {
+                ["NLog:Rules:0:logger"] = "*",
+                ["NLog:Rules:0:minLevel"] = "Trace",
+                ["NLog:Rules:0:writeTo"] = "inMemory",
+                ["NLog:Targets:inMemory:type"] = "Memory",
+                ["NLog:Targets:inMemory:layout"] = "${logger}|${message}|${configsetting:NLog.Targets.inMemory.type}"
+            };
 
             var builder = new HostApplicationBuilder();
             builder.Configuration.AddInMemoryCollection(memoryConfig);
