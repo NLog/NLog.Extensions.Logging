@@ -53,7 +53,7 @@ namespace NLog.Extensions.Logging.Tests
             var result = layoutRenderer.Render(LogEventInfo.CreateNullEvent());
             Assert.Equal("Test", result);
 
-            var layoutRenderer2 = new ConfigSettingLayoutRenderer { Item = @"Logging.Microsoft..Logging" };
+            var layoutRenderer2 = new ConfigSettingLayoutRenderer { Item = "Logging.Microsoft..Logging" };
             var result2 = layoutRenderer2.Render(LogEventInfo.CreateNullEvent());
             Assert.Equal("Test", result2);
         }

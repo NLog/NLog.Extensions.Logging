@@ -30,7 +30,7 @@ namespace NLog.Extensions.Logging.Tests
             runner.SayHigh5();
 
             Assert.Single(runner.GetTarget().Logs);
-            Assert.Equal(@"Hi 5|ActivityId=42", runner.GetTarget().Logs[0]);
+            Assert.Equal("Hi 5|ActivityId=42", runner.GetTarget().Logs[0]);
         }
 
         [Fact]
@@ -42,7 +42,7 @@ namespace NLog.Extensions.Logging.Tests
             runner.SayHigh5();
 
             Assert.Single(runner.GetTarget().Logs);
-            Assert.Equal(@"Hi 5|ActivityId=42, 0=5", runner.GetTarget().Logs[0]);
+            Assert.Equal("Hi 5|ActivityId=42, 0=5", runner.GetTarget().Logs[0]);
         }
 
         private CustomLoggerPropertyTestRunner GetRunner(NLogProviderOptions options = null)
