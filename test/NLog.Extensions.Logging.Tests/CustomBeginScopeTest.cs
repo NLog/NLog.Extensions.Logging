@@ -162,7 +162,7 @@ namespace NLog.Extensions.Logging.Tests
             {
                 // We don't include the _action.Id here because it's just an opaque guid, and if
                 // you have text logging, you can already use the requestId for correlation.
-                return string.Concat(_world, " People");
+                return $"{_world} People";
             }
 
             IEnumerator IEnumerable.GetEnumerator()
