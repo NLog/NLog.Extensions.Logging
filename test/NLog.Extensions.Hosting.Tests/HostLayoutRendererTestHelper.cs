@@ -67,7 +67,7 @@ namespace NLog.Extensions.Hosting.Tests
 
     internal sealed class EnvironmentVariableScope : IDisposable
     {
-        private readonly Dictionary<string, string?> _originalValues = new Dictionary<string, string?>();
+        private readonly Dictionary<string, string?> _originalValues = [];
 
         public EnvironmentVariableScope(params string[] variableNames)
         {

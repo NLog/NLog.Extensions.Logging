@@ -95,7 +95,7 @@ namespace NLog.Extensions.Logging.Tests
         [Fact]
         public void TryParseShouldReturnEmptyListWhenInputIsEmpty()
         {
-            var items = new List<KeyValuePair<string, object>> { };
+            var items = new List<KeyValuePair<string, object>>();
             NLogMessageParameterList parsedList = NLogMessageParameterList.TryParse(items);
 
             var expectedCount = 0;

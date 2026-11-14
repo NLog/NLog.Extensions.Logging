@@ -17,7 +17,7 @@
     {
         private readonly Type[] allTypes;
         private readonly Assembly nlogExtensionAssembly = typeof(NLogLoggerFactory).Assembly;
-        private readonly Dictionary<Type, int> typeUsageCount = new Dictionary<Type, int>();
+        private readonly Dictionary<Type, int> typeUsageCount = [];
 
         public ApiTests()
         {
@@ -149,7 +149,7 @@
                 if (appDomainFixedOutputAttribute != null)
                 {
                     var threadAgnosticAttribute = type.GetCustomAttribute<ThreadAgnosticAttribute>();
-                    Assert.False(threadAgnosticAttribute is null, $"{type.ToString()} is missing [ThreadAgnostic] attribute");
+                    Assert.False(threadAgnosticAttribute is null, $"{type} is missing [ThreadAgnostic] attribute");
                 }
             }
         }
@@ -164,7 +164,7 @@
                     if (type.IsAbstract || !type.IsPublic)
                         continue;   // skip non-concrete types, enumerations, and private nested types
 
-                    Assert.True(type.IsDefined(typeof(ThreadAgnosticAttribute), true), $"{type.ToString()} is missing [ThreadAgnostic] attribute.");
+                    Assert.True(type.IsDefined(typeof(ThreadAgnosticAttribute), true), $"{type} is missing [ThreadAgnostic] attribute.");
                 }
             }
         }
@@ -197,10 +197,10 @@
         {
             // These class-names should be repaired with next major version bump
             // Do NOT add more incorrect class-names to this exlusion-list
-            HashSet<string> oldFaultyClassNames = new HashSet<string>()
-            {
+            HashSet<string> oldFaultyClassNames =
+            [
                 "MicrosoftConsoleLayoutRenderer",
-            };
+            ];
             foreach (Type type in allTypes)
             {
                 if (type.IsSubclassOf(typeof(LayoutRenderer)))
