@@ -90,43 +90,35 @@ namespace NLog.Extensions.Logging.Tests
 
             public async Task<string> SayHi()
             {
-                using (var scopeState = _logger.BeginScope("{World} People", "Earth"))
-                {
-                    await Task.Yield();
-                    _logger.LogInformation("Hi");
-                    return scopeState.ToString();
-                }
+                using var scopeState = _logger.BeginScope("{World} People", "Earth");
+                await Task.Yield();
+                _logger.LogInformation("Hi");
+                return scopeState.ToString();
             }
 
             public async Task<string> SayHiToEarth()
             {
-                using (var scopeState = _logger.BeginScope("{Planet} in {Galaxy}", "Earth", "Milky Way"))
-                {
-                    await Task.Yield();
-                    _logger.LogInformation("Hi");
-                    return scopeState.ToString();
-                }
+                using var scopeState = _logger.BeginScope("{Planet} in {Galaxy}", "Earth", "Milky Way");
+                await Task.Yield();
+                _logger.LogInformation("Hi");
+                return scopeState.ToString();
             }
 
             public async Task SayNothing()
             {
-                using (var scopeState = _logger.BeginScope(new Dictionary<string, string>()))
-                {
-                    await Task.Yield();
-                    _logger.LogInformation("Nothing");
-                }
+                using var scopeState = _logger.BeginScope(new Dictionary<string, string>());
+                await Task.Yield();
+                _logger.LogInformation("Nothing");
             }
 
             public async Task SaySomething()
             {
-                using (var scopeState = _logger.BeginScope(new Dictionary<string, object>()
+                using var scopeState = _logger.BeginScope(new Dictionary<string, object>()
                 {
                     { "Say", "Something" },
-                }))
-                {
-                    await Task.Yield();
-                    _logger.LogInformation("Say");
-                }
+                });
+                await Task.Yield();
+                _logger.LogInformation("Say");
             }
         }
 

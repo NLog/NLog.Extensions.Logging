@@ -47,16 +47,14 @@ namespace NLog.Extensions.Logging.Tests.Logging
             // Arrange
 
             // Act
-            using (var enumerator = _messageParameterList.GetEnumerator())
-            {
-                var list = new List<MessageTemplateParameter>();
-                while (enumerator.MoveNext())
-                    list.Add(enumerator.Current);
-                var array = list.ToArray();
+            using var enumerator = _messageParameterList.GetEnumerator();
+            var list = new List<MessageTemplateParameter>();
+            while (enumerator.MoveNext())
+                list.Add(enumerator.Current);
+            var array = list.ToArray();
 
-                // Assert
-                AssertParameters(array);
-            }
+            // Assert
+            AssertParameters(array);
         }
 
         [Fact]
